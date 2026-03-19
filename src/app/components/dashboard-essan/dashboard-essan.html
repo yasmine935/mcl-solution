@@ -1,0 +1,163 @@
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+       <h2>MCL Solutions</h2>
+      <p>{{ user.prenom }} {{ user.nom }}</p>
+      <span class="role-tag">Essan</span>
+    </div>
+    <nav>
+      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+        <mat-icon>dashboard</mat-icon> Dashboard
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
+        <mat-icon>beach_access</mat-icon> Congés
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
+        <mat-icon>people_alt</mat-icon> Employés
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
+        <mat-icon>support_agent</mat-icon> Tickets
+      </a>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Déconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h3>{{ getPageTitle() }}</h3>
+      <div class="user-info">
+        <mat-icon>account_circle</mat-icon>
+        <span>Bonjour, {{ user.prenom }} 👋</span>
+        <span class="role-badge">ESSAN</span>
+      </div>
+    </div>
+
+    <!-- Home -->
+    @if (currentPage === 'home') {
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>people_alt</mat-icon></div>
+          <div class="stat-info">
+            <h4>Total Employés</h4>
+            <p class="stat-number">{{ employes.length }}</p>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>beach_access</mat-icon></div>
+          <div class="stat-info">
+            <h4>Congés en cours</h4>
+            <p class="stat-number">{{ conges.filter(c => c.statut === 'APPROUVE').length }}</p>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>support_agent</mat-icon></div>
+          <div class="stat-info">
+            <h4>Tickets Ouverts</h4>
+            <p class="stat-number">{{ tickets.filter(t => t.statut === 'OUVERT').length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">
+        <mat-icon>info</mat-icon>
+        <p>📖 Vous avez accès en lecture seule aux données de l'entreprise.</p>
+      </div>
+    }
+
+    <!-- Congés -->
+    @if (currentPage === 'conges') {
+      <div class="table-card">
+        <h3>📋 Congés (Lecture seule)</h3>
+        @if (conges.length === 0) {
+          <div class="empty">Aucune donnée</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employé</th>
+                <th>Type</th>
+                <th>Date début</th>
+                <th>Date fin</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of conges; track c.id) {
+                <tr>
+                  <td>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</td>
+                  <td>{{ c.type }}</td>
+                  <td>{{ c.dateDebut }}</td>
+                  <td>{{ c.dateFin }}</td>
+                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- Employés -->
+    @if (currentPage === 'employes') {
+      <div class="table-card">
+        <h3>👥 Employés</h3>
+        @if (employes.length === 0) {
+          <div class="empty">Aucun employé</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Rôle</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (emp of employes; track emp.id) {
+                <tr>
+                  <td>{{ emp.prenom }} {{ emp.nom }}</td>
+                  <td>{{ emp.email }}</td>
+                  <td>{{ emp.telephone }}</td>
+                  <td><span class="badge-role">{{ emp.role }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- Tickets -->
+    @if (currentPage === 'tickets') {
+      <div class="table-card">
+        <h3>🎫 Tickets (Lecture seule)</h3>
+        @if (tickets.length === 0) {
+          <div class="empty">Aucun ticket</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Statut</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ticket of tickets; track ticket.id) {
+                <tr>
+                  <td>{{ ticket.titre }}</td>
+                  <td><span [class]="'badge ' + ticket.statut?.toLowerCase()">{{ ticket.statut }}</span></td>
+                  <td>{{ ticket.date }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+  </div>
+</div>

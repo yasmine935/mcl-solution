@@ -1,0 +1,316 @@
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+       <h2>MCL Solutions</h2>
+      <p>{{ user.prenom }} {{ user.nom }}</p>
+      <span class="role-tag">Aurelien</span>
+    </div>
+    <nav>
+      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+        <mat-icon>dashboard</mat-icon> Dashboard
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
+        <mat-icon>engineering</mat-icon> Interventions
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
+        <mat-icon>folder_open</mat-icon> GED
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
+        <mat-icon>support_agent</mat-icon> Tickets
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'rh'" (click)="currentPage = 'rh'">
+        <mat-icon>people_alt</mat-icon> RH
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'conges-valider'" (click)="currentPage = 'conges-valider'">
+        <mat-icon>fact_check</mat-icon> Congés à Valider
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
+        <mat-icon>beach_access</mat-icon> Mes Congés
+      </a>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Déconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h3>{{ getPageTitle() }}</h3>
+      <div class="user-info">
+        <mat-icon>account_circle</mat-icon>
+        <span>Bonjour, {{ user.prenom }} 👋</span>
+        <span class="role-badge">AURELIEN</span>
+      </div>
+    </div>
+
+    <!-- Home -->
+    @if (currentPage === 'home') {
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>engineering</mat-icon></div>
+          <div class="stat-info">
+            <h4>Interventions</h4>
+            <p class="stat-number">{{ interventions.length }}</p>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>fact_check</mat-icon></div>
+          <div class="stat-info">
+            <h4>Congés en attente</h4>
+            <p class="stat-number">{{ tousLesConges.length }}</p>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>folder_open</mat-icon></div>
+          <div class="stat-info">
+            <h4>Documents (GED)</h4>
+            <p class="stat-number">{{ documents.length }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Interventions -->
+    @if (currentPage === 'interventions') {
+      <div class="table-card">
+        <h3>🔧 Gestion des Interventions</h3>
+        <div class="coming-soon">
+          <mat-icon>construction</mat-icon>
+          <h3>Fiche d'Intervention Manager</h3>
+          <p>Interface de gestion et création des fiches d'intervention</p>
+        </div>
+      </div>
+    }
+
+    <!-- GED -->
+    @if (currentPage === 'ged') {
+      <div class="table-card">
+        <h3>📁 GED - Gestion Électronique Documentaire</h3>
+        @if (documents.length === 0) {
+          <div class="empty">Aucun document</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom du document</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (doc of documents; track doc.id) {
+                <tr>
+                  <td>{{ doc.nom }}</td>
+                  <td><span class="badge-type">{{ doc.type }}</span></td>
+                  <td>{{ doc.date }}</td>
+                  <td>
+                    <button mat-icon-button color="primary">
+                      <mat-icon>download</mat-icon>
+                    </button>
+                    <button mat-icon-button color="accent">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- Tickets -->
+    @if (currentPage === 'tickets') {
+      <div class="table-card">
+        <h3>🎫 Tickets Support</h3>
+        @if (tickets.length === 0) {
+          <div class="empty">Aucun ticket</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Statut</th>
+                <th>Priorité</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ticket of tickets; track ticket.id) {
+                <tr>
+                  <td>{{ ticket.titre }}</td>
+                  <td><span [class]="'badge ' + ticket.statut?.toLowerCase()">{{ ticket.statut }}</span></td>
+                  <td>
+                    <span [class]="'badge-priority ' + ticket.priorite?.toLowerCase()">
+                      {{ ticket.priorite }}
+                    </span>
+                  </td>
+                  <td>{{ ticket.date }}</td>
+                  <td>
+                    <button mat-icon-button color="primary">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="accent">
+                      <mat-icon>check_circle</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- RH -->
+    @if (currentPage === 'rh') {
+      <div class="table-card">
+        <h3>👥 Ressources Humaines</h3>
+        @if (employes.length === 0) {
+          <div class="empty">Aucun employé</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Poste</th>
+                <th>Département</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (emp of employes; track emp.id) {
+                <tr>
+                  <td>{{ emp.prenom }} {{ emp.nom }}</td>
+                  <td>{{ emp.poste }}</td>
+                  <td>{{ emp.departement }}</td>
+                  <td>{{ emp.email }}</td>
+                  <td>{{ emp.telephone }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- Congés à Valider -->
+    @if (currentPage === 'conges-valider') {
+      <div class="table-card">
+        <h3>📋 Congés à Valider</h3>
+        @if (tousLesConges.length === 0) {
+          <div class="empty">Aucune demande de congé</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employé</th>
+                <th>Type</th>
+                <th>Date début</th>
+                <th>Date fin</th>
+                <th>Motif</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of tousLesConges; track c.id) {
+                <tr>
+                  <td>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</td>
+                  <td>{{ c.type }}</td>
+                  <td>{{ c.dateDebut }}</td>
+                  <td>{{ c.dateFin }}</td>
+                  <td>{{ c.motif }}</td>
+                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+                  <td>
+                    @if (c.statut !== 'APPROUVE') {
+                      <button mat-icon-button color="primary" (click)="updateStatut(c.id, 'APPROUVE')" title="Approuver">
+                        <mat-icon>check_circle</mat-icon>
+                      </button>
+                    }
+                    @if (c.statut !== 'REFUSE') {
+                      <button mat-icon-button color="warn" (click)="updateStatut(c.id, 'REFUSE')" title="Refuser">
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- Mes Congés -->
+    @if (currentPage === 'mes-conges') {
+      <div class="table-card">
+        <div class="page-header">
+          <h3>🏖️ Mes Congés</h3>
+          <button mat-raised-button color="primary" (click)="showCongeForm = !showCongeForm">
+            <mat-icon>add</mat-icon> Nouvelle demande
+          </button>
+        </div>
+        @if (showCongeForm) {
+          <div class="form-card">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Date début</mat-label>
+                <input matInput type="date" [(ngModel)]="conge.dateDebut"/>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date fin</mat-label>
+                <input matInput type="date" [(ngModel)]="conge.dateFin"/>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="conge.type">
+                  <mat-option value="ANNUEL">Congé annuel</mat-option>
+                  <mat-option value="MALADIE">Congé maladie</mat-option>
+                  <mat-option value="SANS_SOLDE">Sans solde</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Motif</mat-label>
+                <input matInput [(ngModel)]="conge.motif"/>
+              </mat-form-field>
+            </div>
+            <div class="form-actions">
+              <button mat-raised-button color="primary" (click)="deposerConge()">
+                <mat-icon>send</mat-icon> Envoyer
+              </button>
+              <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
+            </div>
+          </div>
+        }
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Date début</th>
+              <th>Date fin</th>
+              <th>Motif</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of conges; track c.id) {
+              <tr>
+                <td>{{ c.type }}</td>
+                <td>{{ c.dateDebut }}</td>
+                <td>{{ c.dateFin }}</td>
+                <td>{{ c.motif }}</td>
+                <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

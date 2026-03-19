@@ -1,0 +1,305 @@
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>MCL Solutions</h2>
+      <p>{{ user.prenom }} {{ user.nom }}</p>
+    </div>
+    <nav>
+      <a class="nav-item active">
+        <mat-icon>dashboard</mat-icon> Mon Dashboard
+      </a>
+      <a class="nav-item" (click)="currentPage = 'interventions'">
+        <mat-icon>engineering</mat-icon> Mes Interventions
+      </a>
+      <a class="nav-item" (click)="currentPage = 'conges'">
+        <mat-icon>beach_access</mat-icon> Mes Congés
+      </a>
+      <a class="nav-item" (click)="currentPage = 'fiche'">
+        <mat-icon>description</mat-icon> Fiche de travail
+      </a>
+      <a class="nav-item" (click)="currentPage = 'reclamation'">
+        <mat-icon>report_problem</mat-icon> Réclamation
+      </a>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Déconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Header -->
+    <div class="header">
+      <h3>{{ getPageTitle() }}</h3>
+      <div class="user-info">
+        <mat-icon>account_circle</mat-icon>
+        <span>Bonjour, {{ user.prenom }} 👋</span>
+        <span class="role-badge">{{ user.role }}</span>
+      </div>
+    </div>
+
+    <!-- Dashboard principal -->
+    @if (currentPage === 'home') {
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>engineering</mat-icon></div>
+          <div class="stat-info">
+            <h4>Mes interventions</h4>
+            <p class="stat-number">{{ interventions.length }}</p>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>beach_access</mat-icon></div>
+          <div class="stat-info">
+            <h4>Mes congés</h4>
+            <p class="stat-number">{{ conges.length }}</p>
+          </div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><mat-icon>report_problem</mat-icon></div>
+          <div class="stat-info">
+            <h4>Réclamations</h4>
+            <p class="stat-number">{{ reclamations.length }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Mes Interventions -->
+    @if (currentPage === 'interventions') {
+      <div class="table-card">
+        <h3>🔧 Mes Interventions</h3>
+        @if (interventions.length === 0) {
+          <div class="empty">Aucune intervention pour l'instant</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Description</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (i of interventions; track i.id) {
+                <tr>
+                  <td>{{ i.client }}</td>
+                  <td>{{ i.date }}</td>
+                  <td><span [class]="'badge ' + i.statut?.toLowerCase()">{{ i.statut }}</span></td>
+                  <td>{{ i.description }}</td>
+                  <td>
+                    <button mat-icon-button color="primary" (click)="ouvrirFiche(i.id)" title="Ouvrir la fiche">
+                      <mat-icon>open_in_new</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- Mes Congés -->
+    @if (currentPage === 'conges') {
+      <div class="table-card">
+        <div class="page-header">
+          <h3>🏖️ Mes Congés</h3>
+          <button mat-raised-button color="primary" (click)="showCongeForm = !showCongeForm">
+            <mat-icon>add</mat-icon> Nouvelle demande
+          </button>
+        </div>
+
+        @if (showCongeForm) {
+          <div class="form-card">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Date début</mat-label>
+                <input matInput type="date" [(ngModel)]="conge.dateDebut"/>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date fin</mat-label>
+                <input matInput type="date" [(ngModel)]="conge.dateFin"/>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="conge.type">
+                  <mat-option value="ANNUEL">Congé annuel</mat-option>
+                  <mat-option value="Rtt">Congé Rtt</mat-option>
+                  <mat-option value="SANS_SOLDE">Sans solde</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Motif</mat-label>
+                <input matInput [(ngModel)]="conge.motif"/>
+              </mat-form-field>
+            </div>
+            <div class="form-actions">
+              <button mat-raised-button color="primary" (click)="deposerConge()">
+                <mat-icon>send</mat-icon> Envoyer
+              </button>
+              <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
+            </div>
+          </div>
+        }
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Date début</th>
+              <th>Date fin</th>
+              <th>Motif</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of conges; track c.id) {
+              <tr>
+                <td>{{ c.type }}</td>
+                <td>{{ c.dateDebut }}</td>
+                <td>{{ c.dateFin }}</td>
+                <td>{{ c.motif }}</td>
+                <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- Fiche de travail -->
+    @if (currentPage === 'fiche') {
+      <div class="table-card">
+        <h3>📋 Ma Fiche de Travail</h3>
+        <div class="fiche-info">
+          <div class="fiche-item">
+            <span class="label">Nom complet</span>
+            <span class="value">{{ user.nom }} {{ user.prenom }}</span>
+          </div>
+          <div class="fiche-item">
+            <span class="label">Poste</span>
+            <span class="value">{{ user.poste || 'Non défini' }}</span>
+          </div>
+          <div class="fiche-item">
+            <span class="label">Département</span>
+            <span class="value">{{ user.departement || 'Non défini' }}</span>
+          </div>
+          <div class="fiche-item">
+            <span class="label">Email</span>
+            <span class="value">{{ user.email || 'Non défini' }}</span>
+          </div>
+          <div class="fiche-item">
+            <span class="label">Téléphone</span>
+            <span class="value">{{ user.telephone || 'Non défini' }}</span>
+          </div>
+          <div class="fiche-item">
+            <span class="label">Rôle</span>
+            <span class="value">{{ user.role }}</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Réclamation (UNIQUE) -->
+    @if (currentPage === 'reclamation') {
+      <div class="table-card">
+        <div class="page-header">
+          <h3>⚠️ Mes Réclamations</h3>
+          <button mat-raised-button color="warn" (click)="showReclamationForm = !showReclamationForm">
+            <mat-icon>add</mat-icon> Nouvelle réclamation
+          </button>
+        </div>
+
+        @if (showReclamationForm) {
+          <div class="form-card">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Sujet</mat-label>
+              <input matInput [(ngModel)]="reclamation.sujet" placeholder="Ex: Risque d'effondrement"/>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput rows="4" [(ngModel)]="reclamation.description" placeholder="Décris le problème en détail..."></textarea>
+            </mat-form-field>
+
+            <!-- Section Photos -->
+            <div class="photo-upload-section">
+              <label style="font-weight: 600; color: #1565C0; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <mat-icon>photo_camera</mat-icon> Prendre des photos de la situation
+              </label>
+              
+              <input type="file" multiple accept="image/*" (change)="onPhotoSelectReclamation($event)" style="display: none" #fileInputReclamation/>
+              
+              <button type="button" mat-raised-button color="accent" (click)="fileInputReclamation.click()" style="width: 100%;">
+                <mat-icon>add_a_photo</mat-icon> Ajouter des photos
+              </button>
+
+              @if (photosReclamation.length > 0) {
+                <div class="photos-preview" style="margin-top: 15px;">
+                  <div style="font-size: 12px; color: #666; margin-bottom: 10px; font-weight: 600;">
+                    {{ photosReclamation.length }} photo(s) sélectionnée(s)
+                  </div>
+                  @for (photo of photosReclamation; track $index) {
+                    <div class="photo-preview-item">
+                      <span style="flex: 1;">{{ photo.nom }}</span>
+                      <button type="button" (click)="supprimerPhotoReclamation($index)" class="btn-remove-photo">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="form-actions">
+              <button mat-raised-button color="warn" (click)="envoyerReclamationAvecPhotos()">
+                <mat-icon>send</mat-icon> Envoyer
+              </button>
+              <button mat-stroked-button (click)="showReclamationForm = false">Annuler</button>
+            </div>
+          </div>
+        }
+
+        <!-- Liste des Réclamations -->
+        @if (reclamations.length === 0) {
+          <p class="empty">Aucune réclamation</p>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sujet</th>
+                <th>Description</th>
+                <th>Photos</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rec of reclamations; track rec.id) {
+                <tr>
+                  <td><strong>{{ rec.sujet }}</strong></td>
+                  <td>{{ rec.description }}</td>
+                  <td style="text-align: center;">
+                    @if (rec.photos && rec.photos.length > 0) {
+                      <span style="background: #e3f2fd; color: #1565C0; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                        {{ rec.photos.length }} 📸
+                      </span>
+                    } @else {
+                      <span style="color: #ccc;">-</span>
+                    }
+                  </td>
+                  <td><span class="badge" style="background: #FF9800; color: white;">{{ rec.statut }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+  </div>
+</div>

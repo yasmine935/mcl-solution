@@ -1,0 +1,38 @@
+<div class="login-page">
+  <!-- Côté gauche — Image -->
+  <div class="login-image">
+    <div class="overlay">
+      <h1>MCL Solutions</h1>
+      <p>Votre espace de travail intelligent</p>
+    </div>
+  </div>
+
+  <!-- Côté droit — Formulaire -->
+  <div class="login-form-side">
+    <div class="login-form-container">
+      <img src="assets/logo.png" alt="logo" class="logo" onerror="this.style.display='none'"/>
+      <h2>MCL Solutions</h2>
+      <h3>Connectez-vous à votre compte</h3>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Nom d'utilisateur</mat-label>
+        <input matInput [(ngModel)]="username" placeholder="Entrez votre username"/>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Mot de passe</mat-label>
+        <input matInput type="password" [(ngModel)]="password" placeholder="Entrez votre mot de passe"/>
+      </mat-form-field>
+
+      <a class="forgot">Mot de passe oublié ?</a>
+
+      @if (errorMessage) {
+        <div class="error-msg">{{ errorMessage }}</div>
+      }
+
+      <button mat-raised-button color="primary" (click)="login()" class="full-width login-btn">
+        Se connecter
+      </button>
+    </div>
+  </div>
+</div>

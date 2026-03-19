@@ -1,0 +1,273 @@
+.fiche-tech-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.fiche-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.fiche-header h2 {
+  color: #1565C0;
+  font-size: 24px;
+  margin: 0;
+}
+
+.badge-role {
+  background: #e3f2fd;
+  color: #1565C0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fiche-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header {
+  background: #f5f7fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #1565C0;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.section-header h3 {
+  color: #1565C0;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.section-header p {
+  color: #555;
+  font-size: 13px;
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #1565C0;
+  background: #f5f9ff;
+}
+
+.readonly-input {
+  background: #f5f7fa !important;
+  color: #555;
+}
+
+.tech-input {
+  border: 2px solid #1565C0;
+  padding: 8px 12px;
+}
+
+.dropdown {
+  border: 2px solid #1565C0 !important;
+  padding: 8px 12px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.checkbox-grid label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.checkbox-grid input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkbox-grid input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.photo-upload {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.btn-selection {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.btn-selection:hover {
+  background: #f5f7fa;
+  border-color: #1565C0;
+  color: #1565C0;
+}
+
+.photos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.photo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f5f7fa;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.btn-delete {
+  background: #ffebee;
+  color: #c62828;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-delete:hover {
+  background: #ffcdd2;
+}
+
+.signature-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 20px 0;
+}
+
+.signature-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.signature-box label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.signature-placeholder {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 60px 20px;
+  text-align: center;
+  color: #ccc;
+  font-size: 12px;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.btn-envoyer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-envoyer:hover {
+  background: #45a049;
+}
+
+.btn-envoyer mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.btn-annuler {
+  padding: 12px 24px;
+  background: white;
+  color: #555;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-annuler:hover {
+  background: #f5f7fa;
+  border-color: #1565C0;
+  color: #1565C0;
+}

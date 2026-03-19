@@ -1,0 +1,206 @@
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+       <h2>MCL Solutions</h2>
+      <p>{{ user.prenom }} {{ user.nom }}</p>
+      <span class="role-tag">Technicien Sup</span>
+    </div>
+    <nav>
+      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+        <mat-icon>dashboard</mat-icon> Dashboard
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
+        <mat-icon>engineering</mat-icon> Interventions
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+        <mat-icon>calendar_month</mat-icon> Planning
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'crm'" (click)="currentPage = 'crm'">
+        <mat-icon>people_alt</mat-icon> CRM
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'stock'" (click)="currentPage = 'stock'">
+        <mat-icon>inventory</mat-icon> Stock
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
+        <mat-icon>shopping_cart</mat-icon> Commandes Achat
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'conges-tech'" (click)="currentPage = 'conges-tech'">
+        <mat-icon>fact_check</mat-icon> Congés Techniciens
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
+        <mat-icon>beach_access</mat-icon> Mes Congés
+      </a>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Déconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h3>{{ getPageTitle() }}</h3>
+      <div class="user-info">
+        <mat-icon>account_circle</mat-icon>
+        <span>Bonjour, {{ user.prenom }} 👋</span>
+        <span class="role-badge">TECHNICIEN SUP</span>
+      </div>
+    </div>
+
+    <!-- Home -->
+    @if (currentPage === 'home') {
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><mat-icon>engineering</mat-icon></div>
+          <div class="stat-info">
+            <h4>Interventions</h4>
+            <p class="stat-number">{{ interventions.length }}</p>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><mat-icon>fact_check</mat-icon></div>
+          <div class="stat-info">
+            <h4>Congés en attente</h4>
+            <p class="stat-number">{{ tousLesConges.length }}</p>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><mat-icon>beach_access</mat-icon></div>
+          <div class="stat-info">
+            <h4>Mes congés</h4>
+            <p class="stat-number">{{ conges.length }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Congés Techniciens -->
+    @if (currentPage === 'conges-tech') {
+      <div class="table-card">
+        <h3>📋 Congés des Techniciens</h3>
+        @if (tousLesConges.length === 0) {
+          <div class="empty">Aucune demande de congé</div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employé</th>
+                <th>Type</th>
+                <th>Date début</th>
+                <th>Date fin</th>
+                <th>Motif</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of tousLesConges; track c.id) {
+                <tr>
+                  <td>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</td>
+                  <td>{{ c.type }}</td>
+                  <td>{{ c.dateDebut }}</td>
+                  <td>{{ c.dateFin }}</td>
+                  <td>{{ c.motif }}</td>
+                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+                  <td>
+                    @if (c.statut !== 'APPROUVE') {
+                      <button mat-icon-button color="primary" (click)="updateStatut(c.id, 'APPROUVE')">
+                        <mat-icon>check_circle</mat-icon>
+                      </button>
+                    }
+                    @if (c.statut !== 'EN_ATTENTE') {
+                      <button mat-icon-button color="accent" (click)="updateStatut(c.id, 'EN_ATTENTE')">
+                        <mat-icon>hourglass_empty</mat-icon>
+                      </button>
+                    }
+                    @if (c.statut !== 'REFUSE') {
+                      <button mat-icon-button color="warn" (click)="updateStatut(c.id, 'REFUSE')">
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- Mes Congés -->
+    @if (currentPage === 'mes-conges') {
+      <div class="table-card">
+        <div class="page-header">
+          <h3>🏖️ Mes Congés</h3>
+          <button mat-raised-button color="primary" (click)="showCongeForm = !showCongeForm">
+            <mat-icon>add</mat-icon> Nouvelle demande
+          </button>
+        </div>
+        @if (showCongeForm) {
+          <div class="form-card">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Date début</mat-label>
+                <input matInput type="date" [(ngModel)]="conge.dateDebut"/>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date fin</mat-label>
+                <input matInput type="date" [(ngModel)]="conge.dateFin"/>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="conge.type">
+                  <mat-option value="ANNUEL">Congé annuel</mat-option>
+                  <mat-option value="MALADIE">Congé maladie</mat-option>
+                  <mat-option value="SANS_SOLDE">Sans solde</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Motif</mat-label>
+                <input matInput [(ngModel)]="conge.motif"/>
+              </mat-form-field>
+            </div>
+            <div class="form-actions">
+              <button mat-raised-button color="primary" (click)="deposerConge()">
+                <mat-icon>send</mat-icon> Envoyer
+              </button>
+              <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
+            </div>
+          </div>
+        }
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Date début</th>
+              <th>Date fin</th>
+              <th>Motif</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of conges; track c.id) {
+              <tr>
+                <td>{{ c.type }}</td>
+                <td>{{ c.dateDebut }}</td>
+                <td>{{ c.dateFin }}</td>
+                <td>{{ c.motif }}</td>
+                <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- Pages en construction -->
+    @if (currentPage === 'interventions' || currentPage === 'planning' || currentPage === 'crm' || currentPage === 'stock' || currentPage === 'commandes') {
+      <div class="coming-soon">
+        <mat-icon>construction</mat-icon>
+        <h3>Module en cours de développement</h3>
+        <p>Cette fonctionnalité sera disponible prochainement</p>
+      </div>
+    }
+  </div>
+</div>

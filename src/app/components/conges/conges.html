@@ -1,0 +1,81 @@
+<div class="conges-container">
+  <div class="page-header">
+    <h2>🏖️ Gestion des Congés</h2>
+  </div>
+
+  <div class="table-card">
+    @if (conges.length === 0) {
+      <div class="empty">Aucune demande de congé pour l'instant</div>
+    } @else {
+      <table mat-table [dataSource]="conges" class="full-width">
+
+        <ng-container matColumnDef="employe">
+          <th mat-header-cell *matHeaderCellDef>Employé</th>
+          <td mat-cell *matCellDef="let c">
+            {{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let c">{{ c.type }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="dateDebut">
+          <th mat-header-cell *matHeaderCellDef>Date début</th>
+          <td mat-cell *matCellDef="let c">{{ c.dateDebut }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="dateFin">
+          <th mat-header-cell *matHeaderCellDef>Date fin</th>
+          <td mat-cell *matCellDef="let c">{{ c.dateFin }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="motif">
+          <th mat-header-cell *matHeaderCellDef>Motif</th>
+          <td mat-cell *matCellDef="let c">{{ c.motif }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="statut">
+          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <td mat-cell *matCellDef="let c">
+            <span [class]="'badge ' + c.statut?.toLowerCase()">
+              {{ c.statut }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let c">
+            @if (c.statut !== 'APPROUVE') {
+              <button mat-icon-button color="primary" 
+                (click)="approuver(c.id)" title="Approuver">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+            }
+            @if (c.statut !== 'EN_ATTENTE') {
+              <button mat-icon-button color="accent" 
+                (click)="enAttente(c.id)" title="En attente">
+                <mat-icon>hourglass_empty</mat-icon>
+              </button>
+            }
+            @if (c.statut !== 'REFUSE') {
+              <button mat-icon-button color="warn" 
+                (click)="refuser(c.id)" title="Refuser">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            }
+            <button mat-icon-button color="warn" 
+              (click)="delete(c.id)" title="Supprimer">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    }
+  </div>
+</div>

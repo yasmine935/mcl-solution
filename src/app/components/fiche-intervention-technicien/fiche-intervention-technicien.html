@@ -1,0 +1,162 @@
+<div class="fiche-tech-container">
+  <div class="fiche-header">
+    <h2>📋 Fiche d'Intervention Technicien</h2>
+    <span class="badge-role">{{ intervention.client }}</span>
+  </div>
+
+  <div class="fiche-content">
+    <!-- Client + Code Client -->
+    <div class="section-header">
+      <h3>Client + code client</h3>
+      <p>{{ intervention.client }} - {{ intervention.codeClient }}</p>
+    </div>
+
+    <!-- N° Projet -->
+    <div class="form-group">
+      <label>N° de Projet</label>
+      <input type="text" [(ngModel)]="intervention.numeroProjet" readonly class="readonly-input"/>
+    </div>
+
+    <!-- Heure Début -->
+    <div class="form-group">
+      <label>Heure de Début</label>
+      <input type="time" [(ngModel)]="form.heureDebut"/>
+    </div>
+
+    <!-- Coordonnées -->
+    <div class="section-header">
+      <h3>Coordonnées de l'Intervention :</h3>
+      <p><strong>Adresse :</strong> {{ intervention.adresse }}</p>
+      <p><strong>N° de tel :</strong> {{ intervention.numTel }}</p>
+      <p><strong>Horaire d'ouverture :</strong> {{ intervention.contactSurSite }}</p>
+      <p><strong>Contact sur site :</strong> {{ intervention.contactSurSite }}</p>
+    </div>
+
+    <!-- Intervenants -->
+    <div class="form-group">
+      <label>Intervenants</label>
+      <input type="text" [(ngModel)]="form.intervenants" placeholder="Nom du Technicien" class="tech-input"/>
+    </div>
+
+    <!-- Matériel Hors Standard -->
+    <div class="form-group">
+      <label>Matériel hors Standard</label>
+      <select class="dropdown">
+        <option>Testeur</option>
+        <option>Nacelle</option>
+        <option>Dérouleur</option>
+      </select>
+    </div>
+
+    <!-- Articles et Ref -->
+    <div class="section-header">
+      <h3>Articles et Ref</h3>
+    </div>
+
+    <div class="checkbox-grid">
+      @for (article of ['Câbles xxx Ref xxx', 'Camera xxx Ref xxx']; track $index) {
+        <label>
+          <input type="checkbox"/>
+          {{ article }}
+        </label>
+      }
+    </div>
+
+    <!-- Documents -->
+    <div class="checkbox-grid">
+      <label>
+        <input type="checkbox" [(ngModel)]="form.taches.installationCameras"/>
+        Plan de Prévention
+      </label>
+      <label>
+        <input type="checkbox"/>
+        Fiche de Sécurité
+      </label>
+      <input type="text" placeholder="Doc PdP"/>
+      <input type="text" placeholder="Doc FdS"/>
+    </div>
+
+    <!-- Description des Tâches -->
+    <div class="section-header">
+      <h3>Description des taches</h3>
+    </div>
+
+    <div class="checkbox-grid">
+      <label>
+        <input type="checkbox" [(ngModel)]="form.taches.installationCameras"/>
+        Installation des caméras
+      </label>
+      <label>
+        <input type="checkbox" [(ngModel)]="form.taches.misEnPlaceSupportMural"/>
+        Mise en place support mural
+      </label>
+      <label>
+        <input type="checkbox" [(ngModel)]="form.taches.fixationTV"/>
+        Fixation TV 65" sur Support
+      </label>
+      <label>
+        <input type="checkbox" [(ngModel)]="form.taches.connectique"/>
+        Connectique et Paramétrage
+      </label>
+      <label>
+        <input type="checkbox" [(ngModel)]="form.taches.testValidation"/>
+        Test et Validation
+      </label>
+    </div>
+
+    <!-- Photos -->
+    <div class="section-header">
+      <h3>Photos</h3>
+      <div class="photo-upload">
+        <input type="file" multiple accept="image/*" (change)="onPhotoSelect($event)" style="display: none" #fileInput/>
+        <button type="button" (click)="fileInput.click()" class="btn-selection">Sélection</button>
+      </div>
+      @if (photos.length > 0) {
+        <div class="photos-list">
+          @for (photo of photos; track $index) {
+            <div class="photo-item">
+              <span>{{ photo.nom }}</span>
+              <button type="button" (click)="supprimerPhoto($index)" class="btn-delete">✕</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Date et Heure -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" [(ngModel)]="intervention.dateIntervention" readonly class="readonly-input"/>
+      </div>
+      <div class="form-group">
+        <label>Heure de fin</label>
+        <input type="time" [(ngModel)]="form.heureFin"/>
+      </div>
+    </div>
+
+    <!-- Validation et Signature -->
+    <div class="section-header">
+      <h3>Validation et Signature</h3>
+    </div>
+
+    <div class="signature-section">
+      <div class="signature-box">
+        <label>Signature du Client</label>
+        <div class="signature-placeholder">__________________</div>
+      </div>
+      <div class="signature-box">
+        <label>Signature du Technicien</label>
+        <div class="signature-placeholder">__________________</div>
+      </div>
+    </div>
+
+    <!-- Bouton Envoyer -->
+    <div class="form-actions">
+      <button class="btn-envoyer" (click)="envoyerFiche()">
+        <mat-icon>send</mat-icon> Envoyer
+      </button>
+      <button class="btn-annuler" (click)="annuler()">Annuler</button>
+    </div>
+  </div>
+</div>
