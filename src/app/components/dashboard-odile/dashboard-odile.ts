@@ -28,21 +28,24 @@ export class DashboardOdile implements OnInit {
     return this._currentPage;
   }
   set currentPage(value: string) {
+    this.fermerDetailFiche();
     this.fermerDetailReclamation();
     this._currentPage = value;
   }
 
   showCongeForm = false;
+  showDetailModal = false;
   showReclamationDetailModal = false;
-  selectedReclamation: any = null;
 
-  tousLesConges: any[] = [];
   conges: any[] = [];
   employes: any[] = [];
   documents: any[] = [];
   tickets: any[] = [];
   factures: any[] = [];
   reclamations: any[] = [];
+  fiches: any[] = [];
+  selectedFiche: any = null;
+  selectedReclamation: any = null;
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
 
@@ -60,17 +63,12 @@ export class DashboardOdile implements OnInit {
     this.loadTickets();
     this.loadFactures();
     this.loadReclamations();
+    this.loadFiches();
   }
 
   loadConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges')
-      .subscribe(data => {
-        this.tousLesConges = data;
-        this.conges = data.filter(c => c.utilisateur?.id === this.user.id);
-      }, error => {
-        this.tousLesConges = [];
-        this.conges = [];
-      });
+    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
+      .subscribe(data => this.conges = data, error => this.conges = []);
   }
 
   loadEmployes() {
@@ -81,7 +79,6 @@ export class DashboardOdile implements OnInit {
   loadReclamations() {
     const stored = localStorage.getItem('reclamations');
     const toutesReclamations = stored ? JSON.parse(stored) : [];
-    // Odile voit TOUTES les réclamations
     this.reclamations = toutesReclamations;
   }
 
@@ -115,10 +112,17 @@ export class DashboardOdile implements OnInit {
     ];
   }
 
+  loadFiches() {
+    const stored = localStorage.getItem('interventions');
+    const toutesLesInterventions = stored ? JSON.parse(stored) : [];
+    this.fiches = toutesLesInterventions;
+  }
+
   deposerConge() {
     const demande = {
       ...this.conge,
-      utilisateur: { id: this.user.id }
+      utilisateur: { id: this.user.id },
+      manager: { id: 4 } // Ferid
     };
     this.http.post('http://localhost:8080/api/conges', demande)
       .subscribe(() => {
@@ -128,9 +132,14 @@ export class DashboardOdile implements OnInit {
       }, error => console.error('Erreur', error));
   }
 
-  updateStatut(id: number, statut: string) {
-    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
-      .subscribe(() => this.loadConges(), error => console.error('Erreur', error));
+  ouvrirDetailFiche(fiche: any) {
+    this.selectedFiche = fiche;
+    this.showDetailModal = true;
+  }
+
+  fermerDetailFiche() {
+    this.showDetailModal = false;
+    this.selectedFiche = null;
   }
 
   ouvrirDetailReclamation(reclamation: any) {
@@ -146,12 +155,12 @@ export class DashboardOdile implements OnInit {
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Tableau de Bord';
+      case 'fiches': return 'Fiches d\'Intervention';
       case 'interventions': return 'Interventions';
       case 'ged': return 'GED';
       case 'tickets': return 'Tickets';
       case 'rh': return 'Ressources Humaines';
       case 'factures': return 'Factures';
-      case 'conges-valider': return 'Congés à Valider';
       case 'mes-conges': return 'Mes Congés';
       case 'remonteesTerrain': return 'Remontées Terrain';
       default: return 'Odile Dashboard';

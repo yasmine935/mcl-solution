@@ -2,13 +2,16 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
-       <h2>MCL Solutions</h2>
+      <h2>MCL Solutions</h2>
       <p>{{ user.prenom }} {{ user.nom }}</p>
-      <span class="role-tag">Odile</span>
+      <span class="role-tag">ODILE</span>
     </div>
     <nav>
       <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
         <mat-icon>dashboard</mat-icon> Dashboard
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'fiches'" (click)="currentPage = 'fiches'">
+        <mat-icon>description</mat-icon> Fiches d'Intervention
       </a>
       <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
         <mat-icon>engineering</mat-icon> Interventions
@@ -25,15 +28,12 @@
       <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
         <mat-icon>receipt</mat-icon> Factures
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'conges-valider'" (click)="currentPage = 'conges-valider'">
-        <mat-icon>fact_check</mat-icon> Congés à Valider
+      <a class="nav-item" [class.active]="currentPage === 'remonteesTerrain'" (click)="currentPage = 'remonteesTerrain'">
+        <mat-icon>report_problem</mat-icon> Remontées Terrain
       </a>
       <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
-<a class="nav-item" [class.active]="currentPage === 'remonteesTerrain'" (click)="currentPage = 'remonteesTerrain'">
-  <mat-icon>report_problem</mat-icon> Remontées Terrain
-</a>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
@@ -62,19 +62,58 @@
           </div>
         </div>
         <div class="stat-card orange">
-          <div class="stat-icon"><mat-icon>fact_check</mat-icon></div>
+          <div class="stat-icon"><mat-icon>description</mat-icon></div>
           <div class="stat-info">
-            <h4>Congés en attente</h4>
-            <p class="stat-number">{{ tousLesConges.length }}</p>
+            <h4>Fiches</h4>
+            <p class="stat-number">{{ fiches.length }}</p>
           </div>
         </div>
         <div class="stat-card green">
           <div class="stat-icon"><mat-icon>support_agent</mat-icon></div>
           <div class="stat-info">
-            <h4>Tickets à traiter</h4>
+            <h4>Tickets</h4>
             <p class="stat-number">{{ tickets.length }}</p>
           </div>
         </div>
+      </div>
+    }
+
+    <!-- Fiches d'Intervention -->
+    @if (currentPage === 'fiches') {
+      <div class="table-card">
+        <h3>📋 Fiches d'Intervention ({{ fiches.length }})</h3>
+        @if (fiches.length === 0) {
+          <p class="empty">Aucune fiche d'intervention</p>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>N° Projet</th>
+                <th>Client</th>
+                <th>Technicien</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fiche of fiches; track fiche.id) {
+                <tr>
+                  <td><strong>{{ fiche.numero }}</strong></td>
+                  <td>{{ fiche.client }}</td>
+                  <td>{{ fiche.technicienNom || '-' }}</td>
+                  <td>{{ fiche.date }}</td>
+                  <td><span [class]="'badge ' + fiche.statut?.toLowerCase()">{{ fiche.statut }}</span></td>
+                  <td>
+                    <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" title="Voir détails">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
     }
 
@@ -259,45 +298,46 @@
       </div>
     }
 
-    <!-- Congés à Valider -->
-    @if (currentPage === 'conges-valider') {
+    <!-- Remontées Terrain -->
+    @if (currentPage === 'remonteesTerrain') {
       <div class="table-card">
-        <h3>📋 Congés à Valider (Tous)</h3>
-        @if (tousLesConges.length === 0) {
-          <div class="empty">Aucune demande de congé</div>
+        <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
+        @if (reclamations.length === 0) {
+          <p class="empty">Aucune remontée terrain</p>
         } @else {
           <table class="data-table">
             <thead>
               <tr>
-                <th>Employé</th>
-                <th>Type</th>
-                <th>Date début</th>
-                <th>Date fin</th>
-                <th>Motif</th>
+                <th>Technicien</th>
+                <th>Sujet</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Photos</th>
                 <th>Statut</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              @for (c of tousLesConges; track c.id) {
-                <tr>
-                  <td>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</td>
-                  <td>{{ c.type }}</td>
-                  <td>{{ c.dateDebut }}</td>
-                  <td>{{ c.dateFin }}</td>
-                  <td>{{ c.motif }}</td>
-                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+              @for (rec of reclamations; track rec.id) {
+                <tr (click)="ouvrirDetailReclamation(rec)" style="cursor: pointer;">
+                  <td><strong>{{ rec.technicienNom }}</strong></td>
+                  <td><strong>{{ rec.sujet }}</strong></td>
+                  <td>{{ rec.description | slice:0:50 }}...</td>
+                  <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td style="text-align: center;">
+                    @if (rec.photos && rec.photos.length > 0) {
+                      <span style="background: #e3f2fd; color: #1565C0; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                        {{ rec.photos.length }} 📸
+                      </span>
+                    } @else {
+                      <span style="color: #ccc;">-</span>
+                    }
+                  </td>
+                  <td><span class="badge" style="background: #FF9800; color: white;">{{ rec.statut }}</span></td>
                   <td>
-                    @if (c.statut !== 'APPROUVE') {
-                      <button mat-icon-button color="primary" (click)="updateStatut(c.id, 'APPROUVE')">
-                        <mat-icon>check_circle</mat-icon>
-                      </button>
-                    }
-                    @if (c.statut !== 'REFUSE') {
-                      <button mat-icon-button color="warn" (click)="updateStatut(c.id, 'REFUSE')">
-                        <mat-icon>cancel</mat-icon>
-                      </button>
-                    }
+                    <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec); $event.stopPropagation()">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
                   </td>
                 </tr>
               }
@@ -307,113 +347,6 @@
       </div>
     }
 
-    <!-- Remontées Terrain -->
-@if (currentPage === 'remonteesTerrain') {
-  <div class="table-card">
-    <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
-    @if (reclamations.length === 0) {
-      <p class="empty">Aucune remontée terrain</p>
-    } @else {
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Technicien</th>
-            <th>Sujet</th>
-            <th>Description</th>
-            <th>Date</th>
-            <th>Photos</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (rec of reclamations; track rec.id) {
-            <tr (click)="ouvrirDetailReclamation(rec)" style="cursor: pointer;">
-              <td><strong>{{ rec.technicienNom }}</strong></td>
-              <td><strong>{{ rec.sujet }}</strong></td>
-              <td>{{ rec.description | slice:0:50 }}...</td>
-              <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td style="text-align: center;">
-                @if (rec.photos && rec.photos.length > 0) {
-                  <span style="background: #e3f2fd; color: #1565C0; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
-                    {{ rec.photos.length }} 📸
-                  </span>
-                } @else {
-                  <span style="color: #ccc;">-</span>
-                }
-              </td>
-              <td><span class="badge" style="background: #FF9800; color: white;">{{ rec.statut }}</span></td>
-              <td>
-                <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec); $event.stopPropagation()">
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
-  </div>
-}
-
-<!-- Modal Détails Réclamation -->
-@if (showReclamationDetailModal && selectedReclamation) {
-  <div class="modal-overlay" (click)="fermerDetailReclamation()">
-    <div class="modal-detail-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>📋 Remontée Terrain Détaillée</h2>
-        <button mat-icon-button (click)="fermerDetailReclamation()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <div class="detail-row">
-          <span class="label">Technicien :</span>
-          <span class="value">{{ selectedReclamation.technicienNom }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Sujet :</span>
-          <span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Description :</span>
-          <span class="value">{{ selectedReclamation.description }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Date :</span>
-          <span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Statut :</span>
-          <span class="badge" style="background: #FF9800; color: white;">{{ selectedReclamation.statut }}</span>
-        </div>
-
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
-        @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
-          <div class="photos-gallery-detail">
-            @for (photo of selectedReclamation.photos; track $index) {
-              <div class="photo-detail-item">
-                <img [src]="photo.data" alt="{{ photo.nom }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
-                <p style="margin-top: 8px; font-size: 12px; color: #555;">{{ photo.nom }}</p>
-              </div>
-            }
-          </div>
-        } @else {
-          <p style="color: #999;">Aucune photo</p>
-        }
-      </div>
-
-      <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()">
-          <mat-icon>close</mat-icon> Fermer
-        </button>
-      </div>
-    </div>
-  </div>
-}
     <!-- Mes Congés -->
     @if (currentPage === 'mes-conges') {
       <div class="table-card">
@@ -481,3 +414,103 @@
     }
   </div>
 </div>
+
+<!-- Modal Détails Fiche -->
+@if (showDetailModal && selectedFiche) {
+  <div class="modal-overlay" (click)="fermerDetailFiche()">
+    <div class="modal-detail-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📋 Fiche d'Intervention - Détails</h2>
+        <button mat-icon-button (click)="fermerDetailFiche()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">N° Projet :</span>
+          <span class="value">{{ selectedFiche.numero }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Client :</span>
+          <span class="value"><strong>{{ selectedFiche.client }}</strong></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Technicien assigné :</span>
+          <span class="value">{{ selectedFiche.technicienNom || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Date :</span>
+          <span class="value">{{ selectedFiche.date }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Description :</span>
+          <span class="value">{{ selectedFiche.description }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Statut :</span>
+          <span class="badge" [class]="selectedFiche.statut?.toLowerCase()">{{ selectedFiche.statut }}</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" (click)="fermerDetailFiche()">
+          <mat-icon>close</mat-icon> Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Détails Réclamation -->
+@if (showReclamationDetailModal && selectedReclamation) {
+  <div class="modal-overlay" (click)="fermerDetailReclamation()">
+    <div class="modal-detail-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📋 Remontée Terrain Détaillée</h2>
+        <button mat-icon-button (click)="fermerDetailReclamation()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">Technicien :</span>
+          <span class="value">{{ selectedReclamation.technicienNom }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Sujet :</span>
+          <span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Description :</span>
+          <span class="value">{{ selectedReclamation.description }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Date :</span>
+          <span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Statut :</span>
+          <span class="badge" style="background: #FF9800; color: white;">{{ selectedReclamation.statut }}</span>
+        </div>
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
+        @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
+          <div class="photos-gallery-detail">
+            @for (photo of selectedReclamation.photos; track $index) {
+              <div class="photo-detail-item">
+                <img [src]="photo.data" alt="{{ photo.nom }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+                <p style="margin-top: 8px; font-size: 12px; color: #555;">{{ photo.nom }}</p>
+              </div>
+            }
+          </div>
+        } @else {
+          <p style="color: #999;">Aucune photo</p>
+        }
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()">
+          <mat-icon>close</mat-icon> Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+}

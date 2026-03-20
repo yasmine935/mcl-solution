@@ -22,15 +22,26 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class DashboardAurelien implements OnInit {
   user: any = {};
-  currentPage = 'home';
+  
+  private _currentPage = 'home';
+  get currentPage(): string {
+    return this._currentPage;
+  }
+  set currentPage(value: string) {
+    this.fermerDetailFiche();
+    this._currentPage = value;
+  }
+
   showCongeForm = false;
+  showDetailModal = false;
 
   interventions: any[] = [];
   conges: any[] = [];
-  tousLesConges: any[] = [];
   documents: any[] = [];
   tickets: any[] = [];
   employes: any[] = [];
+  fiches: any[] = [];
+  selectedFiche: any = null;
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
 
@@ -43,24 +54,15 @@ export class DashboardAurelien implements OnInit {
 
   loadData() {
     this.loadConges();
-    this.loadTousLesConges();
+    this.loadEmployes();
     this.loadDocuments();
     this.loadTickets();
-    this.loadEmployes();
+    this.loadFiches();
   }
 
   loadConges() {
     this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
       .subscribe(data => this.conges = data, error => this.conges = []);
-  }
-
-  loadTousLesConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges')
-      .subscribe(data => {
-        this.tousLesConges = data.filter((c: any) => 
-          c.utilisateur?.role === 'TECHNICIEN' || c.utilisateur?.role === 'TECHNICIEN_SUP'
-        );
-      }, error => this.tousLesConges = []);
   }
 
   loadDocuments() {
@@ -87,10 +89,17 @@ export class DashboardAurelien implements OnInit {
       .subscribe(data => this.employes = data, error => this.employes = []);
   }
 
+  loadFiches() {
+    const stored = localStorage.getItem('interventions');
+    const toutesLesInterventions = stored ? JSON.parse(stored) : [];
+    this.fiches = toutesLesInterventions;
+  }
+
   deposerConge() {
     const demande = {
       ...this.conge,
-      utilisateur: { id: this.user.id }
+      utilisateur: { id: this.user.id },
+      manager: { id: 4 } // Ferid
     };
     this.http.post('http://localhost:8080/api/conges', demande)
       .subscribe(() => {
@@ -100,20 +109,25 @@ export class DashboardAurelien implements OnInit {
       }, error => console.error('Erreur envoi congé', error));
   }
 
-  updateStatut(id: number, statut: string) {
-    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
-      .subscribe(() => this.loadTousLesConges(), error => console.error('Erreur statut', error));
+  ouvrirDetailFiche(fiche: any) {
+    this.selectedFiche = fiche;
+    this.showDetailModal = true;
+  }
+
+  fermerDetailFiche() {
+    this.showDetailModal = false;
+    this.selectedFiche = null;
   }
 
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Mon Dashboard';
+      case 'fiches': return 'Fiches d\'Intervention';
       case 'interventions': return 'Gestion des Interventions';
       case 'ged': return 'GED - Gestion Électronique Documentaire';
       case 'tickets': return 'Tickets Support';
       case 'rh': return 'Ressources Humaines';
       case 'mes-conges': return 'Mes Congés';
-      case 'conges-valider': return 'Congés à Valider';
       default: return 'Dashboard';
     }
   }

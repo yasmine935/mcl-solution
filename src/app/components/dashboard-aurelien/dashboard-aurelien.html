@@ -2,13 +2,16 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
-       <h2>MCL Solutions</h2>
+      <h2>MCL Solutions</h2>
       <p>{{ user.prenom }} {{ user.nom }}</p>
-      <span class="role-tag">Aurelien</span>
+      <span class="role-tag">AURELIEN</span>
     </div>
     <nav>
       <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
         <mat-icon>dashboard</mat-icon> Dashboard
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'fiches'" (click)="currentPage = 'fiches'">
+        <mat-icon>description</mat-icon> Fiches d'Intervention
       </a>
       <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
         <mat-icon>engineering</mat-icon> Interventions
@@ -21,9 +24,6 @@
       </a>
       <a class="nav-item" [class.active]="currentPage === 'rh'" (click)="currentPage = 'rh'">
         <mat-icon>people_alt</mat-icon> RH
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'conges-valider'" (click)="currentPage = 'conges-valider'">
-        <mat-icon>fact_check</mat-icon> Congés à Valider
       </a>
       <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
@@ -56,10 +56,10 @@
           </div>
         </div>
         <div class="stat-card orange">
-          <div class="stat-icon"><mat-icon>fact_check</mat-icon></div>
+          <div class="stat-icon"><mat-icon>description</mat-icon></div>
           <div class="stat-info">
-            <h4>Congés en attente</h4>
-            <p class="stat-number">{{ tousLesConges.length }}</p>
+            <h4>Fiches</h4>
+            <p class="stat-number">{{ fiches.length }}</p>
           </div>
         </div>
         <div class="stat-card green">
@@ -69,6 +69,45 @@
             <p class="stat-number">{{ documents.length }}</p>
           </div>
         </div>
+      </div>
+    }
+
+    <!-- Fiches d'Intervention -->
+    @if (currentPage === 'fiches') {
+      <div class="table-card">
+        <h3>📋 Fiches d'Intervention ({{ fiches.length }})</h3>
+        @if (fiches.length === 0) {
+          <p class="empty">Aucune fiche d'intervention</p>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>N° Projet</th>
+                <th>Client</th>
+                <th>Technicien</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fiche of fiches; track fiche.id) {
+                <tr>
+                  <td><strong>{{ fiche.numero }}</strong></td>
+                  <td>{{ fiche.client }}</td>
+                  <td>{{ fiche.technicienNom || '-' }}</td>
+                  <td>{{ fiche.date }}</td>
+                  <td><span [class]="'badge ' + fiche.statut?.toLowerCase()">{{ fiche.statut }}</span></td>
+                  <td>
+                    <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" title="Voir détails">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
     }
 
@@ -199,54 +238,6 @@
       </div>
     }
 
-    <!-- Congés à Valider -->
-    @if (currentPage === 'conges-valider') {
-      <div class="table-card">
-        <h3>📋 Congés à Valider</h3>
-        @if (tousLesConges.length === 0) {
-          <div class="empty">Aucune demande de congé</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Employé</th>
-                <th>Type</th>
-                <th>Date début</th>
-                <th>Date fin</th>
-                <th>Motif</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (c of tousLesConges; track c.id) {
-                <tr>
-                  <td>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</td>
-                  <td>{{ c.type }}</td>
-                  <td>{{ c.dateDebut }}</td>
-                  <td>{{ c.dateFin }}</td>
-                  <td>{{ c.motif }}</td>
-                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
-                  <td>
-                    @if (c.statut !== 'APPROUVE') {
-                      <button mat-icon-button color="primary" (click)="updateStatut(c.id, 'APPROUVE')" title="Approuver">
-                        <mat-icon>check_circle</mat-icon>
-                      </button>
-                    }
-                    @if (c.statut !== 'REFUSE') {
-                      <button mat-icon-button color="warn" (click)="updateStatut(c.id, 'REFUSE')" title="Refuser">
-                        <mat-icon>cancel</mat-icon>
-                      </button>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-
     <!-- Mes Congés -->
     @if (currentPage === 'mes-conges') {
       <div class="table-card">
@@ -282,7 +273,7 @@
             </div>
             <div class="form-actions">
               <button mat-raised-button color="primary" (click)="deposerConge()">
-                <mat-icon>send</mat-icon> Envoyer
+                <mat-icon>send</mat-icon> Envoyer à Ferid
               </button>
               <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
             </div>
@@ -314,3 +305,48 @@
     }
   </div>
 </div>
+
+<!-- Modal Détails Fiche -->
+@if (showDetailModal && selectedFiche) {
+  <div class="modal-overlay" (click)="fermerDetailFiche()">
+    <div class="modal-detail-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📋 Fiche d'Intervention - Détails</h2>
+        <button mat-icon-button (click)="fermerDetailFiche()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">N° Projet :</span>
+          <span class="value">{{ selectedFiche.numero }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Client :</span>
+          <span class="value"><strong>{{ selectedFiche.client }}</strong></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Technicien assigné :</span>
+          <span class="value">{{ selectedFiche.technicienNom || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Date :</span>
+          <span class="value">{{ selectedFiche.date }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Description :</span>
+          <span class="value">{{ selectedFiche.description }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Statut :</span>
+          <span class="badge" [class]="selectedFiche.statut?.toLowerCase()">{{ selectedFiche.statut }}</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" (click)="fermerDetailFiche()">
+          <mat-icon>close</mat-icon> Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+}

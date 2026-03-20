@@ -28,17 +28,23 @@ export class DashboardKia implements OnInit {
     return this._currentPage;
   }
   set currentPage(value: string) {
+    this.fermerDetailFiche();
     this.fermerDetailReclamation();
     this._currentPage = value;
   }
 
   showCongeForm = false;
+  showDetailModal = false;
   showReclamationDetailModal = false;
-  selectedReclamation: any = null;
 
-  conges: any[] = [];
+  congesTechniciens: any[] = [];
+  mesConges: any[] = [];
   employes: any[] = [];
   reclamations: any[] = [];
+  interventions: any[] = [];
+  fiches: any[] = [];
+  selectedFiche: any = null;
+  selectedReclamation: any = null;
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
 
@@ -53,11 +59,22 @@ export class DashboardKia implements OnInit {
     this.loadConges();
     this.loadEmployes();
     this.loadReclamations();
+    this.loadInterventions();
+    this.loadFiches();
   }
 
   loadConges() {
     this.http.get<any[]>('http://localhost:8080/api/conges')
-      .subscribe(data => this.conges = data, error => this.conges = []);
+      .subscribe(data => {
+        this.congesTechniciens = data.filter((c: any) => 
+          c.utilisateur?.role === 'TECHNICIEN' && c.manager?.id === this.user.id
+        );
+        
+        this.mesConges = data.filter(c => c.utilisateur?.id === this.user.id);
+      }, error => {
+        this.congesTechniciens = [];
+        this.mesConges = [];
+      });
   }
 
   loadEmployes() {
@@ -68,17 +85,30 @@ export class DashboardKia implements OnInit {
   loadReclamations() {
     const stored = localStorage.getItem('reclamations');
     const toutesReclamations = stored ? JSON.parse(stored) : [];
-    
-    // KIA voit les réclamations de ses techniciens (tous sauf lui-même)
     this.reclamations = toutesReclamations.filter((r: any) => 
       r.technicienId !== this.user.id
+    );
+  }
+
+  loadInterventions() {
+    const stored = localStorage.getItem('interventions');
+    const allInterventions = stored ? JSON.parse(stored) : [];
+    this.interventions = allInterventions;
+  }
+
+  loadFiches() {
+    const stored = localStorage.getItem('interventions');
+    const toutesLesInterventions = stored ? JSON.parse(stored) : [];
+    this.fiches = toutesLesInterventions.filter((f: any) => 
+      f.technicienId !== this.user.id
     );
   }
 
   deposerConge() {
     const demande = {
       ...this.conge,
-      utilisateur: { id: this.user.id }
+      utilisateur: { id: this.user.id },
+      manager: { id: 4 }
     };
     this.http.post('http://localhost:8080/api/conges', demande)
       .subscribe(() => {
@@ -88,9 +118,19 @@ export class DashboardKia implements OnInit {
       }, error => console.error('Erreur', error));
   }
 
-  updateStatut(id: number, statut: string) {
+  updateStatutConge(id: number, statut: string) {
     this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
       .subscribe(() => this.loadConges(), error => console.error('Erreur', error));
+  }
+
+  ouvrirDetailFiche(fiche: any) {
+    this.selectedFiche = fiche;
+    this.showDetailModal = true;
+  }
+
+  fermerDetailFiche() {
+    this.showDetailModal = false;
+    this.selectedFiche = null;
   }
 
   ouvrirDetailReclamation(reclamation: any) {
@@ -106,10 +146,15 @@ export class DashboardKia implements OnInit {
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Mon Dashboard';
-      case 'conges': return 'Congés à Approuver';
-      case 'employes': return 'Mes Employés';
-      case 'remonteesTerrain': return 'Remontées Terrain';
+      case 'fiches': return 'Fiches d\'Intervention de mes Techniciens';
+      case 'interventions': return 'Interventions';
+      case 'planning': return 'Planning';
+      case 'crm': return 'CRM';
+      case 'stock': return 'Stock';
+      case 'commandes': return 'Commandes Achat';
+      case 'conges-tech': return 'Congés Techniciens à Valider';
       case 'mes-conges': return 'Mes Congés';
+      case 'remonteesTerrain': return 'Remontées Terrain de mes Techniciens';
       default: return 'KIA Dashboard';
     }
   }
@@ -118,8 +163,4 @@ export class DashboardKia implements OnInit {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
-  navigateTo(page: string) {
-  this.fermerDetailReclamation();
-  this.currentPage = page;
-}
 }

@@ -22,34 +22,41 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class DashboardTechnicien implements OnInit {
   user: any = {};
-  currentPage = 'home';
   
+  private _currentPage = 'home';
+  get currentPage(): string {
+    return this._currentPage;
+  }
+  set currentPage(value: string) {
+    this.fermerDetailReclamation();
+    this._currentPage = value;
+  }
+
   showCongeForm = false;
-  showReclamationForm = false;
   showReclamationDetailModal = false;
-  selectedReclamation: any = null;
+  showReclamationForm = false;
 
   interventions: any[] = [];
   interventionsCompletees: any[] = [];
   conges: any[] = [];
   reclamations: any[] = [];
   photosReclamation: any[] = [];
+  selectedReclamation: any = null;
 
+  reclamation = { sujet: '', description: '' };
   conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
-  reclamation = { sujet: '', description: '', photos: [] };
 
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.loadConges();
-    this.loadInterventions();
-    this.loadReclamations();
+    this.loadData();
   }
 
-  loadConges() {
-    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
-      .subscribe(data => this.conges = data, error => this.conges = []);
+  loadData() {
+    this.loadInterventions();
+    this.loadConges();
+    this.loadReclamations();
   }
 
   loadInterventions() {
@@ -57,12 +64,17 @@ export class DashboardTechnicien implements OnInit {
     const allInterventions = stored ? JSON.parse(stored) : [];
     
     this.interventions = allInterventions.filter((i: any) => 
-      i.statut === 'EN_COURS'
+      i.technicienId === this.user.id && i.statut === 'EN_COURS'
     );
     
     this.interventionsCompletees = allInterventions.filter((i: any) => 
-      i.statut === 'COMPLETEE'
+      i.technicienId === this.user.id && i.statut === 'COMPLETEE'
     );
+  }
+
+  loadConges() {
+    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
+      .subscribe(data => this.conges = data, error => this.conges = []);
   }
 
   loadReclamations() {
@@ -73,60 +85,30 @@ export class DashboardTechnicien implements OnInit {
     );
   }
 
+  getCountInterventionsEnCours(): number {
+    return this.interventions.length;
+  }
+
+  getCountInterventionsCompletees(): number {
+    return this.interventionsCompletees.length;
+  }
+
+  getCountReclamations(): number {
+    return this.reclamations.length;
+  }
+
   deposerConge() {
     const demande = {
       ...this.conge,
-      utilisateur: { id: this.user.id }
+      utilisateur: { id: this.user.id },
+      manager: { id: 3 } // KIA
     };
     this.http.post('http://localhost:8080/api/conges', demande)
       .subscribe(() => {
         this.loadConges();
         this.showCongeForm = false;
         this.conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
-      }, error => console.error('Erreur', error));
-  }
-
-  onPhotoSelectReclamation(event: any) {
-    const files = event.target.files;
-    if (files) {
-      for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.photosReclamation.push({
-            nom: files[i].name,
-            data: e.target.result
-          });
-        };
-        reader.readAsDataURL(files[i]);
-      }
-    }
-  }
-
-  supprimerPhotoReclamation(index: number) {
-    this.photosReclamation.splice(index, 1);
-  }
-
-  envoyerReclamationAvecPhotos() {
-    const nouvelleReclamation = {
-      id: Date.now(),
-      ...this.reclamation,
-      photos: this.photosReclamation,
-      statut: 'EN_ATTENTE',
-      dateCreation: new Date(),
-      technicienId: this.user.id,
-      technicienNom: this.user.prenom + ' ' + this.user.nom
-    };
-    
-    this.reclamations.push(nouvelleReclamation);
-    
-    const toutesReclamations = JSON.parse(localStorage.getItem('reclamations') || '[]');
-    toutesReclamations.push(nouvelleReclamation);
-    localStorage.setItem('reclamations', JSON.stringify(toutesReclamations));
-    
-    this.showReclamationForm = false;
-    this.reclamation = { sujet: '', description: '', photos: [] };
-    this.photosReclamation = [];
-    alert('Réclamation envoyée avec photos ! ✅');
+      }, error => console.error('Erreur envoi congé', error));
   }
 
   ouvrirDetailReclamation(reclamation: any) {
@@ -139,8 +121,57 @@ export class DashboardTechnicien implements OnInit {
     this.selectedReclamation = null;
   }
 
-  ouvrirFiche(id: number) {
-    this.router.navigate(['/fiche-intervention-tech', id]);
+  ouvrirFiche(fichId: number) {
+    this.router.navigate(['/fiche-intervention-tech', fichId]);
+  }
+
+  onPhotoSelectReclamation(event: any) {
+    const files = event.target.files;
+    if (!files) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.photosReclamation.push({
+          nom: file.name,
+          data: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  supprimerPhotoReclamation(index: number) {
+    this.photosReclamation.splice(index, 1);
+  }
+
+  envoyerReclamationAvecPhotos() {
+    if (!this.reclamation.sujet || !this.reclamation.description) {
+      alert('Veuillez remplir sujet et description');
+      return;
+    }
+
+    const idIncrement = Math.max(...this.reclamations.map(r => r.id || 0), 0) + 1;
+    const nouvelleReclamation = {
+      id: idIncrement,
+      sujet: this.reclamation.sujet,
+      description: this.reclamation.description,
+      technicienId: this.user.id,
+      technicienNom: `${this.user.prenom} ${this.user.nom}`,
+      photos: this.photosReclamation,
+      statut: 'EN_ATTENTE',
+      dateCreation: new Date().toISOString()
+    };
+
+    this.reclamations.push(nouvelleReclamation);
+    const allReclamations = JSON.parse(localStorage.getItem('reclamations') || '[]');
+    allReclamations.push(nouvelleReclamation);
+    localStorage.setItem('reclamations', JSON.stringify(allReclamations));
+
+    this.reclamation = { sujet: '', description: '' };
+    this.photosReclamation = [];
+    this.showReclamationForm = false;
   }
 
   getPageTitle(): string {
@@ -150,20 +181,8 @@ export class DashboardTechnicien implements OnInit {
       case 'completees': return 'Interventions Complétées';
       case 'conges': return 'Mes Congés';
       case 'reclamations': return 'Mes Réclamations';
-      default: return 'Dashboard';
+      default: return 'Dashboard Technicien';
     }
-  }
-
-  getCountInterventionsEnCours(): number {
-    return this.interventions.length;
-  }
-
-  getCountInterventionsCompletees(): number {
-    return this.interventionsCompletees.length;
-  }
-
-  getCountReclamations(): number {
-    return this.reclamations.filter(r => r.statut === 'EN_ATTENTE').length;
   }
 
   logout() {

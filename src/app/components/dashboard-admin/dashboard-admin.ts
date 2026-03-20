@@ -24,17 +24,45 @@ import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-in
 })
 export class DashboardAdmin implements OnInit {
   user: any = {};
-  currentPage = 'home';
 
+  private _currentPage = 'home';
+  get currentPage(): string {
+    return this._currentPage;
+  }
+  set currentPage(value: string) {
+    this.fermerDetailFiche();
+    this.fermerDetailReclamation();
+    this._currentPage = value;
+  }
+
+  showCreateFiche = false;
+  showDetailFicheModal = false;
+  showReclamationDetailModal = false;
+
+  fiches: any[] = [];
+  fichesFiltrees: any[] = [];
+  ficheCompletees: any[] = [];
   conges: any[] = [];
   employes: any[] = [];
+  reclamations: any[] = [];
   documents: any[] = [];
   tickets: any[] = [];
   factures: any[] = [];
   utilisateurs: any[] = [];
-  reclamations: any[] = [];
-  showReclamationDetailModal = false;
-selectedReclamation: any = null;
+
+  selectedFiche: any = null;
+  selectedReclamation: any = null;
+  techniciensDisponibles: any[] = [];
+
+  nouveauFiche = {
+    numero: '',
+    client: '',
+    description: '',
+    date: '',
+    technicienId: null,
+    technicienNom: ''
+  };
+
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
@@ -43,51 +71,68 @@ selectedReclamation: any = null;
   }
 
   loadData() {
+    this.loadFiches();
     this.loadConges();
     this.loadEmployes();
+    this.loadReclamations();
     this.loadDocuments();
     this.loadTickets();
     this.loadFactures();
-    this.loadUtilisateurs();
-    this.loadReclamations();
+  }
+
+  loadFiches() {
+    const stored = localStorage.getItem('interventions');
+    const toutesLesFiches = stored ? JSON.parse(stored) : [];
+    
+    this.fichesFiltrees = toutesLesFiches.filter((f: any) => f.statut === 'EN_COURS');
+    this.ficheCompletees = toutesLesFiches.filter((f: any) => f.statut === 'COMPLETEE');
+    this.fiches = toutesLesFiches;
   }
 
   loadConges() {
     this.http.get<any[]>('http://localhost:8080/api/conges')
-      .subscribe(data => this.conges = data, error => this.conges = []);
+      .subscribe(data => {
+        this.conges = data;
+      }, error => {
+        this.conges = [];
+      });
   }
 
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
-      .subscribe(data => this.employes = data, error => this.employes = []);
-  }
-
-  loadUtilisateurs() {
-    this.utilisateurs = this.employes;
+      .subscribe(data => {
+        this.employes = data;
+        this.utilisateurs = data;
+        this.techniciensDisponibles = data.filter((e: any) => 
+          e.role === 'TECHNICIEN' || e.role === 'TECHNICIEN_SUP'
+        );
+      }, error => {
+        this.employes = [];
+        this.utilisateurs = [];
+      });
   }
 
   loadReclamations() {
     const stored = localStorage.getItem('reclamations');
-    this.reclamations = stored ? JSON.parse(stored) : [];
+    const toutesReclamations = stored ? JSON.parse(stored) : [];
+    this.reclamations = toutesReclamations;
   }
 
   loadDocuments() {
     this.documents = [
-      { id: 1, nom: 'Archive 2025', date: '2025-12-31', type: 'PDF', taille: '2.5 GB' },
-      { id: 2, nom: 'Rapport Annuel 2025', date: '2025-12-20', type: 'PDF', taille: '5 MB' },
-      { id: 3, nom: 'Directives Entreprise', date: '2025-12-01', type: 'DOCX', taille: '1.2 MB' },
-      { id: 4, nom: 'Contrats Clients', date: '2025-11-15', type: 'PDF', taille: '3.8 MB' },
-      { id: 5, nom: 'Politique RH', date: '2025-10-01', type: 'DOCX', taille: '800 KB' }
+      { id: 1, nom: 'Politique d\'entreprise', date: '2025-12-01', type: 'PDF' },
+      { id: 2, nom: 'Manuel d\'utilisation', date: '2025-11-15', type: 'PDF' },
+      { id: 3, nom: 'Charte de sécurité', date: '2025-10-01', type: 'DOCX' },
+      { id: 4, nom: 'Procédures RH', date: '2025-09-20', type: 'PDF' }
     ];
   }
 
   loadTickets() {
     this.tickets = [
-      { id: 1, titre: 'Problème critique', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-18' },
-      { id: 2, titre: 'Amélioration système', statut: 'EN_COURS', priorite: 'MOYENNE', date: '2026-01-15' },
-      { id: 3, titre: 'Migration serveur', statut: 'EN_COURS', priorite: 'HAUTE', date: '2026-01-16' },
-      { id: 4, titre: 'Sécurité données', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-17' },
-      { id: 5, titre: 'Sauvegarde disque', statut: 'FERME', priorite: 'MOYENNE', date: '2026-01-10' }
+      { id: 1, titre: 'Problème critique système', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-18' },
+      { id: 2, titre: 'Amélioration infrastructure', statut: 'EN_COURS', priorite: 'MOYENNE', date: '2026-01-15' },
+      { id: 3, titre: 'Migration données', statut: 'EN_COURS', priorite: 'HAUTE', date: '2026-01-16' },
+      { id: 4, titre: 'Maintenance serveurs', statut: 'PLANIFIE', priorite: 'MOYENNE', date: '2026-01-20' }
     ];
   }
 
@@ -95,10 +140,41 @@ selectedReclamation: any = null;
     this.factures = [
       { id: 1, numero: 'FAC-2026-001', client: 'Client A', montant: '5000€', date: '2026-01-15', statut: 'PAYEE' },
       { id: 2, numero: 'FAC-2026-002', client: 'Client B', montant: '3500€', date: '2026-01-12', statut: 'EN_ATTENTE' },
-      { id: 3, numero: 'FAC-2026-003', client: 'Client C', montant: '7200€', date: '2026-01-10', statut: 'PAYEE' },
-      { id: 4, numero: 'FAC-2026-004', client: 'Client D', montant: '4100€', date: '2026-01-08', statut: 'EN_ATTENTE' },
-      { id: 5, numero: 'FAC-2026-005', client: 'Client E', montant: '2800€', date: '2026-01-05', statut: 'PAYEE' }
+      { id: 3, numero: 'FAC-2026-003', client: 'Client C', montant: '7200€', date: '2026-01-10', statut: 'PAYEE' }
     ];
+  }
+
+  creerFiche() {
+    if (!this.nouveauFiche.numero || !this.nouveauFiche.client || !this.nouveauFiche.technicienId) {
+      alert('Veuillez remplir tous les champs');
+      return;
+    }
+
+    const idIncrement = Math.max(...this.fiches.map(f => f.id || 0), 0) + 1;
+    const nouvelleFiche = {
+      id: idIncrement,
+      ...this.nouveauFiche,
+      statut: 'EN_COURS',
+      dateCreation: new Date().toISOString()
+    };
+
+    this.fiches.push(nouvelleFiche);
+    this.fichesFiltrees.push(nouvelleFiche);
+    
+    localStorage.setItem('interventions', JSON.stringify(this.fiches));
+    
+    this.showCreateFiche = false;
+    this.nouveauFiche = { numero: '', client: '', description: '', date: '', technicienId: null, technicienNom: '' };
+  }
+
+  ouvrirDetailFiche(fiche: any) {
+    this.selectedFiche = fiche;
+    this.showDetailFicheModal = true;
+  }
+
+  fermerDetailFiche() {
+    this.showDetailFicheModal = false;
+    this.selectedFiche = null;
   }
 
   updateStatut(id: number, statut: string) {
@@ -106,18 +182,28 @@ selectedReclamation: any = null;
       .subscribe(() => this.loadConges(), error => console.error('Erreur', error));
   }
 
+  ouvrirDetailReclamation(reclamation: any) {
+    this.selectedReclamation = reclamation;
+    this.showReclamationDetailModal = true;
+  }
+
+  fermerDetailReclamation() {
+    this.showReclamationDetailModal = false;
+    this.selectedReclamation = null;
+  }
+
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Tableau de Bord Admin';
-      case 'interventions': return 'Fiches d\'Intervention';
-      case 'conges': return 'Tous les Congés';
-      case 'employes': return 'Gestion Employés';
-      case 'documents': return 'Gestion Documentaire';
+      case 'fiches': return 'Fiches d\'Intervention';
+      case 'tousLesConges': return 'Tous les Congés';
+      case 'employes': return 'Employés';
+      case 'documents': return 'Documents';
       case 'reclamations': return 'Réclamations';
-      case 'tickets': return 'Support Technique';
-      case 'factures': return 'Factures & Comptabilité';
-      case 'utilisateurs': return 'Utilisateurs & Permissions';
-      default: return 'Admin Dashboard';
+      case 'support': return 'Support';
+      case 'factures': return 'Factures';
+      case 'utilisateurs': return 'Utilisateurs';
+      default: return 'Dashboard Admin';
     }
   }
 
@@ -125,13 +211,4 @@ selectedReclamation: any = null;
     localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
-  ouvrirDetailReclamation(reclamation: any) {
-  this.selectedReclamation = reclamation;
-  this.showReclamationDetailModal = true;
-}
-
-fermerDetailReclamation() {
-  this.showReclamationDetailModal = false;
-  this.selectedReclamation = null;
-}
 }

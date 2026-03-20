@@ -20,7 +20,7 @@
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
       <a class="nav-item" [class.active]="currentPage === 'reclamations'" (click)="currentPage = 'reclamations'">
-        <mat-icon>report_problem</mat-icon> Mes Réclamations
+        <mat-icon>report_problem</mat-icon> Remontées Terrain
       </a>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
@@ -59,7 +59,7 @@
         <div class="stat-card red">
           <div class="stat-icon"><mat-icon>report_problem</mat-icon></div>
           <div class="stat-info">
-            <h4>Réclamations En Attente</h4>
+            <h4>Remontées Terrain</h4>
             <p class="stat-number">{{ getCountReclamations() }}</p>
           </div>
         </div>
@@ -73,7 +73,7 @@
             <mat-icon>engineering</mat-icon> Voir Mes Interventions
           </button>
           <button mat-raised-button color="accent" (click)="currentPage = 'reclamations'">
-            <mat-icon>report_problem</mat-icon> Mes Réclamations
+            <mat-icon>report_problem</mat-icon> Remontées Terrain
           </button>
           <button mat-raised-button (click)="currentPage = 'conges'">
             <mat-icon>beach_access</mat-icon> Mes Congés
@@ -245,7 +245,7 @@
       <!-- Formulaire Réclamation -->
       @if (showReclamationForm) {
         <div class="form-card">
-          <h3>📝 Nouvelle Réclamation</h3>
+          <h3>📝Remontées Terrain </h3>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Sujet</mat-label>
             <input matInput [(ngModel)]="reclamation.sujet" placeholder="Ex: Problème équipement"/>
@@ -277,7 +277,7 @@
 
           <div class="form-actions">
             <button mat-raised-button color="primary" (click)="envoyerReclamationAvecPhotos()">
-              <mat-icon>send</mat-icon> Envoyer Réclamation
+              <mat-icon>send</mat-icon> Remonté terrain
             </button>
             <button mat-stroked-button (click)="showReclamationForm = false">Annuler</button>
           </div>
@@ -286,12 +286,12 @@
 
       <!-- Tableau Réclamations -->
       <div class="table-card">
-        <h3>⚠️ Mes Réclamations ({{ reclamations.length }})</h3>
+        <h3>⚠️ Mes Remontées Terrain ({{ reclamations.length }})</h3>
         @if (reclamations.length === 0) {
-          <p class="empty">Aucune réclamation</p>
+          <p class="empty">Aucune remontée terrain</p>
           @if (!showReclamationForm) {
             <button mat-raised-button color="primary" (click)="showReclamationForm = true">
-              <mat-icon>add</mat-icon> Créer une Réclamation
+              <mat-icon>add</mat-icon> Créer une remontée terrain
             </button>
           }
         } @else {
@@ -335,7 +335,7 @@
           @if (!showReclamationForm) {
             <div style="margin-top: 15px; text-align: center;">
               <button mat-raised-button color="primary" (click)="showReclamationForm = true">
-                <mat-icon>add</mat-icon> Nouvelle Réclamation
+                <mat-icon>add</mat-icon> Nouvelle Remontée terrain
               </button>
             </div>
           }
