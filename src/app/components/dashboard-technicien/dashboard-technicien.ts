@@ -23,10 +23,14 @@ import { MatSelectModule } from '@angular/material/select';
 export class DashboardTechnicien implements OnInit {
   user: any = {};
   currentPage = 'home';
+  
   showCongeForm = false;
   showReclamationForm = false;
+  showReclamationDetailModal = false;
+  selectedReclamation: any = null;
 
   interventions: any[] = [];
+  interventionsCompletees: any[] = [];
   conges: any[] = [];
   reclamations: any[] = [];
   photosReclamation: any[] = [];
@@ -40,6 +44,7 @@ export class DashboardTechnicien implements OnInit {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadConges();
     this.loadInterventions();
+    this.loadReclamations();
   }
 
   loadConges() {
@@ -48,13 +53,23 @@ export class DashboardTechnicien implements OnInit {
   }
 
   loadInterventions() {
-    // Récupère les interventions depuis le localStorage (mode MOCK)
     const stored = localStorage.getItem('interventions');
     const allInterventions = stored ? JSON.parse(stored) : [];
     
-    // Filtre pour ce technicien
     this.interventions = allInterventions.filter((i: any) => 
-      i.statut === 'EN_COURS' || i.statut === 'COMPLETEE'
+      i.statut === 'EN_COURS'
+    );
+    
+    this.interventionsCompletees = allInterventions.filter((i: any) => 
+      i.statut === 'COMPLETEE'
+    );
+  }
+
+  loadReclamations() {
+    const stored = localStorage.getItem('reclamations');
+    const toutesReclamations = stored ? JSON.parse(stored) : [];
+    this.reclamations = toutesReclamations.filter((r: any) => 
+      r.technicienId === this.user.id
     );
   }
 
@@ -92,17 +107,36 @@ export class DashboardTechnicien implements OnInit {
   }
 
   envoyerReclamationAvecPhotos() {
-    this.reclamations.push({
+    const nouvelleReclamation = {
       id: Date.now(),
       ...this.reclamation,
       photos: this.photosReclamation,
       statut: 'EN_ATTENTE',
-      dateCreation: new Date()
-    });
+      dateCreation: new Date(),
+      technicienId: this.user.id,
+      technicienNom: this.user.prenom + ' ' + this.user.nom
+    };
+    
+    this.reclamations.push(nouvelleReclamation);
+    
+    const toutesReclamations = JSON.parse(localStorage.getItem('reclamations') || '[]');
+    toutesReclamations.push(nouvelleReclamation);
+    localStorage.setItem('reclamations', JSON.stringify(toutesReclamations));
+    
     this.showReclamationForm = false;
     this.reclamation = { sujet: '', description: '', photos: [] };
     this.photosReclamation = [];
     alert('Réclamation envoyée avec photos ! ✅');
+  }
+
+  ouvrirDetailReclamation(reclamation: any) {
+    this.selectedReclamation = reclamation;
+    this.showReclamationDetailModal = true;
+  }
+
+  fermerDetailReclamation() {
+    this.showReclamationDetailModal = false;
+    this.selectedReclamation = null;
   }
 
   ouvrirFiche(id: number) {
@@ -113,11 +147,23 @@ export class DashboardTechnicien implements OnInit {
     switch(this.currentPage) {
       case 'home': return 'Mon Dashboard';
       case 'interventions': return 'Mes Interventions';
+      case 'completees': return 'Interventions Complétées';
       case 'conges': return 'Mes Congés';
-      case 'fiche': return 'Ma Fiche de Travail';
-      case 'reclamation': return 'Mes Réclamations';
+      case 'reclamations': return 'Mes Réclamations';
       default: return 'Dashboard';
     }
+  }
+
+  getCountInterventionsEnCours(): number {
+    return this.interventions.length;
+  }
+
+  getCountInterventionsCompletees(): number {
+    return this.interventionsCompletees.length;
+  }
+
+  getCountReclamations(): number {
+    return this.reclamations.filter(r => r.statut === 'EN_ATTENTE').length;
   }
 
   logout() {

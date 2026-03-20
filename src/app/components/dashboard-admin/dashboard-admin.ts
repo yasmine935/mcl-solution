@@ -32,7 +32,9 @@ export class DashboardAdmin implements OnInit {
   tickets: any[] = [];
   factures: any[] = [];
   utilisateurs: any[] = [];
-
+  reclamations: any[] = [];
+  showReclamationDetailModal = false;
+selectedReclamation: any = null;
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
@@ -47,6 +49,7 @@ export class DashboardAdmin implements OnInit {
     this.loadTickets();
     this.loadFactures();
     this.loadUtilisateurs();
+    this.loadReclamations();
   }
 
   loadConges() {
@@ -61,6 +64,11 @@ export class DashboardAdmin implements OnInit {
 
   loadUtilisateurs() {
     this.utilisateurs = this.employes;
+  }
+
+  loadReclamations() {
+    const stored = localStorage.getItem('reclamations');
+    this.reclamations = stored ? JSON.parse(stored) : [];
   }
 
   loadDocuments() {
@@ -105,6 +113,7 @@ export class DashboardAdmin implements OnInit {
       case 'conges': return 'Tous les Congés';
       case 'employes': return 'Gestion Employés';
       case 'documents': return 'Gestion Documentaire';
+      case 'reclamations': return 'Réclamations';
       case 'tickets': return 'Support Technique';
       case 'factures': return 'Factures & Comptabilité';
       case 'utilisateurs': return 'Utilisateurs & Permissions';
@@ -116,4 +125,13 @@ export class DashboardAdmin implements OnInit {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
+  ouvrirDetailReclamation(reclamation: any) {
+  this.selectedReclamation = reclamation;
+  this.showReclamationDetailModal = true;
+}
+
+fermerDetailReclamation() {
+  this.showReclamationDetailModal = false;
+  this.selectedReclamation = null;
+}
 }

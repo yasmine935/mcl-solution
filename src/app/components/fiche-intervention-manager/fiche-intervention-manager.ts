@@ -66,11 +66,20 @@ getInterventiionsCompletees() {
     private interventionsService: InterventionsService,
     private http: HttpClient
   ) {}
+ouvrirDetailFiche(fiche: any) {
+  this.selectedFiche = fiche;
+  this.showDetailModal = true;
+}
 
+fermerDetailModal() {
+  this.showDetailModal = false;
+  this.selectedFiche = null;
+}
   ngOnInit() {
     this.loadData();
   }
-
+showDetailModal = false;
+selectedFiche: any = null;
   loadData() {
     this.interventionsService.getInterventions()
       .subscribe(data => this.interventions = data, error => this.interventions = []);

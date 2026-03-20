@@ -181,9 +181,9 @@
                   <button mat-icon-button color="primary" (click)="openEnvoyerModal(int.id)" title="Envoyer au technicien">
                     <mat-icon>send</mat-icon>
                   </button>
-                  <button mat-icon-button color="accent" title="Voir détails">
-                    <mat-icon>visibility</mat-icon>
-                  </button>
+                <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(int)" title="Voir détails">
+  <mat-icon>visibility</mat-icon>
+</button>
                 </td>
               </tr>
             }
@@ -263,4 +263,80 @@
       </div>
     </div>
   }
+  <!-- Modal Détails Fiche -->
+@if (showDetailModal && selectedFiche) {
+  <div class="modal-overlay" (click)="fermerDetailModal()">
+    <div class="modal-detail-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📋 Fiche Complétée - {{ selectedFiche.client }}</h2>
+        <button mat-icon-button (click)="fermerDetailModal()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">N° Projet :</span>
+          <span class="value">{{ selectedFiche.numeroProjet }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Client :</span>
+          <span class="value">{{ selectedFiche.client }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Heure Début :</span>
+          <span class="value">{{ selectedFiche.heureDebut }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Heure Fin :</span>
+          <span class="value">{{ selectedFiche.heureFin }}</span>
+        </div>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+        <h3 style="color: #1565C0; margin-bottom: 15px;">Tâches Réalisées :</h3>
+        @if (selectedFiche.taches) {
+          <div class="tasks-list">
+            @if (selectedFiche.taches.installationCameras) {
+              <div class="task-item">✅ Installation des caméras</div>
+            }
+            @if (selectedFiche.taches.misEnPlaceSupportMural) {
+              <div class="task-item">✅ Mise en place support mural</div>
+            }
+            @if (selectedFiche.taches.fixationTV) {
+              <div class="task-item">✅ Fixation TV 65" sur Support</div>
+            }
+            @if (selectedFiche.taches.connectique) {
+              <div class="task-item">✅ Connectique et Paramétrage</div>
+            }
+            @if (selectedFiche.taches.testValidation) {
+              <div class="task-item">✅ Test et Validation</div>
+            }
+          </div>
+        }
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
+        @if (selectedFiche.photos && selectedFiche.photos.length > 0) {
+          <div class="photos-gallery">
+            @for (photo of selectedFiche.photos; track $index) {
+              <div class="photo-item">
+                <span>📷 {{ photo.nom }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p style="color: #999;">Aucune photo</p>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" (click)="fermerDetailModal()">
+          <mat-icon>close</mat-icon> Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+}
 </div>
