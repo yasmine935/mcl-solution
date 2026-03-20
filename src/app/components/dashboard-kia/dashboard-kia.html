@@ -31,6 +31,9 @@
       <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'remonteesTerrain'" (click)="currentPage = 'remonteesTerrain'">
+  <mat-icon>report_problem</mat-icon> Remontées Terrain
+</a>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
@@ -193,6 +196,113 @@
         </table>
       </div>
     }
+    <!-- Remontées Terrain -->
+@if (currentPage === 'remonteesTerrain') {
+  <div class="table-card">
+    <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
+    @if (reclamations.length === 0) {
+      <p class="empty">Aucune remontée terrain</p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Technicien</th>
+            <th>Sujet</th>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Photos</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (rec of reclamations; track rec.id) {
+            <tr (click)="ouvrirDetailReclamation(rec)" style="cursor: pointer;">
+              <td><strong>{{ rec.technicienNom }}</strong></td>
+              <td><strong>{{ rec.sujet }}</strong></td>
+              <td>{{ rec.description | slice:0:50 }}...</td>
+              <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td style="text-align: center;">
+                @if (rec.photos && rec.photos.length > 0) {
+                  <span style="background: #e3f2fd; color: #1565C0; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                    {{ rec.photos.length }} 📸
+                  </span>
+                } @else {
+                  <span style="color: #ccc;">-</span>
+                }
+              </td>
+              <td><span class="badge" style="background: #FF9800; color: white;">{{ rec.statut }}</span></td>
+              <td>
+                <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec); $event.stopPropagation()">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+}
+
+<!-- Modal Détails Réclamation -->
+@if (showReclamationDetailModal && selectedReclamation) {
+  <div class="modal-overlay" (click)="fermerDetailReclamation()">
+    <div class="modal-detail-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📋 Remontée Terrain Détaillée</h2>
+        <button mat-icon-button (click)="fermerDetailReclamation()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="label">Technicien :</span>
+          <span class="value">{{ selectedReclamation.technicienNom }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Sujet :</span>
+          <span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Description :</span>
+          <span class="value">{{ selectedReclamation.description }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Date :</span>
+          <span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Statut :</span>
+          <span class="badge" style="background: #FF9800; color: white;">{{ selectedReclamation.statut }}</span>
+        </div>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
+        @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
+          <div class="photos-gallery-detail">
+            @for (photo of selectedReclamation.photos; track $index) {
+              <div class="photo-detail-item">
+                <img [src]="photo.data" alt="{{ photo.nom }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+                <p style="margin-top: 8px; font-size: 12px; color: #555;">{{ photo.nom }}</p>
+              </div>
+            }
+          </div>
+        } @else {
+          <p style="color: #999;">Aucune photo</p>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()">
+          <mat-icon>close</mat-icon> Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
     <!-- Pages en construction -->
     @if (currentPage === 'interventions' || currentPage === 'planning' || currentPage === 'crm' || currentPage === 'stock' || currentPage === 'commandes') {

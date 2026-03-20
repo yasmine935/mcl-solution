@@ -22,13 +22,23 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class DashboardKia implements OnInit {
   user: any = {};
-  currentPage = 'home';
-  showCongeForm = false;
+  
+  private _currentPage = 'home';
+  get currentPage(): string {
+    return this._currentPage;
+  }
+  set currentPage(value: string) {
+    this.fermerDetailReclamation();
+    this._currentPage = value;
+  }
 
-  interventions: any[] = [];
+  showCongeForm = false;
+  showReclamationDetailModal = false;
+  selectedReclamation: any = null;
+
   conges: any[] = [];
-  tousLesConges: any[] = [];
-  planning: any[] = [];
+  employes: any[] = [];
+  reclamations: any[] = [];
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
 
@@ -36,22 +46,33 @@ export class DashboardKia implements OnInit {
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.loadData();
+  }
+
+  loadData() {
     this.loadConges();
-    this.loadTousLesConges();
+    this.loadEmployes();
+    this.loadReclamations();
   }
 
   loadConges() {
-    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
-      .subscribe(data => this.conges = data);
+    this.http.get<any[]>('http://localhost:8080/api/conges')
+      .subscribe(data => this.conges = data, error => this.conges = []);
   }
 
-  loadTousLesConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges')
-      .subscribe(data => {
-        this.tousLesConges = data.filter((c: any) => 
-          c.utilisateur?.role === 'TECHNICIEN'
-        );
-      });
+  loadEmployes() {
+    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
+      .subscribe(data => this.employes = data, error => this.employes = []);
+  }
+
+  loadReclamations() {
+    const stored = localStorage.getItem('reclamations');
+    const toutesReclamations = stored ? JSON.parse(stored) : [];
+    
+    // KIA voit les réclamations de ses techniciens (tous sauf lui-même)
+    this.reclamations = toutesReclamations.filter((r: any) => 
+      r.technicienId !== this.user.id
+    );
   }
 
   deposerConge() {
@@ -64,25 +85,32 @@ export class DashboardKia implements OnInit {
         this.loadConges();
         this.showCongeForm = false;
         this.conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
-      });
+      }, error => console.error('Erreur', error));
   }
 
   updateStatut(id: number, statut: string) {
     this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
-      .subscribe(() => this.loadTousLesConges());
+      .subscribe(() => this.loadConges(), error => console.error('Erreur', error));
+  }
+
+  ouvrirDetailReclamation(reclamation: any) {
+    this.selectedReclamation = reclamation;
+    this.showReclamationDetailModal = true;
+  }
+
+  fermerDetailReclamation() {
+    this.showReclamationDetailModal = false;
+    this.selectedReclamation = null;
   }
 
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Mon Dashboard';
-      case 'interventions': return 'Gestion des Interventions';
+      case 'conges': return 'Congés à Approuver';
+      case 'employes': return 'Mes Employés';
+      case 'remonteesTerrain': return 'Remontées Terrain';
       case 'mes-conges': return 'Mes Congés';
-      case 'conges-tech': return 'Congés des Techniciens';
-      case 'planning': return 'Planning';
-      case 'crm': return 'CRM';
-      case 'stock': return 'Stock';
-      case 'commandes': return 'Commandes Achat';
-      default: return 'Dashboard';
+      default: return 'KIA Dashboard';
     }
   }
 
@@ -90,4 +118,8 @@ export class DashboardKia implements OnInit {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
+  navigateTo(page: string) {
+  this.fermerDetailReclamation();
+  this.currentPage = page;
+}
 }

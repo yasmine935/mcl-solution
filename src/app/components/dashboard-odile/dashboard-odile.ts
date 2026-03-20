@@ -22,16 +22,27 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class DashboardOdile implements OnInit {
   user: any = {};
-  currentPage = 'home';
-  showCongeForm = false;
+  
+  private _currentPage = 'home';
+  get currentPage(): string {
+    return this._currentPage;
+  }
+  set currentPage(value: string) {
+    this.fermerDetailReclamation();
+    this._currentPage = value;
+  }
 
-  interventions: any[] = [];
-  conges: any[] = [];
+  showCongeForm = false;
+  showReclamationDetailModal = false;
+  selectedReclamation: any = null;
+
   tousLesConges: any[] = [];
+  conges: any[] = [];
+  employes: any[] = [];
   documents: any[] = [];
   tickets: any[] = [];
-  employes: any[] = [];
   factures: any[] = [];
+  reclamations: any[] = [];
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
 
@@ -44,51 +55,54 @@ export class DashboardOdile implements OnInit {
 
   loadData() {
     this.loadConges();
-    this.loadTousLesConges();
+    this.loadEmployes();
     this.loadDocuments();
     this.loadTickets();
-    this.loadEmployes();
     this.loadFactures();
+    this.loadReclamations();
   }
 
   loadConges() {
-    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
-      .subscribe(data => this.conges = data, error => this.conges = []);
-  }
-
-  loadTousLesConges() {
     this.http.get<any[]>('http://localhost:8080/api/conges')
       .subscribe(data => {
-        this.tousLesConges = data.filter((c: any) => 
-          c.utilisateur?.role === 'TECHNICIEN' || c.utilisateur?.role === 'TECHNICIEN_SUP'
-        );
-      }, error => this.tousLesConges = []);
-  }
-
-  loadDocuments() {
-    this.documents = [
-      { id: 1, nom: 'Rapport Complet 2026', date: '2026-01-15', type: 'PDF' },
-      { id: 2, nom: 'Devis Clients', date: '2026-01-10', type: 'XLSX' },
-      { id: 3, nom: 'Manuel Technique Complet', date: '2025-12-20', type: 'PDF' },
-      { id: 4, nom: 'Contrats Signés', date: '2025-12-15', type: 'PDF' },
-      { id: 5, nom: 'PV Réunions', date: '2026-01-08', type: 'DOCX' },
-      { id: 6, nom: 'Directives RH', date: '2025-12-01', type: 'DOCX' }
-    ];
-  }
-
-  loadTickets() {
-    this.tickets = [
-      { id: 1, titre: 'Problème critique système', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-18' },
-      { id: 2, titre: 'Amélioration interface', statut: 'EN_COURS', priorite: 'MOYENNE', date: '2026-01-15' },
-      { id: 3, titre: 'Formation utilisateurs', statut: 'FERME', priorite: 'BASSE', date: '2026-01-10' },
-      { id: 4, titre: 'Optimisation serveur', statut: 'EN_COURS', priorite: 'HAUTE', date: '2026-01-16' },
-      { id: 5, titre: 'Sécurité données', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-17' }
-    ];
+        this.tousLesConges = data;
+        this.conges = data.filter(c => c.utilisateur?.id === this.user.id);
+      }, error => {
+        this.tousLesConges = [];
+        this.conges = [];
+      });
   }
 
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
       .subscribe(data => this.employes = data, error => this.employes = []);
+  }
+
+  loadReclamations() {
+    const stored = localStorage.getItem('reclamations');
+    const toutesReclamations = stored ? JSON.parse(stored) : [];
+    // Odile voit TOUTES les réclamations
+    this.reclamations = toutesReclamations;
+  }
+
+  loadDocuments() {
+    this.documents = [
+      { id: 1, nom: 'Archive 2025', date: '2025-12-31', type: 'PDF' },
+      { id: 2, nom: 'Rapport Annuel 2025', date: '2025-12-20', type: 'PDF' },
+      { id: 3, nom: 'Directives Entreprise', date: '2025-12-01', type: 'DOCX' },
+      { id: 4, nom: 'Contrats Clients', date: '2025-11-15', type: 'PDF' },
+      { id: 5, nom: 'Politique RH', date: '2025-10-01', type: 'DOCX' }
+    ];
+  }
+
+  loadTickets() {
+    this.tickets = [
+      { id: 1, titre: 'Problème critique', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-18' },
+      { id: 2, titre: 'Amélioration système', statut: 'EN_COURS', priorite: 'MOYENNE', date: '2026-01-15' },
+      { id: 3, titre: 'Migration serveur', statut: 'EN_COURS', priorite: 'HAUTE', date: '2026-01-16' },
+      { id: 4, titre: 'Sécurité données', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-17' },
+      { id: 5, titre: 'Sauvegarde disque', statut: 'FERME', priorite: 'MOYENNE', date: '2026-01-10' }
+    ];
   }
 
   loadFactures() {
@@ -97,7 +111,7 @@ export class DashboardOdile implements OnInit {
       { id: 2, numero: 'FAC-2026-002', client: 'Client B', montant: '3500€', date: '2026-01-12', statut: 'EN_ATTENTE' },
       { id: 3, numero: 'FAC-2026-003', client: 'Client C', montant: '7200€', date: '2026-01-10', statut: 'PAYEE' },
       { id: 4, numero: 'FAC-2026-004', client: 'Client D', montant: '4100€', date: '2026-01-08', statut: 'EN_ATTENTE' },
-      { id: 5, numero: 'FAC-2025-050', client: 'Client E', montant: '2800€', date: '2025-12-20', statut: 'PAYEE' }
+      { id: 5, numero: 'FAC-2026-005', client: 'Client E', montant: '2800€', date: '2026-01-05', statut: 'PAYEE' }
     ];
   }
 
@@ -111,25 +125,36 @@ export class DashboardOdile implements OnInit {
         this.loadConges();
         this.showCongeForm = false;
         this.conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
-      }, error => console.error('Erreur envoi congé', error));
+      }, error => console.error('Erreur', error));
   }
 
   updateStatut(id: number, statut: string) {
     this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
-      .subscribe(() => this.loadTousLesConges(), error => console.error('Erreur statut', error));
+      .subscribe(() => this.loadConges(), error => console.error('Erreur', error));
+  }
+
+  ouvrirDetailReclamation(reclamation: any) {
+    this.selectedReclamation = reclamation;
+    this.showReclamationDetailModal = true;
+  }
+
+  fermerDetailReclamation() {
+    this.showReclamationDetailModal = false;
+    this.selectedReclamation = null;
   }
 
   getPageTitle(): string {
     switch(this.currentPage) {
-      case 'home': return 'Mon Dashboard';
-      case 'interventions': return 'Gestion des Interventions';
-      case 'ged': return 'GED - Gestion Électronique Documentaire';
-      case 'tickets': return 'Tickets Support';
+      case 'home': return 'Tableau de Bord';
+      case 'interventions': return 'Interventions';
+      case 'ged': return 'GED';
+      case 'tickets': return 'Tickets';
       case 'rh': return 'Ressources Humaines';
-      case 'factures': return 'Gestion des Factures';
+      case 'factures': return 'Factures';
       case 'conges-valider': return 'Congés à Valider';
       case 'mes-conges': return 'Mes Congés';
-      default: return 'Dashboard';
+      case 'remonteesTerrain': return 'Remontées Terrain';
+      default: return 'Odile Dashboard';
     }
   }
 
