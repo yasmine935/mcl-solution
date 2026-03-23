@@ -1,0 +1,237 @@
+<div class="taches-container">
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>📋 Tâches & Projets</h2>
+    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd" class="btn-add">
+      <mat-icon>add</mat-icon> Ajouter une Tâche
+    </button>
+  </div>
+
+  <!-- FORMULAIRE AJOUT -->
+  @if (showFormAdd) {
+    <div class="form-container">
+      <h3>➕ Nouvelle Tâche</h3>
+      
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Projet *</mat-label>
+          <input matInput [(ngModel)]="nouvelleTache.projet" placeholder="Ex: Projet 1"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select [(ngModel)]="nouvelleTache.statut">
+            @for (statut of statuts; track statut) {
+              <mat-option [value]="statut">{{ statut }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Date</mat-label>
+          <input matInput [(ngModel)]="nouvelleTache.date" placeholder="Ex: 1 oct"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Priorité</mat-label>
+          <mat-select [(ngModel)]="nouvelleTache.priorite">
+            @for (priorite of priorites; track priorite) {
+              <mat-option [value]="priorite">{{ priorite }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Échéance</mat-label>
+          <input matInput [(ngModel)]="nouvelleTache.echeance" placeholder="Ex: 11 oct"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Valeur</mat-label>
+          <mat-select [(ngModel)]="nouvelleTache.valeur">
+            @for (valeur of valeurs; track valeur) {
+              <mat-option [value]="valeur">{{ valeur }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="ajouterTache()">
+          <mat-icon>check</mat-icon> Ajouter
+        </button>
+        <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- FORMULAIRE ÉDITION -->
+  @if (showFormEdit && selectedTache) {
+    <div class="form-container form-edit">
+      <h3>✏️ Modifier - {{ selectedTache.projet }}</h3>
+      
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Projet *</mat-label>
+          <input matInput [(ngModel)]="tacheEnEdition.projet"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select [(ngModel)]="tacheEnEdition.statut">
+            @for (statut of statuts; track statut) {
+              <mat-option [value]="statut">{{ statut }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Date</mat-label>
+          <input matInput [(ngModel)]="tacheEnEdition.date"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Priorité</mat-label>
+          <mat-select [(ngModel)]="tacheEnEdition.priorite">
+            @for (priorite of priorites; track priorite) {
+              <mat-option [value]="priorite">{{ priorite }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Échéance</mat-label>
+          <input matInput [(ngModel)]="tacheEnEdition.echeance"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Valeur</mat-label>
+          <mat-select [(ngModel)]="tacheEnEdition.valeur">
+            @for (valeur of valeurs; track valeur) {
+              <mat-option [value]="valeur">{{ valeur }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="modifierTache()">
+          <mat-icon>save</mat-icon> Enregistrer
+        </button>
+        <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- TABLEAU DES TÂCHES -->
+  <div class="table-container">
+    <h3>📊 Liste des Tâches ({{ taches.length }})</h3>
+    
+    @if (taches.length === 0) {
+      <p class="empty">Aucune tâche</p>
+    } @else {
+      <div class="table-wrapper">
+        <table class="taches-table">
+          <thead>
+            <tr>
+              <th>Tâche</th>
+              <th>Personnes</th>
+              <th>Statut</th>
+              <th>Date</th>
+              <th>Priorité</th>
+              <th>Fichiers</th>
+              <th>Échéances</th>
+              <th>Valeur</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tache of taches; track tache.id) {
+              <tr>
+                <td>
+                  <div class="projet-with-note">
+                    <strong>{{ tache.projet }}</strong>
+                    <button mat-icon-button (click)="ouvrirNoteModal(tache)" title="Ajouter/Modifier une note" class="note-btn">
+                      <mat-icon [class.has-note]="tache.note">note</mat-icon>
+                    </button>
+                  </div>
+                </td>
+                <td><mat-icon class="icon-person">person</mat-icon></td>
+                <td>
+                  <span class="badge-statut" [style.background-color]="getStatutColor(tache.statut)">
+                    {{ tache.statut }}
+                  </span>
+                </td>
+                <td>{{ tache.date }}</td>
+                <td>
+                  <span class="badge-priorite" [style.background-color]="getPrioriteColor(tache.priorite)">
+                    {{ tache.priorite }}
+                  </span>
+                </td>
+                <td>
+                  @if (tache.fichiers > 0) {
+                    <span class="badge-fichiers">{{ tache.fichiers }}</span>
+                  } @else {
+                    <span class="badge-vide">-</span>
+                  }
+                </td>
+                <td>
+                  <span class="badge-echeance">{{ tache.echeance }}</span>
+                </td>
+                <td>
+                  <span class="badge-valeur" [class]="tache.valeur?.toLowerCase()">
+                    {{ tache.valeur }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  <button mat-icon-button color="primary" (click)="ouvrirEdition(tache)" title="Modifier">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="supprimerTache(tache.id)" title="Supprimer">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- MODAL NOTES -->
+@if (showNoteModal && selectedTache) {
+  <div class="modal-overlay" (click)="fermerNoteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📝 Note - {{ selectedTache.projet }}</h3>
+        <button mat-icon-button (click)="fermerNoteModal()" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <textarea 
+          [(ngModel)]="noteTemp" 
+          placeholder="Écrivez votre note ici..."
+          class="note-textarea"
+          rows="6">
+        </textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" (click)="sauvegarderNote()">
+          <mat-icon>save</mat-icon> Sauvegarder
+        </button>
+        <button mat-stroked-button (click)="fermerNoteModal()">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+}

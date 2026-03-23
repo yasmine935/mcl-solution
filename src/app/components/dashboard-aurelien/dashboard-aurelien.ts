@@ -9,13 +9,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
+import { Taches } from '../taches/taches';
 @Component({
   selector: 'app-dashboard-aurelien',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule ,FicheInterventionManager
+    MatInputModule, MatSelectModule ,FicheInterventionManager , Taches
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
