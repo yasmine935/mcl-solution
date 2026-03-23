@@ -1,0 +1,272 @@
+<div class="documents-container">
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>📄 Gestion des Documents</h2>
+    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd" class="btn-add">
+      <mat-icon>upload_file</mat-icon> Ajouter un Document
+    </button>
+  </div>
+
+  <!-- RECHERCHE -->
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>🔍 Rechercher...</mat-label>
+      <input matInput [(ngModel)]="searchText" placeholder="Nom, catégorie, description"/>
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- FORMULAIRE AJOUT -->
+  @if (showFormAdd) {
+    <div class="form-container">
+      <h3>➕ Nouveau Document</h3>
+      
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Nom du document *</mat-label>
+          <input matInput [(ngModel)]="nouveauDocument.nom" placeholder="Ex: Contrat Client"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Catégorie</mat-label>
+          <mat-select [(ngModel)]="nouveauDocument.categorie">
+            @for (cat of categories; track cat) {
+              <mat-option [value]="cat">{{ cat }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="nouveauDocument.description" placeholder="Décrivez le document..." rows="3"></textarea>
+      </mat-form-field>
+
+      <!-- UPLOAD FICHIER -->
+      <div class="fichier-section">
+        <h4>📎 Fichier</h4>
+        <div class="file-upload-box">
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelect($event)" 
+            class="file-input"
+            accept="*/*"
+          />
+          <button mat-stroked-button (click)="fileInput.click()" type="button">
+            <mat-icon>upload_file</mat-icon> Choisir un fichier
+          </button>
+        </div>
+
+        @if (nouveauDocument.fichierNom) {
+          <div class="fichier-info">
+            <mat-icon>{{ getFileIcon(nouveauDocument.fichierNom) }}</mat-icon>
+            <div class="fichier-details">
+              <p class="fichier-nom">{{ nouveauDocument.fichierNom }}</p>
+              <p class="fichier-meta">{{ nouveauDocument.fichierTaille }} KB</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="ajouterDocument()">
+          <mat-icon>check</mat-icon> Ajouter
+        </button>
+        <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- FORMULAIRE ÉDITION -->
+  @if (showFormEdit && selectedDocument) {
+    <div class="form-container form-edit">
+      <h3>✏️ Modifier - {{ selectedDocument.nom }}</h3>
+      
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Nom du document *</mat-label>
+          <input matInput [(ngModel)]="documentEnEdition.nom"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Catégorie</mat-label>
+          <mat-select [(ngModel)]="documentEnEdition.categorie">
+            @for (cat of categories; track cat) {
+              <mat-option [value]="cat">{{ cat }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="documentEnEdition.description" rows="3"></textarea>
+      </mat-form-field>
+
+      <!-- UPLOAD FICHIER (ÉDITION) -->
+      <div class="fichier-section">
+        <h4>📎 Fichier</h4>
+        <div class="file-upload-box">
+          <input 
+            type="file" 
+            #fileInputEdit 
+            (change)="onFileSelectEdit($event)" 
+            class="file-input"
+            accept="*/*"
+          />
+          <button mat-stroked-button (click)="fileInputEdit.click()" type="button">
+            <mat-icon>upload_file</mat-icon> Changer le fichier
+          </button>
+        </div>
+
+        @if (documentEnEdition.fichierNom) {
+          <div class="fichier-info">
+            <mat-icon>{{ getFileIcon(documentEnEdition.fichierNom) }}</mat-icon>
+            <div class="fichier-details">
+              <p class="fichier-nom">{{ documentEnEdition.fichierNom }}</p>
+              <p class="fichier-meta">{{ documentEnEdition.fichierTaille }} KB</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="modifierDocument()">
+          <mat-icon>save</mat-icon> Enregistrer
+        </button>
+        <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- TABLEAU DES DOCUMENTS -->
+  <div class="table-container">
+    <h3>📊 Liste des Documents ({{ getDocumentsFiltres().length }})</h3>
+    
+    @if (getDocumentsFiltres().length === 0) {
+      <p class="empty">Aucun document trouvé</p>
+    } @else {
+      <div class="table-wrapper">
+        <table class="documents-table">
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Catégorie</th>
+              <th>Fichier</th>
+              <th>Ajouté le</th>
+              <th>Auteur</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (doc of getDocumentsFiltres(); track doc.id) {
+              <tr>
+                <td>
+                  <div class="doc-name">
+                    <mat-icon class="doc-icon">{{ getFileIcon(doc.fichierNom) }}</mat-icon>
+                    <strong>{{ doc.nom }}</strong>
+                  </div>
+                  @if (doc.description) {
+                    <p class="doc-description">{{ doc.description }}</p>
+                  }
+                </td>
+                <td>
+                  <span class="badge-category" [style.background-color]="getCategoryColor(doc.categorie)">
+                    {{ doc.categorie }}
+                  </span>
+                </td>
+                <td>
+                  <span class="fichier-badge">{{ doc.fichierNom }}</span>
+                  <p class="fichier-size">{{ doc.fichierTaille }} KB</p>
+                </td>
+                <td class="date-cell">{{ doc.dateAjout }}</td>
+                <td>{{ doc.auteur }}</td>
+                <td class="actions-cell">
+                  <button mat-icon-button color="accent" (click)="telechargerDocument(doc)" title="Télécharger">
+                    <mat-icon>download</mat-icon>
+                  </button>
+                  <button mat-icon-button color="primary" (click)="ouvrirEdition(doc)" title="Modifier">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="supprimerDocument(doc.id)" title="Supprimer">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                  <button mat-icon-button color="primary" (click)="ouvrirDetailModal(doc)" title="Détails">
+                    <mat-icon>info</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- MODAL DÉTAILS -->
+@if (showDetailModal && selectedDocument) {
+  <div class="modal-overlay" (click)="fermerDetailModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📄 Détails du Document</h3>
+        <button mat-icon-button (click)="fermerDetailModal()" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="detail-item">
+          <strong>Nom :</strong>
+          <p>{{ selectedDocument.nom }}</p>
+        </div>
+
+        <div class="detail-item">
+          <strong>Catégorie :</strong>
+          <span class="badge-category" [style.background-color]="getCategoryColor(selectedDocument.categorie)">
+            {{ selectedDocument.categorie }}
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Description :</strong>
+          <p>{{ selectedDocument.description || '-' }}</p>
+        </div>
+
+        <div class="detail-item">
+          <strong>Fichier :</strong>
+          <p>{{ selectedDocument.fichierNom }} ({{ selectedDocument.fichierTaille }} KB)</p>
+        </div>
+
+        <div class="detail-item">
+          <strong>Ajouté le :</strong>
+          <p>{{ selectedDocument.dateAjout }}</p>
+        </div>
+
+        <div class="detail-item">
+          <strong>Modifié le :</strong>
+          <p>{{ selectedDocument.dateModification }}</p>
+        </div>
+
+        <div class="detail-item">
+          <strong>Auteur :</strong>
+          <p>{{ selectedDocument.auteur }}</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button mat-raised-button color="accent" (click)="telechargerDocument(selectedDocument)">
+          <mat-icon>download</mat-icon> Télécharger
+        </button>
+        <button mat-stroked-button (click)="fermerDetailModal()">
+          <mat-icon>close</mat-icon> Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+}

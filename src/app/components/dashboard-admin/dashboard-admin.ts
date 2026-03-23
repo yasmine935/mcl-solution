@@ -10,6 +10,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { Employes } from '../employes/employes';
+import { Taches } from '../taches/taches';
+import { Documents } from '../documents/documents';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -18,7 +20,7 @@ import { Employes } from '../employes/employes';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes
+    FicheInterventionManager,Employes ,Taches, Documents
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'

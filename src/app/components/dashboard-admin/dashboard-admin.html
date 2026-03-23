@@ -13,6 +13,9 @@
      <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
   <mat-icon>engineering</mat-icon> Fiches Intervention
 </a>
+<a class="nav-item" [class.active]="currentPage === 'taches'" (click)="currentPage = 'taches'">
+  <mat-icon>check_circle</mat-icon> Tâches
+</a>
       <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
         <mat-icon>fact_check</mat-icon> Tous les Congés
       </a>
@@ -80,7 +83,10 @@
 @if (currentPage === 'interventions') {
   <app-fiche-intervention-manager></app-fiche-intervention-manager>
 }
-
+<!-- TÂCHES -->
+@if (currentPage === 'taches') {
+  <app-taches></app-taches>
+}
     <!-- Congés -->
     @if (currentPage === 'conges') {
       <div class="table-card">
@@ -232,47 +238,9 @@
   </div>
 }
     <!-- Documents -->
-    @if (currentPage === 'documents') {
-      <div class="table-card">
-        <h3>📁 Gestion Documentaire Complète</h3>
-        @if (documents.length === 0) {
-          <div class="empty">Aucun document</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Type</th>
-                <th>Taille</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (doc of documents; track doc.id) {
-                <tr>
-                  <td>{{ doc.nom }}</td>
-                  <td><span class="badge-type">{{ doc.type }}</span></td>
-                  <td>{{ doc.taille }}</td>
-                  <td>{{ doc.date }}</td>
-                  <td>
-                    <button mat-icon-button color="primary">
-                      <mat-icon>download</mat-icon>
-                    </button>
-                    <button mat-icon-button color="accent">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="warn">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
+  @if (currentPage === 'documents') {
+  <app-documents></app-documents>
+}
 
     <!-- Tickets -->
     @if (currentPage === 'tickets') {

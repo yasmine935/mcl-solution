@@ -1,4 +1,4 @@
-.taches-container {
+.documents-container {
   padding: 25px;
   background: linear-gradient(135deg, #f5f5f5 0%, #f9f9f9 100%);
   min-height: 100vh;
@@ -45,6 +45,20 @@
   color: #FFFFFF;
 }
 
+/* ===== RECHERCHE ===== */
+.search-container {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E0E0E0;
+}
+
+.search-field {
+  width: 100%;
+}
+
 /* ===== FORMULAIRES ===== */
 .form-container {
   background: #FFFFFF;
@@ -74,6 +88,10 @@
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 18px;
   margin-bottom: 25px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
 }
 
 mat-form-field {
@@ -111,13 +129,15 @@ mat-form-field {
 }
 
 /* ===== FICHIERS SECTION ===== */
-.fichiers-section {
+.fichier-section {
   margin-top: 25px;
-  padding-top: 25px;
-  border-top: 2px solid #E0E0E0;
+  padding: 20px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  border-left: 4px solid #1565C0;
 }
 
-.fichiers-section h4 {
+.fichier-section h4 {
   color: #1565C0;
   margin-top: 0;
   margin-bottom: 15px;
@@ -132,7 +152,7 @@ mat-form-field {
   gap: 12px;
   align-items: center;
   padding: 15px;
-  background: #F5F5F5;
+  background: white;
   border: 2px dashed #1565C0;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -157,40 +177,26 @@ mat-form-field {
   color: #FFFFFF;
 }
 
-.fichiers-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.fichier-item {
+.fichier-info {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #F9F9F9;
-  border-left: 4px solid #1565C0;
+  background: white;
   border-radius: 6px;
-  transition: all 0.2s ease;
+  margin-top: 10px;
 }
 
-.fichier-item:hover {
-  background: #F0F0F0;
-  transform: translateX(4px);
-}
-
-.fichier-item mat-icon {
+.fichier-info mat-icon {
   color: #1565C0;
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 
-.fichier-info {
+.fichier-details {
   flex: 1;
-  min-width: 0;
 }
 
 .fichier-nom {
@@ -198,7 +204,6 @@ mat-form-field {
   margin: 0;
   font-weight: 600;
   font-size: 14px;
-  word-break: break-word;
 }
 
 .fichier-meta {
@@ -229,16 +234,16 @@ mat-form-field {
   overflow-x: auto;
 }
 
-.taches-table {
+.documents-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.taches-table thead {
+.documents-table thead {
   background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
 }
 
-.taches-table th {
+.documents-table th {
   padding: 16px;
   text-align: left;
   color: #FFFFFF;
@@ -249,81 +254,47 @@ mat-form-field {
   letter-spacing: 0.5px;
 }
 
-.taches-table td {
+.documents-table td {
   padding: 15px 16px;
   border-bottom: 1px solid #E0E0E0;
   color: #333;
 }
 
-.taches-table tbody tr {
+.documents-table tbody tr {
   transition: all 0.2s ease;
 }
 
-.taches-table tbody tr:hover {
+.documents-table tbody tr:hover {
   background: #F8F9FA;
   transform: scale(1.01);
 }
 
-/* Icône personne */
-.icon-person {
+/* Document Name */
+.doc-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doc-icon {
   color: #1565C0;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
-/* Badges Statut */
-.badge-statut {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  color: white;
-  text-transform: capitalize;
-}
-
-/* Badges Priorité */
-.badge-priorite {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  color: white;
-  text-transform: capitalize;
-}
-
-/* Badges Fichiers */
-.badge-fichiers {
-  display: inline-block;
-  padding: 6px 12px;
-  background: #000;
-  color: white;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.badge-vide {
+.doc-description {
   color: #999;
-}
-
-/* Badges Échéance */
-.badge-echeance {
-  display: inline-block;
-  padding: 6px 12px;
-  background: #E0E0E0;
-  color: #333;
-  border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
+  margin: 6px 0 0 34px;
+  font-style: italic;
 }
 
-/* Badges Valeur */
-.badge-valeur {
+/* Category Badge */
+.badge-category {
   display: inline-block;
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
@@ -331,29 +302,30 @@ mat-form-field {
   text-transform: capitalize;
 }
 
-.badge-valeur.bronze {
-  background: #CD7F32;
+/* Fichier Badge */
+.fichier-badge {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  font-size: 13px;
+  word-break: break-word;
 }
 
-.badge-valeur.platinum {
-  background: #E5E4E2;
-  color: #333;
+.fichier-size {
+  color: #999;
+  font-size: 12px;
+  margin-top: 4px;
 }
 
-.badge-valeur.gold {
-  background: #FFD700;
-  color: #333;
-}
-
-.badge-valeur.silver {
-  background: #C0C0C0;
-  color: #333;
+.date-cell {
+  font-size: 12px;
+  color: #666;
 }
 
 /* Actions */
 .actions-cell {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -373,55 +345,7 @@ mat-form-field {
   font-size: 15px;
 }
 
-/* ===== PROJET AVEC NOTE ===== */
-.projet-with-note {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.note-btn {
-  padding: 0 !important;
-  min-width: 24px;
-  width: 24px;
-  height: 24px;
-  position: relative;
-}
-
-.note-btn mat-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  color: #999;
-  transition: all 0.2s ease;
-}
-
-.note-btn mat-icon:hover {
-  color: #1565C0;
-}
-
-.note-btn mat-icon.has-note {
-  color: #FF9800;
-  font-weight: 700;
-}
-
-.note-count {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #FF5722;
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-/* ===== MODAL OVERLAY ===== */
+/* ===== MODAL ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -450,8 +374,10 @@ mat-form-field {
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
   animation: slideUp 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 @keyframes slideUp {
@@ -491,91 +417,34 @@ mat-form-field {
 
 .modal-body {
   padding: 25px;
-  max-height: 500px;
-  overflow-y: auto;
 }
 
-.notes-list {
-  margin-bottom: 25px;
+.detail-item {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #E0E0E0;
 }
 
-.notes-list h4 {
+.detail-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.detail-item strong {
+  display: block;
   color: #1565C0;
-  margin-top: 0;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   font-size: 14px;
-  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.note-item {
-  background: #F5F5F5;
-  border-left: 4px solid #1565C0;
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-}
-
-.note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  gap: 10px;
-}
-
-.note-author {
-  color: #1565C0;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.note-date {
-  color: #999;
-  font-size: 11px;
-  font-style: italic;
-}
-
-.note-content {
+.detail-item p {
   color: #333;
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
-}
-
-.notes-separator {
-  border: none;
-  border-top: 2px solid #E0E0E0;
-  margin: 20px 0;
-}
-
-.add-note-section h4 {
-  color: #1565C0;
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.note-textarea {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #1565C0;
-  border-radius: 8px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 14px;
-  color: #333;
-  resize: none;
-  transition: all 0.2s ease;
-}
-
-.note-textarea:focus {
-  outline: none;
-  border-color: #0D47A1;
-  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
 }
 
 .modal-footer {
@@ -594,28 +463,6 @@ mat-form-field {
 
 .modal-footer button mat-icon {
   color: #FFFFFF;
-}
-
-/* ===== ASSIGNEES ===== */
-.assignes-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.assignee-badge {
-  display: inline-block;
-  padding: 6px 10px;
-  background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
-  color: white;
-  border-radius: 16px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.assignee-empty {
-  color: #999;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -643,21 +490,38 @@ mat-form-field {
     width: 100%;
   }
 
-  .taches-table th,
-  .taches-table td {
+  .documents-table th,
+  .documents-table td {
     padding: 12px 10px;
     font-size: 12px;
   }
 
-  .taches-table th {
+  .documents-table th {
     font-size: 11px;
   }
 
+  .doc-name {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .doc-description {
+    margin-left: 0;
+  }
+
   .actions-cell {
+    flex-wrap: wrap;
+  }
+
+  .modal-content {
+    width: 95%;
+  }
+
+  .modal-footer {
     flex-direction: column;
   }
 
-  .actions-cell button {
+  .modal-footer button {
     width: 100%;
   }
 }

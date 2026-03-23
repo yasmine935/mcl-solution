@@ -20,6 +20,7 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class Taches implements OnInit {
   taches: any[] = [];
+  employes: any[] = [];
   showFormAdd = false;
   showFormEdit = false;
   showNoteModal = false;
@@ -35,7 +36,8 @@ export class Taches implements OnInit {
     statut: 'En Qualification',
     date: '',
     priorite: 'Moyenne',
-    fichiers: '',
+    fichiers: [] as any[],
+    assignes: [] as any[],
     echeance: '',
     valeur: 'Bronze'
   };
@@ -46,15 +48,21 @@ export class Taches implements OnInit {
 
   ngOnInit() {
     this.loadTaches();
+    this.loadEmployes();
+  }
+
+  loadEmployes() {
+    const stored = localStorage.getItem('employes');
+    this.employes = stored ? JSON.parse(stored) : [];
   }
 
   loadTaches() {
     const stored = localStorage.getItem('taches');
     this.taches = stored ? JSON.parse(stored) : [
-      { id: 1, projet: 'Projet 1', statut: 'En cours', date: '1 oct', priorite: 'Faible', fichiers: 11, echeance: '11 oct', valeur: 'Platinum' },
-      { id: 2, projet: 'Projet 2', statut: 'Fait', date: '2 oct', priorite: 'Élevé', fichiers: 0, echeance: '-', valeur: 'Gold' },
-      { id: 3, projet: 'Projet 3', statut: 'Perdu', date: '3 oct', priorite: 'Moyenne', fichiers: 0, echeance: '-', valeur: 'Bronze' },
-      { id: 4, projet: 'Project4', statut: 'En Attente', date: '16 oct', priorite: 'Faible', fichiers: 0, echeance: '-', valeur: 'Silver' }
+      { id: 1, projet: 'Projet 1', statut: 'En cours', date: '1 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '11 oct', valeur: 'Platinum' },
+      { id: 2, projet: 'Projet 2', statut: 'Fait', date: '2 oct', priorite: 'Élevé', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Gold' },
+      { id: 3, projet: 'Projet 3', statut: 'Perdu', date: '3 oct', priorite: 'Moyenne', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Bronze' },
+      { id: 4, projet: 'Project4', statut: 'En Attente', date: '16 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Silver' }
     ];
   }
 
@@ -69,7 +77,8 @@ export class Taches implements OnInit {
     const tache = {
       id: idIncrement,
       ...this.nouvelleTache,
-      fichiers: 0,
+      fichiers: (this.nouvelleTache.fichiers || []) as any[],
+      assignes: (this.nouvelleTache.assignes || []) as any[],
       dateCreation: new Date().toISOString()
     };
 
@@ -78,6 +87,50 @@ export class Taches implements OnInit {
 
     this.resetFormAdd();
     this.showFormAdd = false;
+  }
+
+  onFileSelectAdd(event: any) {
+    const files = event.target.files;
+    if (files) {
+      if (!this.nouvelleTache.fichiers) {
+        this.nouvelleTache.fichiers = [] as any[];
+      }
+      for (let i = 0; i < files.length; i++) {
+        (this.nouvelleTache.fichiers as any[]).push({
+          nom: files[i].name,
+          taille: (files[i].size / 1024).toFixed(2),
+          date: new Date().toLocaleString('fr-FR')
+        });
+      }
+    }
+  }
+
+  supprimerFichier(index: number) {
+    if (this.nouvelleTache.fichiers) {
+      this.nouvelleTache.fichiers.splice(index, 1);
+    }
+  }
+
+  supprimerFichierEdit(index: number) {
+    if (this.tacheEnEdition.fichiers) {
+      this.tacheEnEdition.fichiers.splice(index, 1);
+    }
+  }
+
+  onFileSelectEdit(event: any) {
+    const files = event.target.files;
+    if (files) {
+      if (!this.tacheEnEdition.fichiers) {
+        this.tacheEnEdition.fichiers = [] as any[];
+      }
+      for (let i = 0; i < files.length; i++) {
+        (this.tacheEnEdition.fichiers as any[]).push({
+          nom: files[i].name,
+          taille: (files[i].size / 1024).toFixed(2),
+          date: new Date().toLocaleString('fr-FR')
+        });
+      }
+    }
   }
 
   ouvrirEdition(tache: any) {
@@ -114,10 +167,16 @@ export class Taches implements OnInit {
       statut: 'En Qualification',
       date: '',
       priorite: 'Moyenne',
-      fichiers: '',
+      fichiers: [] as any[],
+      assignes: [] as any[],
       echeance: '',
       valeur: 'Bronze'
     };
+  }
+
+  getEmployeeName(employeId: number): string {
+    const emp = this.employes.find((e: any) => e.id === employeId);
+    return emp ? `${emp.prenom} ${emp.nom}` : 'Inconnu';
   }
 
   resetFormEdit() {
@@ -146,13 +205,24 @@ export class Taches implements OnInit {
 
   ouvrirNoteModal(tache: any) {
     this.selectedTache = tache;
-    this.noteTemp = tache.note || '';
+    this.noteTemp = tache.noteContent || '';
     this.showNoteModal = true;
   }
 
   sauvegarderNote() {
-    if (this.selectedTache) {
-      this.selectedTache.note = this.noteTemp;
+    if (this.selectedTache && this.noteTemp.trim()) {
+      const currentUser = localStorage.getItem('currentUser') || 'Utilisateur';
+      
+      if (!this.selectedTache.notes) {
+        this.selectedTache.notes = [];
+      }
+
+      this.selectedTache.notes.push({
+        auteur: currentUser,
+        contenu: this.noteTemp,
+        date: new Date().toLocaleString('fr-FR')
+      });
+
       localStorage.setItem('taches', JSON.stringify(this.taches));
       this.showNoteModal = false;
       this.noteTemp = '';

@@ -42,6 +42,15 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
+          <mat-label>Personnes assignées</mat-label>
+          <mat-select [(ngModel)]="nouvelleTache.assignes" multiple>
+            @for (emp of employes; track emp.id) {
+              <mat-option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
           <mat-label>Échéance</mat-label>
           <input matInput [(ngModel)]="nouvelleTache.echeance" placeholder="Ex: 11 oct"/>
         </mat-form-field>
@@ -54,6 +63,42 @@
             }
           </mat-select>
         </mat-form-field>
+      </div>
+
+      <!-- UPLOAD FICHIERS -->
+      <div class="fichiers-section">
+        <h4>📎 Fichiers</h4>
+        <div class="file-upload-box">
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelectAdd($event)" 
+            multiple 
+            class="file-input"
+            accept="*/*"
+          />
+          <button mat-stroked-button (click)="fileInput.click()" type="button">
+            <mat-icon>upload_file</mat-icon> Ajouter des fichiers
+          </button>
+        </div>
+
+        <!-- LISTE DES FICHIERS -->
+        @if (nouvelleTache.fichiers && nouvelleTache.fichiers.length > 0) {
+          <div class="fichiers-list">
+            @for (fichier of nouvelleTache.fichiers; track $index) {
+              <div class="fichier-item">
+                <mat-icon>description</mat-icon>
+                <div class="fichier-info">
+                  <p class="fichier-nom">{{ fichier.nom }}</p>
+                  <p class="fichier-meta">{{ fichier.taille }} KB • {{ fichier.date }}</p>
+                </div>
+                <button mat-icon-button color="warn" (click)="supprimerFichier($index)" type="button">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <div class="form-actions">
@@ -102,6 +147,15 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
+          <mat-label>Personnes assignées</mat-label>
+          <mat-select [(ngModel)]="tacheEnEdition.assignes" multiple>
+            @for (emp of employes; track emp.id) {
+              <mat-option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
           <mat-label>Échéance</mat-label>
           <input matInput [(ngModel)]="tacheEnEdition.echeance"/>
         </mat-form-field>
@@ -114,6 +168,42 @@
             }
           </mat-select>
         </mat-form-field>
+      </div>
+
+      <!-- UPLOAD FICHIERS (ÉDITION) -->
+      <div class="fichiers-section">
+        <h4>📎 Fichiers</h4>
+        <div class="file-upload-box">
+          <input 
+            type="file" 
+            #fileInputEdit 
+            (change)="onFileSelectEdit($event)" 
+            multiple 
+            class="file-input"
+            accept="*/*"
+          />
+          <button mat-stroked-button (click)="fileInputEdit.click()" type="button">
+            <mat-icon>upload_file</mat-icon> Ajouter des fichiers
+          </button>
+        </div>
+
+        <!-- LISTE DES FICHIERS -->
+        @if (tacheEnEdition.fichiers && tacheEnEdition.fichiers.length > 0) {
+          <div class="fichiers-list">
+            @for (fichier of tacheEnEdition.fichiers; track $index) {
+              <div class="fichier-item">
+                <mat-icon>description</mat-icon>
+                <div class="fichier-info">
+                  <p class="fichier-nom">{{ fichier.nom }}</p>
+                  <p class="fichier-meta">{{ fichier.taille }} KB • {{ fichier.date }}</p>
+                </div>
+                <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <div class="form-actions">
@@ -140,6 +230,7 @@
             <tr>
               <th>Tâche</th>
               <th>Personnes</th>
+              <th>Personnes assignées</th>
               <th>Statut</th>
               <th>Date</th>
               <th>Priorité</th>
@@ -155,9 +246,23 @@
                 <td>
                   <div class="projet-with-note">
                     <strong>{{ tache.projet }}</strong>
-                    <button mat-icon-button (click)="ouvrirNoteModal(tache)" title="Ajouter/Modifier une note" class="note-btn">
-                      <mat-icon [class.has-note]="tache.note">note</mat-icon>
+                    <button mat-icon-button (click)="ouvrirNoteModal(tache)" title="Voir/Ajouter une note" class="note-btn">
+                      <mat-icon [class.has-note]="tache.notes && tache.notes.length > 0">note</mat-icon>
+                      @if (tache.notes && tache.notes.length > 0) {
+                        <span class="note-count">{{ tache.notes.length }}</span>
+                      }
                     </button>
+                  </div>
+                </td>
+                <td>
+                  <div class="assignes-container">
+                    @if (tache.assignes && tache.assignes.length > 0) {
+                      @for (assigneId of tache.assignes; track assigneId) {
+                        <span class="assignee-badge">{{ getEmployeeName(assigneId) }}</span>
+                      }
+                    } @else {
+                      <span class="assignee-empty">-</span>
+                    }
                   </div>
                 </td>
                 <td><mat-icon class="icon-person">person</mat-icon></td>
@@ -173,8 +278,8 @@
                   </span>
                 </td>
                 <td>
-                  @if (tache.fichiers > 0) {
-                    <span class="badge-fichiers">{{ tache.fichiers }}</span>
+                  @if (tache.fichiers && tache.fichiers.length > 0) {
+                    <span class="badge-fichiers">{{ tache.fichiers.length }}</span>
                   } @else {
                     <span class="badge-vide">-</span>
                   }
@@ -209,27 +314,48 @@
   <div class="modal-overlay" (click)="fermerNoteModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>📝 Note - {{ selectedTache.projet }}</h3>
+        <h3>📝 Notes - {{ selectedTache.projet }}</h3>
         <button mat-icon-button (click)="fermerNoteModal()" class="close-btn">
           <mat-icon>close</mat-icon>
         </button>
       </div>
       
       <div class="modal-body">
-        <textarea 
-          [(ngModel)]="noteTemp" 
-          placeholder="Écrivez votre note ici..."
-          class="note-textarea"
-          rows="6">
-        </textarea>
+        <!-- NOTES EXISTANTES -->
+        @if (selectedTache.notes && selectedTache.notes.length > 0) {
+          <div class="notes-list">
+            <h4>📋 Historique des Notes</h4>
+            @for (note of selectedTache.notes; track $index) {
+              <div class="note-item">
+                <div class="note-header">
+                  <strong class="note-author">{{ note.auteur }}</strong>
+                  <span class="note-date">{{ note.date }}</span>
+                </div>
+                <p class="note-content">{{ note.contenu }}</p>
+              </div>
+            }
+          </div>
+          <hr class="notes-separator"/>
+        }
+
+        <!-- AJOUTER UNE NOUVELLE NOTE -->
+        <div class="add-note-section">
+          <h4>✍️ Ajouter une Note</h4>
+          <textarea 
+            [(ngModel)]="noteTemp" 
+            placeholder="Écrivez votre note ici..."
+            class="note-textarea"
+            rows="5">
+          </textarea>
+        </div>
       </div>
 
       <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="sauvegarderNote()">
-          <mat-icon>save</mat-icon> Sauvegarder
+        <button mat-raised-button color="primary" (click)="sauvegarderNote()" [disabled]="!noteTemp.trim()">
+          <mat-icon>save</mat-icon> Ajouter la Note
         </button>
         <button mat-stroked-button (click)="fermerNoteModal()">
-          <mat-icon>close</mat-icon> Annuler
+          <mat-icon>close</mat-icon> Fermer
         </button>
       </div>
     </div>
