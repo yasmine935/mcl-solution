@@ -13,9 +13,7 @@
       <a class="nav-item" [class.active]="currentPage === 'fiches'" (click)="currentPage = 'fiches'">
         <mat-icon>description</mat-icon> Fiches d'Intervention
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
-        <mat-icon>engineering</mat-icon> Interventions
-      </a>
+     
       <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
         <mat-icon>folder_open</mat-icon> GED
       </a>
@@ -79,55 +77,9 @@
     }
 
     <!-- Fiches d'Intervention -->
-    @if (currentPage === 'fiches') {
-      <div class="table-card">
-        <h3>📋 Fiches d'Intervention ({{ fiches.length }})</h3>
-        @if (fiches.length === 0) {
-          <p class="empty">Aucune fiche d'intervention</p>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>N° Projet</th>
-                <th>Client</th>
-                <th>Technicien</th>
-                <th>Date</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (fiche of fiches; track fiche.id) {
-                <tr>
-                  <td><strong>{{ fiche.numero }}</strong></td>
-                  <td>{{ fiche.client }}</td>
-                  <td>{{ fiche.technicienNom || '-' }}</td>
-                  <td>{{ fiche.date }}</td>
-                  <td><span [class]="'badge ' + fiche.statut?.toLowerCase()">{{ fiche.statut }}</span></td>
-                  <td>
-                    <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" title="Voir détails">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-
-    <!-- Interventions -->
-    @if (currentPage === 'interventions') {
-      <div class="table-card">
-        <h3>🔧 Gestion des Interventions</h3>
-        <div class="coming-soon">
-          <mat-icon>construction</mat-icon>
-          <h3>Fiche d'Intervention Manager</h3>
-          <p>Interface de gestion des fiches d'intervention</p>
-        </div>
-      </div>
-    }
+   @if (currentPage === 'fiches') {
+  <app-fiche-intervention-manager></app-fiche-intervention-manager>
+}
 
     <!-- GED -->
     @if (currentPage === 'ged') {
