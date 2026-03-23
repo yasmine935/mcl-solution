@@ -1,228 +1,237 @@
-<div class="fiche-container">
+<div class="fiche-manager-container">
+  <!-- HEADER -->
   <div class="fiche-header">
     <h2>📋 Fiche d'Intervention Manager</h2>
-    <div class="tabs">
-      <button 
-        [class.active]="currentTab === 'creation'"
-        (click)="currentTab = 'creation'">
-        📝 Créer & Envoyer
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="showCreateFiche = !showCreateFiche" class="btn-create">
+        <mat-icon>add</mat-icon> Créer & Envoyer
       </button>
-      <button 
-        [class.active]="currentTab === 'completees'"
-        (click)="currentTab = 'completees'">
-        ✅ Fiches Complétées ({{ getInterventiionsCompletees().length }})
+      <button mat-stroked-button color="accent" class="btn-completed" (click)="showCompletedTab = !showCompletedTab">
+        <mat-icon>check_circle</mat-icon> Fiches Complétées ({{ fiches.filter(f => f.statut === 'COMPLETEE').length }})
       </button>
     </div>
-    <button mat-raised-button color="primary" (click)="showForm = !showForm" *ngIf="currentTab === 'creation'">
-      <mat-icon>add</mat-icon> Nouvelle Fiche
-    </button>
   </div>
 
-  <!-- TAB Créer & Envoyer -->
-  @if (currentTab === 'creation') {
-    <!-- Formulaire Création -->
-    @if (showForm) {
-      <div class="form-section">
-        <h3>Créer une Fiche d'Intervention</h3>
+  <!-- FORMULAIRE CRÉATION -->
+  @if (showCreateFiche) {
+    <div class="form-container">
+      <h3>📝 Nouvelle Fiche d'Intervention</h3>
 
-        <div class="form-row">
+      <!-- SECTION 1 : Infos principales -->
+      <div class="form-section">
+        <h4>📌 Informations Principales</h4>
+        <div class="form-grid">
           <mat-form-field appearance="outline">
             <mat-label>N° Projet</mat-label>
-            <input matInput [(ngModel)]="intervention.numeroProjet"/>
+            <input matInput [(ngModel)]="nouveauFiche.numero" placeholder="Ex: PRJ-2026-001"/>
           </mat-form-field>
+
           <mat-form-field appearance="outline">
             <mat-label>Client</mat-label>
-            <mat-select [(ngModel)]="intervention.client">
-              <mat-option value="Client A">Client A</mat-option>
-              <mat-option value="Client B">Client B</mat-option>
-              <mat-option value="Client C">Client C</mat-option>
+            <input matInput [(ngModel)]="nouveauFiche.client" placeholder="Ex: Client ABC"/>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput type="date" [(ngModel)]="nouveauFiche.date"/>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Technicien Assigné</mat-label>
+            <mat-select [(ngModel)]="nouveauFiche.technicienId" (change)="onTechnicienChange()">
+              @for (tech of techniciensDisponibles; track tech.id) {
+                <mat-option [value]="tech.id">
+                  {{ tech.prenom }} {{ tech.nom }}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
         </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Code Client</mat-label>
-            <input matInput [(ngModel)]="intervention.codeClient"/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Statut</mat-label>
-            <mat-select [(ngModel)]="intervention.statut">
-              <mat-option value="EN_PREPARATION">En Préparation</mat-option>
-              <mat-option value="EN_COURS">En Cours</mat-option>
-              <mat-option value="A_FACTURER">A Facturer</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput [(ngModel)]="nouveauFiche.description" rows="3" placeholder="Description du travail à effectuer..."></textarea>
+        </mat-form-field>
+      </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Date du Projet</mat-label>
-            <input matInput type="date" [(ngModel)]="intervention.dateProjet"/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Date d'Intervention</mat-label>
-            <input matInput type="date" [(ngModel)]="intervention.dateIntervention"/>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Adresse</mat-label>
-            <input matInput [(ngModel)]="intervention.adresse"/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>N° Téléphone</mat-label>
-            <input matInput [(ngModel)]="intervention.numTel"/>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Contact sur site</mat-label>
-            <input matInput [(ngModel)]="intervention.contactSurSite"/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Intervenants</mat-label>
-            <input matInput [(ngModel)]="intervention.intervenants" placeholder="Nom du technicien"/>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row checkboxes">
-          <label>
-            <input type="checkbox" [(ngModel)]="intervention.sousTraitant"/>
-            Sous Traitant
-          </label>
-          <label>
-            <input type="checkbox" [(ngModel)]="intervention.interim"/>
-            Intérim
-          </label>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Matériel Hors Standard</mat-label>
-            <input matInput [(ngModel)]="intervention.materielHorsStandard" placeholder="Testeur, Nacelle, Dérouleur..."/>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Articles en Stock</mat-label>
-            <input matInput [(ngModel)]="intervention.articlesStock" placeholder="Câbles, Caméras..."/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Articles à Commander</mat-label>
-            <input matInput [(ngModel)]="intervention.articlesCommander"/>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row checkboxes">
-          <label>
-            <input type="checkbox" [(ngModel)]="intervention.planPrevention"/>
-            Plan de Prévention
-          </label>
-          <label>
-            <input type="checkbox" [(ngModel)]="intervention.ficheSecurity"/>
-            Fiche de Sécurité
-          </label>
-          <label>
-            <input type="checkbox" [(ngModel)]="intervention.docPdP"/>
-            Doc PdP
-          </label>
-          <label>
-            <input type="checkbox" [(ngModel)]="intervention.docFdS"/>
-            Doc FdS
-          </label>
-        </div>
-
-        <div class="form-section">
-          <h4>Description des Tâches</h4>
-          <label><input type="checkbox" [(ngModel)]="intervention.taches.installationCameras"/> Installation des caméras</label>
-          <label><input type="checkbox" [(ngModel)]="intervention.taches.misEnPlaceSupportMural"/> Mise en place support mural</label>
-          <label><input type="checkbox" [(ngModel)]="intervention.taches.fixationTV"/> Fixation TV 65" sur Support</label>
-          <label><input type="checkbox" [(ngModel)]="intervention.taches.connectique"/> Connectique et Paramétrage</label>
-          <label><input type="checkbox" [(ngModel)]="intervention.taches.testValidation"/> Test et Validation</label>
-        </div>
-
-        <div class="form-actions">
-          <button mat-raised-button color="primary" (click)="creerIntervention()">
-            <mat-icon>save</mat-icon> Créer la Fiche
+      <!-- SECTION 2 : Documents -->
+      <div class="form-section">
+        <div class="section-header">
+          <h4>📄 Documents / Fonctionnalités</h4>
+          <button mat-icon-button color="primary" (click)="ajouterDocument()" title="Ajouter un document">
+            <mat-icon>add_circle</mat-icon>
           </button>
-          <button mat-stroked-button (click)="showForm = false">Annuler</button>
+        </div>
+
+        <div class="dynamic-list">
+          @for (doc of documents; track doc.id; let i = $index) {
+            <div class="dynamic-item">
+              <mat-checkbox [(ngModel)]="doc.checked" class="item-checkbox"></mat-checkbox>
+              <input 
+                type="text" 
+                class="item-input" 
+                [(ngModel)]="doc.nom"
+                placeholder="Nom du document..."
+              />
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="supprimerDocument(i)"
+                title="Supprimer"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
         </div>
       </div>
-    }
 
-    <!-- Liste des Interventions -->
-    <div class="interventions-list">
-      <h3>📌 Interventions en cours</h3>
-      @if (interventions.length === 0) {
-        <p class="empty">Aucune intervention</p>
+      <!-- SECTION 3 : Tâches -->
+      <div class="form-section">
+        <div class="section-header">
+          <h4>✅ Description des Tâches</h4>
+          <button mat-icon-button color="primary" (click)="ajouterTache()" title="Ajouter une tâche">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+
+        <div class="dynamic-list">
+          @for (tache of taches; track tache.id; let i = $index) {
+            <div class="dynamic-item">
+              <mat-checkbox [(ngModel)]="tache.checked" class="item-checkbox"></mat-checkbox>
+              <input 
+                type="text" 
+                class="item-input" 
+                [(ngModel)]="tache.nom"
+                placeholder="Nom de la tâche..."
+              />
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="supprimerTache(i)"
+                title="Supprimer"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- SECTION 4 : Champs Libres (Optionnel) -->
+      <div class="form-section">
+        <div class="section-header">
+          <h4>📝 Champs Personnalisés (Optionnel)</h4>
+          <button mat-icon-button color="primary" (click)="ajouterChampLibre()" title="Ajouter un champ">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+
+        @if (champsLibres.length > 0) {
+          <div class="dynamic-list">
+            @for (champ of champsLibres; track champ.id; let i = $index) {
+              <div class="dynamic-item-double">
+                <input 
+                  type="text" 
+                  class="item-input" 
+                  [(ngModel)]="champ.label"
+                  placeholder="Label du champ..."
+                />
+                <input 
+                  type="text" 
+                  class="item-input" 
+                  [(ngModel)]="champ.valeur"
+                  placeholder="Valeur..."
+                />
+                <button 
+                  mat-icon-button 
+                  color="warn" 
+                  (click)="supprimerChampLibre(i)"
+                  title="Supprimer"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="creerFiche()" class="btn-create-fiche">
+          <mat-icon>check</mat-icon> Créer la Fiche
+        </button>
+        <button mat-stroked-button (click)="showCreateFiche = false; resetFormulaire()" class="btn-cancel">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- TABLEAU DES FICHES EN COURS -->
+  <div class="fiches-table-container">
+    <h3>⚡ Interventions en cours</h3>
+    @if (fiches.filter(f => f.statut === 'EN_COURS').length === 0) {
+      <p class="empty">Aucune fiche en cours</p>
+    } @else {
+      <table class="fiches-table">
+        <thead>
+          <tr>
+            <th>N° Projet</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fiche of fiches.filter(f => f.statut === 'EN_COURS'); track fiche.id) {
+            <tr>
+              <td><strong>{{ fiche.numero }}</strong></td>
+              <td>{{ fiche.client }}</td>
+              <td>{{ fiche.date }}</td>
+              <td><span class="badge en-cours">EN_COURS</span></td>
+              <td>
+                <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" title="Voir détails">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- TABLEAU DES FICHES COMPLÉTÉES -->
+  @if (showCompletedTab) {
+    <div class="fiches-table-container">
+      <h3>✅ Fiches Complétées</h3>
+      @if (fiches.filter(f => f.statut === 'COMPLETEE').length === 0) {
+        <p class="empty">Aucune fiche complétée</p>
       } @else {
-        <table class="data-table">
+        <table class="fiches-table">
           <thead>
             <tr>
               <th>N° Projet</th>
               <th>Client</th>
+              <th>Technicien</th>
               <th>Date</th>
               <th>Statut</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            @for (int of interventions; track int.id) {
+            @for (fiche of fiches.filter(f => f.statut === 'COMPLETEE'); track fiche.id) {
               <tr>
-                <td>{{ int.numeroProjet }}</td>
-                <td>{{ int.client }}</td>
-                <td>{{ int.dateIntervention }}</td>
-                <td><span [class]="'badge ' + int.statut?.toLowerCase()">{{ int.statut }}</span></td>
+                <td><strong>{{ fiche.numero }}</strong></td>
+                <td>{{ fiche.client }}</td>
+                <td>{{ fiche.technicienNom }}</td>
+                <td>{{ fiche.date }}</td>
+                <td><span class="badge completee">COMPLETEE</span></td>
                 <td>
-                  <button mat-icon-button color="primary" (click)="openEnvoyerModal(int.id)" title="Envoyer au technicien">
-                    <mat-icon>send</mat-icon>
-                  </button>
-                <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(int)" title="Voir détails">
-  <mat-icon>visibility</mat-icon>
-</button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </div>
-  }
-
-  <!-- TAB Fiches Complétées -->
-  @if (currentTab === 'completees') {
-    <div class="completees-section">
-      <h3>✅ Fiches Complétées par les Techniciens</h3>
-      @if (getInterventiionsCompletees().length === 0) {
-        <p class="empty">Aucune fiche complétée</p>
-      } @else {
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>N° Projet</th>
-              <th>Client</th>
-              <th>Technicien</th>
-              <th>Heure Début</th>
-              <th>Heure Fin</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (int of getInterventiionsCompletees(); track int.id) {
-              <tr>
-                <td>{{ int.numeroProjet }}</td>
-                <td>{{ int.client }}</td>
-                <td>{{ int.intervenants }}</td>
-                <td>{{ int.heureDebut }}</td>
-                <td>{{ int.heureFin }}</td>
-                <td><span class="badge completee">COMPLÉTÉE</span></td>
-                <td>
-                  <button mat-icon-button color="primary" title="Voir détails">
+                  <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" title="Voir détails">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 </td>
@@ -233,110 +242,96 @@
       }
     </div>
   }
+</div>
 
-  <!-- Modal Envoyer -->
-  @if (showEnvoyerModal) {
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <h3>Envoyer au Technicien</h3>
-        <p>Fiche : {{ interventionToSend?.client }} - {{ interventionToSend?.numeroProjet }}</p>
-        
-        <mat-form-field appearance="outline">
-          <mat-label>Sélectionne un Technicien</mat-label>
-          <mat-select [(ngModel)]="selectedTechnicienForSending">
-            @for (tech of techniciens; track tech.id) {
-              <mat-option [value]="tech">
-                {{ tech.prenom }} {{ tech.nom }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <div class="modal-actions">
-          <button mat-raised-button color="primary" (click)="envoyerAuTechnicien()">
-            <mat-icon>send</mat-icon> Envoyer
-          </button>
-          <button mat-stroked-button (click)="fermerModal()">
-            Annuler
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-  <!-- Modal Détails Fiche -->
+<!-- MODAL - DÉTAILS FICHE -->
 @if (showDetailModal && selectedFiche) {
-  <div class="modal-overlay" (click)="fermerDetailModal()">
-    <div class="modal-detail-content" (click)="$event.stopPropagation()">
+  <div class="modal-overlay" (click)="fermerDetailFiche()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>📋 Fiche Complétée - {{ selectedFiche.client }}</h2>
-        <button mat-icon-button (click)="fermerDetailModal()">
+        <h2>📋 Détails Fiche d'Intervention</h2>
+        <button mat-icon-button (click)="fermerDetailFiche()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
       <div class="modal-body">
-        <div class="detail-row">
-          <span class="label">N° Projet :</span>
-          <span class="value">{{ selectedFiche.numeroProjet }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Client :</span>
-          <span class="value">{{ selectedFiche.client }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Heure Début :</span>
-          <span class="value">{{ selectedFiche.heureDebut }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Heure Fin :</span>
-          <span class="value">{{ selectedFiche.heureFin }}</span>
+        <!-- INFOS PRINCIPALES -->
+        <div class="detail-section">
+          <h3>📌 Informations Principales</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="label">N° Projet</span>
+              <span class="value">{{ selectedFiche.numero }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Client</span>
+              <span class="value">{{ selectedFiche.client }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Date</span>
+              <span class="value">{{ selectedFiche.date }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Technicien</span>
+              <span class="value">{{ selectedFiche.technicienNom }}</span>
+            </div>
+            <div class="detail-item full">
+              <span class="label">Description</span>
+              <span class="value">{{ selectedFiche.description }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Statut</span>
+              <span class="badge" [class]="selectedFiche.statut?.toLowerCase()">{{ selectedFiche.statut }}</span>
+            </div>
+          </div>
         </div>
 
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-        <h3 style="color: #1565C0; margin-bottom: 15px;">Tâches Réalisées :</h3>
-        @if (selectedFiche.taches) {
-          <div class="tasks-list">
-            @if (selectedFiche.taches.installationCameras) {
-              <div class="task-item">✅ Installation des caméras</div>
-            }
-            @if (selectedFiche.taches.misEnPlaceSupportMural) {
-              <div class="task-item">✅ Mise en place support mural</div>
-            }
-            @if (selectedFiche.taches.fixationTV) {
-              <div class="task-item">✅ Fixation TV 65" sur Support</div>
-            }
-            @if (selectedFiche.taches.connectique) {
-              <div class="task-item">✅ Connectique et Paramétrage</div>
-            }
-            @if (selectedFiche.taches.testValidation) {
-              <div class="task-item">✅ Test et Validation</div>
-            }
+        <!-- DOCUMENTS -->
+        @if (selectedFiche.documents && selectedFiche.documents.length > 0) {
+          <div class="detail-section">
+            <h3>📄 Documents / Fonctionnalités</h3>
+            <ul class="detail-list">
+              @for (doc of selectedFiche.documents; track $index) {
+                <li>✅ {{ doc }}</li>
+              }
+            </ul>
           </div>
         }
 
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
-        @if (selectedFiche.photos && selectedFiche.photos.length > 0) {
-          <div class="photos-gallery">
-            @for (photo of selectedFiche.photos; track $index) {
-              <div class="photo-item">
-                <span>📷 {{ photo.nom }}</span>
-              </div>
-            }
+        <!-- TÂCHES -->
+        @if (selectedFiche.taches && selectedFiche.taches.length > 0) {
+          <div class="detail-section">
+            <h3>✅ Tâches à Effectuer</h3>
+            <ul class="detail-list">
+              @for (tache of selectedFiche.taches; track $index) {
+                <li>☐ {{ tache }}</li>
+              }
+            </ul>
           </div>
-        } @else {
-          <p style="color: #999;">Aucune photo</p>
+        }
+
+        <!-- CHAMPS LIBRES -->
+        @if (selectedFiche.champsLibres && selectedFiche.champsLibres.length > 0) {
+          <div class="detail-section">
+            <h3>📝 Informations Personnalisées</h3>
+            <div class="detail-grid">
+              @for (champ of selectedFiche.champsLibres; track $index) {
+                <div class="detail-item">
+                  <span class="label">{{ champ.label }}</span>
+                  <span class="value">{{ champ.valeur }}</span>
+                </div>
+              }
+            </div>
+          </div>
         }
       </div>
 
       <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="fermerDetailModal()">
+        <button mat-raised-button color="primary" (click)="fermerDetailFiche()">
           <mat-icon>close</mat-icon> Fermer
         </button>
       </div>
     </div>
   </div>
 }
-</div>

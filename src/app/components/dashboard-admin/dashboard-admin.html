@@ -31,9 +31,7 @@
       <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
         <mat-icon>receipt</mat-icon> Factures
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'utilisateurs'" (click)="currentPage = 'utilisateurs'">
-        <mat-icon>admin_panel_settings</mat-icon> Utilisateurs
-      </a>
+      
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
@@ -128,47 +126,10 @@
         }
       </div>
     }
-
-    <!-- Employés -->
-    @if (currentPage === 'employes') {
-      <div class="table-card">
-        <h3>👥 Gestion Employés</h3>
-        @if (employes.length === 0) {
-          <div class="empty">Aucun employé</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Rôle</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (emp of employes; track emp.id) {
-                <tr>
-                  <td>{{ emp.prenom }} {{ emp.nom }}</td>
-                  <td>{{ emp.email }}</td>
-                  <td>{{ emp.telephone }}</td>
-                  <td><span class="badge-role">{{ emp.role }}</span></td>
-                  <td>
-                    <button mat-icon-button color="primary">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="warn">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-
+<!-- Employés -->
+@if (currentPage === 'employes') {
+  <app-employes></app-employes>
+}
    <!-- Réclamations -->
 @if (currentPage === 'reclamations') {
   <div class="table-card">
@@ -399,49 +360,7 @@
       </div>
     }
 
-    <!-- Utilisateurs -->
-    @if (currentPage === 'utilisateurs') {
-      <div class="table-card">
-        <h3>👤 Utilisateurs & Permissions</h3>
-        @if (utilisateurs.length === 0) {
-          <div class="empty">Aucun utilisateur</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (user of utilisateurs; track user.id) {
-                <tr>
-                  <td>{{ user.prenom }} {{ user.nom }}</td>
-                  <td>{{ user.email }}</td>
-                  <td><span class="badge-role">{{ user.role }}</span></td>
-                  <td><span class="badge actif">ACTIF</span></td>
-                  <td>
-                    <button mat-icon-button color="primary">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="accent">
-                      <mat-icon>security</mat-icon>
-                    </button>
-                    <button mat-icon-button color="warn">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-  </div>
+   
   <!-- Modal Détails Réclamation -->
 @if (showReclamationDetailModal && selectedReclamation) {
   <div class="modal-overlay" (click)="fermerDetailReclamation()">

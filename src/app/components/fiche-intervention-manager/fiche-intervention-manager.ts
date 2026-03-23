@@ -8,162 +8,193 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { InterventionsService } from '../../services/interventions.service';
 
 @Component({
   selector: 'app-fiche-intervention-manager',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, MatIconModule,
-    MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatCheckboxModule
+    CommonModule, FormsModule, MatIconModule, MatButtonModule,
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule
   ],
   templateUrl: './fiche-intervention-manager.html',
   styleUrl: './fiche-intervention-manager.css'
 })
 export class FicheInterventionManager implements OnInit {
-  showForm = false;
-  showEnvoyerModal = false;
-  interventions: any[] = [];
-  techniciens: any[] = [];
-  clients: any[] = [];
-  selectedTechnicienForSending: any = null;
-  interventionToSend: any = null;
+  user: any = {};
+  showCreateFiche = false;
+  showDetailModal = false;
+  showCompletedTab = false;
+  fiches: any[] = [];
+  techniciensDisponibles: any[] = [];
+  selectedFiche: any = null;
 
-  intervention = {
-    numeroProjet: '',
+  nouveauFiche = {
+    numero: '',
     client: '',
-    codeClient: '',
-    dateProjet: '',
-    dateIntervention: '',
-    statut: 'EN_PREPARATION',
-    adresse: '',
-    numTel: '',
-    contactSurSite: '',
-    intervenants: '',
-    sousTraitant: false,
-    interim: false,
-    materielHorsStandard: '',
-    articlesStock: '',
-    articlesCommander: '',
-    planPrevention: false,
-    ficheSecurity: false,
-    docPdP: false,
-    docFdS: false,
-    taches: {
-      installationCameras: false,
-      misEnPlaceSupportMural: false,
-      fixationTV: false,
-      connectique: false,
-      testValidation: false
-    }
+    description: '',
+    date: '',
+    technicienId: null,
+    technicienNom: ''
   };
-  currentTab = 'creation'; // 'creation' ou 'completees'
-getInterventiionsCompletees() {
-  return this.interventions.filter(i => i.statut === 'COMPLETEE');
-}
-  constructor(
-    private interventionsService: InterventionsService,
-    private http: HttpClient
-  ) {}
-ouvrirDetailFiche(fiche: any) {
-  this.selectedFiche = fiche;
-  this.showDetailModal = true;
-}
 
-fermerDetailModal() {
-  this.showDetailModal = false;
-  this.selectedFiche = null;
-}
+  // Documents/Fonctionnalités dynamiques
+  documents: any[] = [
+    { id: 1, nom: 'Plan de Prévention', checked: false },
+    { id: 2, nom: 'Fiche de Sécurité', checked: false },
+    { id: 3, nom: 'Doc PdP', checked: false },
+    { id: 4, nom: 'Doc FdS', checked: false }
+  ];
+
+  // Tâches dynamiques
+  taches: any[] = [
+    { id: 1, nom: 'Installation des caméras', checked: false },
+    { id: 2, nom: 'Mise en place support mural', checked: false },
+    { id: 3, nom: 'Fixation TV 65" sur Support', checked: false },
+    { id: 4, nom: 'Connectique et Paramétrage', checked: false },
+    { id: 5, nom: 'Test et Validation', checked: false }
+  ];
+
+  // Champs de saisie libres
+  champsLibres: any[] = [];
+
+  constructor(private http: HttpClient) {}
+
   ngOnInit() {
-    this.loadData();
-  }
-showDetailModal = false;
-selectedFiche: any = null;
-  loadData() {
-    this.interventionsService.getInterventions()
-      .subscribe(data => this.interventions = data, error => this.interventions = []);
-    
-    this.interventionsService.getTechniciens()
-      .subscribe(data => this.techniciens = data, error => this.techniciens = []);
-    
-    this.interventionsService.getClients()
-      .subscribe(data => this.clients = data, error => this.clients = []);
+    this.user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.loadFiches();
+    this.loadTechniciens();
   }
 
-  creerIntervention() {
-    const demande = {
-      ...this.intervention,
-      dateCreation: new Date(),
-      statut: 'EN_PREPARATION'
-    };
-
-    this.interventionsService.creerIntervention(demande)
-      .subscribe(() => {
-        this.loadData();
-        this.showForm = false;
-        this.resetForm();
-        alert('Fiche d\'intervention créée !');
-      }, error => console.error('Erreur création', error));
+  loadFiches() {
+    const stored = localStorage.getItem('interventions');
+    this.fiches = stored ? JSON.parse(stored) : [];
   }
 
-  openEnvoyerModal(id: number) {
-    this.interventionToSend = this.interventions.find(i => i.id === id);
-    this.showEnvoyerModal = true;
+  loadTechniciens() {
+    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
+      .subscribe(data => {
+        this.techniciensDisponibles = data.filter((u: any) =>
+          u.role === 'TECHNICIEN' || u.role === 'TECHNICIEN_SUP'
+        );
+      }, error => console.error('Erreur chargement techniciens', error));
   }
 
-  envoyerAuTechnicien() {
-    if (!this.selectedTechnicienForSending || !this.interventionToSend) {
-      alert('Sélectionne un technicien !');
+  // AJOUTER un document/fonctionnalité
+  ajouterDocument() {
+    const newId = Math.max(...this.documents.map(d => d.id || 0), 0) + 1;
+    this.documents.push({
+      id: newId,
+      nom: '',
+      checked: false
+    });
+  }
+
+  // SUPPRIMER un document
+  supprimerDocument(index: number) {
+    this.documents.splice(index, 1);
+  }
+
+  // AJOUTER une tâche
+  ajouterTache() {
+    const newId = Math.max(...this.taches.map(t => t.id || 0), 0) + 1;
+    this.taches.push({
+      id: newId,
+      nom: '',
+      checked: false
+    });
+  }
+
+  // SUPPRIMER une tâche
+  supprimerTache(index: number) {
+    this.taches.splice(index, 1);
+  }
+
+  // AJOUTER un champ libre
+  ajouterChampLibre() {
+    this.champsLibres.push({
+      id: Math.random(),
+      label: '',
+      valeur: ''
+    });
+  }
+
+  // SUPPRIMER un champ libre
+  supprimerChampLibre(index: number) {
+    this.champsLibres.splice(index, 1);
+  }
+
+  creerFiche() {
+    if (!this.nouveauFiche.numero || !this.nouveauFiche.client || !this.nouveauFiche.technicienId) {
+      alert('Veuillez remplir : Numéro, Client et Technicien');
       return;
     }
 
-    this.interventionsService.envoyerAuTechnicien(
-      this.interventionToSend.id,
-      this.selectedTechnicienForSending.id
-    ).subscribe(() => {
-      this.loadData();
-      this.showEnvoyerModal = false;
-      this.selectedTechnicienForSending = null;
-      this.interventionToSend = null;
-      alert('Fiche envoyée au technicien ! ✅');
-    }, error => console.error('Erreur envoi', error));
-  }
+    const idIncrement = Math.max(...this.fiches.map(f => f.id || 0), 0) + 1;
 
-  fermerModal() {
-    this.showEnvoyerModal = false;
-    this.selectedTechnicienForSending = null;
-    this.interventionToSend = null;
-  }
+    // Récupérer les documents cochés
+    const docsCoches = this.documents.filter(d => d.checked && d.nom).map(d => d.nom);
+    
+    // Récupérer les tâches cochées
+    const tachesCoches = this.taches.filter(t => t.checked && t.nom).map(t => t.nom);
 
-  resetForm() {
-    this.intervention = {
-      numeroProjet: '',
-      client: '',
-      codeClient: '',
-      dateProjet: '',
-      dateIntervention: '',
-      statut: 'EN_PREPARATION',
-      adresse: '',
-      numTel: '',
-      contactSurSite: '',
-      intervenants: '',
-      sousTraitant: false,
-      interim: false,
-      materielHorsStandard: '',
-      articlesStock: '',
-      articlesCommander: '',
-      planPrevention: false,
-      ficheSecurity: false,
-      docPdP: false,
-      docFdS: false,
-      taches: {
-        installationCameras: false,
-        misEnPlaceSupportMural: false,
-        fixationTV: false,
-        connectique: false,
-        testValidation: false
-      }
+    const nouvelleFiche = {
+      id: idIncrement,
+      numero: this.nouveauFiche.numero,
+      client: this.nouveauFiche.client,
+      description: this.nouveauFiche.description,
+      date: this.nouveauFiche.date,
+      technicienId: this.nouveauFiche.technicienId,
+      technicienNom: this.nouveauFiche.technicienNom,
+      statut: 'EN_COURS',
+      documents: docsCoches,
+      taches: tachesCoches,
+      champsLibres: this.champsLibres,
+      dateCreation: new Date().toISOString()
     };
+
+    this.fiches.push(nouvelleFiche);
+    localStorage.setItem('interventions', JSON.stringify(this.fiches));
+
+    // Reset formulaire
+    this.resetFormulaire();
+    this.showCreateFiche = false;
+  }
+
+  resetFormulaire() {
+    this.nouveauFiche = { numero: '', client: '', description: '', date: '', technicienId: null, technicienNom: '' };
+    
+    this.documents = [
+      { id: 1, nom: 'Plan de Prévention', checked: false },
+      { id: 2, nom: 'Fiche de Sécurité', checked: false },
+      { id: 3, nom: 'Doc PdP', checked: false },
+      { id: 4, nom: 'Doc FdS', checked: false }
+    ];
+
+    this.taches = [
+      { id: 1, nom: 'Installation des caméras', checked: false },
+      { id: 2, nom: 'Mise en place support mural', checked: false },
+      { id: 3, nom: 'Fixation TV 65" sur Support', checked: false },
+      { id: 4, nom: 'Connectique et Paramétrage', checked: false },
+      { id: 5, nom: 'Test et Validation', checked: false }
+    ];
+
+    this.champsLibres = [];
+  }
+
+  onTechnicienChange() {
+    const tech = this.techniciensDisponibles.find(t => t.id === this.nouveauFiche.technicienId);
+    if (tech) {
+      this.nouveauFiche.technicienNom = `${tech.prenom} ${tech.nom}`;
+    }
+  }
+
+  ouvrirDetailFiche(fiche: any) {
+    this.selectedFiche = fiche;
+    this.showDetailModal = true;
+  }
+
+  fermerDetailFiche() {
+    this.showDetailModal = false;
+    this.selectedFiche = null;
   }
 }
