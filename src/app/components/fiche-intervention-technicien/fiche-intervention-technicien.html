@@ -1,162 +1,204 @@
-<div class="fiche-tech-container">
+<div class="fiche-container">
   <div class="fiche-header">
-    <h2>📋 Fiche d'Intervention Technicien</h2>
-    <span class="badge-role">{{ intervention.client }}</span>
+    <h2>🔧 Fiche d'Intervention</h2>
+    @if (intervention && intervention.numProjet) {
+      <div class="fiche-info-header">
+        <span><strong>{{ intervention.numProjet }}</strong> - {{ intervention.client }}</span>
+        <span>{{ intervention.date }}</span>
+      </div>
+    }
   </div>
 
-  <div class="fiche-content">
-    <!-- Client + Code Client -->
-    <div class="section-header">
-      <h3>Client + code client</h3>
-      <p>{{ intervention.client }} - {{ intervention.codeClient }}</p>
-    </div>
-
-    <!-- N° Projet -->
-    <div class="form-group">
-      <label>N° de Projet</label>
-      <input type="text" [(ngModel)]="intervention.numeroProjet" readonly class="readonly-input"/>
-    </div>
-
-    <!-- Heure Début -->
-    <div class="form-group">
-      <label>Heure de Début</label>
-      <input type="time" [(ngModel)]="form.heureDebut"/>
-    </div>
-
-    <!-- Coordonnées -->
-    <div class="section-header">
-      <h3>Coordonnées de l'Intervention :</h3>
-      <p><strong>Adresse :</strong> {{ intervention.adresse }}</p>
-      <p><strong>N° de tel :</strong> {{ intervention.numTel }}</p>
-      <p><strong>Horaire d'ouverture :</strong> {{ intervention.contactSurSite }}</p>
-      <p><strong>Contact sur site :</strong> {{ intervention.contactSurSite }}</p>
-    </div>
-
-    <!-- Intervenants -->
-    <div class="form-group">
-      <label>Intervenants</label>
-      <input type="text" [(ngModel)]="form.intervenants" placeholder="Nom du Technicien" class="tech-input"/>
-    </div>
-
-    <!-- Matériel Hors Standard -->
-    <div class="form-group">
-      <label>Matériel hors Standard</label>
-      <select class="dropdown">
-        <option>Testeur</option>
-        <option>Nacelle</option>
-        <option>Dérouleur</option>
-      </select>
-    </div>
-
-    <!-- Articles et Ref -->
-    <div class="section-header">
-      <h3>Articles et Ref</h3>
-    </div>
-
-    <div class="checkbox-grid">
-      @for (article of ['Câbles xxx Ref xxx', 'Camera xxx Ref xxx']; track $index) {
-        <label>
-          <input type="checkbox"/>
-          {{ article }}
-        </label>
-      }
-    </div>
-
-    <!-- Documents -->
-    <div class="checkbox-grid">
-      <label>
-        <input type="checkbox" [(ngModel)]="form.taches.installationCameras"/>
-        Plan de Prévention
-      </label>
-      <label>
-        <input type="checkbox"/>
-        Fiche de Sécurité
-      </label>
-      <input type="text" placeholder="Doc PdP"/>
-      <input type="text" placeholder="Doc FdS"/>
-    </div>
-
-    <!-- Description des Tâches -->
-    <div class="section-header">
-      <h3>Description des taches</h3>
-    </div>
-
-    <div class="checkbox-grid">
-      <label>
-        <input type="checkbox" [(ngModel)]="form.taches.installationCameras"/>
-        Installation des caméras
-      </label>
-      <label>
-        <input type="checkbox" [(ngModel)]="form.taches.misEnPlaceSupportMural"/>
-        Mise en place support mural
-      </label>
-      <label>
-        <input type="checkbox" [(ngModel)]="form.taches.fixationTV"/>
-        Fixation TV 65" sur Support
-      </label>
-      <label>
-        <input type="checkbox" [(ngModel)]="form.taches.connectique"/>
-        Connectique et Paramétrage
-      </label>
-      <label>
-        <input type="checkbox" [(ngModel)]="form.taches.testValidation"/>
-        Test et Validation
-      </label>
-    </div>
-
-    <!-- Photos -->
-    <div class="section-header">
-      <h3>Photos</h3>
-      <div class="photo-upload">
-        <input type="file" multiple accept="image/*" (change)="onPhotoSelect($event)" style="display: none" #fileInput/>
-        <button type="button" (click)="fileInput.click()" class="btn-selection">Sélection</button>
+  @if (intervention && intervention.id) {
+    <div class="fiche-content">
+      <!-- SECTION 1: INFORMATIONS PRINCIPALES -->
+      <div class="section">
+        <h3>⭐ Informations Principales</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>N° Projet:</strong> 
+            <p>{{ intervention.numProjet }}</p>
+          </div>
+          <div class="info-item">
+            <strong>Client:</strong> 
+            <p>{{ intervention.client }}</p>
+          </div>
+          <div class="info-item">
+            <strong>Date:</strong> 
+            <p>{{ intervention.date }}</p>
+          </div>
+          <div class="info-item">
+            <strong>Technicien:</strong> 
+            <p>{{ intervention.technicienAssigne }}</p>
+          </div>
+        </div>
+        <div class="info-full">
+          <strong>Description:</strong>
+          <p>{{ intervention.description }}</p>
+        </div>
       </div>
-      @if (photos.length > 0) {
-        <div class="photos-list">
-          @for (photo of photos; track $index) {
-            <div class="photo-item">
-              <span>{{ photo.nom }}</span>
-              <button type="button" (click)="supprimerPhoto($index)" class="btn-delete">✕</button>
-            </div>
-          }
+
+      <!-- SECTION 2: INFOS CLIENT -->
+      @if (intervention.numCommande || intervention.adresse || intervention.contact) {
+        <div class="section">
+          <h3>👥 Informations Client</h3>
+          <div class="info-grid">
+            @if (intervention.numCommande) {
+              <div class="info-item">
+                <strong>N° Commande:</strong> 
+                <p>{{ intervention.numCommande }}</p>
+              </div>
+            }
+            @if (intervention.adresse) {
+              <div class="info-item">
+                <strong>Adresse:</strong> 
+                <p>{{ intervention.adresse }}</p>
+              </div>
+            }
+            @if (intervention.contact) {
+              <div class="info-item">
+                <strong>Contact:</strong> 
+                <p>{{ intervention.contact }}</p>
+              </div>
+            }
+          </div>
         </div>
       }
-    </div>
 
-    <!-- Date et Heure -->
-    <div class="form-row">
-      <div class="form-group">
-        <label>Date</label>
-        <input type="date" [(ngModel)]="intervention.dateIntervention" readonly class="readonly-input"/>
+      <!-- SECTION 3: TÂCHES -->
+      @if (intervention.taches && intervention.taches.length > 0) {
+        <div class="section">
+          <h3>✅ Tâches à Effectuer</h3>
+          <div class="taches-list">
+            @for (tache of intervention.taches; track $index) {
+              <div class="tache-item">
+                <input type="checkbox" [(ngModel)]="tache.coche" [id]="'tache-' + $index"/>
+                <label [for]="'tache-' + $index">
+                  {{ tache.nom }}
+                  @if (tache.selection) {
+                    <span class="selection-badge">{{ tache.selection }}</span>
+                  }
+                </label>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- SECTION 4: DONNÉES D'EXÉCUTION -->
+      <div class="section">
+        <h3>⏱️ Données d'Exécution</h3>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Date de début</mat-label>
+            <input matInput type="date" [(ngModel)]="form.dateDebut"/>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Heure début</mat-label>
+            <input matInput type="time" [(ngModel)]="form.heureDebut"/>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Heure fin</mat-label>
+            <input matInput type="time" [(ngModel)]="form.heureFin"/>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Intervenants</mat-label>
+            <input matInput [(ngModel)]="form.intervenants" placeholder="Noms des personnes"/>
+          </mat-form-field>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Heure de fin</label>
-        <input type="time" [(ngModel)]="form.heureFin"/>
+
+      <!-- SECTION 5: PHOTOS -->
+      <div class="section">
+        <h3>📸 Photos</h3>
+        <div class="photo-upload">
+          <input type="file" #photoInput multiple accept="image/*" (change)="onPhotoSelect($event)" style="display:none;"/>
+          <button mat-raised-button color="primary" (click)="photoInput.click()" type="button">
+            <mat-icon>add_photo_alternate</mat-icon> Ajouter des photos
+          </button>
+        </div>
+        @if (photos.length > 0) {
+          <div class="photos-list">
+            @for (photo of photos; track $index) {
+              <div class="photo-item">
+                <span>{{ photo.nom }}</span>
+                <button mat-icon-button color="warn" (click)="supprimerPhoto($index)" type="button">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- SECTION 6: SIGNATURE TECHNICIEN -->
+      <div class="section signature-section">
+        <h3>✍️ Signature du Technicien</h3>
+        <div class="signature-container">
+          <canvas #signatureTechnicien class="signature-canvas"></canvas>
+        </div>
+        <div class="signature-buttons">
+          <button mat-raised-button color="primary" (click)="sauvegarderSignature('tech')" type="button">
+            <mat-icon>check</mat-icon> Valider Signature Technicien
+          </button>
+          <button mat-stroked-button (click)="effacerSignature('tech')" type="button">
+            <mat-icon>delete</mat-icon> Effacer
+          </button>
+        </div>
+        @if (signatureTechnicienData) {
+          <div class="signature-preview">
+            <strong>✅ Signature Technicien Validée</strong>
+            <img [src]="signatureTechnicienData" alt="Signature Technicien"/>
+          </div>
+        }
+      </div>
+
+      <!-- SECTION 7: SIGNATURE CLIENT -->
+      <div class="section signature-section">
+        <h3>✍️ Signature du Client</h3>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nom du client (pour signature)</mat-label>
+          <input matInput [(ngModel)]="form.nomClientSigne" placeholder="Nom du représentant client"/>
+        </mat-form-field>
+
+        <div class="signature-container">
+          <canvas #signatureClient class="signature-canvas"></canvas>
+        </div>
+        <div class="signature-buttons">
+          <button mat-raised-button color="primary" (click)="sauvegarderSignature('client')" type="button">
+            <mat-icon>check</mat-icon> Valider Signature Client
+          </button>
+          <button mat-stroked-button (click)="effacerSignature('client')" type="button">
+            <mat-icon>delete</mat-icon> Effacer
+          </button>
+        </div>
+        @if (signatureClientData) {
+          <div class="signature-preview">
+            <strong>✅ Signature Client Validée - {{ form.nomClientSigne }}</strong>
+            <img [src]="signatureClientData" alt="Signature Client"/>
+          </div>
+        }
+      </div>
+
+      <!-- SECTION 8: ACTIONS FINALES -->
+      <div class="section">
+        <div class="form-actions">
+          <button mat-raised-button color="primary" (click)="envoyerFiche()" type="button">
+            <mat-icon>send</mat-icon> Envoyer la Fiche
+          </button>
+          <button mat-stroked-button (click)="annuler()" type="button">
+            <mat-icon>close</mat-icon> Annuler
+          </button>
+        </div>
       </div>
     </div>
-
-    <!-- Validation et Signature -->
-    <div class="section-header">
-      <h3>Validation et Signature</h3>
-    </div>
-
-    <div class="signature-section">
-      <div class="signature-box">
-        <label>Signature du Client</label>
-        <div class="signature-placeholder">__________________</div>
-      </div>
-      <div class="signature-box">
-        <label>Signature du Technicien</label>
-        <div class="signature-placeholder">__________________</div>
-      </div>
-    </div>
-
-    <!-- Bouton Envoyer -->
-    <div class="form-actions">
-      <button class="btn-envoyer" (click)="envoyerFiche()">
-        <mat-icon>send</mat-icon> Envoyer
+  } @else {
+    <div class="empty">
+      <p>❌ Aucune intervention assignée</p>
+      <button mat-raised-button color="primary" (click)="annuler()">
+        <mat-icon>arrow_back</mat-icon> Retour
       </button>
-      <button class="btn-annuler" (click)="annuler()">Annuler</button>
     </div>
-  </div>
+  }
 </div>

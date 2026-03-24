@@ -13,7 +13,9 @@
       <a class="nav-item" [class.active]="currentPage === 'fiches'" (click)="currentPage = 'fiches'">
         <mat-icon>description</mat-icon> Fiches d'Intervention
       </a>
-     
+     <a class="nav-item" [class.active]="currentPage === 'fiches-completees'" (click)="currentPage = 'fiches-completees'">
+  <mat-icon>check_circle</mat-icon> Fiches Complétées
+</a>
       <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
         <mat-icon>folder_open</mat-icon> GED
       </a>
@@ -80,7 +82,10 @@
    @if (currentPage === 'fiches') {
   <app-fiche-intervention-manager></app-fiche-intervention-manager>
 }
-
+<!-- ✅ AJOUTE CE COMPOSANT -->
+@if (currentPage === 'fiches-completees') {
+  <app-fiches-completees></app-fiches-completees>
+}
     <!-- GED -->
     @if (currentPage === 'ged') {
       <div class="table-card">

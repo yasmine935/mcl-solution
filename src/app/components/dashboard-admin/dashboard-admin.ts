@@ -12,6 +12,7 @@ import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-in
 import { Employes } from '../employes/employes';
 import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
+import { FichesCompletees } from '../fiches-completees/fiches-completees';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -20,7 +21,7 @@ import { Documents } from '../documents/documents';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents
+    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'

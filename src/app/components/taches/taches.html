@@ -63,6 +63,16 @@
             }
           </mat-select>
         </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Chiffre d'affaire (€)</mat-label>
+          <input matInput type="number" [(ngModel)]="nouvelleTache.chiffreAffaire" placeholder="Ex: 5000"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Numéro de commande</mat-label>
+          <input matInput [(ngModel)]="nouvelleTache.numCommande" placeholder="Ex: CMD-001"/>
+        </mat-form-field>
       </div>
 
       <!-- UPLOAD FICHIERS -->
@@ -168,6 +178,16 @@
             }
           </mat-select>
         </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Chiffre d'affaire (€)</mat-label>
+          <input matInput type="number" [(ngModel)]="tacheEnEdition.chiffreAffaire"/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Numéro de commande</mat-label>
+          <input matInput [(ngModel)]="tacheEnEdition.numCommande"/>
+        </mat-form-field>
       </div>
 
       <!-- UPLOAD FICHIERS (ÉDITION) -->
@@ -230,13 +250,12 @@
             <tr>
               <th>Tâche</th>
               <th>Personnes</th>
-              <th>Personnes assignées</th>
               <th>Statut</th>
-              <th>Date</th>
               <th>Priorité</th>
-              <th>Fichiers</th>
               <th>Échéances</th>
               <th>Valeur</th>
+              <th>Chiffre d'affaire</th>
+              <th>N° Commande</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -246,7 +265,7 @@
                 <td>
                   <div class="projet-with-note">
                     <strong>{{ tache.projet }}</strong>
-                    <button mat-icon-button (click)="ouvrirNoteModal(tache)" title="Voir/Ajouter une note" class="note-btn">
+                    <button mat-icon-button (click)="ouvrirNoteModal(tache)" title="Ajouter/Modifier une note" class="note-btn">
                       <mat-icon [class.has-note]="tache.notes && tache.notes.length > 0">note</mat-icon>
                       @if (tache.notes && tache.notes.length > 0) {
                         <span class="note-count">{{ tache.notes.length }}</span>
@@ -265,34 +284,30 @@
                     }
                   </div>
                 </td>
-                <td><mat-icon class="icon-person">person</mat-icon></td>
                 <td>
                   <span class="badge-statut" [style.background-color]="getStatutColor(tache.statut)">
                     {{ tache.statut }}
                   </span>
                 </td>
-                <td>{{ tache.date }}</td>
                 <td>
                   <span class="badge-priorite" [style.background-color]="getPrioriteColor(tache.priorite)">
                     {{ tache.priorite }}
                   </span>
                 </td>
                 <td>
-                  @if (tache.fichiers && tache.fichiers.length > 0) {
-                    <span class="badge-fichiers">{{ tache.fichiers.length }}</span>
-                  } @else {
-                    <span class="badge-vide">-</span>
-                  }
-                </td>
-                <td>
                   <span class="badge-echeance">{{ tache.echeance }}</span>
                 </td>
                 <td>
-                  <span class="badge-valeur" [class]="tache.valeur?.toLowerCase()">
+                  <span class="badge-valeur" [style.background-color]="getValeurColor(tache.valeur)">
                     {{ tache.valeur }}
                   </span>
                 </td>
+                <td><strong>{{ tache.chiffreAffaire }}€</strong></td>
+                <td><strong>{{ tache.numCommande }}</strong></td>
                 <td class="actions-cell">
+                  <button mat-icon-button color="info" (click)="ouvrirDetailModal(tache)" title="Détails">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
                   <button mat-icon-button color="primary" (click)="ouvrirEdition(tache)" title="Modifier">
                     <mat-icon>edit</mat-icon>
                   </button>
@@ -355,6 +370,109 @@
           <mat-icon>save</mat-icon> Ajouter la Note
         </button>
         <button mat-stroked-button (click)="fermerNoteModal()">
+          <mat-icon>close</mat-icon> Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MODAL DÉTAILS -->
+@if (showDetailModal && selectedTache) {
+  <div class="modal-overlay" (click)="fermerDetailModal()">
+    <div class="modal-content modal-detail" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📋 Détails de la Tâche</h3>
+        <button mat-icon-button (click)="fermerDetailModal()" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <strong>Projet :</strong>
+            <p>{{ selectedTache.projet }}</p>
+          </div>
+
+          <div class="detail-item">
+            <strong>Statut :</strong>
+            <span class="badge-statut" [style.background-color]="getStatutColor(selectedTache.statut)">
+              {{ selectedTache.statut }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Priorité :</strong>
+            <span class="badge-priorite" [style.background-color]="getPrioriteColor(selectedTache.priorite)">
+              {{ selectedTache.priorite }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Valeur :</strong>
+            <span class="badge-valeur" [style.background-color]="getValeurColor(selectedTache.valeur)">
+              {{ selectedTache.valeur }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Date :</strong>
+            <p>{{ selectedTache.date }}</p>
+          </div>
+
+          <div class="detail-item">
+            <strong>Échéance :</strong>
+            <p>{{ selectedTache.echeance }}</p>
+          </div>
+
+          <div class="detail-item">
+            <strong>Chiffre d'affaire :</strong>
+            <p class="highlight-number">{{ selectedTache.chiffreAffaire }}€</p>
+          </div>
+
+          <div class="detail-item">
+            <strong>Numéro de commande :</strong>
+            <p class="highlight-number">{{ selectedTache.numCommande }}</p>
+          </div>
+
+          <div class="detail-item full-width">
+            <strong>Personnes assignées :</strong>
+            <div class="assignes-container">
+              @if (selectedTache.assignes && selectedTache.assignes.length > 0) {
+                @for (assigneId of selectedTache.assignes; track assigneId) {
+                  <span class="assignee-badge">{{ getEmployeeName(assigneId) }}</span>
+                }
+              } @else {
+                <span class="assignee-empty">-</span>
+              }
+            </div>
+          </div>
+
+          @if (selectedTache.fichiers && selectedTache.fichiers.length > 0) {
+            <div class="detail-item full-width">
+              <strong>Fichiers ({{ selectedTache.fichiers.length }}) :</strong>
+              <div class="fichiers-list">
+                @for (fichier of selectedTache.fichiers; track $index) {
+                  <div class="fichier-item">
+                    <mat-icon>description</mat-icon>
+                    <div class="fichier-info">
+                      <p class="fichier-nom">{{ fichier.nom }}</p>
+                      <p class="fichier-meta">{{ fichier.taille }} KB</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" (click)="ouvrirEdition(selectedTache)">
+          <mat-icon>edit</mat-icon> Modifier
+        </button>
+        <button mat-stroked-button (click)="fermerDetailModal()">
           <mat-icon>close</mat-icon> Fermer
         </button>
       </div>

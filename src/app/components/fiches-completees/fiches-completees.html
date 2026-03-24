@@ -1,0 +1,321 @@
+<div class="fiches-completees-container">
+  <div class="fiches-header">
+    <h2>📋 Fiches Complétées par les Techniciens</h2>
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number">{{ getCountPending() }}</span>
+        <span class="stat-label">En attente de validation</span>
+      </div>
+      <div class="stat-card validated">
+        <span class="stat-number">{{ getCountValidees() }}</span>
+        <span class="stat-label">Validées</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="filters-section">
+    <button 
+      [class.active]="filterStatut === 'PENDING'"
+      (click)="filterStatut = 'PENDING'" 
+      class="filter-btn pending">
+      ⏳ En attente ({{ getCountPending() }})
+    </button>
+    <button 
+      [class.active]="filterStatut === 'VALIDEE'"
+      (click)="filterStatut = 'VALIDEE'" 
+      class="filter-btn validee">
+      ✅ Validées ({{ getCountValidees() }})
+    </button>
+  </div>
+
+  <!-- LISTE DES FICHES -->
+  @if (getFichesAffichees().length > 0) {
+    <div class="fiches-list">
+      @for (fiche of getFichesAffichees(); track fiche.id) {
+        <div class="fiche-card" [class.validee]="fiche.approuvePar">
+          <div class="fiche-card-header">
+            <div class="fiche-info">
+              <h3>{{ fiche.numProjet }} - {{ fiche.client }}</h3>
+              <p class="tech-name">👤 {{ fiche.technicienAssigne }}</p>
+            </div>
+            <div class="fiche-status">
+              @if (fiche.approuvePar) {
+                <span class="badge badge-validee">✅ VALIDÉE</span>
+                <p class="validated-by">Validé par: {{ fiche.approuvePar }}</p>
+              } @else {
+                <span class="badge badge-pending">⏳ EN ATTENTE</span>
+              }
+            </div>
+          </div>
+
+          <div class="fiche-card-body">
+            <div class="fiche-dates">
+              <div class="date-item">
+                <strong>Date intervention:</strong> {{ fiche.dateIntervention || fiche.date }}
+              </div>
+              <div class="date-item">
+                <strong>Date complétée:</strong> {{ fiche.dateCompletion | date:'dd/MM/yyyy HH:mm' }}
+              </div>
+              @if (fiche.approuvePar) {
+                <div class="date-item validated">
+                  <strong>Date validation:</strong> {{ fiche.dateApprobation | date:'dd/MM/yyyy HH:mm' }}
+                </div>
+              }
+            </div>
+
+            <div class="fiche-details-preview">
+              <div class="detail-item">
+                <strong>📍 Adresse:</strong> {{ fiche.adresse }}
+              </div>
+              <div class="detail-item">
+                <strong>📞 Contact:</strong> {{ fiche.contact }}
+              </div>
+              <div class="detail-item">
+                <strong>🕐 Heure début:</strong> {{ fiche.heureDebut }} - 
+                <strong>Heure fin:</strong> {{ fiche.heureFin }}
+              </div>
+              @if (fiche.intervenants) {
+                <div class="detail-item">
+                  <strong>👥 Intervenants:</strong> {{ fiche.intervenants }}
+                </div>
+              }
+            </div>
+
+            <!-- SIGNATURES PREVIEW -->
+            <div class="signatures-preview">
+              <div class="signature-box">
+                <strong>✍️ Signature Technicien</strong>
+                @if (afficherSignature(fiche.signatureTechnicien)) {
+                  <img [src]="fiche.signatureTechnicien" alt="Signature Technicien" class="sig-preview"/>
+                } @else {
+                  <p class="no-sig">Pas de signature</p>
+                }
+              </div>
+
+              <div class="signature-box">
+                <strong>✍️ Signature Client</strong>
+                @if (fiche.nomClientSigne) {
+                  <p class="client-name">{{ fiche.nomClientSigne }}</p>
+                }
+                @if (afficherSignature(fiche.signatureClient)) {
+                  <img [src]="fiche.signatureClient" alt="Signature Client" class="sig-preview"/>
+                } @else {
+                  <p class="no-sig">Pas de signature</p>
+                }
+              </div>
+            </div>
+
+            <!-- TÂCHES COMPLÉTÉES -->
+            @if (fiche.taches && fiche.taches.length > 0) {
+              <div class="taches-resume">
+                <strong>✅ Tâches effectuées:</strong>
+                <ul>
+                  @for (tache of fiche.taches; track $index) {
+                    <li [class.checked]="tache.coche">
+                      <input type="checkbox" [checked]="tache.coche" disabled/>
+                      {{ tache.nom }}
+                      @if (tache.selection) {
+                        <span class="tache-selection">{{ tache.selection }}</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <!-- PHOTOS -->
+            @if (fiche.photos && fiche.photos.length > 0) {
+              <div class="photos-count">
+                <mat-icon>photo</mat-icon> {{ fiche.photos.length }} photo(s)
+              </div>
+            }
+
+            @if (fiche.documentsImportes && fiche.documentsImportes.length > 0) {
+              <div class="documents-count">
+                <mat-icon>description</mat-icon> {{ fiche.documentsImportes.length }} document(s)
+              </div>
+            }
+          </div>
+
+          <!-- ACTIONS -->
+          @if (!fiche.approuvePar) {
+            <div class="fiche-card-actions">
+              <button mat-raised-button color="primary" (click)="ouvrirDetail(fiche)" class="btn-detail">
+                <mat-icon>visibility</mat-icon> Voir détails
+              </button>
+              <button mat-raised-button color="accent" (click)="validerFiche(fiche)" class="btn-valider">
+                <mat-icon>check_circle</mat-icon> Valider
+              </button>
+              <button mat-stroked-button color="warn" (click)="rejeterFiche(fiche)" class="btn-rejeter">
+                <mat-icon>cancel</mat-icon> Rejeter
+              </button>
+            </div>
+          } @else {
+            <div class="fiche-card-actions">
+              <button mat-raised-button color="primary" (click)="ouvrirDetail(fiche)" class="btn-detail">
+                <mat-icon>visibility</mat-icon> Voir détails
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>inbox</mat-icon>
+      <p>Aucune fiche {{ filterStatut === 'PENDING' ? 'en attente' : 'validée' }}</p>
+    </div>
+  }
+
+  <!-- MODAL DÉTAIL -->
+  @if (showDetailModal && selectedFiche) {
+    <div class="modal-overlay" (click)="fermerDetail()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ selectedFiche.numProjet }} - {{ selectedFiche.client }}</h2>
+          <button class="close-btn" (click)="fermerDetail()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- INFOS PRINCIPALES -->
+          <div class="modal-section">
+            <h3>⭐ Informations Principales</h3>
+            <div class="modal-grid">
+              <div class="modal-item">
+                <strong>N° Projet:</strong> {{ selectedFiche.numProjet }}
+              </div>
+              <div class="modal-item">
+                <strong>Client:</strong> {{ selectedFiche.client }}
+              </div>
+              <div class="modal-item">
+                <strong>Technicien:</strong> {{ selectedFiche.technicienAssigne }}
+              </div>
+              <div class="modal-item">
+                <strong>Date:</strong> {{ selectedFiche.date }}
+              </div>
+            </div>
+            <div class="modal-description">
+              <strong>Description:</strong>
+              <p>{{ selectedFiche.description }}</p>
+            </div>
+          </div>
+
+          <!-- INFOS CLIENT -->
+          <div class="modal-section">
+            <h3>👥 Informations Client</h3>
+            <div class="modal-grid">
+              <div class="modal-item">
+                <strong>N° Commande:</strong> {{ selectedFiche.numCommande }}
+              </div>
+              <div class="modal-item">
+                <strong>Adresse:</strong> {{ selectedFiche.adresse }}
+              </div>
+              <div class="modal-item">
+                <strong>Contact:</strong> {{ selectedFiche.contact }}
+              </div>
+            </div>
+          </div>
+
+          <!-- DONNÉES D'EXÉCUTION -->
+          <div class="modal-section">
+            <h3>⏱️ Données d'Exécution</h3>
+            <div class="modal-grid">
+              <div class="modal-item">
+                <strong>Date début:</strong> {{ selectedFiche.dateDebut }}
+              </div>
+              <div class="modal-item">
+                <strong>Heure début:</strong> {{ selectedFiche.heureDebut }}
+              </div>
+              <div class="modal-item">
+                <strong>Heure fin:</strong> {{ selectedFiche.heureFin }}
+              </div>
+              <div class="modal-item">
+                <strong>Intervenants:</strong> {{ selectedFiche.intervenants }}
+              </div>
+            </div>
+          </div>
+
+          <!-- TÂCHES -->
+          @if (selectedFiche.taches && selectedFiche.taches.length > 0) {
+            <div class="modal-section">
+              <h3>✅ Tâches</h3>
+              <ul class="taches-complete-list">
+                @for (tache of selectedFiche.taches; track $index) {
+                  <li [class.checked]="tache.coche">
+                    <input type="checkbox" [checked]="tache.coche" disabled/>
+                    <span>{{ tache.nom }}</span>
+                    @if (tache.selection) {
+                      <span class="tache-selection">{{ tache.selection }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- SIGNATURES COMPLÈTES -->
+          <div class="modal-section signatures-full">
+            <h3>✍️ Signatures</h3>
+            <div class="signatures-grid">
+              <div class="signature-full">
+                <strong>Signature Technicien</strong>
+                @if (afficherSignature(selectedFiche.signatureTechnicien)) {
+                  <img [src]="selectedFiche.signatureTechnicien" alt="Signature Technicien"/>
+                } @else {
+                  <p>Pas de signature</p>
+                }
+              </div>
+
+              <div class="signature-full">
+                <strong>Signature Client: {{ selectedFiche.nomClientSigne }}</strong>
+                @if (afficherSignature(selectedFiche.signatureClient)) {
+                  <img [src]="selectedFiche.signatureClient" alt="Signature Client"/>
+                } @else {
+                  <p>Pas de signature</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- PHOTOS -->
+          @if (selectedFiche.photos && selectedFiche.photos.length > 0) {
+            <div class="modal-section">
+              <h3>📸 Photos ({{ selectedFiche.photos.length }})</h3>
+              <p>{{ getPhotosNames() }}</p>
+            </div>
+          }
+
+          <!-- DOCUMENTS -->
+          @if (selectedFiche.documentsImportes && selectedFiche.documentsImportes.length > 0) {
+            <div class="modal-section">
+              <h3>📄 Documents ({{ selectedFiche.documentsImportes.length }})</h3>
+              <ul>
+                @for (doc of selectedFiche.documentsImportes; track $index) {
+                  <li>{{ doc.nom }} ({{ doc.taille }} KB)</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+
+        <!-- MODAL ACTIONS -->
+        <div class="modal-footer">
+          @if (!selectedFiche.approuvePar) {
+            <button mat-raised-button color="accent" (click)="validerFiche(selectedFiche)">
+              <mat-icon>check_circle</mat-icon> Valider
+            </button>
+            <button mat-stroked-button color="warn" (click)="rejeterFiche(selectedFiche)">
+              <mat-icon>cancel</mat-icon> Rejeter
+            </button>
+          }
+          <button mat-stroked-button (click)="fermerDetail()">
+            <mat-icon>close</mat-icon> Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
+import { FichesCompletees } from '../fiches-completees/fiches-completees';
 
 @Component({
   selector: 'app-dashboard-kia',
@@ -16,7 +17,7 @@ import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-in
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule ,FicheInterventionManager
+    MatInputModule, MatSelectModule ,FicheInterventionManager, FichesCompletees 
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'

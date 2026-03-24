@@ -1,200 +1,227 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-fiche-intervention-manager',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatIconModule, MatButtonModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule
+    MatFormFieldModule, MatInputModule, MatSelectModule
   ],
   templateUrl: './fiche-intervention-manager.html',
   styleUrl: './fiche-intervention-manager.css'
 })
 export class FicheInterventionManager implements OnInit {
-  user: any = {};
-  showCreateFiche = false;
-  showDetailModal = false;
-  showCompletedTab = false;
   fiches: any[] = [];
-  techniciensDisponibles: any[] = [];
-  selectedFiche: any = null;
+  employes: any[] = [];
+  showFormAdd = false;
+  showFormEdit = false;
+  ficheEnEdition: any = null;
 
-  nouveauFiche = {
-    numero: '',
-    client: '',
-    description: '',
-    date: '',
-    technicienId: null,
-    technicienNom: ''
+  // Options pour chaque type de tâche
+  optionsTaches: any = {
+    'Installation des caméras': ['Camera HD 4K', 'Camera IP', 'Camera Thermique', 'Camera PTZ'],
+    'Mise en place support mural': ['Support universel', 'Support motorisé', 'Support articule', 'Support fixe'],
+    'Fixation TV 65" sur Support': ['Support fixe', 'Support articulé', 'Support motorisé', 'Bras extensible'],
+    'Connectique et Paramétrage': ['HDMI 2.1', 'Ethernet', 'WiFi 6', 'Fiber Optique', 'USB-C'],
+    'Test et Validation': ['Test vidéo', 'Test audio', 'Test réseau', 'Test sécurité', 'Validation client']
   };
 
-  // Documents/Fonctionnalités dynamiques
-  documents: any[] = [
-    { id: 1, nom: 'Plan de Prévention', checked: false },
-    { id: 2, nom: 'Fiche de Sécurité', checked: false },
-    { id: 3, nom: 'Doc PdP', checked: false },
-    { id: 4, nom: 'Doc FdS', checked: false }
+  // TECHNICIENS CHARGÉS DEPUIS EMPLOYES
+  techniciens: any[] = [];
+
+  nouvelleFiche = {
+    numProjet: '',
+    client: '',
+    date: '',
+    technicienAssigne: '',
+    description: '',
+    // INFO CLIENT
+    codeClient: '',
+    numCommande: '',
+    adresse: '',
+    contact: '',
+    // MATÉRIEL HORS STANDARD
+    materielsHorsStandard: [] as any[],
+    nouveauMateriel: '',
+    // DOCUMENTS
+    documentsImportes: [] as any[],
+    // TÂCHES
+    taches: [] as any[]
+  };
+
+  tachesDisponibles = [
+    'Installation des caméras',
+    'Mise en place support mural',
+    'Fixation TV 65" sur Support',
+    'Connectique et Paramétrage',
+    'Test et Validation'
   ];
 
-  // Tâches dynamiques
-  taches: any[] = [
-    { id: 1, nom: 'Installation des caméras', checked: false },
-    { id: 2, nom: 'Mise en place support mural', checked: false },
-    { id: 3, nom: 'Fixation TV 65" sur Support', checked: false },
-    { id: 4, nom: 'Connectique et Paramétrage', checked: false },
-    { id: 5, nom: 'Test et Validation', checked: false }
-  ];
-
-  // Champs de saisie libres
-  champsLibres: any[] = [];
-
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   ngOnInit() {
-    this.user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.loadEmployes();
     this.loadFiches();
-    this.loadTechniciens();
+  }
+
+  loadEmployes() {
+    const stored = localStorage.getItem('employes');
+    this.employes = stored ? JSON.parse(stored) : [];
+    
+    // ✅ CHARGER LES VRAIS TECHNICIENS DEPUIS EMPLOYES
+    this.techniciens = this.employes
+      .filter((emp: any) => emp.role === 'TECHNICIEN' || emp.role === 'TECHNICIEN_SUP')
+      .map((emp: any) => `${emp.prenom} ${emp.nom}`);
   }
 
   loadFiches() {
-    const stored = localStorage.getItem('interventions');
-    this.fiches = stored ? JSON.parse(stored) : [];
+    const stored = localStorage.getItem('fiches_intervention');
+    this.fiches = stored ? JSON.parse(stored) : [
+      { id: 1, numProjet: 'PRJ-001', client: 'Acme Corp', date: '25/03/2026', technicienAssigne: 'Test Technicien', description: 'Installation complète salle de réunion', codeClient: 'CLI-001', numCommande: 'CMD-2025-001', adresse: '123 Rue de Paris, 75001 Paris', contact: 'Jean Dupont - 01 23 45 67 89', materielsHorsStandard: ['Nacelle'], documentsImportes: [], taches: [] }
+    ];
   }
 
-  loadTechniciens() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
-      .subscribe(data => {
-        this.techniciensDisponibles = data.filter((u: any) =>
-          u.role === 'TECHNICIEN' || u.role === 'TECHNICIEN_SUP'
-        );
-      }, error => console.error('Erreur chargement techniciens', error));
-  }
-
-  // AJOUTER un document/fonctionnalité
-  ajouterDocument() {
-    const newId = Math.max(...this.documents.map(d => d.id || 0), 0) + 1;
-    this.documents.push({
-      id: newId,
-      nom: '',
-      checked: false
-    });
-  }
-
-  // SUPPRIMER un document
-  supprimerDocument(index: number) {
-    this.documents.splice(index, 1);
-  }
-
-  // AJOUTER une tâche
-  ajouterTache() {
-    const newId = Math.max(...this.taches.map(t => t.id || 0), 0) + 1;
-    this.taches.push({
-      id: newId,
-      nom: '',
-      checked: false
-    });
-  }
-
-  // SUPPRIMER une tâche
-  supprimerTache(index: number) {
-    this.taches.splice(index, 1);
-  }
-
-  // AJOUTER un champ libre
-  ajouterChampLibre() {
-    this.champsLibres.push({
-      id: Math.random(),
-      label: '',
-      valeur: ''
-    });
-  }
-
-  // SUPPRIMER un champ libre
-  supprimerChampLibre(index: number) {
-    this.champsLibres.splice(index, 1);
-  }
-
-  creerFiche() {
-    if (!this.nouveauFiche.numero || !this.nouveauFiche.client || !this.nouveauFiche.technicienId) {
-      alert('Veuillez remplir : Numéro, Client et Technicien');
+  ajouterFiche() {
+    if (!this.nouvelleFiche.numProjet || !this.nouvelleFiche.numCommande || !this.nouvelleFiche.adresse || !this.nouvelleFiche.contact) {
+      alert('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
-    const idIncrement = Math.max(...this.fiches.map(f => f.id || 0), 0) + 1;
+    const idIncrement = Math.max(...this.fiches.map((f: any) => f.id || 0), 0) + 1;
 
-    // Récupérer les documents cochés
-    const docsCoches = this.documents.filter(d => d.checked && d.nom).map(d => d.nom);
-    
-    // Récupérer les tâches cochées
-    const tachesCoches = this.taches.filter(t => t.checked && t.nom).map(t => t.nom);
-
-    const nouvelleFiche = {
+    const fiche = {
       id: idIncrement,
-      numero: this.nouveauFiche.numero,
-      client: this.nouveauFiche.client,
-      description: this.nouveauFiche.description,
-      date: this.nouveauFiche.date,
-      technicienId: this.nouveauFiche.technicienId,
-      technicienNom: this.nouveauFiche.technicienNom,
-      statut: 'EN_COURS',
-      documents: docsCoches,
-      taches: tachesCoches,
-      champsLibres: this.champsLibres,
-      dateCreation: new Date().toISOString()
+      ...this.nouvelleFiche,
+      taches: this.nouvelleFiche.taches.map((t: any) => ({ ...t, coche: false, selection: '' }))
     };
 
-    this.fiches.push(nouvelleFiche);
-    localStorage.setItem('interventions', JSON.stringify(this.fiches));
+    this.fiches.push(fiche);
+    localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
 
-    // Reset formulaire
-    this.resetFormulaire();
-    this.showCreateFiche = false;
+    alert('✅ Fiche créée et envoyée à ' + this.nouvelleFiche.technicienAssigne + ' !');
+    this.resetFormAdd();
+    this.showFormAdd = false;
   }
 
-  resetFormulaire() {
-    this.nouveauFiche = { numero: '', client: '', description: '', date: '', technicienId: null, technicienNom: '' };
-    
-    this.documents = [
-      { id: 1, nom: 'Plan de Prévention', checked: false },
-      { id: 2, nom: 'Fiche de Sécurité', checked: false },
-      { id: 3, nom: 'Doc PdP', checked: false },
-      { id: 4, nom: 'Doc FdS', checked: false }
-    ];
-
-    this.taches = [
-      { id: 1, nom: 'Installation des caméras', checked: false },
-      { id: 2, nom: 'Mise en place support mural', checked: false },
-      { id: 3, nom: 'Fixation TV 65" sur Support', checked: false },
-      { id: 4, nom: 'Connectique et Paramétrage', checked: false },
-      { id: 5, nom: 'Test et Validation', checked: false }
-    ];
-
-    this.champsLibres = [];
+  ouvrirEdition(fiche: any) {
+    this.ficheEnEdition = JSON.parse(JSON.stringify(fiche));
+    this.showFormEdit = true;
   }
 
-  onTechnicienChange() {
-    const tech = this.techniciensDisponibles.find(t => t.id === this.nouveauFiche.technicienId);
-    if (tech) {
-      this.nouveauFiche.technicienNom = `${tech.prenom} ${tech.nom}`;
+  modifierFiche() {
+    if (!this.ficheEnEdition.numProjet || !this.ficheEnEdition.numCommande || !this.ficheEnEdition.adresse || !this.ficheEnEdition.contact) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    const index = this.fiches.findIndex((f: any) => f.id === this.ficheEnEdition.id);
+    if (index !== -1) {
+      this.fiches[index] = this.ficheEnEdition;
+      localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
+      this.resetFormEdit();
+      this.showFormEdit = false;
     }
   }
 
-  ouvrirDetailFiche(fiche: any) {
-    this.selectedFiche = fiche;
-    this.showDetailModal = true;
+  supprimerFiche(id: number) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette fiche ?')) {
+      this.fiches = this.fiches.filter((f: any) => f.id !== id);
+      localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
+    }
   }
 
-  fermerDetailFiche() {
-    this.showDetailModal = false;
-    this.selectedFiche = null;
+  resetFormAdd() {
+    this.nouvelleFiche = {
+      numProjet: '',
+      client: '',
+      date: '',
+      technicienAssigne: '',
+      description: '',
+      codeClient: '',
+      numCommande: '',
+      adresse: '',
+      contact: '',
+      materielsHorsStandard: [] as any[],
+      nouveauMateriel: '',
+      documentsImportes: [] as any[],
+      taches: []
+    };
+  }
+
+  resetFormEdit() {
+    this.ficheEnEdition = null;
+  }
+
+  // ===== MATÉRIEL HORS STANDARD =====
+  ajouterMateriel(form: any) {
+    if (form.nouveauMateriel && form.nouveauMateriel.trim()) {
+      if (!form.materielsHorsStandard) {
+        form.materielsHorsStandard = [];
+      }
+      form.materielsHorsStandard.push(form.nouveauMateriel);
+      form.nouveauMateriel = '';
+    }
+  }
+
+  supprimerMateriel(form: any, index: number) {
+    form.materielsHorsStandard.splice(index, 1);
+  }
+
+  // ===== DOCUMENTS IMPORT =====
+  onFileSelectDocuments(event: any, form: any) {
+    const files = event.target.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        form.documentsImportes.push({
+          nom: file.name.replace(/\.[^/.]+$/, ''),
+          type: 'file',
+          taille: (file.size / 1024).toFixed(2),
+          dateAjout: new Date().toLocaleString('fr-FR')
+        });
+      }
+    }
+  }
+
+  supprimerDocument(form: any, index: number) {
+    form.documentsImportes.splice(index, 1);
+  }
+
+  // ===== TÂCHES AVEC SÉLECTION =====
+  ajouterTache(form: any, tache: string) {
+    if (!form.taches) {
+      form.taches = [];
+    }
+    
+    const tacheExiste = form.taches.some((t: any) => t.nom === tache);
+    if (!tacheExiste) {
+      form.taches.push({
+        nom: tache,
+        coche: false,
+        selection: ''
+      });
+    }
+  }
+
+  supprimerTache(form: any, index: number) {
+    form.taches.splice(index, 1);
+  }
+
+  getOptionsTache(nomTache: string): string[] {
+    return this.optionsTaches[nomTache] || [];
+  }
+
+  tacheExiste(form: any, nomTache: string): boolean {
+    if (!form.taches) {
+      return false;
+    }
+    return form.taches.some((t: any) => t.nom === nomTache);
   }
 }

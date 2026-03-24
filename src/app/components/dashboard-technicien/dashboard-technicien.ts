@@ -60,16 +60,29 @@ export class DashboardTechnicien implements OnInit {
   }
 
   loadInterventions() {
-    const stored = localStorage.getItem('interventions');
-    const allInterventions = stored ? JSON.parse(stored) : [];
+    // 🔧 LIRE LES FICHES CRÉÉES PAR LE MANAGER DEPUIS fiches_intervention
+    const storedFiches = localStorage.getItem('fiches_intervention');
+    const allFiches = storedFiches ? JSON.parse(storedFiches) : [];
     
-    this.interventions = allInterventions.filter((i: any) => 
-      i.technicienId === this.user.id && i.statut === 'EN_COURS'
+    // Construire le nom complet de l'utilisateur connecté
+    const userFullName = `${this.user.prenom} ${this.user.nom}`;
+    
+    console.log('👤 Technicien connecté:', userFullName);
+    console.log('📋 Fiches disponibles:', allFiches);
+    
+    // ✅ FILTRER LES FICHES ASSIGNÉES À CE TECHNICIEN
+    this.interventions = allFiches.filter((fiche: any) => {
+      const match = fiche.technicienAssigne === userFullName && fiche.statut !== 'COMPLETEE';
+      console.log(`Fiche ${fiche.numProjet}: assignée à "${fiche.technicienAssigne}" - Match: ${match}`);
+      return match;
+    });
+    
+    this.interventionsCompletees = allFiches.filter((fiche: any) => 
+      fiche.technicienAssigne === userFullName && fiche.statut === 'COMPLETEE'
     );
     
-    this.interventionsCompletees = allInterventions.filter((i: any) => 
-      i.technicienId === this.user.id && i.statut === 'COMPLETEE'
-    );
+    console.log('✅ Interventions trouvées:', this.interventions.length);
+    console.log('✅ Interventions complétées:', this.interventionsCompletees.length);
   }
 
   loadConges() {
@@ -101,7 +114,7 @@ export class DashboardTechnicien implements OnInit {
     const demande = {
       ...this.conge,
       utilisateur: { id: this.user.id },
-      manager: { id: 3 } // KIA
+      manager: { id: 3 }
     };
     this.http.post('http://localhost:8080/api/conges', demande)
       .subscribe(() => {

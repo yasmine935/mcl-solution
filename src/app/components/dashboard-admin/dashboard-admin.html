@@ -13,6 +13,9 @@
      <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
   <mat-icon>engineering</mat-icon> Fiches Intervention
 </a>
+<a class="nav-item" [class.active]="currentPage === 'fiches-completees'" (click)="currentPage = 'fiches-completees'">
+  <mat-icon>check_circle</mat-icon> Fiches Complétées
+</a>
 <a class="nav-item" [class.active]="currentPage === 'taches'" (click)="currentPage = 'taches'">
   <mat-icon>check_circle</mat-icon> Tâches
 </a>
@@ -82,6 +85,10 @@
     <!-- Interventions -->
 @if (currentPage === 'interventions') {
   <app-fiche-intervention-manager></app-fiche-intervention-manager>
+}
+<!-- ✅ AJOUTE CE COMPOSANT ICI -->
+@if (currentPage === 'fiches-completees') {
+  <app-fiches-completees></app-fiches-completees>
 }
 <!-- TÂCHES -->
 @if (currentPage === 'taches') {

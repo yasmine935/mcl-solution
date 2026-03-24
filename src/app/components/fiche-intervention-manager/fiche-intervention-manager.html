@@ -1,48 +1,41 @@
-<div class="fiche-manager-container">
+<div class="fiche-container">
   <!-- HEADER -->
-  <div class="fiche-header">
-    <h2>📋 Fiche d'Intervention Manager</h2>
-    <div class="header-actions">
-      <button mat-raised-button color="primary" (click)="showCreateFiche = !showCreateFiche" class="btn-create">
-        <mat-icon>add</mat-icon> Créer & Envoyer
-      </button>
-      <button mat-stroked-button color="accent" class="btn-completed" (click)="showCompletedTab = !showCompletedTab">
-        <mat-icon>check_circle</mat-icon> Fiches Complétées ({{ fiches.filter(f => f.statut === 'COMPLETEE').length }})
-      </button>
-    </div>
+  <div class="page-header">
+    <h2>🔧 Fiches d'Intervention</h2>
+    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd" class="btn-add">
+      <mat-icon>add</mat-icon> Nouvelle Fiche
+    </button>
   </div>
 
-  <!-- FORMULAIRE CRÉATION -->
-  @if (showCreateFiche) {
+  <!-- FORMULAIRE AJOUT -->
+  @if (showFormAdd) {
     <div class="form-container">
-      <h3>📝 Nouvelle Fiche d'Intervention</h3>
+      <h3>➕ Nouvelle Fiche d'Intervention</h3>
 
-      <!-- SECTION 1 : Infos principales -->
-      <div class="form-section">
-        <h4>📌 Informations Principales</h4>
+      <!-- ===== 1. INFORMATION PRINCIPALE ===== -->
+      <div class="section">
+        <h4>⭐ Informations Principales</h4>
         <div class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>N° Projet</mat-label>
-            <input matInput [(ngModel)]="nouveauFiche.numero" placeholder="Ex: PRJ-2026-001"/>
+            <mat-label>N° Projet *</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.numProjet" placeholder="PRJ-001"/>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Client</mat-label>
-            <input matInput [(ngModel)]="nouveauFiche.client" placeholder="Ex: Client ABC"/>
+            <input matInput [(ngModel)]="nouvelleFiche.client" placeholder="Ex: Acme Corp"/>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Date</mat-label>
-            <input matInput type="date" [(ngModel)]="nouveauFiche.date"/>
+            <input matInput type="date" [(ngModel)]="nouvelleFiche.date"/>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Technicien Assigné</mat-label>
-            <mat-select [(ngModel)]="nouveauFiche.technicienId" (change)="onTechnicienChange()">
-              @for (tech of techniciensDisponibles; track tech.id) {
-                <mat-option [value]="tech.id">
-                  {{ tech.prenom }} {{ tech.nom }}
-                </mat-option>
+            <mat-select [(ngModel)]="nouvelleFiche.technicienAssigne">
+              @for (tech of techniciens; track tech) {
+                <mat-option [value]="tech">{{ tech }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -50,105 +43,91 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Description</mat-label>
-          <textarea matInput [(ngModel)]="nouveauFiche.description" rows="3" placeholder="Description du travail à effectuer..."></textarea>
+          <textarea matInput [(ngModel)]="nouvelleFiche.description" rows="3" placeholder="Décrivez l'intervention..."></textarea>
         </mat-form-field>
       </div>
 
-      <!-- SECTION 2 : Documents -->
-      <div class="form-section">
-        <div class="section-header">
-          <h4>📄 Documents / Fonctionnalités</h4>
-          <button mat-icon-button color="primary" (click)="ajouterDocument()" title="Ajouter un document">
-            <mat-icon>add_circle</mat-icon>
-          </button>
-        </div>
+      <!-- ===== 2. INFO CLIENTS ===== -->
+      <div class="section">
+        <h4>👥 Informations Clients</h4>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Code Client</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.codeClient" placeholder="CLI-001"/>
+            <mat-hint>Optionnel</mat-hint>
+          </mat-form-field>
 
-        <div class="dynamic-list">
-          @for (doc of documents; track doc.id; let i = $index) {
-            <div class="dynamic-item">
-              <mat-checkbox [(ngModel)]="doc.checked" class="item-checkbox"></mat-checkbox>
-              <input 
-                type="text" 
-                class="item-input" 
-                [(ngModel)]="doc.nom"
-                placeholder="Nom du document..."
-              />
-              <button 
-                mat-icon-button 
-                color="warn" 
-                (click)="supprimerDocument(i)"
-                title="Supprimer"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          }
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de Commande *</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.numCommande" placeholder="CMD-2025-001"/>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Adresse *</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.adresse" placeholder="123 Rue de Paris, 75001 Paris"/>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contact *</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.contact" placeholder="Jean Dupont - 01 23 45 67 89"/>
+          </mat-form-field>
         </div>
       </div>
 
-      <!-- SECTION 3 : Tâches -->
-      <div class="form-section">
-        <div class="section-header">
-          <h4>✅ Description des Tâches</h4>
-          <button mat-icon-button color="primary" (click)="ajouterTache()" title="Ajouter une tâche">
+      <!-- ===== 3. MATÉRIEL HORS STANDARD ===== -->
+      <div class="section">
+        <h4>🔩 Matériel Hors Standard</h4>
+        <div class="materiel-input">
+          <mat-form-field appearance="outline" class="flex-grow">
+            <mat-label>Ajouter un matériel</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.nouveauMateriel" placeholder="Ex: Nacelle, Testeur..."/>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="ajouterMateriel(nouvelleFiche)" type="button">
             <mat-icon>add_circle</mat-icon>
           </button>
         </div>
 
-        <div class="dynamic-list">
-          @for (tache of taches; track tache.id; let i = $index) {
-            <div class="dynamic-item">
-              <mat-checkbox [(ngModel)]="tache.checked" class="item-checkbox"></mat-checkbox>
-              <input 
-                type="text" 
-                class="item-input" 
-                [(ngModel)]="tache.nom"
-                placeholder="Nom de la tâche..."
-              />
-              <button 
-                mat-icon-button 
-                color="warn" 
-                (click)="supprimerTache(i)"
-                title="Supprimer"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          }
-        </div>
+        @if (nouvelleFiche.materielsHorsStandard && nouvelleFiche.materielsHorsStandard.length > 0) {
+          <div class="chips-container">
+            @for (materiel of nouvelleFiche.materielsHorsStandard; track $index) {
+              <div class="chip">
+                <span>{{ materiel }}</span>
+                <button mat-icon-button (click)="supprimerMateriel(nouvelleFiche, $index)" type="button" class="chip-delete">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
       </div>
 
-      <!-- SECTION 4 : Champs Libres (Optionnel) -->
-      <div class="form-section">
-        <div class="section-header">
-          <h4>📝 Champs Personnalisés (Optionnel)</h4>
-          <button mat-icon-button color="primary" (click)="ajouterChampLibre()" title="Ajouter un champ">
-            <mat-icon>add_circle</mat-icon>
+      <!-- ===== 4. DOCUMENTS / FONCTIONNALITÉS ===== -->
+      <div class="section">
+        <h4>📎 Documents / Fonctionnalités</h4>
+        <div class="file-upload-section">
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelectDocuments($event, nouvelleFiche)" 
+            multiple 
+            class="file-input"
+            accept="*/*"
+          />
+          <button mat-stroked-button (click)="fileInput.click()" type="button" class="upload-btn">
+            <mat-icon>upload_file</mat-icon> Importer des dossiers/fichiers
           </button>
         </div>
 
-        @if (champsLibres.length > 0) {
-          <div class="dynamic-list">
-            @for (champ of champsLibres; track champ.id; let i = $index) {
-              <div class="dynamic-item-double">
-                <input 
-                  type="text" 
-                  class="item-input" 
-                  [(ngModel)]="champ.label"
-                  placeholder="Label du champ..."
-                />
-                <input 
-                  type="text" 
-                  class="item-input" 
-                  [(ngModel)]="champ.valeur"
-                  placeholder="Valeur..."
-                />
-                <button 
-                  mat-icon-button 
-                  color="warn" 
-                  (click)="supprimerChampLibre(i)"
-                  title="Supprimer"
-                >
+        @if (nouvelleFiche.documentsImportes && nouvelleFiche.documentsImportes.length > 0) {
+          <div class="documents-list">
+            @for (doc of nouvelleFiche.documentsImportes; track $index) {
+              <div class="document-item">
+                <mat-icon>folder</mat-icon>
+                <div class="doc-info">
+                  <p class="doc-nom">{{ doc.nom }}</p>
+                  <p class="doc-meta">{{ doc.taille }} KB • {{ doc.dateAjout }}</p>
+                </div>
+                <button mat-icon-button color="warn" (click)="supprimerDocument(nouvelleFiche, $index)" type="button">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -157,181 +136,332 @@
         }
       </div>
 
-      <!-- ACTIONS -->
+      <!-- ===== 5. DESCRIPTION DES TÂCHES ===== -->
+      <div class="section">
+        <h4>✅ Description des Tâches</h4>
+        
+        <div class="taches-buttons">
+          @for (tache of tachesDisponibles; track tache) {
+            <button 
+              mat-stroked-button 
+              (click)="ajouterTache(nouvelleFiche, tache)" 
+              type="button"
+              [disabled]="tacheExiste(nouvelleFiche, tache)"
+              class="tache-btn">
+              <mat-icon>add</mat-icon> {{ tache }}
+            </button>
+          }
+        </div>
+
+        @if (nouvelleFiche.taches && nouvelleFiche.taches.length > 0) {
+          <div class="taches-list">
+            @for (tache of nouvelleFiche.taches; track $index) {
+              <div class="tache-item">
+                <div class="tache-checkbox">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="tache.coche" 
+                    [id]="'tache-add-' + $index"
+                  />
+                  <label [for]="'tache-add-' + $index">{{ tache.nom }}</label>
+                </div>
+
+                @if (getOptionsTache(tache.nom).length > 0) {
+                  <mat-form-field appearance="outline" class="tache-select">
+                    <mat-label>Sélectionner</mat-label>
+                    <mat-select [(ngModel)]="tache.selection">
+                      <mat-option value="">Aucun</mat-option>
+                      @for (option of getOptionsTache(tache.nom); track option) {
+                        <mat-option [value]="option">{{ option }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+
+                <button mat-icon-button color="warn" (click)="supprimerTache(nouvelleFiche, $index)" type="button">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- BOUTONS ACTION -->
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="creerFiche()" class="btn-create-fiche">
-          <mat-icon>check</mat-icon> Créer la Fiche
+        <button mat-raised-button color="primary" (click)="ajouterFiche()">
+          <mat-icon>save</mat-icon> Créer la Fiche
         </button>
-        <button mat-stroked-button (click)="showCreateFiche = false; resetFormulaire()" class="btn-cancel">
+        <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
           <mat-icon>close</mat-icon> Annuler
         </button>
       </div>
     </div>
   }
 
-  <!-- TABLEAU DES FICHES EN COURS -->
-  <div class="fiches-table-container">
-    <h3>⚡ Interventions en cours</h3>
-    @if (fiches.filter(f => f.statut === 'EN_COURS').length === 0) {
-      <p class="empty">Aucune fiche en cours</p>
-    } @else {
-      <table class="fiches-table">
-        <thead>
-          <tr>
-            <th>N° Projet</th>
-            <th>Client</th>
-            <th>Date</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (fiche of fiches.filter(f => f.statut === 'EN_COURS'); track fiche.id) {
-            <tr>
-              <td><strong>{{ fiche.numero }}</strong></td>
-              <td>{{ fiche.client }}</td>
-              <td>{{ fiche.date }}</td>
-              <td><span class="badge en-cours">EN_COURS</span></td>
-              <td>
-                <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" title="Voir détails">
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
-  </div>
+  <!-- FORMULAIRE ÉDITION -->
+  @if (showFormEdit && ficheEnEdition) {
+    <div class="form-container form-edit">
+      <h3>✏️ Modifier - {{ ficheEnEdition.numProjet }}</h3>
 
-  <!-- TABLEAU DES FICHES COMPLÉTÉES -->
-  @if (showCompletedTab) {
-    <div class="fiches-table-container">
-      <h3>✅ Fiches Complétées</h3>
-      @if (fiches.filter(f => f.statut === 'COMPLETEE').length === 0) {
-        <p class="empty">Aucune fiche complétée</p>
-      } @else {
-        <table class="fiches-table">
-          <thead>
-            <tr>
-              <th>N° Projet</th>
-              <th>Client</th>
-              <th>Technicien</th>
-              <th>Date</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (fiche of fiches.filter(f => f.statut === 'COMPLETEE'); track fiche.id) {
-              <tr>
-                <td><strong>{{ fiche.numero }}</strong></td>
-                <td>{{ fiche.client }}</td>
-                <td>{{ fiche.technicienNom }}</td>
-                <td>{{ fiche.date }}</td>
-                <td><span class="badge completee">COMPLETEE</span></td>
-                <td>
-                  <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" title="Voir détails">
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </div>
-  }
-</div>
+      <!-- ===== 1. INFORMATION PRINCIPALE ===== -->
+      <div class="section">
+        <h4>⭐ Informations Principales</h4>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>N° Projet *</mat-label>
+            <input matInput [(ngModel)]="ficheEnEdition.numProjet"/>
+          </mat-form-field>
 
-<!-- MODAL - DÉTAILS FICHE -->
-@if (showDetailModal && selectedFiche) {
-  <div class="modal-overlay" (click)="fermerDetailFiche()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>📋 Détails Fiche d'Intervention</h2>
-        <button mat-icon-button (click)="fermerDetailFiche()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Client</mat-label>
+            <input matInput [(ngModel)]="ficheEnEdition.client"/>
+          </mat-form-field>
 
-      <div class="modal-body">
-        <!-- INFOS PRINCIPALES -->
-        <div class="detail-section">
-          <h3>📌 Informations Principales</h3>
-          <div class="detail-grid">
-            <div class="detail-item">
-              <span class="label">N° Projet</span>
-              <span class="value">{{ selectedFiche.numero }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Client</span>
-              <span class="value">{{ selectedFiche.client }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Date</span>
-              <span class="value">{{ selectedFiche.date }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Technicien</span>
-              <span class="value">{{ selectedFiche.technicienNom }}</span>
-            </div>
-            <div class="detail-item full">
-              <span class="label">Description</span>
-              <span class="value">{{ selectedFiche.description }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Statut</span>
-              <span class="badge" [class]="selectedFiche.statut?.toLowerCase()">{{ selectedFiche.statut }}</span>
-            </div>
-          </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput type="date" [(ngModel)]="ficheEnEdition.date"/>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Technicien Assigné</mat-label>
+            <mat-select [(ngModel)]="ficheEnEdition.technicienAssigne">
+              @for (tech of techniciens; track tech) {
+                <mat-option [value]="tech">{{ tech }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         </div>
 
-        <!-- DOCUMENTS -->
-        @if (selectedFiche.documents && selectedFiche.documents.length > 0) {
-          <div class="detail-section">
-            <h3>📄 Documents / Fonctionnalités</h3>
-            <ul class="detail-list">
-              @for (doc of selectedFiche.documents; track $index) {
-                <li>✅ {{ doc }}</li>
-              }
-            </ul>
-          </div>
-        }
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput [(ngModel)]="ficheEnEdition.description" rows="3"></textarea>
+        </mat-form-field>
+      </div>
 
-        <!-- TÂCHES -->
-        @if (selectedFiche.taches && selectedFiche.taches.length > 0) {
-          <div class="detail-section">
-            <h3>✅ Tâches à Effectuer</h3>
-            <ul class="detail-list">
-              @for (tache of selectedFiche.taches; track $index) {
-                <li>☐ {{ tache }}</li>
-              }
-            </ul>
-          </div>
-        }
+      <!-- ===== 2. INFO CLIENTS ===== -->
+      <div class="section">
+        <h4>👥 Informations Clients</h4>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Code Client</mat-label>
+            <input matInput [(ngModel)]="ficheEnEdition.codeClient"/>
+            <mat-hint>Optionnel</mat-hint>
+          </mat-form-field>
 
-        <!-- CHAMPS LIBRES -->
-        @if (selectedFiche.champsLibres && selectedFiche.champsLibres.length > 0) {
-          <div class="detail-section">
-            <h3>📝 Informations Personnalisées</h3>
-            <div class="detail-grid">
-              @for (champ of selectedFiche.champsLibres; track $index) {
-                <div class="detail-item">
-                  <span class="label">{{ champ.label }}</span>
-                  <span class="value">{{ champ.valeur }}</span>
-                </div>
-              }
-            </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Numéro de Commande *</mat-label>
+            <input matInput [(ngModel)]="ficheEnEdition.numCommande"/>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Adresse *</mat-label>
+            <input matInput [(ngModel)]="ficheEnEdition.adresse"/>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contact *</mat-label>
+            <input matInput [(ngModel)]="ficheEnEdition.contact"/>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- ===== 3. MATÉRIEL HORS STANDARD ===== -->
+      <div class="section">
+        <h4>🔩 Matériel Hors Standard</h4>
+        <div class="materiel-input">
+          <mat-form-field appearance="outline" class="flex-grow">
+            <mat-label>Ajouter un matériel</mat-label>
+            <input matInput [(ngModel)]="ficheEnEdition.nouveauMateriel" placeholder="Ex: Nacelle, Testeur..."/>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="ajouterMateriel(ficheEnEdition)" type="button">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+
+        @if (ficheEnEdition.materielsHorsStandard && ficheEnEdition.materielsHorsStandard.length > 0) {
+          <div class="chips-container">
+            @for (materiel of ficheEnEdition.materielsHorsStandard; track $index) {
+              <div class="chip">
+                <span>{{ materiel }}</span>
+                <button mat-icon-button (click)="supprimerMateriel(ficheEnEdition, $index)" type="button" class="chip-delete">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
           </div>
         }
       </div>
 
-      <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="fermerDetailFiche()">
-          <mat-icon>close</mat-icon> Fermer
+      <!-- ===== 4. DOCUMENTS / FONCTIONNALITÉS ===== -->
+      <div class="section">
+        <h4>📎 Documents / Fonctionnalités</h4>
+        <div class="file-upload-section">
+          <input 
+            type="file" 
+            #fileInputEdit 
+            (change)="onFileSelectDocuments($event, ficheEnEdition)" 
+            multiple 
+            class="file-input"
+            accept="*/*"
+          />
+          <button mat-stroked-button (click)="fileInputEdit.click()" type="button" class="upload-btn">
+            <mat-icon>upload_file</mat-icon> Importer des dossiers/fichiers
+          </button>
+        </div>
+
+        @if (ficheEnEdition.documentsImportes && ficheEnEdition.documentsImportes.length > 0) {
+          <div class="documents-list">
+            @for (doc of ficheEnEdition.documentsImportes; track $index) {
+              <div class="document-item">
+                <mat-icon>folder</mat-icon>
+                <div class="doc-info">
+                  <p class="doc-nom">{{ doc.nom }}</p>
+                  <p class="doc-meta">{{ doc.taille }} KB • {{ doc.dateAjout }}</p>
+                </div>
+                <button mat-icon-button color="warn" (click)="supprimerDocument(ficheEnEdition, $index)" type="button">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ===== 5. DESCRIPTION DES TÂCHES ===== -->
+      <div class="section">
+        <h4>✅ Description des Tâches</h4>
+        
+        <div class="taches-buttons">
+          @for (tache of tachesDisponibles; track tache) {
+            <button 
+              mat-stroked-button 
+              (click)="ajouterTache(ficheEnEdition, tache)" 
+              type="button"
+              [disabled]="tacheExiste(ficheEnEdition, tache)"
+              class="tache-btn">
+              <mat-icon>add</mat-icon> {{ tache }}
+            </button>
+          }
+        </div>
+
+        @if (ficheEnEdition.taches && ficheEnEdition.taches.length > 0) {
+          <div class="taches-list">
+            @for (tache of ficheEnEdition.taches; track $index) {
+              <div class="tache-item">
+                <div class="tache-checkbox">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="tache.coche" 
+                    [id]="'tache-edit-' + $index"
+                  />
+                  <label [for]="'tache-edit-' + $index">{{ tache.nom }}</label>
+                </div>
+
+                @if (getOptionsTache(tache.nom).length > 0) {
+                  <mat-form-field appearance="outline" class="tache-select">
+                    <mat-label>Sélectionner</mat-label>
+                    <mat-select [(ngModel)]="tache.selection">
+                      <mat-option value="">Aucun</mat-option>
+                      @for (option of getOptionsTache(tache.nom); track option) {
+                        <mat-option [value]="option">{{ option }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+
+                <button mat-icon-button color="warn" (click)="supprimerTache(ficheEnEdition, $index)" type="button">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- BOUTONS ACTION -->
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="modifierFiche()">
+          <mat-icon>save</mat-icon> Enregistrer
+        </button>
+        <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
+          <mat-icon>close</mat-icon> Annuler
         </button>
       </div>
     </div>
+  }
+
+  <!-- LISTE DES FICHES -->
+  <div class="fiches-list-container">
+    <h3>📋 Fiches d'Intervention ({{ fiches.length }})</h3>
+
+    @if (fiches.length === 0) {
+      <p class="empty">Aucune fiche d'intervention</p>
+    } @else {
+      @for (fiche of fiches; track fiche.id) {
+        <div class="fiche-card">
+          <div class="fiche-header">
+            <div class="fiche-title">
+              <h4>{{ fiche.numProjet }} - {{ fiche.client }}</h4>
+              <p class="fiche-date">{{ fiche.date }} • {{ fiche.technicienAssigne }}</p>
+            </div>
+            <div class="fiche-actions">
+              <button mat-icon-button color="primary" (click)="ouvrirEdition(fiche)" title="Modifier">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="supprimerFiche(fiche.id)" title="Supprimer">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="fiche-content">
+            <p class="description">{{ fiche.description }}</p>
+
+            @if (fiche.codeClient || fiche.numCommande || fiche.adresse || fiche.contact) {
+              <div class="fiche-info">
+                <span class="info-item">
+                  <strong>N° Commande:</strong> {{ fiche.numCommande }}
+                </span>
+                <span class="info-item">
+                  <strong>Adresse:</strong> {{ fiche.adresse }}
+                </span>
+                <span class="info-item">
+                  <strong>Contact:</strong> {{ fiche.contact }}
+                </span>
+              </div>
+            }
+
+            @if (fiche.materielsHorsStandard && fiche.materielsHorsStandard.length > 0) {
+              <div class="fiche-materiels">
+                <strong>Matériel Hors Standard:</strong>
+                <div class="chips-display">
+                  @for (materiel of fiche.materielsHorsStandard; track $index) {
+                    <span class="chip-display">{{ materiel }}</span>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (fiche.taches && fiche.taches.length > 0) {
+              <div class="fiche-taches">
+                <strong>Tâches:</strong>
+                <div class="taches-display">
+                  @for (tache of fiche.taches; track $index) {
+                    <div class="tache-display" [class.coche]="tache.coche">
+                      <mat-icon class="tache-icon">{{ tache.coche ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                      <span>{{ tache.nom }}</span>
+                      @if (tache.selection) {
+                        <span class="selection-badge">{{ tache.selection }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
   </div>
-}
+</div>

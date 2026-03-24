@@ -24,6 +24,7 @@ export class Taches implements OnInit {
   showFormAdd = false;
   showFormEdit = false;
   showNoteModal = false;
+  showDetailModal = false;
   selectedTache: any = null;
   noteTemp = '';
 
@@ -39,7 +40,9 @@ export class Taches implements OnInit {
     fichiers: [] as any[],
     assignes: [] as any[],
     echeance: '',
-    valeur: 'Bronze'
+    valeur: 'Bronze',
+    chiffreAffaire: '',
+    numCommande: ''
   };
 
   tacheEnEdition: any = {};
@@ -59,10 +62,10 @@ export class Taches implements OnInit {
   loadTaches() {
     const stored = localStorage.getItem('taches');
     this.taches = stored ? JSON.parse(stored) : [
-      { id: 1, projet: 'Projet 1', statut: 'En cours', date: '1 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '11 oct', valeur: 'Platinum' },
-      { id: 2, projet: 'Projet 2', statut: 'Fait', date: '2 oct', priorite: 'Élevé', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Gold' },
-      { id: 3, projet: 'Projet 3', statut: 'Perdu', date: '3 oct', priorite: 'Moyenne', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Bronze' },
-      { id: 4, projet: 'Project4', statut: 'En Attente', date: '16 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Silver' }
+      { id: 1, projet: 'Projet 1', statut: 'En cours', date: '1 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '11 oct', valeur: 'Platinum', chiffreAffaire: '5000', numCommande: 'CMD-001' },
+      { id: 2, projet: 'Projet 2', statut: 'Fait', date: '2 oct', priorite: 'Élevé', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Gold', chiffreAffaire: '3500', numCommande: 'CMD-002' },
+      { id: 3, projet: 'Projet 3', statut: 'Perdu', date: '3 oct', priorite: 'Moyenne', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Bronze', chiffreAffaire: '2000', numCommande: 'CMD-003' },
+      { id: 4, projet: 'Project4', statut: 'En Attente', date: '16 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Silver', chiffreAffaire: '1500', numCommande: 'CMD-004' }
     ];
   }
 
@@ -87,6 +90,63 @@ export class Taches implements OnInit {
 
     this.resetFormAdd();
     this.showFormAdd = false;
+  }
+
+  ouvrirEdition(tache: any) {
+    this.tacheEnEdition = { ...tache };
+    this.selectedTache = tache;
+    this.showFormEdit = true;
+  }
+
+  modifierTache() {
+    if (!this.tacheEnEdition.projet) {
+      alert('Veuillez remplir le nom du projet');
+      return;
+    }
+
+    const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
+    if (index !== -1) {
+      this.taches[index] = { ...this.tacheEnEdition };
+      localStorage.setItem('taches', JSON.stringify(this.taches));
+      this.resetFormEdit();
+      this.showFormEdit = false;
+    }
+  }
+
+  supprimerTache(id: number) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+      this.taches = this.taches.filter((t: any) => t.id !== id);
+      localStorage.setItem('taches', JSON.stringify(this.taches));
+    }
+  }
+
+  ouvrirDetailModal(tache: any) {
+    this.selectedTache = tache;
+    this.showDetailModal = true;
+  }
+
+  fermerDetailModal() {
+    this.showDetailModal = false;
+    this.selectedTache = null;
+  }
+
+  resetFormAdd() {
+    this.nouvelleTache = {
+      projet: '',
+      statut: 'En Qualification',
+      date: '',
+      priorite: 'Moyenne',
+      fichiers: [] as any[],
+      assignes: [] as any[],
+      echeance: '',
+      valeur: 'Bronze',
+      chiffreAffaire: '',
+      numCommande: ''
+    };
+  }
+
+  resetFormEdit() {
+    this.tacheEnEdition = {};
   }
 
   onFileSelectAdd(event: any) {
@@ -133,76 +193,6 @@ export class Taches implements OnInit {
     }
   }
 
-  ouvrirEdition(tache: any) {
-    this.tacheEnEdition = { ...tache };
-    this.selectedTache = tache;
-    this.showFormEdit = true;
-  }
-
-  modifierTache() {
-    if (!this.tacheEnEdition.projet) {
-      alert('Veuillez remplir le nom du projet');
-      return;
-    }
-
-    const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
-    if (index !== -1) {
-      this.taches[index] = { ...this.tacheEnEdition };
-      localStorage.setItem('taches', JSON.stringify(this.taches));
-      this.resetFormEdit();
-      this.showFormEdit = false;
-    }
-  }
-
-  supprimerTache(id: number) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
-      this.taches = this.taches.filter((t: any) => t.id !== id);
-      localStorage.setItem('taches', JSON.stringify(this.taches));
-    }
-  }
-
-  resetFormAdd() {
-    this.nouvelleTache = {
-      projet: '',
-      statut: 'En Qualification',
-      date: '',
-      priorite: 'Moyenne',
-      fichiers: [] as any[],
-      assignes: [] as any[],
-      echeance: '',
-      valeur: 'Bronze'
-    };
-  }
-
-  getEmployeeName(employeId: number): string {
-    const emp = this.employes.find((e: any) => e.id === employeId);
-    return emp ? `${emp.prenom} ${emp.nom}` : 'Inconnu';
-  }
-
-  resetFormEdit() {
-    this.tacheEnEdition = {};
-  }
-
-  getStatutColor(statut: string): string {
-    const colors: any = {
-      'En Qualification': '#CCCCCC',
-      'En cours': '#FFA500',
-      'Fait': '#00CC00',
-      'Perdu': '#FF0000',
-      'En Attente': '#0066FF'
-    };
-    return colors[statut] || '#CCCCCC';
-  }
-
-  getPrioriteColor(priorite: string): string {
-    const colors: any = {
-      'Faible': '#0066FF',
-      'Élevé': '#7700CC',
-      'Moyenne': '#0066FF'
-    };
-    return colors[priorite] || '#0066FF';
-  }
-
   ouvrirNoteModal(tache: any) {
     this.selectedTache = tache;
     this.noteTemp = tache.noteContent || '';
@@ -232,5 +222,40 @@ export class Taches implements OnInit {
   fermerNoteModal() {
     this.showNoteModal = false;
     this.noteTemp = '';
+  }
+
+  getStatutColor(statut: string): string {
+    const colors: any = {
+      'En Qualification': '#CCCCCC',
+      'En cours': '#FFA500',
+      'Fait': '#00CC00',
+      'Perdu': '#FF0000',
+      'En Attente': '#0066FF'
+    };
+    return colors[statut] || '#CCCCCC';
+  }
+
+  getPrioriteColor(priorite: string): string {
+    const colors: any = {
+      'Faible': '#0066FF',
+      'Élevé': '#7700CC',
+      'Moyenne': '#0066FF'
+    };
+    return colors[priorite] || '#0066FF';
+  }
+
+  getValeurColor(valeur: string): string {
+    const colors: any = {
+      'Bronze': '#CD7F32',
+      'Platinum': '#E5E4E2',
+      'Gold': '#FFD700',
+      'Silver': '#C0C0C0'
+    };
+    return colors[valeur] || '#CCCCCC';
+  }
+
+  getEmployeeName(employeId: number): string {
+    const emp = this.employes.find((e: any) => e.id === employeId);
+    return emp ? `${emp.prenom} ${emp.nom}` : 'Inconnu';
   }
 }
