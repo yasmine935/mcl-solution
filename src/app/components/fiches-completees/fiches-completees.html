@@ -145,10 +145,7 @@
                 <mat-icon>visibility</mat-icon> Voir détails
               </button>
               <button mat-raised-button color="accent" (click)="validerFiche(fiche)" class="btn-valider">
-                <mat-icon>check_circle</mat-icon> Valider
-              </button>
-              <button mat-stroked-button color="warn" (click)="rejeterFiche(fiche)" class="btn-rejeter">
-                <mat-icon>cancel</mat-icon> Rejeter
+                <mat-icon>check_circle</mat-icon> Valider & Facturer
               </button>
             </div>
           } @else {
@@ -305,10 +302,7 @@
         <div class="modal-footer">
           @if (!selectedFiche.approuvePar) {
             <button mat-raised-button color="accent" (click)="validerFiche(selectedFiche)">
-              <mat-icon>check_circle</mat-icon> Valider
-            </button>
-            <button mat-stroked-button color="warn" (click)="rejeterFiche(selectedFiche)">
-              <mat-icon>cancel</mat-icon> Rejeter
+              <mat-icon>check_circle</mat-icon> Valider & Facturer
             </button>
           }
           <button mat-stroked-button (click)="fermerDetail()">

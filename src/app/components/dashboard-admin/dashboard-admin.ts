@@ -13,6 +13,7 @@ import { Employes } from '../employes/employes';
 import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
+import { Factures } from '../factures/factures';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -21,7 +22,7 @@ import { FichesCompletees } from '../fiches-completees/fiches-completees';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees
+    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'

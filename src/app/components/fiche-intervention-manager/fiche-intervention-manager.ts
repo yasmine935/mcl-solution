@@ -45,6 +45,7 @@ export class FicheInterventionManager implements OnInit {
     // INFO CLIENT
     codeClient: '',
     numCommande: '',
+    chiffreAffaire: 0,
     adresse: '',
     contact: '',
     // MATÉRIEL HORS STANDARD
@@ -84,7 +85,7 @@ export class FicheInterventionManager implements OnInit {
   loadFiches() {
     const stored = localStorage.getItem('fiches_intervention');
     this.fiches = stored ? JSON.parse(stored) : [
-      { id: 1, numProjet: 'PRJ-001', client: 'Acme Corp', date: '25/03/2026', technicienAssigne: 'Test Technicien', description: 'Installation complète salle de réunion', codeClient: 'CLI-001', numCommande: 'CMD-2025-001', adresse: '123 Rue de Paris, 75001 Paris', contact: 'Jean Dupont - 01 23 45 67 89', materielsHorsStandard: ['Nacelle'], documentsImportes: [], taches: [] }
+      { id: 1, numProjet: 'PRJ-001', client: 'Acme Corp', date: '25/03/2026', technicienAssigne: 'Test Technicien', description: 'Installation complète salle de réunion', codeClient: 'CLI-001', numCommande: 'CMD-2025-001', chiffreAffaire: 5000, adresse: '123 Rue de Paris, 75001 Paris', contact: 'Jean Dupont - 01 23 45 67 89', materielsHorsStandard: ['Nacelle'], documentsImportes: [], taches: [] }
     ];
   }
 
@@ -146,6 +147,7 @@ export class FicheInterventionManager implements OnInit {
       description: '',
       codeClient: '',
       numCommande: '',
+      chiffreAffaire: 0,
       adresse: '',
       contact: '',
       materielsHorsStandard: [] as any[],

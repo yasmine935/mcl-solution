@@ -20,7 +20,7 @@ export class FichesCompletees implements OnInit {
   fichesCompletees: any[] = [];
   selectedFiche: any = null;
   showDetailModal = false;
-  filterStatut = 'PENDING'; // PENDING, VALIDEE, REJETEE
+  filterStatut = 'PENDING'; // PENDING, VALIDEE
 
   constructor() {}
 
@@ -57,6 +57,7 @@ export class FichesCompletees implements OnInit {
     this.selectedFiche = null;
   }
 
+  // ✅ VALIDER ET CRÉER FACTURE
   validerFiche(fiche: any) {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const nomManager = `${user.prenom} ${user.nom}`;
@@ -72,33 +73,25 @@ export class FichesCompletees implements OnInit {
         toutes[index].statut = 'VALIDEE';
         
         localStorage.setItem('fiches_intervention', JSON.stringify(toutes));
-        
-        alert(`✅ Fiche validée par ${nomManager}`);
-        this.loadFichesCompletees();
-        this.fermerDetail();
-      }
-    }
-  }
 
-  rejeterFiche(fiche: any) {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const nomManager = `${user.prenom} ${user.nom}`;
-    
-    const motif = prompt('Motif du rejet:');
-    if (motif) {
-      const stored = localStorage.getItem('fiches_intervention');
-      const toutes = stored ? JSON.parse(stored) : [];
-      
-      const index = toutes.findIndex((f: any) => f.id === fiche.id);
-      if (index !== -1) {
-        toutes[index].rejetePar = nomManager;
-        toutes[index].motifRejet = motif;
-        toutes[index].dateRejet = new Date().toISOString();
-        toutes[index].statut = 'EN_COURS'; // Revient à EN_COURS pour que le technicien rectifie
+        // ✅ CRÉER LA FACTURE AUTOMATIQUEMENT
+        const factures = this.loadFactures();
+        const numFacture = `FAC-${new Date().getFullYear()}-${String(factures.length + 1).padStart(3, '0')}`;
         
-        localStorage.setItem('fiches_intervention', JSON.stringify(toutes));
+        const nouvelleFacture = {
+          id: Math.max(...factures.map((f: any) => f.id || 0), 0) + 1,
+          numero: numFacture,
+          client: fiche.client,
+          montant: fiche.chiffreAffaire || 0,
+          date: new Date().toLocaleDateString('fr-FR'),
+          statut: 'EN_ATTENTE',
+          ficheSouvenanceId: fiche.id
+        };
+
+        factures.push(nouvelleFacture);
+        localStorage.setItem('factures', JSON.stringify(factures));
         
-        alert(`❌ Fiche rejetée - Motif: ${motif}`);
+        alert(`✅ Fiche validée par ${nomManager}\n💰 Facture créée: ${numFacture}`);
         this.loadFichesCompletees();
         this.fermerDetail();
       }
@@ -130,5 +123,10 @@ export class FichesCompletees implements OnInit {
       return '';
     }
     return this.selectedFiche.photos.map((p: any) => p.nom).join(', ');
+  }
+
+  loadFactures(): any[] {
+    const stored = localStorage.getItem('factures');
+    return stored ? JSON.parse(stored) : [];
   }
 }
