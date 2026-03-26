@@ -14,6 +14,8 @@ import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Factures } from '../factures/factures';
+import { Semenier } from '../semenier/semenier';
+import { Planning } from '../planning/planning';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -22,7 +24,7 @@ import { Factures } from '../factures/factures';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures
+    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'

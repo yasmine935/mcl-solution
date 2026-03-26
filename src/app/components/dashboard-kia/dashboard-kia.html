@@ -16,15 +16,19 @@
      <a class="nav-item" [class.active]="currentPage === 'fiches-completees'" (click)="currentPage = 'fiches-completees'">
   <mat-icon>check_circle</mat-icon> Fiches Complétées
 </a>
-      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
-        <mat-icon>calendar_month</mat-icon> Planning
-      </a>
+      
       <a class="nav-item" [class.active]="currentPage === 'crm'" (click)="currentPage = 'crm'">
         <mat-icon>people_alt</mat-icon> CRM
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+  <mat-icon>calendar_month</mat-icon> Planning
+</a>
       <a class="nav-item" [class.active]="currentPage === 'stock'" (click)="currentPage = 'stock'">
         <mat-icon>inventory</mat-icon> Stock
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
+  <mat-icon>calendar_today</mat-icon> Semenier
+</a>
       <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
         <mat-icon>shopping_cart</mat-icon> Commandes Achat
       </a>
@@ -80,11 +84,19 @@
         </div>
       </div>
     }
-
+<!-- PLANNING -->
+@if (currentPage === 'planning') {
+  <app-planning></app-planning>
+}
+    <!-- SEMENIER -->
+@if (currentPage === 'semenier') {
+  <app-semenier></app-semenier>
+}
     <!-- Fiches d'Intervention -->
    @if (currentPage === 'fiches') {
   <app-fiche-intervention-manager></app-fiche-intervention-manager>
 }
+
 <!-- ✅ AJOUTE CE COMPOSANT -->
 @if (currentPage === 'fiches-completees') {
   <app-fiches-completees></app-fiches-completees>

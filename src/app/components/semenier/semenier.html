@@ -1,0 +1,145 @@
+<div class="semenier-container">
+  <div class="semenier-header">
+    <h3>📅 Semenier</h3>
+    <button mat-raised-button color="primary" (click)="showForm = !showForm">
+      <mat-icon>add</mat-icon> Nouveau
+    </button>
+  </div>
+
+  @if (showForm) {
+    <div class="form-card">
+      <h4>Créer un Semenier</h4>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Utilisateur</mat-label>
+          <mat-select [(ngModel)]="selectedUser">
+            @for (user of utilisateurs; track user.id) {
+              <mat-option [value]="user">
+                {{ user.prenom }} {{ user.nom }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Semaine</mat-label>
+          <mat-select [(ngModel)]="selectedWeek">
+            @for (semaine of obtenirSemaines(); track semaine.semaine) {
+              <mat-option [value]="semaine">
+                {{ semaine.semaine }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="creerSemenier()">Créer</button>
+        <button mat-stroked-button (click)="showForm = false">Annuler</button>
+      </div>
+    </div>
+  }
+
+  <div class="semeniers-list">
+    @if (semeniers.length === 0) {
+      <p class="empty">Aucun semenier 📅</p>
+    } @else {
+      @for (semenier of semeniers; track semenier.id) {
+        <div class="semenier-card">
+          <div class="semenier-card-header">
+            <div>
+              <h4>{{ semenier.utilisateurNom }}</h4>
+              <p>{{ semenier.semaine }}</p>
+            </div>
+            <div class="semenier-actions">
+              <button mat-icon-button (click)="confirmerSemenier(semenier)">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+              <button mat-icon-button (click)="supprimerSemenier(semenier.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="jours-container">
+            @for (jour of semenier.jours; track jour.id) {
+              <div class="jour-card">
+                <div class="jour-header">
+                  <div>
+                    <h5>{{ jour.jour }}</h5>
+                    <p>{{ jour.dateJour }}</p>
+                  </div>
+                  <div>
+                    <span>⏱️ {{ compterHeures(jour) }}h</span>
+                  </div>
+                </div>
+
+                <div class="creneaux-list">
+                  @for (creneau of jour.creneaux; let idx = $index; track creneau.id) {
+                    <div class="creneau-item" [style.backgroundColor]="getCouleurCreneau(creneau.localisation)">
+                      <div>
+                        <strong>{{ creneau.heureDebut }}-{{ creneau.heureFin }}</strong>
+                        <br />
+                        <span>{{ creneau.localisation }}</span>
+                        @if (creneau.notes) {
+                          <br />
+                          <small>{{ creneau.notes }}</small>
+                        }
+                      </div>
+                      <button mat-icon-button size="small" (click)="supprimerCreneau(semenier, jour, idx)">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+
+                <button mat-stroked-button (click)="openAjouterCreneau(semenier, jour)">
+                  Ajouter créneau
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (showFormCreneau && currentDay) {
+    <div class="modal-overlay" (click)="showFormCreneau = false">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h4>Ajouter créneau - {{ currentDay.jour }}</h4>
+        
+        <div class="form-group">
+          <label>Heure début</label>
+          <input type="time" [(ngModel)]="newCreneau.heureDebut">
+        </div>
+
+        <div class="form-group">
+          <label>Heure fin</label>
+          <input type="time" [(ngModel)]="newCreneau.heureFin">
+        </div>
+
+        <div class="form-group">
+          <label>Localisation</label>
+          <select [(ngModel)]="newCreneau.localisation">
+            @for (loc of localisations; track loc) {
+              <option [value]="loc">{{ loc }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" [(ngModel)]="newCreneau.notes" placeholder="Ex: Réunion...">
+        </div>
+
+        <div class="modal-actions">
+          <button mat-raised-button color="primary" (click)="ajouterCreneau()">
+            Ajouter
+          </button>
+          <button mat-stroked-button (click)="showFormCreneau = false">Annuler</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

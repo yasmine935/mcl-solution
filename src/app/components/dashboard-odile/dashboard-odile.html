@@ -17,7 +17,7 @@
   <mat-icon>check_circle</mat-icon> Fiches Complétées
 </a>
       <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
-        <mat-icon>folder_open</mat-icon> GED
+        <mat-icon>folder_open</mat-icon>  Documents
       </a>
       <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
         <mat-icon>support_agent</mat-icon> Tickets
@@ -25,9 +25,18 @@
       <a class="nav-item" [class.active]="currentPage === 'rh'" (click)="currentPage = 'rh'">
         <mat-icon>people_alt</mat-icon> RH
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
+  <mat-icon>calendar_today</mat-icon> Semenier
+</a>
+<a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+  <mat-icon>calendar_month</mat-icon> Planning
+</a>
       <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
         <mat-icon>receipt</mat-icon> Factures
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
+  <mat-icon>calendar_today</mat-icon> Semenier
+</a>
       <a class="nav-item" [class.active]="currentPage === 'remonteesTerrain'" (click)="currentPage = 'remonteesTerrain'">
         <mat-icon>report_problem</mat-icon> Remontées Terrain
       </a>
@@ -50,7 +59,14 @@
         <span class="role-badge">ODILE</span>
       </div>
     </div>
-
+     <!-- PLANNING -->
+    @if (currentPage === 'planning') {
+  <app-planning></app-planning>
+}
+ <!-- SEMENIER -->
+@if (currentPage === 'semenier') {
+  <app-semenier></app-semenier>
+}
     <!-- Home -->
     @if (currentPage === 'home') {
       <div class="stats-grid">
@@ -86,47 +102,10 @@
 @if (currentPage === 'fiches-completees') {
   <app-fiches-completees></app-fiches-completees>
 }
-    <!-- GED -->
-    @if (currentPage === 'ged') {
-      <div class="table-card">
-        <h3>📁 GED - Gestion Électronique Documentaire (Avancée)</h3>
-        @if (documents.length === 0) {
-          <div class="empty">Aucun document</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nom du document</th>
-                <th>Type</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (doc of documents; track doc.id) {
-                <tr>
-                  <td>{{ doc.nom }}</td>
-                  <td><span class="badge-type">{{ doc.type }}</span></td>
-                  <td>{{ doc.date }}</td>
-                  <td>
-                    <button mat-icon-button color="primary">
-                      <mat-icon>download</mat-icon>
-                    </button>
-                    <button mat-icon-button color="accent">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="warn">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-
+    <!-- Documents -->
+ @if (currentPage === 'ged') {
+  <app-documents></app-documents>
+}
     <!-- Tickets -->
     @if (currentPage === 'tickets') {
       <div class="table-card">
@@ -214,46 +193,9 @@
     }
 
     <!-- Factures -->
-    @if (currentPage === 'factures') {
-      <div class="table-card">
-        <h3>💰 Gestion des Factures</h3>
-        @if (factures.length === 0) {
-          <div class="empty">Aucune facture</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Numéro</th>
-                <th>Client</th>
-                <th>Montant</th>
-                <th>Date</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (fac of factures; track fac.id) {
-                <tr>
-                  <td>{{ fac.numero }}</td>
-                  <td>{{ fac.client }}</td>
-                  <td class="montant">{{ fac.montant }}</td>
-                  <td>{{ fac.date }}</td>
-                  <td><span [class]="'badge ' + fac.statut?.toLowerCase()">{{ fac.statut }}</span></td>
-                  <td>
-                    <button mat-icon-button color="primary">
-                      <mat-icon>download</mat-icon>
-                    </button>
-                    <button mat-icon-button color="accent">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
+   @if (currentPage === 'factures') {
+  <app-factures></app-factures>
+}
 
     <!-- Remontées Terrain -->
     @if (currentPage === 'remonteesTerrain') {

@@ -16,6 +16,9 @@
 <a class="nav-item" [class.active]="currentPage === 'fiches-completees'" (click)="currentPage = 'fiches-completees'">
   <mat-icon>check_circle</mat-icon> Fiches Complétées
 </a>
+<a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+  <mat-icon>calendar_month</mat-icon> Planning
+</a>
 <a class="nav-item" [class.active]="currentPage === 'taches'" (click)="currentPage = 'taches'">
   <mat-icon>check_circle</mat-icon> Tâches
 </a>
@@ -24,6 +27,9 @@
       </a>
       <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
         <mat-icon>people_alt</mat-icon> Employés
+      </a>
+    <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
+        <mat-icon>folder_open</mat-icon> Semenier
       </a>
       <a class="nav-item" [class.active]="currentPage === 'documents'" (click)="currentPage = 'documents'">
         <mat-icon>folder_open</mat-icon> Documents
@@ -143,6 +149,14 @@
 @if (currentPage === 'employes') {
   <app-employes></app-employes>
 }
+<!-- PLANNING -->
+@if (currentPage === 'planning') {
+  <app-planning></app-planning>
+}
+<!-- Main content -->
+@if (currentPage === 'semenier') {
+  <app-semenier></app-semenier>
+}
    <!-- Réclamations -->
 @if (currentPage === 'reclamations') {
   <div class="table-card">
@@ -248,7 +262,10 @@
   @if (currentPage === 'documents') {
   <app-documents></app-documents>
 }
-
+<!-- SEMENIER -->
+@if (currentPage === 'semenier') {
+  <app-semenier></app-semenier>
+}
     <!-- Tickets -->
     @if (currentPage === 'tickets') {
       <div class="table-card">

@@ -16,9 +16,18 @@
       <a class="nav-item" [class.active]="currentPage === 'completees'" (click)="currentPage = 'completees'">
         <mat-icon>check_circle</mat-icon> Complétées
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
+  <mat-icon>calendar_today</mat-icon> Semenier
+</a>
       <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+  <mat-icon>calendar_month</mat-icon> Planning
+</a>
+      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
+  <mat-icon>calendar_today</mat-icon> Semenier
+</a>
       <a class="nav-item" [class.active]="currentPage === 'reclamations'" (click)="currentPage = 'reclamations'">
         <mat-icon>report_problem</mat-icon> Remontées Terrain
       </a>
@@ -38,7 +47,14 @@
         <span class="role-badge">TECHNICIEN</span>
       </div>
     </div>
-
+ <!-- SEMENIER -->
+@if (currentPage === 'semenier') {
+  <app-semenier></app-semenier>
+}
+<!-- PLANNING -->
+@if (currentPage === 'planning') {
+  <app-planning></app-planning>
+}
     <!-- HOME PAGE WITH STATS -->
     @if (currentPage === 'home') {
       <div class="stats-grid">

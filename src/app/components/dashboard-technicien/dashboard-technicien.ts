@@ -8,6 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { Semenier } from '../semenier/semenier';
+import { Planning } from '../planning/planning';
+
 
 @Component({
   selector: 'app-dashboard-technicien',
@@ -15,7 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule
+    MatInputModule, MatSelectModule, Semenier , Planning
   ],
   templateUrl: './dashboard-technicien.html',
   styleUrl: './dashboard-technicien.css'

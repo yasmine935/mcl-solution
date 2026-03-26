@@ -11,13 +11,18 @@ import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { Taches } from '../taches/taches';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
+import { Factures } from '../factures/factures';
+import { Documents } from '../documents/documents';
+import { Semenier } from '../semenier/semenier';
+import { Planning } from '../planning/planning';
+
 @Component({
   selector: 'app-dashboard-aurelien',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule ,FicheInterventionManager , Taches,FichesCompletees 
+    MatInputModule, MatSelectModule ,FicheInterventionManager , Taches,FichesCompletees ,Factures , Documents , Semenier, Planning
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
@@ -126,11 +131,14 @@ export class DashboardAurelien implements OnInit {
       case 'home': return 'Mon Dashboard';
       case 'fiches': return 'Fiches d\'Intervention';
       case 'interventions': return 'Gestion des Interventions';
-      case 'ged': return 'GED - Gestion Électronique Documentaire';
+     case 'ged': return '📄 Documents'; 
       case 'tickets': return 'Tickets Support';
       case 'rh': return 'Ressources Humaines';
       case 'mes-conges': return 'Mes Congés';
       default: return 'Dashboard';
+      case 'fiches-completees': return '✅ Fiches Complétées';
+case 'taches': return '✓ Tâches';
+case 'factures': return '💰 Factures';
     }
   }
 

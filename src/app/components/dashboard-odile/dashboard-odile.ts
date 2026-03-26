@@ -9,14 +9,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
+import { Factures } from '../factures/factures';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
+import { Documents } from '../documents/documents';
+import { Semenier } from '../semenier/semenier';
+import { Planning } from '../planning/planning';
+
 @Component({
   selector: 'app-dashboard-odile',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule , FicheInterventionManager ,FichesCompletees 
+    MatInputModule, MatSelectModule , FicheInterventionManager ,FichesCompletees , Factures , Documents, Semenier, Planning
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
@@ -158,7 +163,7 @@ export class DashboardOdile implements OnInit {
       case 'home': return 'Tableau de Bord';
       case 'fiches': return 'Fiches d\'Intervention';
       case 'interventions': return 'Interventions';
-      case 'ged': return 'GED';
+      case 'ged': return '📄 Documents'; 
       case 'tickets': return 'Tickets';
       case 'rh': return 'Ressources Humaines';
       case 'factures': return 'Factures';
