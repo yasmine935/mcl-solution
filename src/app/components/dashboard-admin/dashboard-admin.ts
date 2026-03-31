@@ -16,6 +16,7 @@ import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Factures } from '../factures/factures';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
+import { TicketingComponent } from '../ticketing/ticketing';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -24,7 +25,7 @@ import { Planning } from '../planning/planning';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning
+    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'
@@ -210,6 +211,7 @@ export class DashboardAdmin implements OnInit {
       case 'support': return 'Support';
       case 'factures': return 'Factures';
       case 'utilisateurs': return 'Utilisateurs';
+      case 'tickets': return '🎫 Tickets Clients';
       default: return 'Dashboard Admin';
     }
   }

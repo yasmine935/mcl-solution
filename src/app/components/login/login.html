@@ -1,38 +1,108 @@
 <div class="login-page">
-  <!-- Côté gauche — Image -->
-  <div class="login-image">
-    <div class="overlay">
-      <h1>MCL Solutions</h1>
-      <p>Votre espace de travail intelligent</p>
+
+  <!-- CÔTÉ GAUCHE — visuel MCL -->
+  <div class="login-visual">
+    <div class="visual-bg"></div>
+    <div class="grid-overlay"></div>
+    <div class="glow-orb orb1"></div>
+    <div class="glow-orb orb2"></div>
+    <div class="glow-orb orb3"></div>
+
+    <div class="visual-content">
+      <div class="mcl-logo-big">
+        <span class="logo-mcl">mcl</span>
+        <span class="logo-sol">Solutions</span>
+      </div>
+      <div class="visual-tagline">
+        <h2>Votre espace de travail<br><span>intelligent & sécurisé</span></h2>
+        <p>Plateforme intégrée de gestion des activités professionnelles</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-n">6</span>
+          <span class="stat-l">Rôles</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <span class="stat-n">10</span>
+          <span class="stat-l">Modules</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <span class="stat-n">22</span>
+          <span class="stat-l">Fonctions</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="visual-footer">
+      © 2026 MCL Solutions — Tous droits réservés
     </div>
   </div>
 
-  <!-- Côté droit — Formulaire -->
+  <!-- CÔTÉ DROIT — formulaire -->
   <div class="login-form-side">
     <div class="login-form-container">
-      <img src="assets/logo.png" alt="logo" class="logo" onerror="this.style.display='none'"/>
-      <h2>MCL Solutions</h2>
-      <h3>Connectez-vous à votre compte</h3>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Nom d'utilisateur</mat-label>
-        <input matInput [(ngModel)]="username" placeholder="Entrez votre username"/>
-      </mat-form-field>
+      <div class="form-logo">
+        <div class="logo-icon">⚡</div>
+        <div class="form-logo-text">
+          <strong>MCL</strong> Solutions
+        </div>
+      </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Mot de passe</mat-label>
-        <input matInput type="password" [(ngModel)]="password" placeholder="Entrez votre mot de passe"/>
-      </mat-form-field>
+      <div class="form-header">
+        <h3>Bienvenue</h3>
+        <p>Connectez-vous à votre espace</p>
+      </div>
+
+      <div class="input-group">
+        <label>Nom d'utilisateur</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input
+            matInput
+            [(ngModel)]="username"
+            type="text"
+            placeholder="Entrez votre username"
+            class="mcl-input"
+          />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Mot de passe</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input
+            matInput
+            [(ngModel)]="password"
+            type="password"
+            placeholder="Entrez votre mot de passe"
+            class="mcl-input"
+          />
+        </div>
+      </div>
 
       <a class="forgot">Mot de passe oublié ?</a>
 
       @if (errorMessage) {
-        <div class="error-msg">{{ errorMessage }}</div>
+        <div class="error-msg">
+          <span>⚠️</span> {{ errorMessage }}
+        </div>
       }
 
-      <button mat-raised-button color="primary" (click)="login()" class="full-width login-btn">
-        Se connecter
+      <button class="login-btn" (click)="login()">
+        <span>Se connecter</span>
+        <span class="btn-arrow">→</span>
       </button>
+
+      <div class="ticket-link">
+        <span>Vous avez un problème ?</span>
+        <a routerLink="/nouveau-ticket">Soumettre un ticket →</a>
+      </div>
+
     </div>
   </div>
+
 </div>

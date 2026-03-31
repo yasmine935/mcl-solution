@@ -1,0 +1,354 @@
+<div class="ticketing-wrapper">
+
+  <!-- ══════════ HEADER TITRE ══════════ -->
+  <div class="page-header">
+    <h2>🎫 Tickets Clients</h2>
+    <button class="btn-nouveau" (click)="openNewForm()">+ Nouveau Ticket</button>
+  </div>
+
+  <!-- ══════════ KPI BARS (orange + vert comme Fiches) ══════════ -->
+  <div class="kpi-bars">
+    <div class="kpi-bar kpi-orange">
+      <div class="kpi-number">{{ ticketsEnAttente.length }}</div>
+      <div class="kpi-label">En attente de traitement</div>
+    </div>
+    <div class="kpi-bar kpi-green">
+      <div class="kpi-number">{{ ticketsValides.length }}</div>
+      <div class="kpi-label">Validés</div>
+    </div>
+  </div>
+
+  <!-- ══════════ TABS ══════════ -->
+  <div class="tabs-row">
+    <button class="tab-btn" [class.active-attente]="activeTab === 'attente'"
+      (click)="activeTab = 'attente'">
+      ⏳ En attente ({{ ticketsEnAttente.length }})
+    </button>
+    <button class="tab-btn tab-validee" [class.active-validee]="activeTab === 'validee'"
+      (click)="activeTab = 'validee'">
+      ✅ Validés ({{ ticketsValides.length }})
+    </button>
+  </div>
+
+  <!-- ══════════ EMPTY STATE ══════════ -->
+  <div *ngIf="displayedTickets.length === 0" class="empty-state">
+    <p>{{ activeTab === 'attente' ? '🎉 Aucun ticket en attente !' : '📭 Aucun ticket validé pour l\'instant.' }}</p>
+  </div>
+
+  <!-- ══════════ CARDS GRID ══════════ -->
+  <div class="cards-grid" *ngIf="displayedTickets.length > 0">
+    <div class="ticket-card" *ngFor="let ticket of displayedTickets"
+      [class.card-encours]="ticket.statut === 'En cours'"
+      [class.card-validee]="ticket.statut === 'Validée'"
+      (click)="viewDetail(ticket)">
+
+      <!-- En-tête carte -->
+      <div class="card-header">
+        <div class="card-title-row">
+          <span class="card-numero">{{ ticket.numero }}</span>
+          <span class="card-site">{{ ticket.site }}</span>
+          <span class="statut-badge"
+            [class.badge-attente]="ticket.statut === 'En attente'"
+            [class.badge-encours]="ticket.statut === 'En cours'"
+            [class.badge-validee]="ticket.statut === 'Validée'">
+            {{ ticket.statut === 'Validée' ? '✅ VALIDÉE' : ticket.statut === 'En cours' ? '⚙️ EN COURS' : '⏳ EN ATTENTE' }}
+          </span>
+        </div>
+        <div class="card-client">
+          <span class="icon-user">👤</span>
+          {{ ticket.prenom }} {{ ticket.nom }}
+        </div>
+        <div *ngIf="ticket.statut === 'Validée'" class="valide-par">
+          Validé par: {{ ticket.valideePar }}
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="card-dates">
+        <div><strong>Date création:</strong> {{ formatDate(ticket.dateCreation) }}</div>
+        <div *ngIf="ticket.dateValidation"><strong>Date validation:</strong> {{ formatDate(ticket.dateValidation) }}</div>
+      </div>
+
+      <!-- Infos contact -->
+      <div class="card-infos">
+        <div *ngIf="ticket.lieuSite || ticket.nomSalle">
+          <span>📍</span>
+          <span>{{ ticket.lieuSite }}{{ ticket.nomSalle ? ' - ' + ticket.nomSalle : '' }}</span>
+        </div>
+        <div *ngIf="ticket.telephone">
+          <span>📞</span>
+          <span>{{ ticket.prenom }} {{ ticket.nom }} - {{ ticket.telephone }}</span>
+        </div>
+        <div *ngIf="ticket.email">
+          <span>✉️</span>
+          <span>{{ ticket.email }}</span>
+        </div>
+      </div>
+
+      <!-- Matériel & Criticité -->
+      <div class="card-materiel">
+        <div class="materiel-row">
+          <span class="materiel-label">🔧 {{ ticket.typeMateriel }}</span>
+          <span *ngIf="ticket.marque" class="materiel-tag">{{ ticket.marque }}</span>
+          <span *ngIf="ticket.reference" class="materiel-tag">{{ ticket.reference }}</span>
+        </div>
+        <div class="criticite-row">
+          <span class="badge" [class]="getCritClass(ticket.criticite)">{{ ticket.criticite }}</span>
+          <span class="garantie" *ngIf="ticket.sousGarantie">🛡️ Sous garantie</span>
+        </div>
+        <div class="description-panne">{{ ticket.descriptionPanne }}</div>
+      </div>
+
+      <!-- Assigné & Priorité -->
+      <div class="card-assignee">
+        <span>👷 {{ getUserName(ticket.assigneId) }}</span>
+        <span class="badge" [class]="getCritClass(ticket.priorite)">{{ ticket.priorite }}</span>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions" (click)="$event.stopPropagation()">
+        <button *ngIf="ticket.statut === 'En attente'" class="btn-action btn-encours"
+          (click)="mettreEnCours(ticket, $event)">
+          ⚙️ Mettre En cours
+        </button>
+        <button *ngIf="ticket.statut === 'En cours'" class="btn-action btn-valider"
+          (click)="validerTicket(ticket, $event)">
+          ✅ Valider (Résolu)
+        </button>
+        <button class="btn-action btn-detail" (click)="viewDetail(ticket)">
+          👁️ Voir détails
+        </button>
+        <button class="btn-action btn-suppr"
+          (click)="deleteTicket(ticket, $event)">
+          🗑️
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ MODAL FORMULAIRE CLIENT ══════════ -->
+  <div class="modal-overlay" *ngIf="showForm" (click)="cancel()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+
+      <div class="modal-top">
+        <h3>🎫 Créer un nouveau Ticket Client</h3>
+        <button class="btn-close" (click)="cancel()">✕</button>
+        <span class="modifier-btn">✏️ Modifier le formulaire</span>
+      </div>
+
+      <div class="modal-content">
+        <!-- GAUCHE : Formulaire -->
+        <div class="form-left">
+
+          <!-- Demande d'Intervention -->
+          <div class="fsection">
+            <h4>☰ Demande d'Intervention</h4>
+            <div class="frow full">
+              <div class="fgroup">
+                <label>Site <span class="req">*</span></label>
+                <input [(ngModel)]="form.site" type="text" />
+              </div>
+            </div>
+            <div class="frow two">
+              <div class="fgroup">
+                <label>Nom <span class="req">*</span></label>
+                <input [(ngModel)]="form.nom" type="text" />
+                <small>du demandeur</small>
+              </div>
+              <div class="fgroup">
+                <label>Prénom <span class="req">*</span></label>
+                <input [(ngModel)]="form.prenom" type="text" />
+                <small>du demandeur</small>
+              </div>
+            </div>
+            <div class="frow two">
+              <div class="fgroup">
+                <label>Téléphone <span class="req">*</span></label>
+                <input [(ngModel)]="form.telephone" type="tel" />
+                <small>du demandeur</small>
+              </div>
+              <div class="fgroup">
+                <label>Adresse Mail <span class="req">*</span></label>
+                <input [(ngModel)]="form.email" type="email" />
+                <small>du demandeur</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lieu d'Intervention -->
+          <div class="fsection">
+            <h4>📍 Lieu d'Intervention</h4>
+            <div class="frow two">
+              <div class="fgroup">
+                <label>Site</label>
+                <input [(ngModel)]="form.lieuSite" type="text" class="input-gray" />
+              </div>
+              <div class="fgroup">
+                <label>Nom de la Salle <span class="req">*</span></label>
+                <input [(ngModel)]="form.nomSalle" type="text" />
+              </div>
+            </div>
+            <div class="frow two">
+              <div class="fgroup">
+                <label>Étage</label>
+                <input [(ngModel)]="form.etage" type="text" />
+              </div>
+              <div class="fgroup">
+                <label>Informations additionnelles</label>
+                <textarea [(ngModel)]="form.informationsAdditionnelles" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nature de la Panne -->
+          <div class="fsection">
+            <h4>🔧 Nature de la Panne</h4>
+            <div class="frow three">
+              <div class="fgroup">
+                <label>Type de Matériel <span class="req">*</span></label>
+                <input [(ngModel)]="form.typeMateriel" type="text" />
+              </div>
+              <div class="fgroup">
+                <label>Marque <span class="req">*</span></label>
+                <input [(ngModel)]="form.marque" type="text" />
+              </div>
+              <div class="fgroup">
+                <label>Référence <span class="req">*</span></label>
+                <input [(ngModel)]="form.reference" type="text" />
+              </div>
+            </div>
+            <div class="frow three-mix">
+              <div class="fgroup">
+                <label>Marque sous Garantie</label>
+                <div class="toggle-grp">
+                  <button [class.on]="form.sousGarantie === true" (click)="form.sousGarantie = true">Oui</button>
+                  <button [class.on]="form.sousGarantie === false" (click)="form.sousGarantie = false">Non</button>
+                </div>
+              </div>
+              <div class="fgroup">
+                <label>Criticité de la Panne</label>
+                <div class="radio-grp">
+                  <label *ngFor="let c of criticiteOptions">
+                    <input type="radio" [value]="c" [(ngModel)]="form.criticite" name="crit" /> {{ c }}
+                  </label>
+                </div>
+              </div>
+              <div class="fgroup">
+                <label>Description de la Panne <span class="req">*</span></label>
+                <input [(ngModel)]="form.descriptionPanne" type="text" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload -->
+          <div class="fsection">
+            <h4>📎 Éléments Complémentaires <span class="req">*</span></h4>
+            <div class="upload-zone">📎 Charger des fichiers</div>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn-abandon" (click)="cancel()">Abandonner</button>
+            <button class="btn-soumettre" (click)="submitTicket()">Soumettre</button>
+          </div>
+
+        </div>
+
+        <!-- DROITE : Détails admin -->
+        <div class="form-right">
+          <div class="aside-tabs">
+            <span class="aside-tab on">🧩 Détails</span>
+            <span class="aside-tab">📁 Fichiers</span>
+          </div>
+          <div class="aside-field">
+            <label>Assigné(e)</label>
+            <select [(ngModel)]="form.assigneId">
+              <option [ngValue]="null">Non attribué</option>
+              <option *ngFor="let u of users" [value]="u.id">{{ u.prenom }} {{ u.nom }}</option>
+            </select>
+          </div>
+          <div class="aside-field">
+            <label>Priorité <span class="req">*</span></label>
+            <select [(ngModel)]="form.priorite">
+              <option *ngFor="let p of prioriteOptions" [value]="p">{{ p }}</option>
+            </select>
+          </div>
+          <div class="aside-field">
+            <label>Échéance</label>
+            <input type="date" [(ngModel)]="form.echeance" />
+          </div>
+          <div class="aside-field">
+            <label>Demandeur</label>
+            <div class="demandeur-box">
+              <span class="avatar">{{ currentUser?.prenom?.charAt(0) }}{{ currentUser?.nom?.charAt(0) }}</span>
+              {{ currentUser?.prenom }} {{ currentUser?.nom }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ MODAL DETAIL ══════════ -->
+  <div class="modal-overlay" *ngIf="showDetail" (click)="cancel()">
+    <div class="modal-box modal-detail-box" (click)="$event.stopPropagation()">
+      <div class="modal-top" [class.top-validee]="showDetail!.statut === 'Validée'"
+        [class.top-encours]="showDetail!.statut === 'En cours'">
+        <h3>🎫 {{ showDetail!.numero }} — {{ showDetail!.site }}</h3>
+        <div class="detail-top-actions">
+          <span class="statut-badge-detail"
+            [class.badge-attente]="showDetail!.statut === 'En attente'"
+            [class.badge-encours]="showDetail!.statut === 'En cours'"
+            [class.badge-validee]="showDetail!.statut === 'Validée'">
+            {{ showDetail!.statut }}
+          </span>
+          <button class="btn-close" (click)="cancel()">✕</button>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="ditem"><label>Client</label><span>{{ showDetail!.prenom }} {{ showDetail!.nom }}</span></div>
+        <div class="ditem"><label>Téléphone</label><span>{{ showDetail!.telephone }}</span></div>
+        <div class="ditem"><label>Email</label><span>{{ showDetail!.email }}</span></div>
+        <div class="ditem"><label>Site</label><span>{{ showDetail!.site }}</span></div>
+        <div class="ditem"><label>Lieu</label><span>{{ showDetail!.lieuSite }} {{ showDetail!.nomSalle }}</span></div>
+        <div class="ditem"><label>Étage</label><span>{{ showDetail!.etage || '-' }}</span></div>
+        <div class="ditem"><label>Matériel</label><span>{{ showDetail!.typeMateriel }}</span></div>
+        <div class="ditem"><label>Marque</label><span>{{ showDetail!.marque }}</span></div>
+        <div class="ditem"><label>Référence</label><span>{{ showDetail!.reference }}</span></div>
+        <div class="ditem"><label>Garantie</label><span>{{ showDetail!.sousGarantie ? '✅ Oui' : '❌ Non' }}</span></div>
+        <div class="ditem">
+          <label>Criticité</label>
+          <span class="badge" [class]="getCritClass(showDetail!.criticite)">{{ showDetail!.criticite }}</span>
+        </div>
+        <div class="ditem">
+          <label>Priorité</label>
+          <span class="badge" [class]="getCritClass(showDetail!.priorite)">{{ showDetail!.priorite }}</span>
+        </div>
+        <div class="ditem full"><label>Description</label><span>{{ showDetail!.descriptionPanne }}</span></div>
+        <div class="ditem full" *ngIf="showDetail!.informationsAdditionnelles">
+          <label>Infos additionnelles</label><span>{{ showDetail!.informationsAdditionnelles }}</span>
+        </div>
+        <div class="ditem"><label>Assigné(e)</label><span>{{ getUserName(showDetail!.assigneId) }}</span></div>
+        <div class="ditem"><label>Échéance</label><span>{{ showDetail!.echeance || '-' }}</span></div>
+        <div class="ditem"><label>Créé le</label><span>{{ formatDate(showDetail!.dateCreation) }}</span></div>
+        <div class="ditem" *ngIf="showDetail!.dateValidation">
+          <label>Validé le</label><span>{{ formatDate(showDetail!.dateValidation) }}</span>
+        </div>
+        <div class="ditem" *ngIf="showDetail!.valideePar">
+          <label>Validé par</label><span>{{ showDetail!.valideePar }}</span>
+        </div>
+      </div>
+      <div class="detail-footer">
+        <button *ngIf="showDetail!.statut === 'En attente'"
+          class="btn-action btn-encours" (click)="mettreEnCours(showDetail!, $event)">⚙️ Mettre En cours</button>
+        <button *ngIf="showDetail!.statut === 'En cours'"
+          class="btn-action btn-valider" (click)="validerTicket(showDetail!, $event)">✅ Valider (Résolu)</button>
+        <button class="btn-action btn-suppr-detail"
+          (click)="deleteTicket(showDetail!, $event)">🗑️ Supprimer</button>
+        <button class="btn-action btn-fermer" (click)="cancel()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+</div>

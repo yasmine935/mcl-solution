@@ -14,6 +14,7 @@ import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Documents } from '../documents/documents';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
+import { TicketingComponent } from '../ticketing/ticketing'; // ✅ AJOUT
 
 @Component({
   selector: 'app-dashboard-odile',
@@ -21,7 +22,9 @@ import { Planning } from '../planning/planning';
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule , FicheInterventionManager ,FichesCompletees , Factures , Documents, Semenier, Planning
+    MatInputModule, MatSelectModule,
+    FicheInterventionManager, FichesCompletees, Factures, Documents, Semenier, Planning,
+    TicketingComponent // ✅ AJOUT
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
@@ -30,9 +33,7 @@ export class DashboardOdile implements OnInit {
   user: any = {};
   
   private _currentPage = 'home';
-  get currentPage(): string {
-    return this._currentPage;
-  }
+  get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) {
     this.fermerDetailFiche();
     this.fermerDetailReclamation();
@@ -66,7 +67,6 @@ export class DashboardOdile implements OnInit {
     this.loadConges();
     this.loadEmployes();
     this.loadDocuments();
-    this.loadTickets();
     this.loadFactures();
     this.loadReclamations();
     this.loadFiches();
@@ -84,8 +84,7 @@ export class DashboardOdile implements OnInit {
 
   loadReclamations() {
     const stored = localStorage.getItem('reclamations');
-    const toutesReclamations = stored ? JSON.parse(stored) : [];
-    this.reclamations = toutesReclamations;
+    this.reclamations = stored ? JSON.parse(stored) : [];
   }
 
   loadDocuments() {
@@ -95,16 +94,6 @@ export class DashboardOdile implements OnInit {
       { id: 3, nom: 'Directives Entreprise', date: '2025-12-01', type: 'DOCX' },
       { id: 4, nom: 'Contrats Clients', date: '2025-11-15', type: 'PDF' },
       { id: 5, nom: 'Politique RH', date: '2025-10-01', type: 'DOCX' }
-    ];
-  }
-
-  loadTickets() {
-    this.tickets = [
-      { id: 1, titre: 'Problème critique', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-18' },
-      { id: 2, titre: 'Amélioration système', statut: 'EN_COURS', priorite: 'MOYENNE', date: '2026-01-15' },
-      { id: 3, titre: 'Migration serveur', statut: 'EN_COURS', priorite: 'HAUTE', date: '2026-01-16' },
-      { id: 4, titre: 'Sécurité données', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-17' },
-      { id: 5, titre: 'Sauvegarde disque', statut: 'FERME', priorite: 'MOYENNE', date: '2026-01-10' }
     ];
   }
 
@@ -120,16 +109,11 @@ export class DashboardOdile implements OnInit {
 
   loadFiches() {
     const stored = localStorage.getItem('interventions');
-    const toutesLesInterventions = stored ? JSON.parse(stored) : [];
-    this.fiches = toutesLesInterventions;
+    this.fiches = stored ? JSON.parse(stored) : [];
   }
 
   deposerConge() {
-    const demande = {
-      ...this.conge,
-      utilisateur: { id: this.user.id },
-      manager: { id: 4 } // Ferid
-    };
+    const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 4 } };
     this.http.post('http://localhost:8080/api/conges', demande)
       .subscribe(() => {
         this.loadConges();
@@ -138,38 +122,25 @@ export class DashboardOdile implements OnInit {
       }, error => console.error('Erreur', error));
   }
 
-  ouvrirDetailFiche(fiche: any) {
-    this.selectedFiche = fiche;
-    this.showDetailModal = true;
-  }
-
-  fermerDetailFiche() {
-    this.showDetailModal = false;
-    this.selectedFiche = null;
-  }
-
-  ouvrirDetailReclamation(reclamation: any) {
-    this.selectedReclamation = reclamation;
-    this.showReclamationDetailModal = true;
-  }
-
-  fermerDetailReclamation() {
-    this.showReclamationDetailModal = false;
-    this.selectedReclamation = null;
-  }
+  ouvrirDetailFiche(fiche: any) { this.selectedFiche = fiche; this.showDetailModal = true; }
+  fermerDetailFiche() { this.showDetailModal = false; this.selectedFiche = null; }
+  ouvrirDetailReclamation(rec: any) { this.selectedReclamation = rec; this.showReclamationDetailModal = true; }
+  fermerDetailReclamation() { this.showReclamationDetailModal = false; this.selectedReclamation = null; }
 
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Tableau de Bord';
       case 'fiches': return 'Fiches d\'Intervention';
-      case 'interventions': return 'Interventions';
-      case 'ged': return '📄 Documents'; 
-      case 'tickets': return 'Tickets';
-      case 'rh': return 'Ressources Humaines';
-      case 'factures': return 'Factures';
-      case 'mes-conges': return 'Mes Congés';
-      case 'remonteesTerrain': return 'Remontées Terrain';
-      default: return 'Odile Dashboard';
+      case 'fiches-completees': return '✅ Fiches Complétées';
+      case 'ged': return '📄 Documents';
+      case 'tickets': return '🎫 Tickets Clients';
+      case 'rh': return '👥 Ressources Humaines';
+      case 'factures': return '💰 Factures';
+      case 'planning': return '📅 Planning';
+      case 'semenier': return '📆 Semenier';
+      case 'mes-conges': return '🏖️ Mes Congés';
+      case 'remonteesTerrain': return '⚠️ Remontées Terrain';
+      default: return 'Dashboard Odile';
     }
   }
 

@@ -1,165 +1,455 @@
 <div class="dashboard-layout">
-  <!-- Sidebar -->
+
+  <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <h2>MCL Solutions</h2>
-      <p>{{ user.prenom }} {{ user.nom }}</p>
-      <span class="role-badge">ESSAN</span>
+      <div class="sidebar-brand">
+        <div class="brand-icon">👑</div>
+        <div class="brand-text">
+          <strong>MCL Solutions</strong>
+          <span>Espace Propriétaire</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">
+          {{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}
+        </div>
+        <div>
+          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <span class="role-tag">⭐ Propriétaire</span>
+        </div>
+      </div>
     </div>
+
     <nav>
-      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+      <div class="nav-section-label">Vue Globale</div>
+
+      <a class="nav-item" [class.active]="currentPage === 'dashboard'" (click)="currentPage = 'dashboard'">
         <mat-icon>dashboard</mat-icon> Dashboard
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'remonteesTerrain'" (click)="currentPage = 'remonteesTerrain'">
-        <mat-icon>report_problem</mat-icon> Remontées Terrain
+      <a class="nav-item" [class.active]="currentPage === 'semeniersGlobal'" (click)="currentPage = 'semeniersGlobal'">
+        <mat-icon>calendar_today</mat-icon> Semenieres
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'planningsGlobal'" (click)="currentPage = 'planningsGlobal'">
+        <mat-icon>calendar_month</mat-icon> Plannings
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'fichesGlobal'" (click)="currentPage = 'fichesGlobal'">
+        <mat-icon>description</mat-icon> Fiches
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Finances</div>
+
+      <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
+        <mat-icon>receipt</mat-icon> Factures
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'stock'" (click)="currentPage = 'stock'">
+        <mat-icon>inventory_2</mat-icon> Stock
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
+        <mat-icon>shopping_cart</mat-icon> Commandes
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">RH & Terrain</div>
+
+      <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
+        <mat-icon>beach_access</mat-icon> Congés
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'reclamations'" (click)="currentPage = 'reclamations'">
+        <mat-icon>report_problem</mat-icon> Remontées
+      </a>
+
+      <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
     </nav>
   </div>
 
-  <!-- Main Content -->
+  <!-- ══════════ MAIN CONTENT ══════════ -->
   <div class="main-content">
-    <div class="header">
-      <h3>{{ getPageTitle() }}</h3>
-      <div class="user-info">
-        <mat-icon>account_circle</mat-icon>
-        <span>Bonjour, {{ user.prenom }} 👋</span>
-        <span class="role-badge">ESSAN (LECTURE SEULE)</span>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h3>{{ getPageTitle() }}</h3>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-greeting">Bonjour, <strong>{{ user.prenom }}</strong> 👋</span>
+        <span class="readonly-badge">👁️ LECTURE SEULE</span>
+        <span class="role-badge">⭐ ESSAN</span>
       </div>
     </div>
 
-    <!-- HOME PAGE -->
-    @if (currentPage === 'home') {
-      <div class="stats-grid">
-        <div class="stat-card blue">
-          <div class="stat-icon"><mat-icon>report_problem</mat-icon></div>
-          <div class="stat-info">
-            <h4>Remontées Terrain</h4>
-            <p class="stat-number">{{ reclamations.length }}</p>
+    <div class="page-content">
+
+      <!-- ══ DASHBOARD ══ -->
+      @if (currentPage === 'dashboard') {
+        <div class="stats-grid">
+          <div class="stat-card mauve">
+            <div class="stat-icon-wrap"><mat-icon>report_problem</mat-icon></div>
+            <div class="stat-info">
+              <h4>Remontées Terrain</h4>
+              <p class="stat-number">{{ totalReclamations }}</p>
+            </div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon-wrap"><mat-icon>description</mat-icon></div>
+            <div class="stat-info">
+              <h4>Fiches Complétées</h4>
+              <p class="stat-number">{{ totalFiches }}</p>
+            </div>
+          </div>
+          <div class="stat-card indigo">
+            <div class="stat-icon-wrap"><mat-icon>receipt</mat-icon></div>
+            <div class="stat-info">
+              <h4>Factures</h4>
+              <p class="stat-number">{{ totalFactures }}</p>
+            </div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon-wrap"><mat-icon>shopping_cart</mat-icon></div>
+            <div class="stat-info">
+              <h4>Commandes</h4>
+              <p class="stat-number">{{ totalCommandes }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Quick Info -->
-      <div class="table-card">
-        <h3>📋 Informations</h3>
-        <div class="info-box">
-          <p><strong>Bienvenue ESSAN !</strong></p>
-          <p>Vous avez accès en <strong>LECTURE SEULE</strong> à toutes les Remontées Terrain.</p>
-          <p>Consultez les détails des réclamations et visualisez les photos associées.</p>
+        <div class="stats-grid-2">
+          <div class="stat-card kpi">
+            <div class="stat-icon-wrap"><mat-icon>euro</mat-icon></div>
+            <div class="stat-info">
+              <h4>Montant Total Factures</h4>
+              <p class="stat-amount">{{ montantTotalFactures | number:'1.2-2' }} €</p>
+            </div>
+          </div>
+          <div class="stat-card kpi">
+            <div class="stat-icon-wrap"><mat-icon>inventory</mat-icon></div>
+            <div class="stat-info">
+              <h4>Valeur du Stock</h4>
+              <p class="stat-amount">{{ getTotalStockValue() | number:'1.2-2' }} €</p>
+            </div>
+          </div>
+          <div class="stat-card kpi">
+            <div class="stat-icon-wrap"><mat-icon>beach_access</mat-icon></div>
+            <div class="stat-info">
+              <h4>Congés en Attente</h4>
+              <p class="stat-number">{{ getCongesEnAttente() }}</p>
+            </div>
+          </div>
         </div>
-      </div>
-    }
 
-    <!-- REMONTÉES TERRAIN (LECTURE SEULE) -->
-    @if (currentPage === 'remonteesTerrain') {
-      <div class="table-card">
-        <h3>⚠️ Remontées Terrain - Vue Complète ({{ reclamations.length }})</h3>
-        <p style="color: #FF9800; font-weight: 600; margin-bottom: 15px;">📖 Mode consultation - Lecture seule</p>
-        
-        @if (reclamations.length === 0) {
-          <p class="empty">Aucune remontée terrain</p>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Technicien</th>
-                <th>Sujet</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Photos</th>
-                <th>Statut</th>
-                <th>Voir</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (rec of reclamations; track rec.id) {
-                <tr style="opacity: 0.9;">
-                  <td><strong>{{ rec.technicienNom }}</strong></td>
-                  <td><strong>{{ rec.sujet }}</strong></td>
-                  <td>{{ rec.description | slice:0:50 }}...</td>
-                  <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
-                  <td style="text-align: center;">
-                    @if (rec.photos && rec.photos.length > 0) {
-                      <span style="background: #e3f2fd; color: #1565C0; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
-                        {{ rec.photos.length }} 📸
-                      </span>
-                    } @else {
-                      <span style="color: #ccc;">-</span>
-                    }
-                  </td>
-                  <td><span class="badge" style="background: #FF9800; color: white;">{{ rec.statut }}</span></td>
-                  <td>
-                    <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec)" title="Consulter">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                  </td>
+        <div class="table-card">
+          <h3>👑 Informations Propriétaire</h3>
+          <div class="info-box">
+            <p><strong>Bienvenue ESSAN !</strong></p>
+            <p>Vous avez accès en <strong>LECTURE SEULE</strong> à tous les modules de MCL Solutions.</p>
+            <p>Vous pouvez consulter :</p>
+            <ul>
+              <li>✅ Les semenieres de tous les employés</li>
+              <li>✅ Les plannings de tous les employés</li>
+              <li>✅ Les fiches complétées</li>
+              <li>✅ Les factures et montants</li>
+              <li>✅ Le stock et sa valeur</li>
+              <li>✅ Les commandes</li>
+              <li>✅ Les congés demandés</li>
+              <li>✅ Les remontées terrain</li>
+            </ul>
+            <p style="color:#5e35b1;font-weight:700;margin-top:12px">⚠️ Mode consultation uniquement — aucune modification possible.</p>
+          </div>
+        </div>
+      }
+
+      <!-- ══ SEMENIERES ══ -->
+      @if (currentPage === 'semeniersGlobal') {
+        <div class="table-card">
+          <h3>📅 Semenieres Globales ({{ (semeniersGlobal | keyvalue).length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if ((semeniersGlobal | keyvalue).length === 0) {
+            <div class="empty">Aucune semaine enregistrée</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Utilisateur</th>
+                  <th>Date Début</th>
+                  <th>Statut</th>
+                  <th>Action</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
+              </thead>
+              <tbody>
+                @for (item of (semeniersGlobal | keyvalue); track item.key) {
+                  <tr>
+                    <td><strong>{{ item.key }}</strong></td>
+                    <td>{{ item.value.dateDebut | date:'dd/MM/yyyy' }}</td>
+                    <td><span class="badge" style="background:#e8eaf6;color:#5e35b1">VALIDÉE</span></td>
+                    <td>
+                      <button mat-icon-button color="primary" (click)="ouvrirDetailSemenier(item.key)">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ PLANNINGS ══ -->
+      @if (currentPage === 'planningsGlobal') {
+        <div class="table-card">
+          <h3>📆 Plannings Globaux ({{ plannings.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (plannings.length === 0) {
+            <div class="empty">Aucune note planifiée</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Date</th><th>Note</th><th>Voir</th></tr>
+              </thead>
+              <tbody>
+                @for (planning of plannings; track planning.id) {
+                  <tr>
+                    <td>{{ planning.jour }}/{{ planning.mois }} - {{ planning.annee }}</td>
+                    <td>{{ planning.note }}</td>
+                    <td><button mat-icon-button color="primary"><mat-icon>visibility</mat-icon></button></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ FICHES ══ -->
+      @if (currentPage === 'fichesGlobal') {
+        <div class="table-card">
+          <h3>📋 Fiches Complétées ({{ fiches.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (fiches.length === 0) {
+            <div class="empty">Aucune fiche enregistrée</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Numéro</th><th>Utilisateur</th><th>Client</th><th>Montant</th><th>Date</th><th>Voir</th></tr>
+              </thead>
+              <tbody>
+                @for (fiche of fiches; track fiche.id) {
+                  <tr>
+                    <td><strong>{{ fiche.numero }}</strong></td>
+                    <td>{{ fiche.userId }}</td>
+                    <td>{{ fiche.client }}</td>
+                    <td>{{ fiche.montant }} €</td>
+                    <td>{{ fiche.dateCreation | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ FACTURES ══ -->
+      @if (currentPage === 'factures') {
+        <div class="table-card">
+          <h3>💰 Factures ({{ factures.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (factures.length === 0) {
+            <div class="empty">Aucune facture</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Numéro</th><th>Client</th><th>Montant HT</th><th>TVA</th><th>Montant TTC</th><th>Statut</th></tr>
+              </thead>
+              <tbody>
+                @for (facture of factures; track facture.id) {
+                  <tr>
+                    <td><strong>{{ facture.numero }}</strong></td>
+                    <td>{{ facture.client }}</td>
+                    <td>{{ facture.montantHT }} €</td>
+                    <td>{{ facture.tva }}%</td>
+                    <td><strong>{{ facture.montantHT * (1 + facture.tva / 100) | number:'1.2-2' }} €</strong></td>
+                    <td><span class="badge" style="background:#e8eaf6;color:#5e35b1">{{ facture.statut }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ STOCK ══ -->
+      @if (currentPage === 'stock') {
+        <div class="table-card">
+          <h3>📦 Stock ({{ stock.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (stock.length === 0) {
+            <div class="empty">Aucun article en stock</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Référence</th><th>Nom</th><th>Quantité</th><th>Prix Unitaire</th><th>Valeur Totale</th></tr>
+              </thead>
+              <tbody>
+                @for (article of stock; track article.id) {
+                  <tr>
+                    <td><strong>{{ article.reference }}</strong></td>
+                    <td>{{ article.nom }}</td>
+                    <td>{{ article.quantite }}</td>
+                    <td>{{ article.prixUnitaire }} €</td>
+                    <td><strong>{{ article.quantite * article.prixUnitaire | number:'1.2-2' }} €</strong></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ COMMANDES ══ -->
+      @if (currentPage === 'commandes') {
+        <div class="table-card">
+          <h3>🛒 Commandes ({{ commandes.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (commandes.length === 0) {
+            <div class="empty">Aucune commande</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Numéro</th><th>Fournisseur</th><th>Montant</th><th>Statut</th><th>Date</th></tr>
+              </thead>
+              <tbody>
+                @for (cmd of commandes; track cmd.id) {
+                  <tr>
+                    <td><strong>{{ cmd.numero }}</strong></td>
+                    <td>{{ cmd.fournisseur }}</td>
+                    <td>{{ cmd.montant }} €</td>
+                    <td><span class="badge" style="background:#e8eaf6;color:#5e35b1">{{ cmd.statut }}</span></td>
+                    <td>{{ cmd.dateCreation | date:'dd/MM/yyyy' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ CONGÉS ══ -->
+      @if (currentPage === 'conges') {
+        <div class="table-card">
+          <h3>🏖️ Congés ({{ conges.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (conges.length === 0) {
+            <div class="empty">Aucun congé</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Utilisateur</th><th>Type</th><th>Date Début</th><th>Date Fin</th><th>Statut</th></tr>
+              </thead>
+              <tbody>
+                @for (cg of conges; track cg.id) {
+                  <tr>
+                    <td><strong>{{ cg.userId }}</strong></td>
+                    <td>{{ cg.type }}</td>
+                    <td>{{ cg.dateDebut | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ cg.dateFin | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <span class="badge"
+                        [style.background]="cg.statut === 'APPROUVÉ' ? '#e8eaf6' : cg.statut === 'EN ATTENTE' ? '#fff3e0' : '#ffebee'"
+                        [style.color]="cg.statut === 'APPROUVÉ' ? '#5e35b1' : cg.statut === 'EN ATTENTE' ? '#e65100' : '#c62828'">
+                        {{ cg.statut }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ REMONTÉES ══ -->
+      @if (currentPage === 'reclamations') {
+        <div class="table-card">
+          <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (reclamations.length === 0) {
+            <div class="empty">Aucune remontée terrain</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Technicien</th><th>Sujet</th><th>Description</th><th>Date</th><th>Photos</th><th>Statut</th><th>Voir</th></tr>
+              </thead>
+              <tbody>
+                @for (rec of reclamations; track rec.id) {
+                  <tr>
+                    <td><strong>{{ rec.technicienNom }}</strong></td>
+                    <td><strong>{{ rec.sujet }}</strong></td>
+                    <td>{{ rec.description | slice:0:50 }}...</td>
+                    <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                      @if (rec.photos && rec.photos.length > 0) {
+                        <span class="badge" style="background:#ede7f6;color:#5e35b1">{{ rec.photos.length }} 📸</span>
+                      } @else {
+                        <span style="color:#ccc">-</span>
+                      }
+                    </td>
+                    <td><span class="badge" style="background:#fff3e0;color:#e65100">{{ rec.statut }}</span></td>
+                    <td>
+                      <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec)">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+    </div>
   </div>
 </div>
 
-<!-- Modal Détails Réclamation (LECTURE SEULE) -->
+<!-- ══ MODAL RÉCLAMATION ══ -->
 @if (showReclamationDetailModal && selectedReclamation) {
   <div class="modal-overlay" (click)="fermerDetailReclamation()">
     <div class="modal-detail-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>📋 Remontée Terrain - Consultation</h2>
-        <button mat-icon-button (click)="fermerDetailReclamation()">
-          <mat-icon>close</mat-icon>
-        </button>
+        <h2>⚠️ Remontée Terrain — Consultation</h2>
+        <button mat-icon-button (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon></button>
       </div>
-
       <div class="modal-body">
-        <div class="detail-row">
-          <span class="label">Technicien :</span>
-          <span class="value">{{ selectedReclamation.technicienNom }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Sujet :</span>
-          <span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Description :</span>
-          <span class="value">{{ selectedReclamation.description }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Date :</span>
-          <span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Statut :</span>
-          <span class="badge" style="background: #FF9800; color: white;">{{ selectedReclamation.statut }}</span>
-        </div>
-
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
+        <div class="detail-row"><span class="label">Technicien</span><span class="value">{{ selectedReclamation.technicienNom }}</span></div>
+        <div class="detail-row"><span class="label">Sujet</span><span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span></div>
+        <div class="detail-row"><span class="label">Description</span><span class="value">{{ selectedReclamation.description }}</span></div>
+        <div class="detail-row"><span class="label">Date</span><span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span></div>
+        <div class="detail-row"><span class="label">Statut</span><span class="badge" style="background:#fff3e0;color:#e65100">{{ selectedReclamation.statut }}</span></div>
+        <h3 style="color:#5e35b1;margin:20px 0 12px;font-size:0.95rem">📸 Photos</h3>
         @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
           <div class="photos-gallery-detail">
             @for (photo of selectedReclamation.photos; track $index) {
               <div class="photo-detail-item">
-                <img [src]="photo.data" alt="{{ photo.nom }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
-                <p style="margin-top: 8px; font-size: 12px; color: #555;">{{ photo.nom }}</p>
+                <img [src]="photo.data" alt="{{ photo.nom }}">
+                <p style="padding:8px;font-size:12px;color:#555">{{ photo.nom }}</p>
               </div>
             }
           </div>
         } @else {
-          <p style="color: #999;">Aucune photo</p>
+          <p style="color:#999">Aucune photo</p>
         }
       </div>
-
       <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()">
-          <mat-icon>close</mat-icon> Fermer
-        </button>
+        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon> Fermer</button>
       </div>
     </div>
   </div>

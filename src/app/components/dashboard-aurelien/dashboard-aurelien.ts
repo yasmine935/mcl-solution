@@ -15,6 +15,7 @@ import { Factures } from '../factures/factures';
 import { Documents } from '../documents/documents';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
+import { TicketingComponent } from '../ticketing/ticketing';
 
 @Component({
   selector: 'app-dashboard-aurelien',
@@ -22,7 +23,10 @@ import { Planning } from '../planning/planning';
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule ,FicheInterventionManager , Taches,FichesCompletees ,Factures , Documents , Semenier, Planning
+    MatInputModule, MatSelectModule,
+    FicheInterventionManager, Taches, FichesCompletees,
+    Factures, Documents, Semenier, Planning,
+    TicketingComponent  // ✅ NOUVEAU
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
@@ -45,7 +49,6 @@ export class DashboardAurelien implements OnInit {
   interventions: any[] = [];
   conges: any[] = [];
   documents: any[] = [];
-  tickets: any[] = [];
   employes: any[] = [];
   fiches: any[] = [];
   selectedFiche: any = null;
@@ -63,7 +66,6 @@ export class DashboardAurelien implements OnInit {
     this.loadConges();
     this.loadEmployes();
     this.loadDocuments();
-    this.loadTickets();
     this.loadFiches();
   }
 
@@ -82,15 +84,6 @@ export class DashboardAurelien implements OnInit {
     ];
   }
 
-  loadTickets() {
-    this.tickets = [
-      { id: 1, titre: 'Bug affichage dashboard', statut: 'OUVERT', priorite: 'HAUTE', date: '2026-01-18' },
-      { id: 2, titre: 'Feature export PDF demandée', statut: 'EN_COURS', priorite: 'MOYENNE', date: '2026-01-15' },
-      { id: 3, titre: 'Documentation manquante', statut: 'FERME', priorite: 'BASSE', date: '2026-01-10' },
-      { id: 4, titre: 'Amélioration performance', statut: 'EN_COURS', priorite: 'MOYENNE', date: '2026-01-16' }
-    ];
-  }
-
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
       .subscribe(data => this.employes = data, error => this.employes = []);
@@ -106,7 +99,7 @@ export class DashboardAurelien implements OnInit {
     const demande = {
       ...this.conge,
       utilisateur: { id: this.user.id },
-      manager: { id: 4 } // Ferid
+      manager: { id: 4 }
     };
     this.http.post('http://localhost:8080/api/conges', demande)
       .subscribe(() => {
@@ -130,15 +123,17 @@ export class DashboardAurelien implements OnInit {
     switch(this.currentPage) {
       case 'home': return 'Mon Dashboard';
       case 'fiches': return 'Fiches d\'Intervention';
-      case 'interventions': return 'Gestion des Interventions';
-     case 'ged': return '📄 Documents'; 
-      case 'tickets': return 'Tickets Support';
-      case 'rh': return 'Ressources Humaines';
-      case 'mes-conges': return 'Mes Congés';
-      default: return 'Dashboard';
       case 'fiches-completees': return '✅ Fiches Complétées';
-case 'taches': return '✓ Tâches';
-case 'factures': return '💰 Factures';
+      case 'taches': return '✓ Tâches';
+      case 'planning': return '📅 Planning';
+      case 'ged': return '📄 Documents';
+      case 'semenier': return '📆 Semenier';
+      case 'tickets': return '🎫 Tickets Clients';
+      case 'rh': return '👥 Ressources Humaines';
+      case 'factures': return '💰 Factures';
+      case 'mes-conges': return '🏖️ Mes Congés';
+      
+      default: return 'Dashboard';
     }
   }
 

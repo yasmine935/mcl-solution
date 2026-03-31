@@ -12,6 +12,7 @@ import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-in
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
+import { Documents } from '../documents/documents';
 
 
 @Component({
@@ -20,7 +21,7 @@ import { Planning } from '../planning/planning';
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule ,FicheInterventionManager, FichesCompletees , Semenier, Planning
+    MatInputModule, MatSelectModule ,FicheInterventionManager, FichesCompletees , Semenier, Planning , Documents
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'

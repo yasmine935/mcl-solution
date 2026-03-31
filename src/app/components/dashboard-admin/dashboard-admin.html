@@ -1,206 +1,256 @@
 <div class="dashboard-layout">
-  <!-- Sidebar -->
+
+  <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
     <div class="sidebar-header">
-       <h2>MCL Solutions</h2>
-      <p>{{ user.prenom }} {{ user.nom }}</p>
-      <span class="role-tag">Admin</span>
+      <div class="sidebar-brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <strong>MCL Solutions</strong>
+          <span>Espace de travail</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">
+          {{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}
+        </div>
+        <div class="user-details">
+          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <span class="role-tag">Admin</span>
+        </div>
+      </div>
     </div>
+
     <nav>
+      <div class="nav-section-label">Principal</div>
+
       <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
         <mat-icon>dashboard</mat-icon> Dashboard
       </a>
-     <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
-  <mat-icon>engineering</mat-icon> Fiches Intervention
-</a>
-<a class="nav-item" [class.active]="currentPage === 'fiches-completees'" (click)="currentPage = 'fiches-completees'">
-  <mat-icon>check_circle</mat-icon> Fiches Complétées
-</a>
-<a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
-  <mat-icon>calendar_month</mat-icon> Planning
-</a>
-<a class="nav-item" [class.active]="currentPage === 'taches'" (click)="currentPage = 'taches'">
-  <mat-icon>check_circle</mat-icon> Tâches
-</a>
+      <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
+        <mat-icon>engineering</mat-icon> Fiches Intervention
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'fiches-completees'" (click)="currentPage = 'fiches-completees'">
+        <mat-icon>check_circle</mat-icon> Fiches Complétées
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'taches'" (click)="currentPage = 'taches'">
+        <mat-icon>task_alt</mat-icon> Tâches
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+        <mat-icon>calendar_month</mat-icon> Planning
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Gestion</div>
+
       <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
         <mat-icon>fact_check</mat-icon> Tous les Congés
       </a>
       <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
         <mat-icon>people_alt</mat-icon> Employés
       </a>
-    <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
-        <mat-icon>folder_open</mat-icon> Semenier
+      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
+        <mat-icon>calendar_today</mat-icon> Semenier
       </a>
       <a class="nav-item" [class.active]="currentPage === 'documents'" (click)="currentPage = 'documents'">
         <mat-icon>folder_open</mat-icon> Documents
       </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Support</div>
+
       <a class="nav-item" [class.active]="currentPage === 'reclamations'" (click)="currentPage = 'reclamations'">
-        <mat-icon>report_problem</mat-icon>Remontées Terrain
+        <mat-icon>report_problem</mat-icon> Remontées Terrain
       </a>
       <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
-        <mat-icon>support_agent</mat-icon> Support
+        <mat-icon>support_agent</mat-icon> Tickets
       </a>
       <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
         <mat-icon>receipt</mat-icon> Factures
       </a>
-      
+
+      <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
     </nav>
   </div>
 
-  <!-- Main Content -->
+  <!-- ══════════ MAIN CONTENT ══════════ -->
   <div class="main-content">
-    <div class="header">
-      <h3>{{ getPageTitle() }}</h3>
-      <div class="user-info">
-        <mat-icon>account_circle</mat-icon>
-        <span>Bonjour, {{ user.prenom }} 👋</span>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h3>{{ getPageTitle() }}</h3>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-greeting">Bonjour, <strong>{{ user.prenom }}</strong> 👋</span>
         <span class="role-badge">ADMIN</span>
       </div>
     </div>
 
-    <!-- Home -->
-    @if (currentPage === 'home') {
-      <div class="stats-grid">
-        <div class="stat-card blue">
-          <div class="stat-icon"><mat-icon>people_alt</mat-icon></div>
-          <div class="stat-info">
-            <h4>Employés</h4>
-            <p class="stat-number">{{ employes.length }}</p>
-          </div>
-        </div>
-        <div class="stat-card orange">
-          <div class="stat-icon"><mat-icon>fact_check</mat-icon></div>
-          <div class="stat-info">
-            <h4>Demandes Congés</h4>
-            <p class="stat-number">{{ conges.length }}</p>
-          </div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-icon"><mat-icon>receipt</mat-icon></div>
-          <div class="stat-info">
-            <h4>Factures</h4>
-            <p class="stat-number">{{ factures.length }}</p>
-          </div>
-        </div>
-      </div>
-    }
+    <div class="page-content">
 
-    <!-- Interventions -->
-@if (currentPage === 'interventions') {
-  <app-fiche-intervention-manager></app-fiche-intervention-manager>
-}
-<!-- ✅ AJOUTE CE COMPOSANT ICI -->
-@if (currentPage === 'fiches-completees') {
-  <app-fiches-completees></app-fiches-completees>
-}
-<!-- TÂCHES -->
-@if (currentPage === 'taches') {
-  <app-taches></app-taches>
-}
-    <!-- Congés -->
-    @if (currentPage === 'conges') {
-      <div class="table-card">
-        <h3>📋 Tous les Congés (Admin)</h3>
-        @if (conges.length === 0) {
-          <div class="empty">Aucune demande</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Employé</th>
-                <th>Type</th>
-                <th>Date début</th>
-                <th>Date fin</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (c of conges; track c.id) {
+      <!-- ══ HOME ══ -->
+      @if (currentPage === 'home') {
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon-wrap"><mat-icon>people_alt</mat-icon></div>
+            <div class="stat-info">
+              <h4>Employés</h4>
+              <p class="stat-number">{{ employes.length }}</p>
+              <p class="stat-sub">Actifs dans le système</p>
+            </div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon-wrap"><mat-icon>fact_check</mat-icon></div>
+            <div class="stat-info">
+              <h4>Demandes Congés</h4>
+              <p class="stat-number">{{ conges.length }}</p>
+              <p class="stat-sub">À traiter</p>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon-wrap"><mat-icon>receipt</mat-icon></div>
+            <div class="stat-info">
+              <h4>Factures</h4>
+              <p class="stat-number">{{ factures.length }}</p>
+              <p class="stat-sub">Ce mois-ci</p>
+            </div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon-wrap"><mat-icon>support_agent</mat-icon></div>
+            <div class="stat-info">
+              <h4>Tickets Clients</h4>
+              <p class="stat-number">{{ reclamations.length }}</p>
+              <p class="stat-sub">Remontées terrain</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ══ MODULES ══ -->
+      @if (currentPage === 'interventions') {
+        <app-fiche-intervention-manager></app-fiche-intervention-manager>
+      }
+      @if (currentPage === 'fiches-completees') {
+        <app-fiches-completees></app-fiches-completees>
+      }
+      @if (currentPage === 'taches') {
+        <app-taches></app-taches>
+      }
+      @if (currentPage === 'planning') {
+        <app-planning></app-planning>
+      }
+      @if (currentPage === 'employes') {
+        <app-employes></app-employes>
+      }
+      @if (currentPage === 'semenier') {
+        <app-semenier></app-semenier>
+      }
+      @if (currentPage === 'documents') {
+        <app-documents></app-documents>
+      }
+      @if (currentPage === 'tickets') {
+        <app-ticketing></app-ticketing>
+      }
+      @if (currentPage === 'factures') {
+        <app-factures></app-factures>
+      }
+
+      <!-- ══ CONGÉS ══ -->
+      @if (currentPage === 'conges') {
+        <div class="table-card">
+          <h3>📋 Tous les Congés</h3>
+          @if (conges.length === 0) {
+            <div class="empty">Aucune demande de congé</div>
+          } @else {
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <td>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</td>
-                  <td>{{ c.type }}</td>
-                  <td>{{ c.dateDebut }}</td>
-                  <td>{{ c.dateFin }}</td>
-                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
-                  <td>
-                    @if (c.statut !== 'APPROUVE') {
-                      <button mat-icon-button color="primary" (click)="updateStatut(c.id, 'APPROUVE')">
-                        <mat-icon>check_circle</mat-icon>
-                      </button>
-                    }
-                    @if (c.statut !== 'REFUSE') {
-                      <button mat-icon-button color="warn" (click)="updateStatut(c.id, 'REFUSE')">
-                        <mat-icon>cancel</mat-icon>
-                      </button>
-                    }
-                  </td>
+                  <th>Employé</th>
+                  <th>Type</th>
+                  <th>Date début</th>
+                  <th>Date fin</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-<!-- Employés -->
-@if (currentPage === 'employes') {
-  <app-employes></app-employes>
-}
-<!-- PLANNING -->
-@if (currentPage === 'planning') {
-  <app-planning></app-planning>
-}
-<!-- Main content -->
-@if (currentPage === 'semenier') {
-  <app-semenier></app-semenier>
-}
-   <!-- Réclamations -->
-@if (currentPage === 'reclamations') {
-  <div class="table-card">
-    <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
-    @if (reclamations.length === 0) {
-      <p class="empty">Aucune réclamation</p>
-    } @else {
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Technicien</th>
-            <th>Sujet</th>
-            <th>Description</th>
-            <th>Date</th>
-            <th>Photos</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (rec of reclamations; track rec.id) {
-            <tr (click)="ouvrirDetailReclamation(rec)" style="cursor: pointer;">
-              <td><strong>{{ rec.technicienNom }}</strong></td>
-              <td><strong>{{ rec.sujet }}</strong></td>
-              <td>{{ rec.description | slice:0:50 }}...</td>
-              <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td style="text-align: center;">
-                @if (rec.photos && rec.photos.length > 0) {
-                  <span style="background: #e3f2fd; color: #1565C0; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
-                    {{ rec.photos.length }} 📸
-                  </span>
-                } @else {
-                  <span style="color: #ccc;">-</span>
+              </thead>
+              <tbody>
+                @for (c of conges; track c.id) {
+                  <tr>
+                    <td><strong>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</strong></td>
+                    <td>{{ c.type }}</td>
+                    <td>{{ c.dateDebut }}</td>
+                    <td>{{ c.dateFin }}</td>
+                    <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+                    <td>
+                      @if (c.statut !== 'APPROUVE') {
+                        <button mat-icon-button color="primary" (click)="updateStatut(c.id, 'APPROUVE')">
+                          <mat-icon>check_circle</mat-icon>
+                        </button>
+                      }
+                      @if (c.statut !== 'REFUSE') {
+                        <button mat-icon-button color="warn" (click)="updateStatut(c.id, 'REFUSE')">
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      }
+                    </td>
+                  </tr>
                 }
-              </td>
-              <td><span class="badge" style="background: #FF9800; color: white;">{{ rec.statut }}</span></td>
-            </tr>
+              </tbody>
+            </table>
           }
-        </tbody>
-      </table>
-    }
-  </div>
-}
+        </div>
+      }
 
-<!-- Modal Détails Réclamation -->
+      <!-- ══ RÉCLAMATIONS ══ -->
+      @if (currentPage === 'reclamations') {
+        <div class="table-card">
+          <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
+          @if (reclamations.length === 0) {
+            <div class="empty">Aucune réclamation</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Technicien</th>
+                  <th>Sujet</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Photos</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rec of reclamations; track rec.id) {
+                  <tr (click)="ouvrirDetailReclamation(rec)" style="cursor:pointer">
+                    <td><strong>{{ rec.technicienNom }}</strong></td>
+                    <td><strong>{{ rec.sujet }}</strong></td>
+                    <td>{{ rec.description | slice:0:50 }}...</td>
+                    <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                      @if (rec.photos && rec.photos.length > 0) {
+                        <span class="badge en_cours">{{ rec.photos.length }} 📸</span>
+                      } @else {
+                        <span style="color:#ccc">-</span>
+                      }
+                    </td>
+                    <td><span class="badge" style="background:#fff3e0;color:#e65100">{{ rec.statut }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div>
+
+<!-- ══ MODAL RÉCLAMATION ══ -->
 @if (showReclamationDetailModal && selectedReclamation) {
   <div class="modal-overlay" (click)="fermerDetailReclamation()">
     <div class="modal-detail-content" (click)="$event.stopPropagation()">
@@ -210,46 +260,41 @@
           <mat-icon>close</mat-icon>
         </button>
       </div>
-
       <div class="modal-body">
         <div class="detail-row">
-          <span class="label">Technicien :</span>
+          <span class="label">Technicien</span>
           <span class="value">{{ selectedReclamation.technicienNom }}</span>
         </div>
         <div class="detail-row">
-          <span class="label">Sujet :</span>
+          <span class="label">Sujet</span>
           <span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span>
         </div>
         <div class="detail-row">
-          <span class="label">Description :</span>
+          <span class="label">Description</span>
           <span class="value">{{ selectedReclamation.description }}</span>
         </div>
         <div class="detail-row">
-          <span class="label">Date :</span>
+          <span class="label">Date</span>
           <span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
         <div class="detail-row">
-          <span class="label">Statut :</span>
-          <span class="badge" style="background: #FF9800; color: white;">{{ selectedReclamation.statut }}</span>
+          <span class="label">Statut</span>
+          <span class="badge" style="background:#fff3e0;color:#e65100">{{ selectedReclamation.statut }}</span>
         </div>
-
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
+        <h3 style="color:#1565c0;margin:20px 0 12px;font-size:0.95rem">📸 Photos</h3>
         @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
           <div class="photos-gallery-detail">
             @for (photo of selectedReclamation.photos; track $index) {
               <div class="photo-detail-item">
-                <img [src]="photo.data" alt="{{ photo.nom }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
-                <p style="margin-top: 8px; font-size: 12px; color: #555;">{{ photo.nom }}</p>
+                <img [src]="photo.data" alt="{{ photo.nom }}">
+                <p style="padding:8px;font-size:12px;color:#555">{{ photo.nom }}</p>
               </div>
             }
           </div>
         } @else {
-          <p style="color: #999;">Aucune photo</p>
+          <p style="color:#999">Aucune photo</p>
         }
       </div>
-
       <div class="modal-footer">
         <button mat-raised-button color="primary" (click)="fermerDetailReclamation()">
           <mat-icon>close</mat-icon> Fermer
@@ -258,60 +303,3 @@
     </div>
   </div>
 }
-    <!-- Documents -->
-  @if (currentPage === 'documents') {
-  <app-documents></app-documents>
-}
-<!-- SEMENIER -->
-@if (currentPage === 'semenier') {
-  <app-semenier></app-semenier>
-}
-    <!-- Tickets -->
-    @if (currentPage === 'tickets') {
-      <div class="table-card">
-        <h3>🎫 Support Technique Complet</h3>
-        @if (tickets.length === 0) {
-          <div class="empty">Aucun ticket</div>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Titre</th>
-                <th>Statut</th>
-                <th>Priorité</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (ticket of tickets; track ticket.id) {
-                <tr>
-                  <td>{{ ticket.titre }}</td>
-                  <td><span [class]="'badge ' + ticket.statut?.toLowerCase()">{{ ticket.statut }}</span></td>
-                  <td>
-                    <span [class]="'badge-priority ' + ticket.priorite?.toLowerCase()">
-                      {{ ticket.priorite }}
-                    </span>
-                  </td>
-                  <td>{{ ticket.date }}</td>
-                  <td>
-                    <button mat-icon-button color="primary">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="accent">
-                      <mat-icon>check_circle</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-
-    <!-- Factures -->
-   @if (currentPage === 'factures') {
-  <app-factures></app-factures>
-}
-</div>

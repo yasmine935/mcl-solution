@@ -1,12 +1,29 @@
 <div class="dashboard-layout">
-  <!-- Sidebar -->
+
+  <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <h2>MCL Solutions</h2>
-      <p>{{ user.prenom }} {{ user.nom }}</p>
-      <span class="role-badge">TECHNICIEN</span>
+      <div class="sidebar-brand">
+        <div class="brand-icon">🔧</div>
+        <div class="brand-text">
+          <strong>MCL Solutions</strong>
+          <span>Espace Technicien</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">
+          {{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}
+        </div>
+        <div>
+          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <span class="role-tag">Technicien</span>
+        </div>
+      </div>
     </div>
+
     <nav>
+      <div class="nav-section-label">Mes Activités</div>
+
       <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
         <mat-icon>dashboard</mat-icon> Mon Dashboard
       </a>
@@ -16,401 +33,374 @@
       <a class="nav-item" [class.active]="currentPage === 'completees'" (click)="currentPage = 'completees'">
         <mat-icon>check_circle</mat-icon> Complétées
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+        <mat-icon>calendar_month</mat-icon> Planning
+      </a>
       <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
-  <mat-icon>calendar_today</mat-icon> Semenier
-</a>
+        <mat-icon>calendar_today</mat-icon> Semenier
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Personnel</div>
+
       <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
-  <mat-icon>calendar_month</mat-icon> Planning
-</a>
-      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
-  <mat-icon>calendar_today</mat-icon> Semenier
-</a>
       <a class="nav-item" [class.active]="currentPage === 'reclamations'" (click)="currentPage = 'reclamations'">
         <mat-icon>report_problem</mat-icon> Remontées Terrain
       </a>
+
+      <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
     </nav>
   </div>
 
-  <!-- Main Content -->
+  <!-- ══════════ MAIN CONTENT ══════════ -->
   <div class="main-content">
-    <div class="header">
-      <h3>{{ getPageTitle() }}</h3>
-      <div class="user-info">
-        <mat-icon>account_circle</mat-icon>
-        <span>Bonjour, {{ user.prenom }} 👋</span>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h3>{{ getPageTitle() }}</h3>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-greeting">Bonjour, <strong>{{ user.prenom }}</strong> 👋</span>
         <span class="role-badge">TECHNICIEN</span>
       </div>
     </div>
- <!-- SEMENIER -->
-@if (currentPage === 'semenier') {
-  <app-semenier></app-semenier>
-}
-<!-- PLANNING -->
-@if (currentPage === 'planning') {
-  <app-planning></app-planning>
-}
-    <!-- HOME PAGE WITH STATS -->
-    @if (currentPage === 'home') {
-      <div class="stats-grid">
-        <div class="stat-card blue">
-          <div class="stat-icon"><mat-icon>engineering</mat-icon></div>
-          <div class="stat-info">
-            <h4>Interventions En Cours</h4>
-            <p class="stat-number">{{ getCountInterventionsEnCours() }}</p>
-          </div>
-        </div>
-        <div class="stat-card orange">
-          <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
-          <div class="stat-info">
-            <h4>Complétées</h4>
-            <p class="stat-number">{{ getCountInterventionsCompletees() }}</p>
-          </div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-icon"><mat-icon>report_problem</mat-icon></div>
-          <div class="stat-info">
-            <h4>Remontées Terrain</h4>
-            <p class="stat-number">{{ getCountReclamations() }}</p>
-          </div>
-        </div>
-      </div>
 
-      <!-- Quick Actions -->
-      <div class="table-card">
-        <h3>⚡ Actions Rapides</h3>
-        <div class="quick-actions">
-          <button mat-raised-button color="primary" (click)="currentPage = 'interventions'">
-            <mat-icon>engineering</mat-icon> Voir Mes Interventions
-          </button>
-          <button mat-raised-button color="accent" (click)="currentPage = 'reclamations'">
-            <mat-icon>report_problem</mat-icon> Remontées Terrain
-          </button>
-          <button mat-raised-button (click)="currentPage = 'conges'">
-            <mat-icon>beach_access</mat-icon> Mes Congés
-          </button>
-          <button mat-raised-button color="warn" (click)="showReclamationForm = !showReclamationForm">
-            <mat-icon>add</mat-icon> Nouvelle Réclamation
-          </button>
-        </div>
-      </div>
-    }
+    <div class="page-content">
 
-    <!-- MES INTERVENTIONS EN COURS -->
-    @if (currentPage === 'interventions') {
-      <div class="table-card">
-        <h3>⏳ Interventions En Cours ({{ interventions.length }})</h3>
-        @if (interventions.length === 0) {
-          <p class="empty">Aucune intervention en cours</p>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>N° Projet</th>
-                <th>Client</th>
-                <th>Date</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (int of interventions; track int.id) {
-                <tr>
-                  <td><strong>{{ int.numeroProjet }}</strong></td>
-                  <td>{{ int.client }}</td>
-                  <td>{{ int.dateIntervention }}</td>
-                  <td><span class="badge en_cours">EN COURS</span></td>
-                  <td>
-                    <button mat-icon-button color="primary" (click)="ouvrirFiche(int.id)" title="Ouvrir fiche">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="accent" (click)="ouvrirFiche(int.id)" title="Voir détails">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
+      <!-- ══ MODULES ══ -->
+      @if (currentPage === 'semenier') { <app-semenier></app-semenier> }
+      @if (currentPage === 'planning') { <app-planning></app-planning> }
 
-    <!-- INTERVENTIONS COMPLÉTÉES -->
-    @if (currentPage === 'completees') {
-      <div class="table-card">
-        <h3>✅ Interventions Complétées ({{ interventionsCompletees.length }})</h3>
-        @if (interventionsCompletees.length === 0) {
-          <p class="empty">Aucune intervention complétée</p>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>N° Projet</th>
-                <th>Client</th>
-                <th>Date</th>
-                <th>Heure Début</th>
-                <th>Heure Fin</th>
-                <th>Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (int of interventionsCompletees; track int.id) {
-                <tr>
-                  <td><strong>{{ int.numeroProjet }}</strong></td>
-                  <td>{{ int.client }}</td>
-                  <td>{{ int.dateIntervention }}</td>
-                  <td>{{ int.heureDebut || '-' }}</td>
-                  <td>{{ int.heureFin || '-' }}</td>
-                  <td><span class="badge completee">COMPLÉTÉE</span></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-      </div>
-    }
-
-    <!-- MES CONGÉS -->
-    @if (currentPage === 'conges') {
-      <div class="table-card">
-        <h3>🏖️ Mes Demandes de Congés</h3>
-        
-        <!-- Formulaire -->
-        @if (showCongeForm) {
-          <div class="form-card">
-            <h4>Nouvelle Demande de Congé</h4>
-            <div class="form-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Type de Congé</mat-label>
-                <mat-select [(ngModel)]="conge.type">
-                  <mat-option value="REPOS">Repos</mat-option>
-                  <mat-option value="MALADIE">Maladie</mat-option>
-                  <mat-option value="FORMATION">Formation</mat-option>
-                  <mat-option value="AUTRE">Autre</mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Date Début</mat-label>
-                <input matInput type="date" [(ngModel)]="conge.dateDebut"/>
-              </mat-form-field>
-            </div>
-            <div class="form-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Date Fin</mat-label>
-                <input matInput type="date" [(ngModel)]="conge.dateFin"/>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Motif</mat-label>
-                <input matInput [(ngModel)]="conge.motif"/>
-              </mat-form-field>
-            </div>
-            <div class="form-actions">
-              <button mat-raised-button color="primary" (click)="deposerConge()">
-                <mat-icon>send</mat-icon> Envoyer
-              </button>
-              <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
+      <!-- ══ HOME ══ -->
+      @if (currentPage === 'home') {
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon-wrap"><mat-icon>engineering</mat-icon></div>
+            <div class="stat-info">
+              <h4>Interventions En Cours</h4>
+              <p class="stat-number">{{ getCountInterventionsEnCours() }}</p>
+              <p class="stat-sub">À traiter</p>
             </div>
           </div>
-        }
+          <div class="stat-card navy">
+            <div class="stat-icon-wrap"><mat-icon>check_circle</mat-icon></div>
+            <div class="stat-info">
+              <h4>Complétées</h4>
+              <p class="stat-number">{{ getCountInterventionsCompletees() }}</p>
+              <p class="stat-sub">Ce mois</p>
+            </div>
+          </div>
+          <div class="stat-card deep">
+            <div class="stat-icon-wrap"><mat-icon>report_problem</mat-icon></div>
+            <div class="stat-info">
+              <h4>Remontées Terrain</h4>
+              <p class="stat-number">{{ getCountReclamations() }}</p>
+              <p class="stat-sub">Total envoyées</p>
+            </div>
+          </div>
+        </div>
 
-        <!-- Tableau Congés -->
-        @if (conges.length === 0) {
-          <p class="empty">Aucune demande de congé</p>
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Date Début</th>
-                <th>Date Fin</th>
-                <th>Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (c of conges; track c.id) {
-                <tr>
-                  <td>{{ c.type }}</td>
-                  <td>{{ c.dateDebut }}</td>
-                  <td>{{ c.dateFin }}</td>
-                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-
-        <!-- Bouton Ajouter -->
-        @if (!showCongeForm && conges.length > 0) {
-          <div style="margin-top: 15px; text-align: center;">
-            <button mat-raised-button color="primary" (click)="showCongeForm = true">
-              <mat-icon>add</mat-icon> Nouvelle Demande
+        <div class="table-card">
+          <h3>⚡ Actions Rapides</h3>
+          <div class="quick-actions">
+            <button mat-raised-button color="primary" (click)="currentPage = 'interventions'">
+              <mat-icon>engineering</mat-icon> Mes Interventions
             </button>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- MES RÉCLAMATIONS -->
-    @if (currentPage === 'reclamations') {
-      <!-- Formulaire Réclamation -->
-      @if (showReclamationForm) {
-        <div class="form-card">
-          <h3>📝Remontées Terrain </h3>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Sujet</mat-label>
-            <input matInput [(ngModel)]="reclamation.sujet" placeholder="Ex: Problème équipement"/>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <textarea matInput [(ngModel)]="reclamation.description" rows="4" placeholder="Décrivez le problème..."></textarea>
-          </mat-form-field>
-
-          <!-- Photo Upload -->
-          <div class="photo-upload-section">
-            <label>📸 Ajouter des Photos</label>
-            <input type="file" multiple accept="image/*" (change)="onPhotoSelectReclamation($event)" style="margin-top: 10px;"/>
-            
-            @if (photosReclamation.length > 0) {
-              <div class="photos-preview">
-                @for (photo of photosReclamation; track $index) {
-                  <div class="photo-preview-item">
-                    {{ photo.nom }}
-                    <button type="button" class="btn-remove-photo" (click)="supprimerPhotoReclamation($index)">
-                      <mat-icon>close</mat-icon>
-                    </button>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-
-          <div class="form-actions">
-            <button mat-raised-button color="primary" (click)="envoyerReclamationAvecPhotos()">
-              <mat-icon>send</mat-icon> Remonté terrain
+            <button mat-raised-button color="accent" (click)="currentPage = 'reclamations'">
+              <mat-icon>report_problem</mat-icon> Remontées Terrain
             </button>
-            <button mat-stroked-button (click)="showReclamationForm = false">Annuler</button>
+            <button mat-raised-button (click)="currentPage = 'conges'">
+              <mat-icon>beach_access</mat-icon> Mes Congés
+            </button>
+            <button mat-raised-button color="warn" (click)="currentPage = 'reclamations'; showReclamationForm = true">
+              <mat-icon>add</mat-icon> Nouvelle Remontée
+            </button>
           </div>
         </div>
       }
 
-      <!-- Tableau Réclamations -->
-      <div class="table-card">
-        <h3>⚠️ Mes Remontées Terrain ({{ reclamations.length }})</h3>
-        @if (reclamations.length === 0) {
-          <p class="empty">Aucune remontée terrain</p>
-          @if (!showReclamationForm) {
-            <button mat-raised-button color="primary" (click)="showReclamationForm = true">
-              <mat-icon>add</mat-icon> Créer une remontée terrain
-            </button>
-          }
-        } @else {
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Sujet</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Photos</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (rec of reclamations; track rec.id) {
+      <!-- ══ INTERVENTIONS EN COURS ══ -->
+      @if (currentPage === 'interventions') {
+        <div class="table-card">
+          <h3>⏳ Interventions En Cours ({{ interventions.length }})</h3>
+          @if (interventions.length === 0) {
+            <div class="empty">Aucune intervention en cours</div>
+          } @else {
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <td><strong>{{ rec.sujet }}</strong></td>
-                  <td>{{ rec.description | slice:0:40 }}...</td>
-                  <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
-                  <td style="text-align: center;">
-                    @if (rec.photos && rec.photos.length > 0) {
-                      <span style="background: #e3f2fd; color: #1565C0; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
-                        {{ rec.photos.length }} 📸
-                      </span>
-                    } @else {
-                      <span style="color: #ccc;">-</span>
-                    }
-                  </td>
-                  <td><span class="badge" [style]="rec.statut === 'EN_ATTENTE' ? 'background: #FF9800' : rec.statut === 'APPROUVEE' ? 'background: #4CAF50' : 'background: #f44336'" style="color: white;">{{ rec.statut }}</span></td>
-                  <td>
-                    <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec)" title="Voir détails">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                  </td>
+                  <th>N° Projet</th>
+                  <th>Client</th>
+                  <th>Date</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-          
-          @if (!showReclamationForm) {
-            <div style="margin-top: 15px; text-align: center;">
-              <button mat-raised-button color="primary" (click)="showReclamationForm = true">
-                <mat-icon>add</mat-icon> Nouvelle Rementee ter
+              </thead>
+              <tbody>
+                @for (int of interventions; track int.id) {
+                  <tr>
+                    <td><strong>{{ int.numeroProjet }}</strong></td>
+                    <td>{{ int.client }}</td>
+                    <td>{{ int.dateIntervention }}</td>
+                    <td><span class="badge en_cours">EN COURS</span></td>
+                    <td>
+                      <button mat-icon-button color="primary" (click)="ouvrirFiche(int.id)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button color="accent" (click)="ouvrirFiche(int.id)">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ COMPLÉTÉES ══ -->
+      @if (currentPage === 'completees') {
+        <div class="table-card">
+          <h3>✅ Interventions Complétées ({{ interventionsCompletees.length }})</h3>
+          @if (interventionsCompletees.length === 0) {
+            <div class="empty">Aucune intervention complétée</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>N° Projet</th>
+                  <th>Client</th>
+                  <th>Date</th>
+                  <th>Heure Début</th>
+                  <th>Heure Fin</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (int of interventionsCompletees; track int.id) {
+                  <tr>
+                    <td><strong>{{ int.numeroProjet }}</strong></td>
+                    <td>{{ int.client }}</td>
+                    <td>{{ int.dateIntervention }}</td>
+                    <td>{{ int.heureDebut || '-' }}</td>
+                    <td>{{ int.heureFin || '-' }}</td>
+                    <td><span class="badge completee">COMPLÉTÉE</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ MES CONGÉS ══ -->
+      @if (currentPage === 'conges') {
+        <div class="table-card">
+          <h3>🏖️ Mes Demandes de Congés</h3>
+
+          @if (showCongeForm) {
+            <div class="form-card">
+              <h4>Nouvelle Demande de Congé</h4>
+              <div class="form-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Type de Congé</mat-label>
+                  <mat-select [(ngModel)]="conge.type">
+                    <mat-option value="REPOS">Repos</mat-option>
+                    <mat-option value="MALADIE">Maladie</mat-option>
+                    <mat-option value="FORMATION">Formation</mat-option>
+                    <mat-option value="AUTRE">Autre</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Date Début</mat-label>
+                  <input matInput type="date" [(ngModel)]="conge.dateDebut"/>
+                </mat-form-field>
+              </div>
+              <div class="form-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Date Fin</mat-label>
+                  <input matInput type="date" [(ngModel)]="conge.dateFin"/>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Motif</mat-label>
+                  <input matInput [(ngModel)]="conge.motif"/>
+                </mat-form-field>
+              </div>
+              <div class="form-actions">
+                <button mat-raised-button color="primary" (click)="deposerConge()">
+                  <mat-icon>send</mat-icon> Envoyer
+                </button>
+                <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
+              </div>
+            </div>
+          }
+
+          @if (conges.length === 0) {
+            <div class="empty">Aucune demande de congé</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Type</th><th>Date Début</th><th>Date Fin</th><th>Statut</th></tr>
+              </thead>
+              <tbody>
+                @for (c of conges; track c.id) {
+                  <tr>
+                    <td>{{ c.type }}</td>
+                    <td>{{ c.dateDebut }}</td>
+                    <td>{{ c.dateFin }}</td>
+                    <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+
+          @if (!showCongeForm) {
+            <div style="margin-top:16px;text-align:center">
+              <button mat-raised-button color="primary" (click)="showCongeForm = true">
+                <mat-icon>add</mat-icon> Nouvelle Demande
               </button>
             </div>
           }
+        </div>
+      }
+
+      <!-- ══ REMONTÉES TERRAIN ══ -->
+      @if (currentPage === 'reclamations') {
+
+        @if (showReclamationForm) {
+          <div class="form-card">
+            <h3>📝 Nouvelle Remontée Terrain</h3>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Sujet</mat-label>
+              <input matInput [(ngModel)]="reclamation.sujet" placeholder="Ex: Problème équipement"/>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput [(ngModel)]="reclamation.description" rows="4" placeholder="Décrivez le problème..."></textarea>
+            </mat-form-field>
+            <div class="photo-upload-section">
+              <label>📸 Ajouter des Photos</label>
+              <input type="file" multiple accept="image/*" (change)="onPhotoSelectReclamation($event)" style="margin-top:10px"/>
+              @if (photosReclamation.length > 0) {
+                <div class="photos-preview">
+                  @for (photo of photosReclamation; track $index) {
+                    <div class="photo-preview-item">
+                      {{ photo.nom }}
+                      <button type="button" class="btn-remove-photo" (click)="supprimerPhotoReclamation($index)">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+            <div class="form-actions">
+              <button mat-raised-button color="primary" (click)="envoyerReclamationAvecPhotos()">
+                <mat-icon>send</mat-icon> Envoyer la Remontée
+              </button>
+              <button mat-stroked-button (click)="showReclamationForm = false">Annuler</button>
+            </div>
+          </div>
         }
-      </div>
-    }
+
+        <div class="table-card">
+          <h3>⚠️ Mes Remontées Terrain ({{ reclamations.length }})</h3>
+          @if (reclamations.length === 0) {
+            <div class="empty">Aucune remontée terrain</div>
+            @if (!showReclamationForm) {
+              <div style="text-align:center;margin-top:12px">
+                <button mat-raised-button color="primary" (click)="showReclamationForm = true">
+                  <mat-icon>add</mat-icon> Créer une remontée
+                </button>
+              </div>
+            }
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Sujet</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Photos</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rec of reclamations; track rec.id) {
+                  <tr>
+                    <td><strong>{{ rec.sujet }}</strong></td>
+                    <td>{{ rec.description | slice:0:40 }}...</td>
+                    <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                      @if (rec.photos && rec.photos.length > 0) {
+                        <span class="badge en_cours">{{ rec.photos.length }} 📸</span>
+                      } @else {
+                        <span style="color:#ccc">-</span>
+                      }
+                    </td>
+                    <td><span class="badge en_attente">{{ rec.statut }}</span></td>
+                    <td>
+                      <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec)">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            @if (!showReclamationForm) {
+              <div style="margin-top:16px;text-align:center">
+                <button mat-raised-button color="primary" (click)="showReclamationForm = true">
+                  <mat-icon>add</mat-icon> Nouvelle Remontée
+                </button>
+              </div>
+            }
+          }
+        </div>
+      }
+
+    </div>
   </div>
 </div>
 
-<!-- Modal Détails Réclamation -->
+<!-- ══ MODAL RÉCLAMATION ══ -->
 @if (showReclamationDetailModal && selectedReclamation) {
   <div class="modal-overlay" (click)="fermerDetailReclamation()">
     <div class="modal-detail-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>📋 Détails Réclamation</h2>
-        <button mat-icon-button (click)="fermerDetailReclamation()">
-          <mat-icon>close</mat-icon>
-        </button>
+        <h2>📋 Détails Remontée Terrain</h2>
+        <button mat-icon-button (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon></button>
       </div>
-
       <div class="modal-body">
-        <div class="detail-row">
-          <span class="label">Sujet :</span>
-          <span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Description :</span>
-          <span class="value">{{ selectedReclamation.description }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Date :</span>
-          <span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Statut :</span>
-          <span class="badge" [style]="selectedReclamation.statut === 'EN_ATTENTE' ? 'background: #FF9800' : selectedReclamation.statut === 'APPROUVEE' ? 'background: #4CAF50' : 'background: #f44336'" style="color: white;">{{ selectedReclamation.statut }}</span>
-        </div>
-
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-        <h3 style="color: #1565C0; margin-bottom: 15px;">📸 Photos :</h3>
+        <div class="detail-row"><span class="label">Sujet</span><span class="value">{{ selectedReclamation.sujet }}</span></div>
+        <div class="detail-row"><span class="label">Description</span><span class="value">{{ selectedReclamation.description }}</span></div>
+        <div class="detail-row"><span class="label">Date</span><span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span></div>
+        <div class="detail-row"><span class="label">Statut</span><span class="badge en_attente">{{ selectedReclamation.statut }}</span></div>
+        <h3 style="color:#01579b;margin:20px 0 12px;font-size:0.95rem">📸 Photos</h3>
         @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
           <div class="photos-gallery-detail">
             @for (photo of selectedReclamation.photos; track $index) {
               <div class="photo-detail-item">
-                <img [src]="photo.data" alt="{{ photo.nom }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
-                <p style="margin-top: 8px; font-size: 12px; color: #555;">{{ photo.nom }}</p>
+                <img [src]="photo.data" alt="{{ photo.nom }}">
+                <p style="padding:8px;font-size:12px;color:#555">{{ photo.nom }}</p>
               </div>
             }
           </div>
         } @else {
-          <p style="color: #999;">Aucune photo</p>
+          <p style="color:#999">Aucune photo</p>
         }
       </div>
-
       <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()">
-          <mat-icon>close</mat-icon> Fermer
-        </button>
+        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon> Fermer</button>
       </div>
     </div>
   </div>

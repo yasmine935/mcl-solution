@@ -10,10 +10,11 @@ import { Employes } from './components/employes/employes';
 import { Conges } from './components/conges/conges';
 import { FicheInterventionManager } from './components/fiche-intervention-manager/fiche-intervention-manager';
 import { FicheInterventionTechnicien } from './components/fiche-intervention-technicien/fiche-intervention-technicien';
-
+import { TicketingComponent } from './components/ticketing/ticketing';
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
+  { path: 'nouveau-ticket', component: TicketingComponent },// ✅ PAGE PUBLIQUE CLIENT
   { path: 'dashboard-admin', component: DashboardAdmin },
   { path: 'dashboard-technicien', component: DashboardTechnicien },
   { path: 'dashboard-kia', component: DashboardKia },
