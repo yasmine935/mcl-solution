@@ -1,0 +1,408 @@
+<div class="mat-wrapper">
+
+  <!-- ══════════ LISTE ══════════ -->
+  @if (view === 'liste') {
+    <div class="mat-header">
+      <div class="mat-header-left">
+        <span class="mat-logo">🏗️</span>
+        <div>
+          <h2>Fiches de Mise au Travail</h2>
+          <p>Gestion des fiches sécurité chantier</p>
+        </div>
+      </div>
+      <button class="btn-new" (click)="ouvrirNouveau()">
+        + Nouvelle Fiche
+      </button>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-card kpi-orange">
+        <span class="kpi-num">{{ fichesBrouillon.length }}</span>
+        <span class="kpi-lbl">Brouillons</span>
+      </div>
+      <div class="kpi-card kpi-violet">
+        <span class="kpi-num">{{ fichesValidees.length }}</span>
+        <span class="kpi-lbl">Validées</span>
+      </div>
+      <div class="kpi-card kpi-grey">
+        <span class="kpi-num">{{ fichesArchivees.length }}</span>
+        <span class="kpi-lbl">Archivées</span>
+      </div>
+      <div class="kpi-card kpi-total">
+        <span class="kpi-num">{{ fiches.length }}</span>
+        <span class="kpi-lbl">Total</span>
+      </div>
+    </div>
+
+    <!-- TABLEAU -->
+    @if (fiches.length === 0) {
+      <div class="empty-state">
+        <p>🏗️ Aucune fiche de mise au travail. Créez la première !</p>
+      </div>
+    } @else {
+      <div class="table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Numéro</th>
+              <th>Chantier / Zone</th>
+              <th>Date</th>
+              <th>Responsable</th>
+              <th>Créé par</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (fiche of fiches; track fiche.id) {
+              <tr (click)="voirDetail(fiche)" class="tr-hover">
+                <td><strong>{{ fiche.numero }}</strong></td>
+                <td>{{ fiche.chantierZone }}</td>
+                <td>{{ fiche.date }} {{ fiche.heure }}</td>
+                <td>{{ fiche.responsableIntervention }}</td>
+                <td>{{ fiche.creePar }}</td>
+                <td><span class="badge" [class]="getStatutClass(fiche.statut)">{{ fiche.statut }}</span></td>
+                <td (click)="$event.stopPropagation()">
+                  <button class="btn-icon" (click)="voirDetail(fiche)" title="Voir">👁️</button>
+                  @if (fiche.statut === 'Brouillon') {
+                    <button class="btn-icon btn-valider" (click)="validerFiche(fiche)" title="Valider">✅</button>
+                  }
+                  @if (fiche.statut === 'Validée') {
+                    <button class="btn-icon btn-archiver" (click)="archiverFiche(fiche)" title="Archiver">📦</button>
+                  }
+                  <button class="btn-icon btn-del" (click)="supprimerFiche(fiche)" title="Supprimer">🗑️</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  <!-- ══════════ FORMULAIRE NOUVEAU ══════════ -->
+  @if (view === 'nouveau') {
+    <div class="form-page">
+
+      <div class="form-page-header">
+        <button class="btn-back" (click)="retour()">← Retour</button>
+        <div class="form-title-block">
+          <div class="mcl-brand">
+            <span class="mcl-logo-text">mcl</span>
+            <span class="mcl-sep">Solutions</span>
+          </div>
+          <h2>MISE AU TRAVAIL</h2>
+          <p class="form-subtitle">À remplir par le Responsable de Chantier ou le Chef d'Équipe avant le début des travaux.</p>
+        </div>
+      </div>
+
+      <!-- IDENTIFICATION -->
+      <div class="form-section">
+        <h3 class="section-title">📋 Identification du Travail</h3>
+        <div class="field-row">
+          <label>Chantier / Zone <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.chantierZone" class="field-input" placeholder="Ex: Bâtiment A - Zone 3"/>
+        </div>
+        <div class="field-row two-col">
+          <div>
+            <label>Date <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="form.date" class="field-input"/>
+          </div>
+          <div>
+            <label>Heure</label>
+            <input type="time" [(ngModel)]="form.heure" class="field-input"/>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>Entreprise(s) intervenante(s)</label>
+          <input type="text" [(ngModel)]="form.entreprisesIntervenantes" class="field-input"/>
+        </div>
+        <div class="field-row">
+          <label>Responsable de l'intervention <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.responsableIntervention" class="field-input"/>
+        </div>
+      </div>
+
+      <!-- A. ANALYSE DE LA TÂCHE -->
+      <div class="form-section">
+        <h3 class="section-title">A. Analyse de la Tâche</h3>
+
+        <div class="field-row">
+          <label>Description de l'activité</label>
+          <input type="text" [(ngModel)]="form.descriptionActivite" class="field-input"/>
+        </div>
+
+        <div class="field-row radio-row">
+          <label>Modes opératoires validés ?</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="form.modesOperatoiresValides" [value]="true"/> Oui
+            </label>
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="form.modesOperatoiresValides" [value]="false"/> Non (Si non, arrêt et validation)
+            </label>
+          </div>
+        </div>
+
+        <div class="field-row radio-row">
+          <label>Co-activité identifiée ?</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="form.coActiviteIdentifiee" [value]="true"/> Oui
+            </label>
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="form.coActiviteIdentifiee" [value]="false"/> Non
+            </label>
+          </div>
+          @if (form.coActiviteIdentifiee) {
+            <input type="text" [(ngModel)]="form.coActivitePrecision" class="field-input" placeholder="Précisez..."/>
+          }
+        </div>
+
+        <div class="field-row radio-row">
+          <label>Nécessité de permis spécifiques ?</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="form.permisSpecifiques" [value]="false"/> Non
+            </label>
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="form.permisSpecifiques" [value]="true"/> Oui
+            </label>
+          </div>
+          @if (form.permisSpecifiques) {
+            <input type="text" [(ngModel)]="form.permisSpecifiquesPrecision" class="field-input" placeholder="Précisez..."/>
+          }
+        </div>
+      </div>
+
+      <!-- B. RISQUES -->
+      <div class="form-section">
+        <h3 class="section-title">B. Risques et Moyens de Prévention <span class="hint">(Cochez les points abordés)</span></h3>
+
+        <div class="checkbox-list">
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.risquesEnvironnement"/>
+            <div>
+              <strong>Risques liés à l'environnement :</strong>
+              <span>Bruit, météo, circulation, produits chimiques, amiante.</span>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.risquesTache"/>
+            <div>
+              <strong>Risques liés à la tâche :</strong>
+              <span>Chute, coupure, manutention manuelle, électrisation.</span>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.protectionsCollectives"/>
+            <div>
+              <strong>Protections collectives :</strong>
+              <span>Balisage, garde-corps.</span>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.epiSpecifiques"/>
+            <div>
+              <strong>EPI Spécifiques :</strong>
+              <span>Harnais, masque FFP3, protection auditive.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- C. CONSIGNES D'URGENCE -->
+      <div class="form-section">
+        <h3 class="section-title">C. Consignes d'Urgence <span class="hint">(Rappel)</span></h3>
+
+        <div class="checkbox-list">
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.moyensAlerte"/>
+            <div>
+              <strong>Moyens d'alerte :</strong>
+              <span>Téléphone, alarme sonore.</span>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.secours"/>
+            <div class="secours-row">
+              <strong>Secours :</strong>
+              <span>Nom du SST présent sur zone :</span>
+              <input type="text" [(ngModel)]="form.nomSST" class="field-input inline-input" placeholder="Nom du SST"/> ou 18.
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.evacuation"/>
+            <div>
+              <strong>Évacuation :</strong>
+              <span>Chemin de repli et point de rassemblement connus.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- D. VALIDATION ÉQUIPE -->
+      <div class="form-section">
+        <h3 class="section-title">D. Validation de l'Équipe <span class="hint">(Émargement)</span></h3>
+        <p class="engagement-text">
+          "Je confirme avoir compris les instructions, les risques liés à mon poste et les mesures de prévention
+          à appliquer. Je m'engage à porter mes EPI et à alerter en cas de dérive."
+        </p>
+
+        <table class="membres-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nom / Prénom</th>
+              <th>Entreprise</th>
+              <th>Signature</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (membre of form.membres; track $index; let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}.</td>
+                <td><input type="text" [(ngModel)]="membre.nom" class="field-input" placeholder="Nom Prénom"/></td>
+                <td><input type="text" [(ngModel)]="membre.entreprise" class="field-input" placeholder="Entreprise"/></td>
+                <td><input type="text" [(ngModel)]="membre.signature" class="field-input" placeholder="Initiales ou visa"/></td>
+                <td>
+                  @if ((form.membres?.length ?? 0) > 1) {
+                    <button class="btn-remove" (click)="supprimerMembre(i)">✕</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <button class="btn-add-membre" (click)="ajouterMembre()">+ Ajouter un membre</button>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="retour()">Annuler</button>
+        <button class="btn-brouillon" (click)="soumettre('Brouillon')">💾 Sauvegarder Brouillon</button>
+        <button class="btn-valider-form" (click)="soumettre('Validée')">✅ Valider la Fiche</button>
+      </div>
+
+    </div>
+  }
+
+  <!-- ══════════ DETAIL FICHE ══════════ -->
+  @if (view === 'detail' && selectedFiche) {
+    <div class="form-page">
+
+      <div class="form-page-header">
+        <button class="btn-back" (click)="retour()">← Retour</button>
+        <div class="form-title-block">
+          <div class="mcl-brand">
+            <span class="mcl-logo-text">mcl</span>
+            <span class="mcl-sep">Solutions</span>
+          </div>
+          <h2>MISE AU TRAVAIL — {{ selectedFiche.numero }}</h2>
+          <div class="detail-meta">
+            <span class="badge" [class]="getStatutClass(selectedFiche.statut)">{{ selectedFiche.statut }}</span>
+            <span class="meta-info">Créée par {{ selectedFiche.creePar }}</span>
+          </div>
+        </div>
+        <div class="detail-actions">
+          @if (selectedFiche.statut === 'Brouillon') {
+            <button class="btn-valider-form" (click)="validerFiche(selectedFiche)">✅ Valider</button>
+          }
+          @if (selectedFiche.statut === 'Validée') {
+            <button class="btn-brouillon" (click)="archiverFiche(selectedFiche)">📦 Archiver</button>
+          }
+          <button class="btn-cancel" (click)="supprimerFiche(selectedFiche)">🗑️ Supprimer</button>
+        </div>
+      </div>
+
+      <!-- IDENTIFICATION -->
+      <div class="form-section">
+        <h3 class="section-title">📋 Identification du Travail</h3>
+        <div class="detail-grid">
+          <div class="detail-item"><label>Chantier / Zone</label><span>{{ selectedFiche.chantierZone }}</span></div>
+          <div class="detail-item"><label>Date & Heure</label><span>{{ selectedFiche.date }} à {{ selectedFiche.heure || '-' }}</span></div>
+          <div class="detail-item"><label>Entreprise(s)</label><span>{{ selectedFiche.entreprisesIntervenantes || '-' }}</span></div>
+          <div class="detail-item"><label>Responsable</label><span>{{ selectedFiche.responsableIntervention }}</span></div>
+        </div>
+      </div>
+
+      <!-- A -->
+      <div class="form-section">
+        <h3 class="section-title">A. Analyse de la Tâche</h3>
+        <div class="detail-grid">
+          <div class="detail-item full"><label>Description</label><span>{{ selectedFiche.descriptionActivite || '-' }}</span></div>
+          <div class="detail-item"><label>Modes opératoires validés</label><span>{{ selectedFiche.modesOperatoiresValides === true ? '✅ Oui' : selectedFiche.modesOperatoiresValides === false ? '❌ Non' : '-' }}</span></div>
+          <div class="detail-item"><label>Co-activité identifiée</label><span>{{ selectedFiche.coActiviteIdentifiee === true ? '✅ Oui — ' + selectedFiche.coActivitePrecision : selectedFiche.coActiviteIdentifiee === false ? '❌ Non' : '-' }}</span></div>
+          <div class="detail-item"><label>Permis spécifiques</label><span>{{ selectedFiche.permisSpecifiques === true ? '✅ Oui — ' + selectedFiche.permisSpecifiquesPrecision : selectedFiche.permisSpecifiques === false ? '❌ Non' : '-' }}</span></div>
+        </div>
+      </div>
+
+      <!-- B -->
+      <div class="form-section">
+        <h3 class="section-title">B. Risques et Prévention</h3>
+        <div class="risques-grid">
+          <div class="risque-item" [class.checked]="selectedFiche.risquesEnvironnement">
+            <span>{{ selectedFiche.risquesEnvironnement ? '☑' : '☐' }}</span>
+            <strong>Risques liés à l'environnement</strong>
+          </div>
+          <div class="risque-item" [class.checked]="selectedFiche.risquesTache">
+            <span>{{ selectedFiche.risquesTache ? '☑' : '☐' }}</span>
+            <strong>Risques liés à la tâche</strong>
+          </div>
+          <div class="risque-item" [class.checked]="selectedFiche.protectionsCollectives">
+            <span>{{ selectedFiche.protectionsCollectives ? '☑' : '☐' }}</span>
+            <strong>Protections collectives</strong>
+          </div>
+          <div class="risque-item" [class.checked]="selectedFiche.epiSpecifiques">
+            <span>{{ selectedFiche.epiSpecifiques ? '☑' : '☐' }}</span>
+            <strong>EPI Spécifiques</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- C -->
+      <div class="form-section">
+        <h3 class="section-title">C. Consignes d'Urgence</h3>
+        <div class="risques-grid">
+          <div class="risque-item" [class.checked]="selectedFiche.moyensAlerte">
+            <span>{{ selectedFiche.moyensAlerte ? '☑' : '☐' }}</span>
+            <strong>Moyens d'alerte</strong>
+          </div>
+          <div class="risque-item" [class.checked]="selectedFiche.secours">
+            <span>{{ selectedFiche.secours ? '☑' : '☐' }}</span>
+            <strong>Secours — SST : {{ selectedFiche.nomSST || '-' }}</strong>
+          </div>
+          <div class="risque-item" [class.checked]="selectedFiche.evacuation">
+            <span>{{ selectedFiche.evacuation ? '☑' : '☐' }}</span>
+            <strong>Évacuation</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- D -->
+      <div class="form-section">
+        <h3 class="section-title">D. Validation de l'Équipe</h3>
+        <table class="membres-table">
+          <thead>
+            <tr><th>#</th><th>Nom / Prénom</th><th>Entreprise</th><th>Signature</th></tr>
+          </thead>
+          <tbody>
+            @for (m of selectedFiche.membres; track $index; let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}.</td>
+                <td>{{ m.nom || '-' }}</td>
+                <td>{{ m.entreprise || '-' }}</td>
+                <td>{{ m.signature || '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  }
+
+</div>

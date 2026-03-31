@@ -43,11 +43,14 @@
       <div class="nav-divider"></div>
       <div class="nav-section-label">Gestion</div>
 
-      
+      <!-- ✅ NOUVEAU : Mise au Travail -->
+      <a class="nav-item" [class.active]="currentPage === 'mise-au-travail'" (click)="currentPage = 'mise-au-travail'">
+        <mat-icon>engineering</mat-icon> Mise au Travail
+      </a>
+
       <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
         <mat-icon>shopping_cart</mat-icon> Commandes Achat
       </a>
-      
       <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
         <mat-icon>folder_open</mat-icon> Documents
       </a>
@@ -135,8 +138,13 @@
         <app-documents></app-documents>
       }
 
+      <!-- ✅ NOUVEAU : Mise au Travail -->
+      @if (currentPage === 'mise-au-travail') {
+        <app-mise-au-travail></app-mise-au-travail>
+      }
+
       <!-- ══ COMING SOON ══ -->
-      @if (currentPage === 'stock' || currentPage === 'commandes' || currentPage === 'crm') {
+      @if (currentPage === 'commandes') {
         <div class="coming-soon">
           <mat-icon>construction</mat-icon>
           <h3>Module en cours de développement</h3>

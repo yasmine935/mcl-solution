@@ -1,0 +1,388 @@
+<div class="sse-wrapper">
+
+  <!-- ══════════ LISTE ══════════ -->
+  @if (view === 'liste') {
+    <div class="sse-header">
+      <div class="sse-header-left">
+        <span class="sse-logo">⚠️</span>
+        <div>
+          <h2>Fiches Remontees SSE Terrain</h2>
+          <p>Situations dangereuses · Presqu'accidents · Suggestions</p>
+        </div>
+      </div>
+      @if (!isManager) {
+        <button class="btn-new" (click)="ouvrirNouveau()">+ Nouvelle Fiche SSE</button>
+      }
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-card kpi-orange">
+        <span class="kpi-num">{{ fichesAttente.length }}</span>
+        <span class="kpi-lbl">En attente</span>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <span class="kpi-num">{{ fichesEnCours.length }}</span>
+        <span class="kpi-lbl">En cours</span>
+      </div>
+      <div class="kpi-card kpi-green">
+        <span class="kpi-num">{{ fichesTraitees.length }}</span>
+        <span class="kpi-lbl">Traitees</span>
+      </div>
+      <div class="kpi-card kpi-total">
+        <span class="kpi-num">{{ fiches.length }}</span>
+        <span class="kpi-lbl">Total</span>
+      </div>
+    </div>
+
+    <!-- TABLEAU -->
+    @if (fiches.length === 0) {
+      <div class="empty-state">
+        <span>⚠️</span>
+        <p>Aucune fiche SSE.</p>
+        @if (!isManager) {
+          <button class="btn-new" (click)="ouvrirNouveau()">+ Nouvelle Fiche</button>
+        }
+      </div>
+    } @else {
+      <div class="table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Numero</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Lieu</th>
+              @if (isManager) { <th>Technicien</th> }
+              <th>Gravite</th>
+              <th>Photos</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (fiche of fiches; track fiche.id) {
+              <tr class="tr-hover" (click)="voirDetail(fiche)">
+                <td><strong>{{ fiche.numero }}</strong></td>
+                <td>
+                  @if (fiche.typeSituationDangereuse) { <span class="type-badge type-danger">⚠️ Danger</span> }
+                  @if (fiche.typePresquAccident) { <span class="type-badge type-accident">💥 Presqu'acc.</span> }
+                  @if (fiche.typeSuggestion) { <span class="type-badge type-suggestion">💡 Suggestion</span> }
+                </td>
+                <td>{{ fiche.date }}</td>
+                <td>{{ fiche.lieu }}</td>
+                @if (isManager) { <td><strong>{{ fiche.technicienNom }}</strong></td> }
+                <td>
+                  @if (fiche.gravite) {
+                    <span class="gravite-badge" [class]="getGraviteClass(fiche.gravite)">
+                      {{ fiche.gravite === 'Grave' ? '🔴' : fiche.gravite === 'Moyen' ? '🟡' : '🟢' }} {{ fiche.gravite }}
+                    </span>
+                  } @else {
+                    <span style="color:#ccc">-</span>
+                  }
+                </td>
+                <td>
+                  @if (fiche.photos && fiche.photos.length > 0) {
+                    <span class="badge-photos">{{ fiche.photos.length }} 📸</span>
+                  } @else {
+                    <span style="color:#ccc">-</span>
+                  }
+                </td>
+                <td><span class="badge" [class]="getStatutClass(fiche.statut)">{{ fiche.statut }}</span></td>
+                <td (click)="$event.stopPropagation()">
+                  <button class="btn-icon" (click)="voirDetail(fiche)">👁️</button>
+                  @if (isManager) {
+                    <button class="btn-icon btn-del" (click)="supprimerFiche(fiche)">🗑️</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  <!-- ══════════ FORMULAIRE NOUVEAU ══════════ -->
+  @if (view === 'nouveau') {
+    <div class="form-page">
+
+      <div class="form-top">
+        <button class="btn-back" (click)="retour()">← Retour</button>
+        <div class="form-title-block">
+          <div class="mcl-brand"><span class="mcl-txt">mcl</span></div>
+          <h2>FICHE REMONTEE SSE TERRAIN</h2>
+          <p class="form-sub">A mettre a disposition sur le chantier ou a remettre a chaque chef d'equipe.</p>
+        </div>
+      </div>
+
+      <!-- TYPE DE SIGNALEMENT -->
+      <div class="form-section">
+        <h3 class="section-title">Type de signalement <span class="hint">(Cochez)</span> <span class="req">*</span></h3>
+        <div class="checkbox-list">
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.typeSituationDangereuse"/>
+            <div>
+              <strong>Situation Dangereuse :</strong>
+              <span>Un etat ou une condition qui pourrait causer un accident (ex: garde-corps manquant).</span>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.typePresquAccident"/>
+            <div>
+              <strong>Presqu'accident :</strong>
+              <span>Un evenement qui a eu lieu mais n'a pas fait de blesse (ex: chute d'un outil).</span>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="form.typeSuggestion"/>
+            <div>
+              <strong>Suggestion d'amelioration :</strong>
+              <span>Une idee pour rendre le travail plus sur ou plus simple.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- 1. DESCRIPTION DES FAITS -->
+      <div class="form-section">
+        <h3 class="section-title">1. Description des faits</h3>
+        <div class="field-row three-col">
+          <div>
+            <label>Date <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="form.date" class="field-input"/>
+          </div>
+          <div>
+            <label>Heure</label>
+            <input type="time" [(ngModel)]="form.heure" class="field-input"/>
+          </div>
+          <div>
+            <label>Lieu <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="form.lieu" class="field-input" placeholder="Ex: Batiment A - Etage 2"/>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>Entreprise concernee</label>
+          <input type="text" [(ngModel)]="form.entrepriseConcernee" class="field-input"/>
+        </div>
+        <div class="field-row">
+          <label>Description precise de ce que vous avez vu <span class="req">*</span></label>
+          <textarea [(ngModel)]="form.descriptionFaits" class="field-input textarea-large"
+            placeholder="Decrivez precisement les faits observes..."></textarea>
+        </div>
+      </div>
+
+      <!-- 2. RISQUE POTENTIEL — ✅ UN SEUL RADIO -->
+      <div class="form-section">
+        <h3 class="section-title">2. Risque potentiel <span class="hint">(Gravite estimee)</span></h3>
+        <div class="radio-list">
+          <label class="radio-item" [class.selected]="form.gravite === 'Faible'">
+            <input type="radio" name="gravite" [(ngModel)]="form.gravite" value="Faible"/>
+            <div class="radio-content">
+              <strong>🟢 Faible</strong>
+              <span>(Materiel uniquement)</span>
+            </div>
+          </label>
+          <label class="radio-item" [class.selected]="form.gravite === 'Moyen'">
+            <input type="radio" name="gravite" [(ngModel)]="form.gravite" value="Moyen"/>
+            <div class="radio-content">
+              <strong>🟡 Moyen</strong>
+              <span>(Soin infirmier possible)</span>
+            </div>
+          </label>
+          <label class="radio-item" [class.selected]="form.gravite === 'Grave'">
+            <input type="radio" name="gravite" [(ngModel)]="form.gravite" value="Grave"/>
+            <div class="radio-content">
+              <strong>🔴 Grave</strong>
+              <span>(Arret de travail ou hospitalisation evite de justesse)</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. MESURE IMMEDIATE -->
+      <div class="form-section">
+        <h3 class="section-title">3. Mesure immediate prise <span class="hint">(Si applicable)</span></h3>
+        <p class="question-text">Qu'avez-vous fait sur le moment pour securiser la zone ?</p>
+        <textarea [(ngModel)]="form.mesureImmediate" class="field-input textarea-medium"
+          placeholder="Decrivez les actions prises..."></textarea>
+      </div>
+
+      <!-- PHOTOS -->
+      <div class="form-section">
+        <h3 class="section-title">📸 Photos / Pieces jointes</h3>
+        <div class="upload-zone">
+          <input type="file" multiple accept="image/*" (change)="onPhotoSelect($event)" id="photoInput" style="display:none"/>
+          <label for="photoInput" class="upload-label">📎 Cliquez pour ajouter des photos</label>
+        </div>
+        @if (photosTemp.length > 0) {
+          <div class="photos-preview">
+            @for (photo of photosTemp; track $index) {
+              <div class="photo-item">
+                <img [src]="photo.data" [alt]="photo.nom"/>
+                <div class="photo-name">{{ photo.nom }}</div>
+                <button class="btn-remove-photo" (click)="supprimerPhoto($index)">✕</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="retour()">Annuler</button>
+        <button class="btn-submit" (click)="soumettre()">📤 Envoyer la Fiche SSE</button>
+      </div>
+
+    </div>
+  }
+
+  <!-- ══════════ DETAIL FICHE ══════════ -->
+  @if (view === 'detail' && selectedFiche) {
+    <div class="form-page">
+
+      <div class="form-top">
+        <button class="btn-back" (click)="retour()">← Retour</button>
+        <div class="form-title-block">
+          <div class="mcl-brand"><span class="mcl-txt">mcl</span></div>
+          <h2>FICHE SSE — {{ selectedFiche.numero }}</h2>
+          <div class="detail-badges">
+            <span class="badge" [class]="getStatutClass(selectedFiche.statut)">{{ selectedFiche.statut }}</span>
+            <span class="meta-txt">Par {{ selectedFiche.technicienNom }}</span>
+          </div>
+        </div>
+        @if (isManager) {
+          <div class="manager-actions">
+            @if (selectedFiche.statut === 'EN_ATTENTE') {
+              <button class="btn-encours" (click)="changerStatut(selectedFiche, 'EN_COURS')">⚙️ En cours</button>
+            }
+            @if (selectedFiche.statut === 'EN_COURS') {
+              <button class="btn-traite" (click)="changerStatut(selectedFiche, 'TRAITEE')">✅ Traitee</button>
+            }
+            <button class="btn-cancel" (click)="supprimerFiche(selectedFiche)">🗑️</button>
+          </div>
+        }
+      </div>
+
+      <!-- TYPE -->
+      <div class="form-section">
+        <h3 class="section-title">Type de signalement</h3>
+        <div class="type-row">
+          <span class="checkbox-display" [class.checked]="selectedFiche.typeSituationDangereuse">
+            {{ selectedFiche.typeSituationDangereuse ? '☑' : '☐' }} Situation Dangereuse
+          </span>
+          <span class="checkbox-display" [class.checked]="selectedFiche.typePresquAccident">
+            {{ selectedFiche.typePresquAccident ? '☑' : '☐' }} Presqu'accident
+          </span>
+          <span class="checkbox-display" [class.checked]="selectedFiche.typeSuggestion">
+            {{ selectedFiche.typeSuggestion ? '☑' : '☐' }} Suggestion
+          </span>
+        </div>
+      </div>
+
+      <!-- 1. DESCRIPTION -->
+      <div class="form-section">
+        <h3 class="section-title">1. Description des faits</h3>
+        <div class="detail-grid">
+          <div class="detail-item"><label>Date</label><span>{{ selectedFiche.date }}</span></div>
+          <div class="detail-item"><label>Heure</label><span>{{ selectedFiche.heure || '-' }}</span></div>
+          <div class="detail-item"><label>Lieu</label><span>{{ selectedFiche.lieu }}</span></div>
+          <div class="detail-item"><label>Entreprise</label><span>{{ selectedFiche.entrepriseConcernee || '-' }}</span></div>
+          <div class="detail-item full"><label>Description</label><span class="span-textarea">{{ selectedFiche.descriptionFaits }}</span></div>
+        </div>
+      </div>
+
+      <!-- 2. GRAVITE -->
+      <div class="form-section">
+        <h3 class="section-title">2. Risque potentiel</h3>
+        <div class="type-row">
+          <span class="checkbox-display" [class.checked]="selectedFiche.gravite === 'Faible'">
+            {{ selectedFiche.gravite === 'Faible' ? '☑' : '☐' }} 🟢 Faible
+          </span>
+          <span class="checkbox-display" [class.checked]="selectedFiche.gravite === 'Moyen'">
+            {{ selectedFiche.gravite === 'Moyen' ? '☑' : '☐' }} 🟡 Moyen
+          </span>
+          <span class="checkbox-display" [class.checked]="selectedFiche.gravite === 'Grave'">
+            {{ selectedFiche.gravite === 'Grave' ? '☑' : '☐' }} 🔴 Grave
+          </span>
+        </div>
+      </div>
+
+      <!-- 3. MESURE -->
+      <div class="form-section">
+        <h3 class="section-title">3. Mesure immediate prise</h3>
+        <div class="detail-item full">
+          <span class="span-textarea">{{ selectedFiche.mesureImmediate || 'Aucune mesure renseignee' }}</span>
+        </div>
+      </div>
+
+      <!-- PHOTOS -->
+      @if (selectedFiche.photos && selectedFiche.photos.length > 0) {
+        <div class="form-section">
+          <h3 class="section-title">📸 Photos ({{ selectedFiche.photos.length }})</h3>
+          <div class="photos-preview">
+            @for (photo of selectedFiche.photos; track $index) {
+              <div class="photo-item">
+                <img [src]="photo.data" [alt]="photo.nom"/>
+                <div class="photo-name">{{ photo.nom }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- PARTIE ENCADREMENT -->
+      <div class="form-section encadrement-section">
+        <h3 class="section-title encadrement-title">
+          📋 Partie reservee a l'Encadrement
+          <span class="mase-badge">Suivi MASE</span>
+        </h3>
+        @if (isManager) {
+          <div class="field-row">
+            <label>Analyse des causes</label>
+            <input type="text" [(ngModel)]="selectedFiche.analyseCauses" class="field-input"/>
+          </div>
+          <div class="field-row">
+            <label>Action corrective decidee</label>
+            <input type="text" [(ngModel)]="selectedFiche.actionCorrective" class="field-input"/>
+          </div>
+          <div class="field-row two-col">
+            <div>
+              <label>Responsable de l'action</label>
+              <input type="text" [(ngModel)]="selectedFiche.responsableAction" class="field-input"/>
+            </div>
+            <div>
+              <label>Echeance</label>
+              <input type="date" [(ngModel)]="selectedFiche.echeance" class="field-input"/>
+            </div>
+          </div>
+          <div class="field-row radio-row">
+            <label>Information au declarant (Boucle fermee)</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" [(ngModel)]="selectedFiche.informationDeclarant" [value]="true"/> OUI
+              </label>
+              <label class="radio-label">
+                <input type="radio" [(ngModel)]="selectedFiche.informationDeclarant" [value]="false"/> NON
+              </label>
+            </div>
+          </div>
+          <button class="btn-save-encadrement" (click)="sauvegarderEncadrement()">💾 Sauvegarder</button>
+        } @else {
+          <div class="encadrement-readonly">
+            <div class="detail-item"><label>Analyse des causes</label><span>{{ selectedFiche.analyseCauses || 'En attente de traitement...' }}</span></div>
+            <div class="detail-item"><label>Action corrective</label><span>{{ selectedFiche.actionCorrective || '-' }}</span></div>
+            <div class="detail-item"><label>Responsable</label><span>{{ selectedFiche.responsableAction || '-' }}</span></div>
+            <div class="detail-item"><label>Echeance</label><span>{{ selectedFiche.echeance || '-' }}</span></div>
+            <div class="detail-item">
+              <label>Information declarant</label>
+              <span>{{ selectedFiche.informationDeclarant === true ? '✅ OUI' : selectedFiche.informationDeclarant === false ? '❌ NON' : '-' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>
