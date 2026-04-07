@@ -2,112 +2,98 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-
 @Component({
   selector: 'app-semenier',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div *ngIf="currentUserId" style="padding: 20px; background: white; border-radius: 8px; min-height: 100vh;">
+
       <!-- HEADER -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #1565C0; padding-bottom: 15px;">
-        <h3 style="color: #1565C0; margin: 0;">📅 {{ getCurrentUserName() }}</h3>
-        <span style="font-size: 12px; color: #666;">{{ getCurrentUserRole() }}</span>
+        <h3 style="color: #1565C0; margin: 0;">📅 Semenier — {{ getCurrentUserName() }}</h3>
+        <span style="font-size: 12px; color: #666; background: #e3f2fd; padding: 4px 12px; border-radius: 20px;">
+          Les données viennent automatiquement du Planning ✅
+        </span>
       </div>
 
-      <!-- MA SEMAINE - FORMULAIRE PERSO -->
-      <div style="background: #E3F2FD; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 2px solid #1565C0;">
-        <h4 style="color: #1565C0; margin: 0 0 15px 0;">✏️ MA SEMAINE</h4>
-        
-        <div style="margin-bottom: 15px;">
-          <label style="font-weight: 600;">Sélectionne ta semaine:</label><br/>
-          <select [(ngModel)]="mySelectedWeek" (change)="loadMyWeek()" style="padding: 10px; margin-top: 5px; width: 100%; box-sizing: border-box;">
-            <option *ngFor="let semaine of obtenirSemaines()" [value]="semaine">
-              {{ semaine.semaine }}
-            </option>
-          </select>
-        </div>
+      <!-- SÉLECTION DE LA SEMAINE -->
+      <div style="background: #E3F2FD; padding: 20px; border-radius: 8px; margin-bottom: 24px; border: 2px solid #1565C0;">
+        <h4 style="color: #1565C0; margin: 0 0 12px 0;">✏️ MA SEMAINE</h4>
+        <label style="font-weight: 600;">Sélectionne ta semaine:</label><br/>
+        <select [(ngModel)]="mySelectedWeek" (change)="loadWeekFromPlanning()" style="padding: 10px; margin-top: 8px; width: 100%; box-sizing: border-box; border: 1px solid #90caf9; border-radius: 6px; font-size: 14px;">
+          <option *ngFor="let semaine of obtenirSemaines()" [ngValue]="semaine">
+            {{ semaine.label }}
+          </option>
+        </select>
+      </div>
 
-        <!-- JOURS DE LA SEMAINE - FORMULAIRE PERSO -->
-        <div *ngIf="mySelectedWeek" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
-          <div *ngFor="let jour of joursSemaine" style="border: 1px solid #ccc; border-radius: 6px; padding: 12px; background: white;">
-            <strong style="color: #1565C0; font-size: 14px;">{{ jour }}</strong><br/><br/>
+      <!-- MA SEMAINE — VUE AUTO DU PLANNING -->
+      <div *ngIf="mySelectedWeek" style="background: #f8faff; padding: 20px; border-radius: 8px; margin-bottom: 28px; border: 1px solid #c5cae9;">
+        <h4 style="color: #1565C0; margin: 0 0 16px 0;">
+          📊 Ma semaine : {{ mySelectedWeek.label }}
+        </h4>
+
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+          <div *ngFor="let jour of joursDeSemaine" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
             
-            <div style="margin-bottom: 10px;">
-              <input type="checkbox" [(ngModel)]="myWeek[jour].journeeComplete" (change)="toggleJourneeComplete(jour)">
-              <label style="margin-left: 5px; font-size: 13px;">Journée complète</label>
+            <!-- En-tête jour -->
+            <div style="background: #1565C0; color: white; padding: 10px; text-align: center;">
+              <strong style="font-size: 13px;">{{ jour.nom }}</strong><br/>
+              <span style="font-size: 11px; opacity: 0.85;">{{ jour.dateAffichee }}</span>
             </div>
 
-            <!-- JOURNEE COMPLETE -->
-            <div *ngIf="myWeek[jour].journeeComplete">
-              <select [(ngModel)]="myWeek[jour].localisation" style="width: 100%; padding: 6px; font-size: 12px;">
-                <option value="BUREAU">🏢 BUREAU</option>
-                <option value="DISTANCE">💻 DISTANCE</option>
-                <option value="DEPLACEMENT">🚗 DEPLACEMENT</option>
-                <option value="CONGE">🏖️ CONGE</option>
-              </select>
-            </div>
-
-            <!-- MATIN + APRES-MIDI -->
-            <div *ngIf="!myWeek[jour].journeeComplete">
-              <div style="margin-bottom: 8px;">
-                <label style="font-size: 11px; color: #666;">Matin:</label>
-                <select [(ngModel)]="myWeek[jour].matin" style="width: 100%; padding: 6px; font-size: 11px;">
-                  <option value="BUREAU">🏢 BUREAU</option>
-                  <option value="DISTANCE">💻 DISTANCE</option>
-                  <option value="DEPLACEMENT">🚗 DEPLACEMENT</option>
-                  <option value="CONGE">🏖️ CONGE</option>
-                </select>
+            <!-- Contenu du jour depuis Planning -->
+            <div style="padding: 12px; min-height: 80px; text-align: center;">
+              <div *ngIf="getNotePlanningForJour(jour.date)"
+                [style.backgroundColor]="getCouleurNote(getNotePlanningForJour(jour.date))"
+                style="padding: 8px; border-radius: 6px; color: white; font-weight: 600; font-size: 12px; margin-bottom: 6px;">
+                {{ getNotePlanningForJour(jour.date) }}
               </div>
-
-              <div style="margin-bottom: 8px;">
-                <label style="font-size: 11px; color: #666;">Après-midi:</label>
-                <select [(ngModel)]="myWeek[jour].apresMidi" style="width: 100%; padding: 6px; font-size: 11px;">
-                  <option value="BUREAU">🏢 BUREAU</option>
-                  <option value="DISTANCE">💻 DISTANCE</option>
-                  <option value="DEPLACEMENT">🚗 DEPLACEMENT</option>
-                  <option value="SORTIE">🚗 SORTIE à</option>
-                  <option value="CONGE">🏖️ CONGE</option>
-                </select>
-              </div>
-
-              <!-- SI SORTIE: HEURE -->
-              <div *ngIf="myWeek[jour].apresMidi === 'SORTIE'">
-                <label style="font-size: 11px; color: #666;">Quelle heure?</label>
-                <input type="time" [(ngModel)]="myWeek[jour].heureSortie" style="width: 100%; padding: 6px; font-size: 11px;">
+              <div *ngIf="!getNotePlanningForJour(jour.date)"
+                style="padding: 8px; background: #f5f5f5; border-radius: 6px; color: #bbb; font-size: 12px;">
+                Non rempli
+                <br/>
+                <small style="font-size: 10px; color: #ccc;">Ajoutez une note dans le Planning</small>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- BOUTON VALIDER -->
-        <button (click)="validerMaSemaine()" style="padding: 12px 30px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px;">
-          ✓ VALIDER MA SEMAINE
-        </button>
+        <!-- INFO BOX -->
+        <div style="margin-top: 16px; padding: 12px 16px; background: #e8f5e9; border-radius: 6px; border-left: 4px solid #4CAF50; font-size: 13px; color: #388e3c;">
+          💡 Pour modifier votre planning, allez dans la section <strong>Planning</strong> et ajoutez vos notes jour par jour.
+        </div>
       </div>
 
-      <!-- VUE GLOBALE - TOUT LE MONDE -->
+      <!-- VUE GLOBALE TOUTE L'ÉQUIPE -->
       <div *ngIf="mySelectedWeek">
-        <h4 style="color: #1565C0; margin: 0 0 20px 0;">📊 TOUTE L'ÉQUIPE - {{ mySelectedWeek.semaine }}</h4>
-        
+        <h4 style="color: #1565C0; margin: 0 0 16px 0;">
+          📊 TOUTE L'ÉQUIPE — {{ mySelectedWeek.label }}
+        </h4>
+
         <div style="overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
             <thead>
               <tr style="background: #1565C0; color: white;">
-                <th style="padding: 12px; text-align: left; border: 1px solid #ccc;">PERSONNE</th>
-                <th style="padding: 12px; text-align: center; border: 1px solid #ccc;">LUNDI</th>
-                <th style="padding: 12px; text-align: center; border: 1px solid #ccc;">MARDI</th>
-                <th style="padding: 12px; text-align: center; border: 1px solid #ccc;">MERCREDI</th>
-                <th style="padding: 12px; text-align: center; border: 1px solid #ccc;">JEUDI</th>
-                <th style="padding: 12px; text-align: center; border: 1px solid #ccc;">VENDREDI</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #90caf9; min-width: 140px;">PERSONNE</th>
+                <th *ngFor="let jour of joursDeSemaine" style="padding: 12px; text-align: center; border: 1px solid #90caf9;">
+                  {{ jour.nom }}<br/>
+                  <small style="opacity: 0.75; font-size: 10px;">{{ jour.dateAffichee }}</small>
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let user of utilisateurs" style="background: #f9f9f9; border: 1px solid #e0e0e0;">
-                <td style="padding: 12px; border: 1px solid #ccc; font-weight: 600;">{{ user.prenom }} {{ user.nom }}</td>
-                <td *ngFor="let jour of joursSemaine" style="padding: 12px; text-align: center; border: 1px solid #ccc;">
-                  <div [style.backgroundColor]="getCouleurForJour(user.id, jour)" style="padding: 8px; border-radius: 4px; color: white; font-weight: 500; font-size: 12px;">
-                    {{ getTextForJour(user.id, jour) }}
+              <tr *ngFor="let user of utilisateurs" style="border: 1px solid #e0e0e0;">
+                <td style="padding: 12px; border: 1px solid #e0e0e0; font-weight: 600; color: #333;">
+                  {{ user.prenom }} {{ user.nom }}
+                </td>
+                <td *ngFor="let jour of joursDeSemaine" style="padding: 8px; text-align: center; border: 1px solid #e0e0e0;">
+                  <div
+                    [style.backgroundColor]="getCouleurNote(getNoteForUser(user.id, jour.date))"
+                    [style.color]="getNoteForUser(user.id, jour.date) ? 'white' : '#bbb'"
+                    style="padding: 8px; border-radius: 6px; font-weight: 500; font-size: 12px;">
+                    {{ getNoteForUser(user.id, jour.date) || 'Non rempli' }}
                   </div>
                 </td>
               </tr>
@@ -115,160 +101,101 @@ import { FormsModule } from '@angular/forms';
           </table>
         </div>
       </div>
+
     </div>
 
-    <!-- SI UTILISATEUR PAS DETECTE -->
     <div *ngIf="!currentUserId" style="padding: 40px; text-align: center; color: #999;">
       <p>Veuillez vous connecter d'abord</p>
     </div>
   `,
-  styles: [`
-    :host {
-      display: block;
-    }
-  `]
+  styles: [':host { display: block; }']
 })
 export class Semenier implements OnInit {
-  
+
   utilisateurs: any[] = [];
-  allWeeks: any = {};
-  mySelectedWeek: any = null;
-  myWeek: any = {};
-  joursSemaine = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI'];
+  allNotes: any = {};
   currentUserId: number | null = null;
+  mySelectedWeek: any = null;
+  joursDeSemaine: any[] = [];
 
   ngOnInit() {
-    this.loadUtilisateurs();
-    this.loadAllWeeks();
     this.detectCurrentUser();
-    
-    if (this.currentUserId) {
-      this.mySelectedWeek = this.obtenirSemaines()[0];
-      this.loadMyWeek();
-    }
+    this.loadUtilisateurs();
+    this.loadAllNotes();
+    this.mySelectedWeek = this.obtenirSemaines()[0];
+    this.loadWeekFromPlanning();
   }
 
   detectCurrentUser() {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       const user = JSON.parse(userStr);
-      if (user.id) {
-        this.currentUserId = user.id;
-        return;
-      }
+      this.currentUserId = user.id || 1;
+    } else {
+      this.currentUserId = 1;
     }
-
-    const saved = sessionStorage.getItem('currentUserId');
-    if (saved) {
-      this.currentUserId = parseInt(saved);
-      return;
-    }
-
-    this.currentUserId = 1;
   }
 
   loadUtilisateurs() {
     const stored = localStorage.getItem('utilisateurs');
-    if (stored) {
-      this.utilisateurs = JSON.parse(stored);
-    } else {
-      this.utilisateurs = [
-        { id: 1, prenom: 'Ferid', nom: 'Admin', role: 'ADMIN' },
-        { id: 2, prenom: 'Tech', nom: 'One', role: 'TECHNICIEN' },
-        { id: 3, prenom: 'KIA', nom: 'Manager', role: 'TECHNICIEN_SUP' },
-        { id: 4, prenom: 'Aurélien', nom: 'Manager', role: 'MANAGER' },
-        { id: 5, prenom: 'Odile', nom: 'Manager', role: 'MANAGER' }
-      ];
-      localStorage.setItem('utilisateurs', JSON.stringify(this.utilisateurs));
-    }
+    this.utilisateurs = stored ? JSON.parse(stored) : [
+      { id: 1, prenom: 'Ferid', nom: 'Admin', role: 'ADMIN' },
+      { id: 2, prenom: 'Tech', nom: 'One', role: 'TECHNICIEN' },
+      { id: 3, prenom: 'KIA', nom: 'Manager', role: 'TECHNICIEN_SUP' },
+      { id: 4, prenom: 'Aurelien', nom: 'Manager', role: 'MANAGER' },
+      { id: 5, prenom: 'Odile', nom: 'Manager', role: 'MANAGER' }
+    ];
   }
 
-  loadAllWeeks() {
-    const stored = localStorage.getItem('semeniersGlobal');
-    if (stored) {
-      this.allWeeks = JSON.parse(stored);
-    } else {
-      this.allWeeks = {};
-    }
+  loadAllNotes() {
+    const stored = localStorage.getItem('planningNotes');
+    this.allNotes = stored ? JSON.parse(stored) : {};
   }
 
-  loadMyWeek() {
-    if (!this.mySelectedWeek || !this.currentUserId) return;
+  // ✅ Génère les 5 jours de la semaine sélectionnée
+  loadWeekFromPlanning() {
+    if (!this.mySelectedWeek) return;
+    this.loadAllNotes(); // Refresh depuis localStorage
+    this.joursDeSemaine = [];
+    const noms = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI'];
+    const lundi = new Date(this.mySelectedWeek.lundi);
 
-    const key = `${this.currentUserId}_${this.mySelectedWeek.dateDebut}`;
-    
-    if (this.allWeeks[key]) {
-      this.myWeek = JSON.parse(JSON.stringify(this.allWeeks[key]));
-    } else {
-      this.myWeek = {};
-      this.joursSemaine.forEach(jour => {
-        this.myWeek[jour] = {
-          journeeComplete: true,
-          localisation: 'BUREAU',
-          matin: 'BUREAU',
-          apresMidi: 'BUREAU',
-          heureSortie: '15:00'
-        };
+    for (let i = 0; i < 5; i++) {
+      const date = new Date(lundi);
+      date.setDate(lundi.getDate() + i);
+      this.joursDeSemaine.push({
+        nom: noms[i],
+        date: date,
+        dateAffichee: date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
       });
     }
   }
 
-  toggleJourneeComplete(jour: string) {
-    if (this.myWeek[jour].journeeComplete) {
-      this.myWeek[jour].localisation = 'BUREAU';
-    }
+  // ✅ Lit la note du Planning pour l'utilisateur connecté
+  getNotePlanningForJour(date: Date): string {
+    if (!date || !this.currentUserId) return '';
+    const key = `${this.currentUserId}_${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    return this.allNotes[key] || '';
   }
 
- validerMaSemaine() {
-  if (!this.currentUserId || !this.mySelectedWeek) return;
-  
-  const key = `${this.currentUserId}_${this.mySelectedWeek.dateDebut}`;
-  this.allWeeks[key] = JSON.parse(JSON.stringify(this.myWeek));
-  localStorage.setItem('semeniersGlobal', JSON.stringify(this.allWeeks));
-  
-  // ⭐ RECHARGER depuis localStorage
-  this.loadAllWeeks();
-  
-  // ⭐ Dire à Angular que ça a changé
-  this.allWeeks = { ...this.allWeeks };
-  
-  alert('✅ Ta semaine est validée!');
-}
-
-  getTextForJour(userId: number, jour: string): string {
-    if (!this.mySelectedWeek) return 'N/A';
-    
-    const key = `${userId}_${this.mySelectedWeek.dateDebut}`;
-    const weekData = this.allWeeks[key];
-
-    if (!weekData || !weekData[jour]) {
-      return 'Non rempli';
-    }
-
-    const jour_data = weekData[jour];
-
-    if (jour_data.journeeComplete) {
-      return jour_data.localisation;
-    } else {
-      if (jour_data.apresMidi === 'SORTIE') {
-        return `${jour_data.matin} / SORTIE ${jour_data.heureSortie}`;
-      } else {
-        return `${jour_data.matin} / ${jour_data.apresMidi}`;
-      }
-    }
+  // ✅ Lit la note du Planning pour n'importe quel utilisateur (vue équipe)
+  getNoteForUser(userId: number, date: Date): string {
+    if (!date) return '';
+    const key = `${userId}_${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    return this.allNotes[key] || '';
   }
 
-  getCouleurForJour(userId: number, jour: string): string {
-    const text = this.getTextForJour(userId, jour);
-
-    if (text.includes('BUREAU')) return '#1976D2';
-    if (text.includes('DISTANCE')) return '#FF9800';
-    if (text.includes('DEPLACEMENT')) return '#9C27B0';
-    if (text.includes('SORTIE')) return '#F44336';
-    if (text.includes('CONGE')) return '#F44336';
-    if (text.includes('Non rempli')) return '#BDBDBD';
-    
-    return '#9E9E9E';
+  // ✅ Couleur selon le contenu de la note
+  getCouleurNote(note: string): string {
+    if (!note) return '#f5f5f5';
+    const n = note.toUpperCase();
+    if (n.includes('BUREAU'))      return '#1976D2';
+    if (n.includes('DISTANCE') || n.includes('TELETRAVAIL')) return '#FF9800';
+    if (n.includes('DEPLACEMENT') || n.includes('CLIENT'))   return '#9C27B0';
+    if (n.includes('CONGE') || n.includes('RTT') || n.includes('ABSENT')) return '#F44336';
+    if (n.includes('FORMATION'))   return '#00897B';
+    if (n.includes('SORTIE'))      return '#E64A19';
+    return '#1565C0'; // couleur par défaut pour toute autre note
   }
 
   getCurrentUserName(): string {
@@ -281,26 +208,27 @@ export class Semenier implements OnInit {
     return user ? user.role : '';
   }
 
+  // ✅ Génère les 6 prochaines semaines
   obtenirSemaines() {
     const semaines = [];
     const aujourd = new Date();
-    
-    for (let i = 0; i < 6; i++) {
-      const lundi = new Date(aujourd);
-      lundi.setDate(aujourd.getDate() - aujourd.getDay() + 1 + (i * 7));
-      
-      const dimanche = new Date(lundi);
-      dimanche.setDate(lundi.getDate() + 6);
-      
-      const numSemaine = Math.ceil((lundi.getDate()) / 7);
-      
+    const lundi = new Date(aujourd);
+    // Aller au lundi de la semaine courante
+    const day = lundi.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    lundi.setDate(lundi.getDate() + diff);
+
+    for (let i = -1; i < 8; i++) {
+      const debutSemaine = new Date(lundi);
+      debutSemaine.setDate(lundi.getDate() + i * 7);
+      const finSemaine = new Date(debutSemaine);
+      finSemaine.setDate(debutSemaine.getDate() + 6);
+
       semaines.push({
-        dateDebut: lundi.toLocaleDateString('fr-FR'),
-        dateFin: dimanche.toLocaleDateString('fr-FR'),
-        semaine: `Semaine ${numSemaine} (${lundi.toLocaleDateString('fr-FR')} - ${dimanche.toLocaleDateString('fr-FR')})`
+        lundi: new Date(debutSemaine),
+        label: `Semaine du ${debutSemaine.toLocaleDateString('fr-FR')} au ${finSemaine.toLocaleDateString('fr-FR')}`
       });
     }
-    
     return semaines;
   }
 }
