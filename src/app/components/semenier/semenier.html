@@ -1,145 +1,117 @@
-<div class="semenier-container">
-  <div class="semenier-header">
-    <h3>📅 Semenier</h3>
-    <button mat-raised-button color="primary" (click)="showForm = !showForm">
-      <mat-icon>add</mat-icon> Nouveau
-    </button>
+<div class="semenier-wrapper" *ngIf="currentUserId">
+
+  <!-- HEADER -->
+  <div class="sem-header">
+    <div class="sem-header-left">
+      <div class="sem-icon">📆</div>
+      <div>
+        <h2>Semenier — {{ getCurrentUserName() }}</h2>
+        <p>Vue hebdomadaire automatique du Planning</p>
+      </div>
+    </div>
+    <div class="sem-badge">✅ Synchronisé avec le Planning</div>
   </div>
 
-  @if (showForm) {
-    <div class="form-card">
-      <h4>Créer un Semenier</h4>
-      <div class="form-grid">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Utilisateur</mat-label>
-          <mat-select [(ngModel)]="selectedUser">
+  <!-- SÉLECTION SEMAINE -->
+  <div class="week-selector-card">
+    <div class="week-selector-top">
+      <span class="week-label">✏️ Sélectionne ta semaine</span>
+    </div>
+    <select [(ngModel)]="mySelectedWeek" (change)="loadWeekFromPlanning()" class="week-select">
+      <option *ngFor="let semaine of obtenirSemaines()" [ngValue]="semaine">
+        {{ semaine.label }}
+      </option>
+    </select>
+  </div>
+
+  <!-- MA SEMAINE -->
+  @if (mySelectedWeek) {
+    <div class="my-week-card">
+      <h3 class="my-week-title">
+        <span>🗓️</span> Ma semaine : <span class="week-range">{{ mySelectedWeek.label }}</span>
+      </h3>
+
+      <div class="days-grid">
+        @for (jour of joursDeSemaine; track jour.nom) {
+          <div class="day-card" [class.has-note]="getNotePlanningForJour(jour.date)">
+            <!-- Entête du jour -->
+            <div class="day-header" [style.background]="getDayHeaderColor(jour.date)">
+              <strong>{{ jour.nom }}</strong>
+              <span>{{ jour.dateAffichee }}</span>
+            </div>
+
+            <!-- Contenu -->
+            <div class="day-body">
+              @if (getNotePlanningForJour(jour.date)) {
+                <div class="note-badge" [style.background]="getCouleurNote(getNotePlanningForJour(jour.date))">
+                  {{ getNoteEmoji(getNotePlanningForJour(jour.date)) }}
+                  {{ getNotePlanningForJour(jour.date) }}
+                </div>
+              } @else {
+                <div class="no-note">
+                  <span>📝</span>
+                  <small>Non rempli</small>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- INFO TIP -->
+      <div class="tip-box">
+        💡 Modifiez vos notes dans la section <strong>Planning</strong> — elles apparaissent ici automatiquement.
+      </div>
+    </div>
+
+    <!-- TOUTE L'ÉQUIPE -->
+    <div class="team-card">
+      <h3 class="team-title">
+        <span>👥</span> Toute l'Équipe — {{ mySelectedWeek.label }}
+      </h3>
+
+      <div class="team-table-wrapper">
+        <table class="team-table">
+          <thead>
+            <tr>
+              <th class="th-person">Personne</th>
+              @for (jour of joursDeSemaine; track jour.nom) {
+                <th>
+                  <div>{{ jour.nom }}</div>
+                  <small>{{ jour.dateAffichee }}</small>
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
             @for (user of utilisateurs; track user.id) {
-              <mat-option [value]="user">
-                {{ user.prenom }} {{ user.nom }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Semaine</mat-label>
-          <mat-select [(ngModel)]="selectedWeek">
-            @for (semaine of obtenirSemaines(); track semaine.semaine) {
-              <mat-option [value]="semaine">
-                {{ semaine.semaine }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="creerSemenier()">Créer</button>
-        <button mat-stroked-button (click)="showForm = false">Annuler</button>
-      </div>
-    </div>
-  }
-
-  <div class="semeniers-list">
-    @if (semeniers.length === 0) {
-      <p class="empty">Aucun semenier 📅</p>
-    } @else {
-      @for (semenier of semeniers; track semenier.id) {
-        <div class="semenier-card">
-          <div class="semenier-card-header">
-            <div>
-              <h4>{{ semenier.utilisateurNom }}</h4>
-              <p>{{ semenier.semaine }}</p>
-            </div>
-            <div class="semenier-actions">
-              <button mat-icon-button (click)="confirmerSemenier(semenier)">
-                <mat-icon>check_circle</mat-icon>
-              </button>
-              <button mat-icon-button (click)="supprimerSemenier(semenier.id)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
-
-          <div class="jours-container">
-            @for (jour of semenier.jours; track jour.id) {
-              <div class="jour-card">
-                <div class="jour-header">
-                  <div>
-                    <h5>{{ jour.jour }}</h5>
-                    <p>{{ jour.dateJour }}</p>
-                  </div>
-                  <div>
-                    <span>⏱️ {{ compterHeures(jour) }}h</span>
-                  </div>
-                </div>
-
-                <div class="creneaux-list">
-                  @for (creneau of jour.creneaux; let idx = $index; track creneau.id) {
-                    <div class="creneau-item" [style.backgroundColor]="getCouleurCreneau(creneau.localisation)">
-                      <div>
-                        <strong>{{ creneau.heureDebut }}-{{ creneau.heureFin }}</strong>
-                        <br />
-                        <span>{{ creneau.localisation }}</span>
-                        @if (creneau.notes) {
-                          <br />
-                          <small>{{ creneau.notes }}</small>
-                        }
+              <tr>
+                <td class="td-person">
+                  <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+                  <span>{{ user.prenom }} {{ user.nom }}</span>
+                </td>
+                @for (jour of joursDeSemaine; track jour.nom) {
+                  <td class="td-cell">
+                    @if (getNoteForUser(user.id, jour.date)) {
+                      <div class="team-note-pill" [style.background]="getCouleurNote(getNoteForUser(user.id, jour.date))">
+                        {{ getNoteEmoji(getNoteForUser(user.id, jour.date)) }}
+                        {{ getNoteForUser(user.id, jour.date) }}
                       </div>
-                      <button mat-icon-button size="small" (click)="supprimerCreneau(semenier, jour, idx)">
-                        <mat-icon>close</mat-icon>
-                      </button>
-                    </div>
-                  }
-                </div>
-
-                <button mat-stroked-button (click)="openAjouterCreneau(semenier, jour)">
-                  Ajouter créneau
-                </button>
-              </div>
+                    } @else {
+                      <span class="empty-dot">·</span>
+                    }
+                  </td>
+                }
+              </tr>
             }
-          </div>
-        </div>
-      }
-    }
-  </div>
-
-  @if (showFormCreneau && currentDay) {
-    <div class="modal-overlay" (click)="showFormCreneau = false">
-      <div class="modal-card" (click)="$event.stopPropagation()">
-        <h4>Ajouter créneau - {{ currentDay.jour }}</h4>
-        
-        <div class="form-group">
-          <label>Heure début</label>
-          <input type="time" [(ngModel)]="newCreneau.heureDebut">
-        </div>
-
-        <div class="form-group">
-          <label>Heure fin</label>
-          <input type="time" [(ngModel)]="newCreneau.heureFin">
-        </div>
-
-        <div class="form-group">
-          <label>Localisation</label>
-          <select [(ngModel)]="newCreneau.localisation">
-            @for (loc of localisations; track loc) {
-              <option [value]="loc">{{ loc }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Notes</label>
-          <input type="text" [(ngModel)]="newCreneau.notes" placeholder="Ex: Réunion...">
-        </div>
-
-        <div class="modal-actions">
-          <button mat-raised-button color="primary" (click)="ajouterCreneau()">
-            Ajouter
-          </button>
-          <button mat-stroked-button (click)="showFormCreneau = false">Annuler</button>
-        </div>
+          </tbody>
+        </table>
       </div>
     </div>
   }
+
+</div>
+
+<div *ngIf="!currentUserId" style="padding: 40px; text-align: center; color: #999;">
+  <p>Veuillez vous connecter</p>
 </div>

@@ -120,11 +120,16 @@ export class DashboardAdmin implements OnInit {
       });
   }
 
-  loadReclamations() {
-    const stored = localStorage.getItem('reclamations');
-    const toutesReclamations = stored ? JSON.parse(stored) : [];
-    this.reclamations = toutesReclamations;
-  }
+loadReclamations() {
+  this.http.get<any[]>('http://localhost:8080/api/reclamations-sse')
+    .subscribe({
+      next: (data) => this.reclamations = data,
+      error: () => {
+        const stored = localStorage.getItem('reclamations');
+        this.reclamations = stored ? JSON.parse(stored) : [];
+      }
+    });
+}
 
   loadDocuments() {
     this.documents = [

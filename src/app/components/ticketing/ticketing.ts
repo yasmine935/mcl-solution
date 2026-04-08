@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 export interface Ticket {
   id: string;
@@ -30,6 +31,8 @@ export interface Ticket {
   fichiers: string[];
 }
 
+const API = 'http://localhost:8080/api/tickets';
+
 @Component({
   selector: 'app-ticketing',
   standalone: true,
@@ -57,19 +60,52 @@ export class TicketingComponent implements OnInit {
     { id: '5', nom: 'ODILE', prenom: 'Manager' },
   ];
 
+  constructor(private http: HttpClient) {}
+
   ngOnInit() {
-    const userId = localStorage.getItem('currentUserId') || '4';
-    this.currentUser = this.users.find(u => u.id === userId) || this.users[3];
+    this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadTickets();
   }
 
+  // ✅ LOAD depuis le backend
   loadTickets() {
-    const stored = localStorage.getItem('ticketsGlobal');
-    this.tickets = stored ? JSON.parse(stored) : [];
+    this.http.get<any[]>(API).subscribe({
+      next: (data) => {
+        this.tickets = data.map(t => this.mapFromBackend(t));
+      },
+      error: () => console.error('Erreur chargement tickets')
+    });
   }
 
-  saveTickets() {
-    localStorage.setItem('ticketsGlobal', JSON.stringify(this.tickets));
+  // Convertit le format backend → frontend
+  mapFromBackend(t: any): Ticket {
+    return {
+      id: t.id?.toString(),
+      numero: t.numero,
+      site: t.site,
+      nom: t.nom,
+      prenom: t.prenom,
+      telephone: t.telephone,
+      email: t.email,
+      lieuSite: t.lieuSite,
+      nomSalle: t.nomSalle,
+      etage: t.etage,
+      informationsAdditionnelles: t.informationsAdditionnelles,
+      typeMateriel: t.typeMateriel,
+      marque: t.marque,
+      reference: t.reference,
+      sousGarantie: t.sousGarantie,
+      criticite: t.criticite,
+      descriptionPanne: t.descriptionPanne,
+      assigneId: t.assigne?.id?.toString() || null,
+      priorite: t.priorite,
+      echeance: t.echeance,
+      statut: t.statut === 'EN_ATTENTE' ? 'En attente' : t.statut === 'EN_COURS' ? 'En cours' : 'Validée',
+      dateCreation: t.dateCreation,
+      dateValidation: t.dateValidation,
+      valideePar: t.valideePar,
+      fichiers: []
+    };
   }
 
   get ticketsEnAttente() {
@@ -95,46 +131,83 @@ export class TicketingComponent implements OnInit {
     this.showDetail = null;
   }
 
+  // ✅ POST vers le backend
   submitTicket() {
     if (!this.form.nom || !this.form.site || !this.form.typeMateriel || !this.form.descriptionPanne) {
       alert('Veuillez remplir tous les champs obligatoires (*)');
       return;
     }
-    const newTicket: Ticket = {
-      ...this.form as Ticket,
-      id: Date.now().toString(),
-      numero: 'TKT-' + String(this.tickets.length + 1).padStart(4, '0'),
-      dateCreation: new Date().toISOString(),
+
+    const body = {
+      site: this.form.site,
+      nom: this.form.nom,
+      prenom: this.form.prenom,
+      telephone: this.form.telephone,
+      email: this.form.email,
+      lieuSite: this.form.lieuSite,
+      nomSalle: this.form.nomSalle,
+      etage: this.form.etage,
+      informationsAdditionnelles: this.form.informationsAdditionnelles,
+      typeMateriel: this.form.typeMateriel,
+      marque: this.form.marque,
+      reference: this.form.reference,
+      sousGarantie: this.form.sousGarantie,
+      criticite: this.form.criticite,
+      descriptionPanne: this.form.descriptionPanne,
+      priorite: this.form.priorite,
+      echeance: this.form.echeance,
+      statut: 'EN_ATTENTE'
     };
-    this.tickets.unshift(newTicket);
-    this.saveTickets();
-    this.showForm = false;
-    this.activeTab = 'attente';
-    alert(`✅ Ticket ${newTicket.numero} créé avec succès !`);
+
+    this.http.post<any>(API, body).subscribe({
+      next: (ticket) => {
+        this.tickets.unshift(this.mapFromBackend(ticket));
+        this.showForm = false;
+        this.activeTab = 'attente';
+        alert(`✅ Ticket ${ticket.numero} créé !`);
+      },
+      error: () => alert('❌ Erreur lors de la création du ticket')
+    });
   }
 
+  // ✅ PUT statut → EN_COURS
+  mettreEnCours(ticket: Ticket, event: Event) {
+    event.stopPropagation();
+    this.http.put(`${API}/${ticket.id}/statut?statut=EN_COURS`, {}).subscribe({
+      next: () => {
+        ticket.statut = 'En cours';
+      },
+      error: () => alert('❌ Erreur')
+    });
+  }
+
+  // ✅ PUT statut → VALIDEE
   validerTicket(ticket: Ticket, event: Event) {
     event.stopPropagation();
-    if (confirm(`Valider le ticket ${ticket.numero} ? Le problème a été résolu.`)) {
-      ticket.statut = 'Validée';
-      ticket.dateValidation = new Date().toISOString();
-      ticket.valideePar = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-      this.saveTickets();
+    if (confirm(`Valider le ticket ${ticket.numero} ?`)) {
+      const valideePar = `${this.currentUser.prenom} ${this.currentUser.nom}`;
+      this.http.put(`${API}/${ticket.id}/statut?statut=VALIDEE&valideePar=${valideePar}`, {}).subscribe({
+        next: () => {
+          ticket.statut = 'Validée';
+          ticket.dateValidation = new Date().toISOString();
+          ticket.valideePar = valideePar;
+        },
+        error: () => alert('❌ Erreur')
+      });
     }
   }
 
-  mettreEnCours(ticket: Ticket, event: Event) {
-    event.stopPropagation();
-    ticket.statut = 'En cours';
-    this.saveTickets();
-  }
-
+  // ✅ DELETE
   deleteTicket(ticket: Ticket, event: Event) {
     event.stopPropagation();
     if (confirm(`Supprimer le ticket ${ticket.numero} ?`)) {
-      this.tickets = this.tickets.filter(t => t.id !== ticket.id);
-      this.saveTickets();
-      if (this.showDetail?.id === ticket.id) this.showDetail = null;
+      this.http.delete(`${API}/${ticket.id}`).subscribe({
+        next: () => {
+          this.tickets = this.tickets.filter(t => t.id !== ticket.id);
+          if (this.showDetail?.id === ticket.id) this.showDetail = null;
+        },
+        error: () => alert('❌ Erreur suppression')
+      });
     }
   }
 

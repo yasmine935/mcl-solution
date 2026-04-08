@@ -1,250 +1,316 @@
-.semenier-container {
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
+/* ============================================================
+   SEMENIER — MCL Solutions — Design Premium
+   ============================================================ */
+
+.semenier-wrapper {
+  padding: 0;
+  font-family: 'Exo 2', 'Segoe UI', sans-serif;
 }
 
-.semenier-header {
+/* ── HEADER ── */
+.sem-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #e0e0e0;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 60%, #1976d2 100%);
+  padding: 22px 28px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(13, 71, 161, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.semenier-header h3 {
-  color: #1565C0;
+.sem-header::before {
+  content: '';
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 180px; height: 180px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+
+.sem-header-left { display: flex; align-items: center; gap: 16px; }
+
+.sem-icon {
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.sem-header-left h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.sem-header-left p {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.sem-badge {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.78rem;
   font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
 }
 
-/* Form */
-.form-card {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+/* ── WEEK SELECTOR ── */
+.week-selector-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1.5px solid #e3f2fd;
 }
 
-.form-card h4 {
-  color: #1565C0;
-  margin: 0 0 15px 0;
-  font-size: 16px;
+.week-selector-top {
+  margin-bottom: 10px;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
+.week-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1565c0;
 }
 
-.full-width {
+.week-select {
   width: 100%;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-}
-
-/* List */
-.semeniers-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.empty {
-  text-align: center;
-  color: #999;
-  padding: 40px;
-}
-
-/* Semenier Card */
-.semenier-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.semenier-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f5f5f5;
-  padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.semenier-card-header h4 {
-  color: #1565C0;
-  margin: 0 0 5px 0;
-  font-size: 16px;
-}
-
-.semenier-card-header p {
-  margin: 0;
-  color: #666;
-  font-size: 13px;
-}
-
-.semenier-actions {
-  display: flex;
-  gap: 5px;
-}
-
-/* Jours */
-.jours-container {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 15px;
-}
-
-.jour-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background: #fafafa;
-  overflow: hidden;
-}
-
-.jour-header {
-  background: #1565C0;
-  color: white;
-  padding: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.jour-header h5 {
-  margin: 0;
-  font-size: 14px;
-}
-
-.jour-header p {
-  margin: 2px 0 0 0;
-  font-size: 11px;
-  opacity: 0.9;
-}
-
-/* Creneaux */
-.creneaux-list {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 80px;
-}
-
-.creneau-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 10px;
-  border-radius: 4px;
-  color: white;
-  font-size: 12px;
-}
-
-.creneau-item strong {
-  font-size: 12px;
-}
-
-.creneau-item small {
-  font-size: 10px;
-  opacity: 0.9;
-}
-
-/* Forms */
-.form-group {
-  margin-bottom: 12px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  color: #333;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 13px;
-  font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group select:focus {
+  padding: 12px 16px;
+  border: 1.5px solid #bbdefb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #0d1b2a;
+  background: #f8faff;
   outline: none;
-  border-color: #1565C0;
-  box-shadow: 0 0 4px rgba(21, 101, 192, 0.3);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s;
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+.week-select:focus { border-color: #1565c0; }
+
+/* ── MA SEMAINE ── */
+.my-week-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  border: 1.5px solid #e3f2fd;
+}
+
+.my-week-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1565c0;
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.week-range {
+  font-weight: 500;
+  color: #546e7a;
+  font-size: 0.88rem;
+}
+
+/* DAYS GRID */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.day-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid #e0e0e0;
+  background: #fafafa;
+  transition: all 0.2s;
+}
+
+.day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.day-card.has-note {
+  border-color: #90caf9;
+  background: #fff;
+}
+
+.day-header {
+  padding: 10px 12px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-header strong {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.day-header span {
+  font-size: 0.72rem;
+  opacity: 0.8;
+}
+
+.day-body {
+  padding: 12px;
+  min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
 }
 
-.modal-card {
-  background: white;
+.note-badge {
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 8px 12px;
   border-radius: 8px;
-  padding: 25px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.4;
 }
 
-.modal-card h4 {
-  color: #1565C0;
-  margin: 0 0 20px 0;
-  font-size: 16px;
-}
-
-.modal-actions {
+.no-note {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #b0bec5;
+}
+
+.no-note span { font-size: 1.2rem; }
+.no-note small { font-size: 0.7rem; }
+
+/* TIP BOX */
+.tip-box {
+  background: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #2e7d32;
+}
+
+/* ── TEAM TABLE ── */
+.team-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  border: 1.5px solid #e3f2fd;
+}
+
+.team-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1565c0;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.team-table-wrapper { overflow-x: auto; }
+
+.team-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.team-table thead th {
+  padding: 12px 10px;
+  text-align: center;
+  background: #1565c0;
+  color: #fff;
+  font-weight: 700;
+  border: 1px solid #1976d2;
+  min-width: 100px;
+}
+
+.team-table thead th.th-person {
+  text-align: left;
+  min-width: 160px;
+  padding-left: 16px;
+}
+
+.team-table thead th div {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.team-table thead th small {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+.team-table tbody tr { border: 1px solid #f0f4f8; }
+.team-table tbody tr:hover { background: #f8faff; }
+
+.td-person {
+  padding: 12px 16px;
+  font-weight: 700;
+  color: #2d3748;
+  border: 1px solid #f0f4f8;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
   gap: 10px;
-  margin-top: 20px;
 }
 
-.modal-actions button {
-  flex: 1;
+.user-avatar {
+  width: 32px; height: 32px;
+  background: #e3f2fd;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1565c0;
+  flex-shrink: 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .jours-container {
-    grid-template-columns: 1fr;
-  }
-
-  .semenier-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .semenier-actions {
-    margin-top: 10px;
-  }
+.td-cell {
+  padding: 8px 6px;
+  text-align: center;
+  border: 1px solid #f0f4f8;
+  min-width: 100px;
 }
+
+.team-note-pill {
+  display: inline-block;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-dot { color: #ddd; font-size: 1.2rem; }

@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
+const API = 'http://localhost:8080/api/taches';
+
 @Component({
   selector: 'app-taches',
   standalone: true,
@@ -27,6 +29,7 @@ export class Taches implements OnInit {
   showDetailModal = false;
   selectedTache: any = null;
   noteTemp = '';
+  currentUser: any = {};
 
   statuts = ['En Qualification', 'En cours', 'Fait', 'Perdu', 'En Attente'];
   priorites = ['Faible', 'Élevé', 'Moyenne'];
@@ -50,46 +53,77 @@ export class Taches implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.loadTaches();
+    this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadEmployes();
+    this.loadTaches();
   }
 
   loadEmployes() {
-    const stored = localStorage.getItem('employes');
-    this.employes = stored ? JSON.parse(stored) : [];
+    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+      next: (data) => this.employes = data,
+      error: () => {
+        const stored = localStorage.getItem('employes');
+        this.employes = stored ? JSON.parse(stored) : [];
+      }
+    });
   }
 
+  // ✅ GET depuis backend
   loadTaches() {
-    const stored = localStorage.getItem('taches');
-    this.taches = stored ? JSON.parse(stored) : [
-      { id: 1, projet: 'Projet 1', statut: 'En cours', date: '1 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '11 oct', valeur: 'Platinum', chiffreAffaire: '5000', numCommande: 'CMD-001' },
-      { id: 2, projet: 'Projet 2', statut: 'Fait', date: '2 oct', priorite: 'Élevé', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Gold', chiffreAffaire: '3500', numCommande: 'CMD-002' },
-      { id: 3, projet: 'Projet 3', statut: 'Perdu', date: '3 oct', priorite: 'Moyenne', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Bronze', chiffreAffaire: '2000', numCommande: 'CMD-003' },
-      { id: 4, projet: 'Project4', statut: 'En Attente', date: '16 oct', priorite: 'Faible', fichiers: [] as any[], assignes: [], echeance: '-', valeur: 'Silver', chiffreAffaire: '1500', numCommande: 'CMD-004' }
-    ];
+    this.http.get<any[]>(API).subscribe({
+      next: (data) => this.taches = data,
+      error: () => {
+        const stored = localStorage.getItem('taches');
+        this.taches = stored ? JSON.parse(stored) : [];
+      }
+    });
   }
 
+  // ✅ POST vers backend
   ajouterTache() {
     if (!this.nouvelleTache.projet) {
       alert('Veuillez remplir le nom du projet');
       return;
     }
 
-    const idIncrement = Math.max(...this.taches.map((t: any) => t.id || 0), 0) + 1;
+  const body = {
+  titre: this.nouvelleTache.projet,
+  description: this.nouvelleTache.numCommande,
+  priorite: this.nouvelleTache.priorite,
+  statut: 'A_FAIRE',
+  dateEcheance: this.nouvelleTache.echeance && this.nouvelleTache.echeance.match(/^\d{4}-\d{2}-\d{2}$/) 
+    ? this.nouvelleTache.echeance 
+    : null,
+  utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
+};
 
-    const tache = {
-      id: idIncrement,
-      ...this.nouvelleTache,
-      fichiers: (this.nouvelleTache.fichiers || []) as any[],
-      assignes: (this.nouvelleTache.assignes || []) as any[],
-      dateCreation: new Date().toISOString()
+    this.http.post<any>(API, body).subscribe({
+      next: (tache) => {
+        this.taches.push(this.mapFromBackend(tache));
+        this.resetFormAdd();
+        this.showFormAdd = false;
+      },
+      error: () => alert('❌ Erreur création tâche')
+    });
+  }
+
+  mapFromBackend(t: any): any {
+    return {
+      id: t.id,
+      projet: t.titre,
+      statut: t.statut === 'A_FAIRE' ? 'En Qualification' :
+              t.statut === 'EN_COURS' ? 'En cours' :
+              t.statut === 'TERMINEE' ? 'Fait' : t.statut,
+      date: t.dateCreation ? new Date(t.dateCreation).toLocaleDateString('fr-FR') : '',
+      priorite: t.priorite,
+      echeance: t.dateEcheance || '-',
+      valeur: 'Bronze',
+      chiffreAffaire: '',
+      numCommande: t.description || '',
+      fichiers: [],
+      assignes: [],
+      notes: []
     };
-
-    this.taches.push(tache);
-    localStorage.setItem('taches', JSON.stringify(this.taches));
-
-    this.resetFormAdd();
-    this.showFormAdd = false;
   }
 
   ouvrirEdition(tache: any) {
@@ -98,25 +132,38 @@ export class Taches implements OnInit {
     this.showFormEdit = true;
   }
 
+  // ✅ PUT vers backend
   modifierTache() {
     if (!this.tacheEnEdition.projet) {
       alert('Veuillez remplir le nom du projet');
       return;
     }
 
-    const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
-    if (index !== -1) {
-      this.taches[index] = { ...this.tacheEnEdition };
-      localStorage.setItem('taches', JSON.stringify(this.taches));
-      this.resetFormEdit();
-      this.showFormEdit = false;
-    }
+    const body = {
+      titre: this.tacheEnEdition.projet,
+      statut: this.tacheEnEdition.statut === 'En cours' ? 'EN_COURS' :
+              this.tacheEnEdition.statut === 'Fait' ? 'TERMINEE' : 'A_FAIRE',
+      priorite: this.tacheEnEdition.priorite
+    };
+
+    this.http.put<any>(`${API}/${this.tacheEnEdition.id}`, body).subscribe({
+      next: () => {
+        const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
+        if (index !== -1) this.taches[index] = { ...this.tacheEnEdition };
+        this.resetFormEdit();
+        this.showFormEdit = false;
+      },
+      error: () => alert('❌ Erreur modification')
+    });
   }
 
+  // ✅ DELETE vers backend
   supprimerTache(id: number) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
-      this.taches = this.taches.filter((t: any) => t.id !== id);
-      localStorage.setItem('taches', JSON.stringify(this.taches));
+      this.http.delete(`${API}/${id}`).subscribe({
+        next: () => this.taches = this.taches.filter((t: any) => t.id !== id),
+        error: () => alert('❌ Erreur suppression')
+      });
     }
   }
 
@@ -132,124 +179,81 @@ export class Taches implements OnInit {
 
   resetFormAdd() {
     this.nouvelleTache = {
-      projet: '',
-      statut: 'En Qualification',
-      date: '',
-      priorite: 'Moyenne',
-      fichiers: [] as any[],
-      assignes: [] as any[],
-      echeance: '',
-      valeur: 'Bronze',
-      chiffreAffaire: '',
-      numCommande: ''
+      projet: '', statut: 'En Qualification', date: '',
+      priorite: 'Moyenne', fichiers: [], assignes: [],
+      echeance: '', valeur: 'Bronze', chiffreAffaire: '', numCommande: ''
     };
   }
 
-  resetFormEdit() {
-    this.tacheEnEdition = {};
-  }
-
-  onFileSelectAdd(event: any) {
-    const files = event.target.files;
-    if (files) {
-      if (!this.nouvelleTache.fichiers) {
-        this.nouvelleTache.fichiers = [] as any[];
-      }
-      for (let i = 0; i < files.length; i++) {
-        (this.nouvelleTache.fichiers as any[]).push({
-          nom: files[i].name,
-          taille: (files[i].size / 1024).toFixed(2),
-          date: new Date().toLocaleString('fr-FR')
-        });
-      }
-    }
-  }
-
-  supprimerFichier(index: number) {
-    if (this.nouvelleTache.fichiers) {
-      this.nouvelleTache.fichiers.splice(index, 1);
-    }
-  }
-
-  supprimerFichierEdit(index: number) {
-    if (this.tacheEnEdition.fichiers) {
-      this.tacheEnEdition.fichiers.splice(index, 1);
-    }
-  }
-
-  onFileSelectEdit(event: any) {
-    const files = event.target.files;
-    if (files) {
-      if (!this.tacheEnEdition.fichiers) {
-        this.tacheEnEdition.fichiers = [] as any[];
-      }
-      for (let i = 0; i < files.length; i++) {
-        (this.tacheEnEdition.fichiers as any[]).push({
-          nom: files[i].name,
-          taille: (files[i].size / 1024).toFixed(2),
-          date: new Date().toLocaleString('fr-FR')
-        });
-      }
-    }
-  }
+  resetFormEdit() { this.tacheEnEdition = {}; }
 
   ouvrirNoteModal(tache: any) {
     this.selectedTache = tache;
-    this.noteTemp = tache.noteContent || '';
+    this.noteTemp = '';
     this.showNoteModal = true;
   }
 
   sauvegarderNote() {
     if (this.selectedTache && this.noteTemp.trim()) {
-      const currentUser = localStorage.getItem('currentUser') || 'Utilisateur';
-      
-      if (!this.selectedTache.notes) {
-        this.selectedTache.notes = [];
-      }
-
+      if (!this.selectedTache.notes) this.selectedTache.notes = [];
       this.selectedTache.notes.push({
-        auteur: currentUser,
+        auteur: `${this.currentUser.prenom} ${this.currentUser.nom}`,
         contenu: this.noteTemp,
         date: new Date().toLocaleString('fr-FR')
       });
-
-      localStorage.setItem('taches', JSON.stringify(this.taches));
       this.showNoteModal = false;
       this.noteTemp = '';
     }
   }
 
-  fermerNoteModal() {
-    this.showNoteModal = false;
-    this.noteTemp = '';
+  fermerNoteModal() { this.showNoteModal = false; this.noteTemp = ''; }
+
+  onFileSelectAdd(event: any) {
+    const files = event.target.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        this.nouvelleTache.fichiers.push({
+          nom: files[i].name,
+          taille: (files[i].size / 1024).toFixed(2),
+          date: new Date().toLocaleString('fr-FR')
+        });
+      }
+    }
+  }
+
+  supprimerFichier(index: number) { this.nouvelleTache.fichiers.splice(index, 1); }
+  supprimerFichierEdit(index: number) { this.tacheEnEdition.fichiers?.splice(index, 1); }
+
+  onFileSelectEdit(event: any) {
+    const files = event.target.files;
+    if (files) {
+      if (!this.tacheEnEdition.fichiers) this.tacheEnEdition.fichiers = [];
+      for (let i = 0; i < files.length; i++) {
+        this.tacheEnEdition.fichiers.push({
+          nom: files[i].name,
+          taille: (files[i].size / 1024).toFixed(2),
+          date: new Date().toLocaleString('fr-FR')
+        });
+      }
+    }
   }
 
   getStatutColor(statut: string): string {
     const colors: any = {
-      'En Qualification': '#CCCCCC',
-      'En cours': '#FFA500',
-      'Fait': '#00CC00',
-      'Perdu': '#FF0000',
-      'En Attente': '#0066FF'
+      'En Qualification': '#CCCCCC', 'En cours': '#FFA500',
+      'Fait': '#00CC00', 'Perdu': '#FF0000', 'En Attente': '#0066FF'
     };
     return colors[statut] || '#CCCCCC';
   }
 
   getPrioriteColor(priorite: string): string {
-    const colors: any = {
-      'Faible': '#0066FF',
-      'Élevé': '#7700CC',
-      'Moyenne': '#0066FF'
-    };
+    const colors: any = { 'Faible': '#0066FF', 'Élevé': '#7700CC', 'Moyenne': '#0066FF' };
     return colors[priorite] || '#0066FF';
   }
 
   getValeurColor(valeur: string): string {
     const colors: any = {
-      'Bronze': '#CD7F32',
-      'Platinum': '#E5E4E2',
-      'Gold': '#FFD700',
-      'Silver': '#C0C0C0'
+      'Bronze': '#CD7F32', 'Platinum': '#E5E4E2', 'Gold': '#FFD700', 'Silver': '#C0C0C0'
     };
     return colors[valeur] || '#CCCCCC';
   }

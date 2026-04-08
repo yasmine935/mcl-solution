@@ -12,7 +12,7 @@
     <div class="form-container">
       <h3>➕ Nouvelle Fiche d'Intervention</h3>
 
-      <!-- ===== 1. INFORMATION PRINCIPALE ===== -->
+      <!-- 1. INFORMATION PRINCIPALE -->
       <div class="section">
         <h4>⭐ Informations Principales</h4>
         <div class="form-grid">
@@ -34,8 +34,10 @@
           <mat-form-field appearance="outline">
             <mat-label>Technicien Assigné</mat-label>
             <mat-select [(ngModel)]="nouvelleFiche.technicienAssigne">
-              @for (tech of techniciens; track tech) {
-                <mat-option [value]="tech">{{ tech }}</mat-option>
+              @for (tech of techniciens; track tech.id) {
+                <mat-option [value]="tech.prenom + ' ' + tech.nom">
+                  {{ tech.prenom }} {{ tech.nom }}
+                </mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -47,7 +49,7 @@
         </mat-form-field>
       </div>
 
-      <!-- ===== 2. INFO CLIENTS ===== -->
+      <!-- 2. INFO CLIENTS -->
       <div class="section">
         <h4>👥 Informations Clients</h4>
         <div class="form-grid">
@@ -81,7 +83,7 @@
         </mat-form-field>
       </div>
 
-      <!-- ===== 3. MATÉRIEL HORS STANDARD ===== -->
+      <!-- 3. MATÉRIEL HORS STANDARD -->
       <div class="section">
         <h4>🔩 Matériel Hors Standard</h4>
         <div class="materiel-input">
@@ -108,18 +110,11 @@
         }
       </div>
 
-      <!-- ===== 4. DOCUMENTS / FONCTIONNALITÉS ===== -->
+      <!-- 4. DOCUMENTS -->
       <div class="section">
         <h4>📎 Documents / Fonctionnalités</h4>
         <div class="file-upload-section">
-          <input 
-            type="file" 
-            #fileInput 
-            (change)="onFileSelectDocuments($event, nouvelleFiche)" 
-            multiple 
-            class="file-input"
-            accept="*/*"
-          />
+          <input type="file" #fileInput (change)="onFileSelectDocuments($event, nouvelleFiche)" multiple class="file-input" accept="*/*"/>
           <button mat-stroked-button (click)="fileInput.click()" type="button" class="upload-btn">
             <mat-icon>upload_file</mat-icon> Importer des dossiers/fichiers
           </button>
@@ -143,18 +138,13 @@
         }
       </div>
 
-      <!-- ===== 5. DESCRIPTION DES TÂCHES ===== -->
+      <!-- 5. TÂCHES -->
       <div class="section">
         <h4>✅ Description des Tâches</h4>
-        
         <div class="taches-buttons">
           @for (tache of tachesDisponibles; track tache) {
-            <button 
-              mat-stroked-button 
-              (click)="ajouterTache(nouvelleFiche, tache)" 
-              type="button"
-              [disabled]="tacheExiste(nouvelleFiche, tache)"
-              class="tache-btn">
+            <button mat-stroked-button (click)="ajouterTache(nouvelleFiche, tache)" type="button"
+              [disabled]="tacheExiste(nouvelleFiche, tache)" class="tache-btn">
               <mat-icon>add</mat-icon> {{ tache }}
             </button>
           }
@@ -165,14 +155,9 @@
             @for (tache of nouvelleFiche.taches; track $index) {
               <div class="tache-item">
                 <div class="tache-checkbox">
-                  <input 
-                    type="checkbox" 
-                    [(ngModel)]="tache.coche" 
-                    [id]="'tache-add-' + $index"
-                  />
+                  <input type="checkbox" [(ngModel)]="tache.coche" [id]="'tache-add-' + $index"/>
                   <label [for]="'tache-add-' + $index">{{ tache.nom }}</label>
                 </div>
-
                 @if (getOptionsTache(tache.nom).length > 0) {
                   <mat-form-field appearance="outline" class="tache-select">
                     <mat-label>Sélectionner</mat-label>
@@ -184,7 +169,6 @@
                     </mat-select>
                   </mat-form-field>
                 }
-
                 <button mat-icon-button color="warn" (click)="supprimerTache(nouvelleFiche, $index)" type="button">
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -211,7 +195,7 @@
     <div class="form-container form-edit">
       <h3>✏️ Modifier - {{ ficheEnEdition.numProjet }}</h3>
 
-      <!-- ===== 1. INFORMATION PRINCIPALE ===== -->
+      <!-- 1. INFORMATION PRINCIPALE -->
       <div class="section">
         <h4>⭐ Informations Principales</h4>
         <div class="form-grid">
@@ -233,8 +217,10 @@
           <mat-form-field appearance="outline">
             <mat-label>Technicien Assigné</mat-label>
             <mat-select [(ngModel)]="ficheEnEdition.technicienAssigne">
-              @for (tech of techniciens; track tech) {
-                <mat-option [value]="tech">{{ tech }}</mat-option>
+              @for (tech of techniciens; track tech.id) {
+                <mat-option [value]="tech.prenom + ' ' + tech.nom">
+                  {{ tech.prenom }} {{ tech.nom }}
+                </mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -246,7 +232,7 @@
         </mat-form-field>
       </div>
 
-      <!-- ===== 2. INFO CLIENTS ===== -->
+      <!-- 2. INFO CLIENTS -->
       <div class="section">
         <h4>👥 Informations Clients</h4>
         <div class="form-grid">
@@ -280,7 +266,7 @@
         </mat-form-field>
       </div>
 
-      <!-- ===== 3. MATÉRIEL HORS STANDARD ===== -->
+      <!-- 3. MATÉRIEL HORS STANDARD -->
       <div class="section">
         <h4>🔩 Matériel Hors Standard</h4>
         <div class="materiel-input">
@@ -307,18 +293,11 @@
         }
       </div>
 
-      <!-- ===== 4. DOCUMENTS / FONCTIONNALITÉS ===== -->
+      <!-- 4. DOCUMENTS -->
       <div class="section">
         <h4>📎 Documents / Fonctionnalités</h4>
         <div class="file-upload-section">
-          <input 
-            type="file" 
-            #fileInputEdit 
-            (change)="onFileSelectDocuments($event, ficheEnEdition)" 
-            multiple 
-            class="file-input"
-            accept="*/*"
-          />
+          <input type="file" #fileInputEdit (change)="onFileSelectDocuments($event, ficheEnEdition)" multiple class="file-input" accept="*/*"/>
           <button mat-stroked-button (click)="fileInputEdit.click()" type="button" class="upload-btn">
             <mat-icon>upload_file</mat-icon> Importer des dossiers/fichiers
           </button>
@@ -342,18 +321,13 @@
         }
       </div>
 
-      <!-- ===== 5. DESCRIPTION DES TÂCHES ===== -->
+      <!-- 5. TÂCHES -->
       <div class="section">
         <h4>✅ Description des Tâches</h4>
-        
         <div class="taches-buttons">
           @for (tache of tachesDisponibles; track tache) {
-            <button 
-              mat-stroked-button 
-              (click)="ajouterTache(ficheEnEdition, tache)" 
-              type="button"
-              [disabled]="tacheExiste(ficheEnEdition, tache)"
-              class="tache-btn">
+            <button mat-stroked-button (click)="ajouterTache(ficheEnEdition, tache)" type="button"
+              [disabled]="tacheExiste(ficheEnEdition, tache)" class="tache-btn">
               <mat-icon>add</mat-icon> {{ tache }}
             </button>
           }
@@ -364,14 +338,9 @@
             @for (tache of ficheEnEdition.taches; track $index) {
               <div class="tache-item">
                 <div class="tache-checkbox">
-                  <input 
-                    type="checkbox" 
-                    [(ngModel)]="tache.coche" 
-                    [id]="'tache-edit-' + $index"
-                  />
+                  <input type="checkbox" [(ngModel)]="tache.coche" [id]="'tache-edit-' + $index"/>
                   <label [for]="'tache-edit-' + $index">{{ tache.nom }}</label>
                 </div>
-
                 @if (getOptionsTache(tache.nom).length > 0) {
                   <mat-form-field appearance="outline" class="tache-select">
                     <mat-label>Sélectionner</mat-label>
@@ -383,7 +352,6 @@
                     </mat-select>
                   </mat-form-field>
                 }
-
                 <button mat-icon-button color="warn" (click)="supprimerTache(ficheEnEdition, $index)" type="button">
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -398,7 +366,7 @@
         <button mat-raised-button color="primary" (click)="modifierFiche()">
           <mat-icon>save</mat-icon> Enregistrer
         </button>
-        <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
+        <button mat-stroked-button (click)="resetFormEdit()">
           <mat-icon>close</mat-icon> Annuler
         </button>
       </div>
@@ -434,18 +402,10 @@
 
             @if (fiche.codeClient || fiche.numCommande || fiche.adresse || fiche.contact) {
               <div class="fiche-info">
-                <span class="info-item">
-                  <strong>N° Commande:</strong> {{ fiche.numCommande }}
-                </span>
-                <span class="info-item">
-                  <strong>Montant:</strong> {{ fiche.chiffreAffaire }}€
-                </span>
-                <span class="info-item">
-                  <strong>Adresse:</strong> {{ fiche.adresse }}
-                </span>
-                <span class="info-item">
-                  <strong>Contact:</strong> {{ fiche.contact }}
-                </span>
+                <span class="info-item"><strong>N° Commande:</strong> {{ fiche.numCommande }}</span>
+                <span class="info-item"><strong>Montant:</strong> {{ fiche.chiffreAffaire }}€</span>
+                <span class="info-item"><strong>Adresse:</strong> {{ fiche.adresse }}</span>
+                <span class="info-item"><strong>Contact:</strong> {{ fiche.contact }}</span>
               </div>
             }
 

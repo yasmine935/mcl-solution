@@ -1,0 +1,136 @@
+<div class="planning-wrapper" *ngIf="currentUserId">
+
+  <!-- HEADER -->
+  <div class="planning-header">
+    <div class="planning-header-left">
+      <div class="planning-icon">📅</div>
+      <div>
+        <h2>Planning — {{ getCurrentUserName() }}</h2>
+        <p>Calendrier mensuel partagé de l'équipe</p>
+      </div>
+    </div>
+    <div class="nav-mois">
+      <button class="nav-btn" (click)="previousMonth()">←</button>
+      <span class="mois-label">{{ getMoisAnnee() }}</span>
+      <button class="nav-btn" (click)="nextMonth()">→</button>
+    </div>
+  </div>
+
+  <!-- LÉGENDE -->
+  <div class="legende">
+    <span class="leg-item"><span class="leg-dot" style="background:#1565c0"></span>Bureau</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#e65100"></span>Distance</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#6a1b9a"></span>Déplacement</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#c62828"></span>Congé/RTT</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#2e7d32"></span>Formation</span>
+  </div>
+
+  <!-- CALENDRIER -->
+  <div class="calendrier-card">
+
+    <!-- JOURS DE LA SEMAINE -->
+    <div class="cal-grid cal-header-row">
+      <div *ngFor="let j of joursAbbr" class="cal-day-header">{{ j }}</div>
+    </div>
+
+    <!-- JOURS DU MOIS -->
+    <div class="cal-grid">
+      <div *ngFor="let jour of joursAffiche"
+        class="cal-day"
+        [class.other-month]="jour.jour === 0"
+        [class.weekend]="jour.isWeekend && jour.jour !== 0"
+        [class.today]="jour.isToday"
+        [class.has-note]="jour.note && jour.jour !== 0"
+        (click)="ouvrirJour(jour)">
+
+        <span class="day-number">{{ jour.affichage }}</span>
+
+        @if (jour.note && jour.jour !== 0) {
+          <div class="day-note" [style.background]="getNoteColor(jour.note)">
+            {{ jour.note }}
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLEAU ÉQUIPE -->
+  <div class="equipe-card">
+    <h3 class="equipe-title">
+      <span>👥</span> Planning Toute l'Équipe — {{ getMoisAnnee() }}
+    </h3>
+
+    <div class="equipe-table-wrapper">
+      <table class="equipe-table">
+        <thead>
+          <tr>
+            <th class="th-personne">Personne</th>
+            <ng-container *ngFor="let jour of joursAffiche">
+              <th *ngIf="jour.jour !== 0"
+                [class.th-weekend]="jour.isWeekend"
+                [class.th-today]="jour.isToday">
+                {{ jour.affichage }}
+              </th>
+            </ng-container>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of utilisateurs">
+            <td class="td-personne">
+              <div class="user-avatar-sm">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+              {{ user.prenom }} {{ user.nom }}
+            </td>
+            <ng-container *ngFor="let jour of joursAffiche">
+              <td *ngIf="jour.jour !== 0"
+                class="td-note"
+                [class.td-weekend]="jour.isWeekend">
+                @if (getNotesForUser(user.id, jour.jour)) {
+                  <span class="note-pill" [style.background]="getNoteColor(getNotesForUser(user.id, jour.jour))">
+                    {{ getNotesForUser(user.id, jour.jour) }}
+                  </span>
+                } @else {
+                  <span class="td-empty">·</span>
+                }
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL NOTE -->
+  @if (showModal && selectedJour) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-note" (click)="$event.stopPropagation()">
+        <div class="modal-note-header">
+          <div>
+            <h3>📝 {{ selectedJour.affichage }} {{ getMoisAnnee() }}</h3>
+            <p>Ajouter ou modifier votre note</p>
+          </div>
+          <button class="btn-modal-close" (click)="closeModal()">✕</button>
+        </div>
+
+        <div class="note-suggestions">
+          <span *ngFor="let s of ['Bureau', 'Télétravail', 'Déplacement', 'Congé', 'RTT', 'Formation']"
+            class="suggestion-chip" (click)="selectedJour.note = s">
+            {{ s }}
+          </span>
+        </div>
+
+        <textarea class="note-textarea" [(ngModel)]="selectedJour.note"
+          placeholder="Ex: Bureau, Congé, Déplacement client..."></textarea>
+
+        <div class="modal-note-actions">
+          <button class="btn-modal-cancel" (click)="closeModal()">Annuler</button>
+          <button class="btn-modal-save" (click)="sauvegarderNote()">✓ Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
+
+<div *ngIf="!currentUserId" style="padding: 40px; text-align: center; color: #999;">
+  <p>Veuillez vous connecter</p>
+</div>

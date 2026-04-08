@@ -48,9 +48,7 @@
         <mat-icon>engineering</mat-icon> Mise au Travail
       </a>
 
-      <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
-        <mat-icon>shopping_cart</mat-icon> Commandes Achat
-      </a>
+      
       <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
         <mat-icon>folder_open</mat-icon> Documents
       </a>
@@ -271,57 +269,10 @@
         </div>
       }
 
-      <!-- ══ REMONTÉES TERRAIN ══ -->
-      @if (currentPage === 'remonteesTerrain') {
-        <div class="table-card">
-          <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
-          @if (reclamations.length === 0) {
-            <div class="empty">Aucune remontée terrain</div>
-          } @else {
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Technicien</th>
-                  <th>Sujet</th>
-                  <th>Description</th>
-                  <th>Date</th>
-                  <th>Photos</th>
-                  <th>Statut</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (rec of reclamations; track rec.id) {
-                  <tr (click)="ouvrirDetailReclamation(rec)" style="cursor:pointer">
-                    <td><strong>{{ rec.technicienNom }}</strong></td>
-                    <td><strong>{{ rec.sujet }}</strong></td>
-                    <td>{{ rec.description | slice:0:50 }}...</td>
-                    <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
-                    <td>
-                      @if (rec.photos && rec.photos.length > 0) {
-                        <span class="badge en_cours">{{ rec.photos.length }} 📸</span>
-                      } @else {
-                        <span style="color:#ccc">-</span>
-                      }
-                    </td>
-                    <td><span class="badge en_attente">{{ rec.statut }}</span></td>
-                    <td>
-                      <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec); $event.stopPropagation()">
-                        <mat-icon>visibility</mat-icon>
-                      </button>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
-        </div>
-      }
-
-    </div>
-  </div>
-</div>
-
+    <!-- ══ REMONTÉES TERRAIN ══ -->
+@if (currentPage === 'remonteesTerrain') {
+  <app-remontees-terrain></app-remontees-terrain>
+}
 <!-- ══ MODAL FICHE ══ -->
 @if (showDetailModal && selectedFiche) {
   <div class="modal-overlay" (click)="fermerDetailFiche()">

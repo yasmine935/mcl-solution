@@ -1,81 +1,118 @@
-<div class="conges-container">
-  <div class="page-header">
-    <h2>🏖️ Gestion des Congés</h2>
+<div class="conges-wrapper">
+
+  <!-- HEADER -->
+  <div class="conges-header">
+    <div class="conges-header-left">
+      <div class="conges-icon">🏖️</div>
+      <div>
+        <h2>Gestion des Congés</h2>
+        <p>Demandes de congés de toute l'équipe</p>
+      </div>
+    </div>
+    <div class="conges-stats">
+      <div class="stat-pill stat-attente">
+        <span>{{ getCount('EN_ATTENTE') }}</span>
+        <small>En attente</small>
+      </div>
+      <div class="stat-pill stat-approuve">
+        <span>{{ getCount('APPROUVE') }}</span>
+        <small>Approuvés</small>
+      </div>
+      <div class="stat-pill stat-refuse">
+        <span>{{ getCount('REFUSE') }}</span>
+        <small>Refusés</small>
+      </div>
+    </div>
   </div>
 
-  <div class="table-card">
-    @if (conges.length === 0) {
-      <div class="empty">Aucune demande de congé pour l'instant</div>
-    } @else {
-      <table mat-table [dataSource]="conges" class="full-width">
-
-        <ng-container matColumnDef="employe">
-          <th mat-header-cell *matHeaderCellDef>Employé</th>
-          <td mat-cell *matCellDef="let c">
-            {{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="type">
-          <th mat-header-cell *matHeaderCellDef>Type</th>
-          <td mat-cell *matCellDef="let c">{{ c.type }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="dateDebut">
-          <th mat-header-cell *matHeaderCellDef>Date début</th>
-          <td mat-cell *matCellDef="let c">{{ c.dateDebut }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="dateFin">
-          <th mat-header-cell *matHeaderCellDef>Date fin</th>
-          <td mat-cell *matCellDef="let c">{{ c.dateFin }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="motif">
-          <th mat-header-cell *matHeaderCellDef>Motif</th>
-          <td mat-cell *matCellDef="let c">{{ c.motif }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="statut">
-          <th mat-header-cell *matHeaderCellDef>Statut</th>
-          <td mat-cell *matCellDef="let c">
-            <span [class]="'badge ' + c.statut?.toLowerCase()">
-              {{ c.statut }}
-            </span>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let c">
-            @if (c.statut !== 'APPROUVE') {
-              <button mat-icon-button color="primary" 
-                (click)="approuver(c.id)" title="Approuver">
-                <mat-icon>check_circle</mat-icon>
-              </button>
-            }
-            @if (c.statut !== 'EN_ATTENTE') {
-              <button mat-icon-button color="accent" 
-                (click)="enAttente(c.id)" title="En attente">
-                <mat-icon>hourglass_empty</mat-icon>
-              </button>
-            }
-            @if (c.statut !== 'REFUSE') {
-              <button mat-icon-button color="warn" 
-                (click)="refuser(c.id)" title="Refuser">
-                <mat-icon>cancel</mat-icon>
-              </button>
-            }
-            <button mat-icon-button color="warn" 
-              (click)="delete(c.id)" title="Supprimer">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    }
+  <!-- FILTRES -->
+  <div class="filtres-row">
+    <button class="filtre-btn" [class.active]="filtreActif === 'TOUS'" (click)="filtreActif = 'TOUS'">
+      Tous ({{ conges.length }})
+    </button>
+    <button class="filtre-btn filtre-attente" [class.active]="filtreActif === 'EN_ATTENTE'" (click)="filtreActif = 'EN_ATTENTE'">
+      ⏳ En attente ({{ getCount('EN_ATTENTE') }})
+    </button>
+    <button class="filtre-btn filtre-approuve" [class.active]="filtreActif === 'APPROUVE'" (click)="filtreActif = 'APPROUVE'">
+      ✅ Approuvés ({{ getCount('APPROUVE') }})
+    </button>
+    <button class="filtre-btn filtre-refuse" [class.active]="filtreActif === 'REFUSE'" (click)="filtreActif = 'REFUSE'">
+      ❌ Refusés ({{ getCount('REFUSE') }})
+    </button>
   </div>
+
+  <!-- LISTE -->
+  @if (getCongesFiltres().length === 0) {
+    <div class="empty-state">
+      <span>🏖️</span>
+      <p>Aucune demande de congé</p>
+    </div>
+  } @else {
+    <div class="conges-list">
+      @for (c of getCongesFiltres(); track c.id) {
+        <div class="conge-card" [class.card-approuve]="c.statut === 'APPROUVE'" [class.card-refuse]="c.statut === 'REFUSE'" [class.card-attente]="c.statut === 'EN_ATTENTE'">
+
+          <!-- Bande statut -->
+          <div class="card-status-bar" [class.bar-approuve]="c.statut === 'APPROUVE'" [class.bar-refuse]="c.statut === 'REFUSE'" [class.bar-attente]="c.statut === 'EN_ATTENTE'"></div>
+
+          <div class="card-body">
+            <!-- Employé + Badge -->
+            <div class="card-top">
+              <div class="employe-info">
+                <div class="employe-avatar">
+                  {{ c.utilisateur?.prenom?.charAt(0) }}{{ c.utilisateur?.nom?.charAt(0) }}
+                </div>
+                <div>
+                  <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
+                  <span class="type-badge">{{ getTypeIcon(c.type) }} {{ c.type }}</span>
+                </div>
+              </div>
+              <span class="statut-badge" [class.statut-approuve]="c.statut === 'APPROUVE'" [class.statut-refuse]="c.statut === 'REFUSE'" [class.statut-attente]="c.statut === 'EN_ATTENTE'">
+                {{ getStatutIcon(c.statut) }} {{ c.statut }}
+              </span>
+            </div>
+
+            <!-- Dates + Motif -->
+            <div class="card-dates">
+              <div class="date-item">
+                <label>📅 Du</label>
+                <span>{{ c.dateDebut }}</span>
+              </div>
+              <div class="date-arrow">→</div>
+              <div class="date-item">
+                <label>📅 Au</label>
+                <span>{{ c.dateFin }}</span>
+              </div>
+              <div class="date-item" *ngIf="c.motif">
+                <label>💬 Motif</label>
+                <span>{{ c.motif }}</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card-actions">
+              @if (c.statut !== 'APPROUVE') {
+                <button class="action-btn btn-approuver" (click)="approuver(c.id)">
+                  ✅ Approuver
+                </button>
+              }
+              @if (c.statut !== 'EN_ATTENTE') {
+                <button class="action-btn btn-attente" (click)="enAttente(c.id)">
+                  ⏳ En attente
+                </button>
+              }
+              @if (c.statut !== 'REFUSE') {
+                <button class="action-btn btn-refuser" (click)="refuser(c.id)">
+                  ❌ Refuser
+                </button>
+              }
+              <button class="action-btn btn-supprimer" (click)="delete(c.id)">
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

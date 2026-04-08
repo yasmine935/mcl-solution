@@ -15,7 +15,7 @@ import { Documents } from '../documents/documents';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing'; // ✅ AJOUT
-
+import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 @Component({
   selector: 'app-dashboard-odile',
   standalone: true,
@@ -23,8 +23,9 @@ import { TicketingComponent } from '../ticketing/ticketing'; // ✅ AJOUT
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, FichesCompletees, Factures, Documents, Semenier, Planning,
-    TicketingComponent // ✅ AJOUT
+    FicheInterventionManager, FichesCompletees, Factures, Documents, Semenier, Planning, 
+    TicketingComponent , // ✅ AJOUT
+    RemonteesTerrainComponent // ✅ AJOUT
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
@@ -82,11 +83,16 @@ export class DashboardOdile implements OnInit {
       .subscribe(data => this.employes = data, error => this.employes = []);
   }
 
-  loadReclamations() {
-    const stored = localStorage.getItem('reclamations');
-    this.reclamations = stored ? JSON.parse(stored) : [];
-  }
-
+loadReclamations() {
+  this.http.get<any[]>('http://localhost:8080/api/reclamations-sse')
+    .subscribe({
+      next: (data) => this.reclamations = data,
+      error: () => {
+        const stored = localStorage.getItem('reclamations');
+        this.reclamations = stored ? JSON.parse(stored) : [];
+      }
+    });
+}
   loadDocuments() {
     this.documents = [
       { id: 1, nom: 'Archive 2025', date: '2025-12-31', type: 'PDF' },

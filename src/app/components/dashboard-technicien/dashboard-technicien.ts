@@ -54,16 +54,20 @@ export class DashboardTechnicien implements OnInit {
   }
 
   loadInterventions() {
-    const storedFiches = localStorage.getItem('fiches_intervention');
-    const allFiches = storedFiches ? JSON.parse(storedFiches) : [];
-    const userFullName = `${this.user.prenom} ${this.user.nom}`;
-    this.interventions = allFiches.filter((fiche: any) =>
-      fiche.technicienAssigne === userFullName && fiche.statut !== 'COMPLETEE'
-    );
-    this.interventionsCompletees = allFiches.filter((fiche: any) =>
-      fiche.technicienAssigne === userFullName && fiche.statut === 'COMPLETEE'
-    );
-  }
+  this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    next: (data) => {
+      const userFullName = `${this.user.prenom} ${this.user.nom}`;
+      const mesFiches = data.filter((f: any) =>
+        f.technicien &&
+        `${f.technicien.prenom} ${f.technicien.nom}` === userFullName
+      );
+      this.interventions = mesFiches.filter((f: any) => f.statut !== 'COMPLETEE' && f.statut !== 'VALIDEE');
+      this.interventionsCompletees = mesFiches.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE');
+      localStorage.setItem('fiches_intervention', JSON.stringify(data));
+    },
+    error: () => console.error('Erreur chargement interventions')
+  });
+}
 
   loadConges() {
     this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)

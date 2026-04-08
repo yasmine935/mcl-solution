@@ -14,7 +14,7 @@ import { Planning } from '../planning/planning';
 import { Semenier } from '../semenier/semenier';
 import { Documents } from '../documents/documents';
 import { MiseAuTravail } from '../mise-au-travail/mise-au-travail'; // ✅ NOUVEAU
-
+import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 @Component({
   selector: 'app-dashboard-kia',
   standalone: true,
@@ -24,7 +24,7 @@ import { MiseAuTravail } from '../mise-au-travail/mise-au-travail'; // ✅ NOUVE
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees,
     Planning, Semenier, Documents,
-    MiseAuTravail // ✅ NOUVEAU
+    MiseAuTravail ,RemonteesTerrainComponent// ✅ NOUVEAU
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'
@@ -73,9 +73,9 @@ export class DashboardKia implements OnInit {
   loadConges() {
     this.http.get<any[]>('http://localhost:8080/api/conges')
       .subscribe(data => {
-        this.congesTechniciens = data.filter((c: any) =>
-          c.utilisateur?.role === 'TECHNICIEN' && c.manager?.id === this.user.id
-        );
+       this.congesTechniciens = data.filter((c: any) => 
+  c.utilisateur?.role === 'TECHNICIEN'
+);
         this.mesConges = data.filter(c => c.utilisateur?.id === this.user.id);
       }, error => {
         this.congesTechniciens = [];
@@ -88,14 +88,16 @@ export class DashboardKia implements OnInit {
       .subscribe(data => this.employes = data, error => this.employes = []);
   }
 
-  loadReclamations() {
-    const stored = localStorage.getItem('reclamations');
-    const toutesReclamations = stored ? JSON.parse(stored) : [];
-    this.reclamations = toutesReclamations.filter((r: any) =>
-      r.technicienId !== this.user.id
-    );
-  }
-
+loadReclamations() {
+  this.http.get<any[]>('http://localhost:8080/api/reclamations-sse')
+    .subscribe({
+      next: (data) => this.reclamations = data,
+      error: () => {
+        const stored = localStorage.getItem('reclamations');
+        this.reclamations = stored ? JSON.parse(stored) : [];
+      }
+    });
+}
   loadInterventions() {
     const stored = localStorage.getItem('interventions');
     this.interventions = stored ? JSON.parse(stored) : [];
