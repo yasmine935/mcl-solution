@@ -17,6 +17,8 @@ import { Factures } from '../factures/factures';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
+import { Voitures } from '../voitures/voitures';
+
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -25,7 +27,7 @@ import { TicketingComponent } from '../ticketing/ticketing';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent
+    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent , Voitures
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'
@@ -70,7 +72,14 @@ export class DashboardAdmin implements OnInit {
     technicienId: null,
     technicienNom: ''
   };
-
+voitures: any[] = [];
+showFormVoiture = false;
+nouvelleVoiture = {
+  immatriculation: '', marque: '', modele: '',
+  annee: '', kilometrage: '', statut: 'Disponible',
+  conducteur: '', prochainControle: ''
+};
+statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
@@ -79,14 +88,15 @@ export class DashboardAdmin implements OnInit {
   }
 
   loadData() {
-    this.loadFiches();
-    this.loadConges();
-    this.loadEmployes();
-    this.loadReclamations();
-    this.loadDocuments();
-    this.loadTickets();
-    this.loadFactures();
-  }
+  this.loadFiches();
+  this.loadConges();
+  this.loadEmployes();
+  this.loadReclamations();
+  this.loadDocuments();
+  this.loadTickets();
+  this.loadFactures();
+  this.loadVoitures(); // ✅ AJOUTER
+}
 
   loadFiches() {
     const stored = localStorage.getItem('interventions');
@@ -218,9 +228,39 @@ loadReclamations() {
       case 'utilisateurs': return 'Utilisateurs';
       case 'tickets': return '🎫 Tickets Clients';
       default: return 'Dashboard Admin';
+      case 'voitures': return '🚗 Parc Automobile';
     }
   }
+loadVoitures() {
+  const stored = localStorage.getItem('mcl_voitures');
+  this.voitures = stored ? JSON.parse(stored) : [];
+}
 
+saveVoitures() { localStorage.setItem('mcl_voitures', JSON.stringify(this.voitures)); }
+
+ajouterVoiture() {
+  if (!this.nouvelleVoiture.immatriculation || !this.nouvelleVoiture.marque) {
+    alert('Champs obligatoires manquants');
+    return;
+  }
+  const id = Math.max(...this.voitures.map((v: any) => v.id || 0), 0) + 1;
+  this.voitures.push({ id, ...this.nouvelleVoiture });
+  this.saveVoitures();
+  this.nouvelleVoiture = { immatriculation: '', marque: '', modele: '', annee: '', kilometrage: '', statut: 'Disponible', conducteur: '', prochainControle: '' };
+  this.showFormVoiture = false;
+}
+
+supprimerVoiture(id: number) {
+  if (confirm('Supprimer ?')) {
+    this.voitures = this.voitures.filter((v: any) => v.id !== id);
+    this.saveVoitures();
+  }
+}
+
+getStatutVoitureColor(statut: string): string {
+  const map: any = { 'Disponible': '#2e7d32', 'En service': '#1565c0', 'En maintenance': '#f57f17', 'Hors service': '#c62828' };
+  return map[statut] || '#546e7a';
+}
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);

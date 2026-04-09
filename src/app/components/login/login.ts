@@ -44,7 +44,18 @@ export class Login {
           case 'ODILE':        this.router.navigate(['/dashboard-odile']); break;
           case 'FERID':        this.router.navigate(['/dashboard-admin']); break;
           case 'ESSAN':        this.router.navigate(['/dashboard-essan']); break;
+          case 'KARINE':   this.router.navigate(['/dashboard-karine']); break;
+          case 'AYDEH':    this.router.navigate(['/dashboard-aydeh']); break;
+          case 'NACCERA':  this.router.navigate(['/dashboard-naccera']); break;
+          case 'ABY':      this.router.navigate(['/dashboard-aby']); break;
+          case 'ABY':    this.router.navigate(['/dashboard-aby']); break;
+          case 'KARINE': this.router.navigate(['/dashboard-karine']); break;
+          case 'AYDEH':  this.router.navigate(['/dashboard-aydeh']); break;
+          case 'NACCERA': this.router.navigate(['/dashboard-naccera']); break;
+          case 'AYDEH':   this.router.navigate(['/dashboard-aydeh']); break;
+          case 'NACCERA': this.router.navigate(['/dashboard-naccera']); break;
           default:             this.router.navigate(['/login']);
+          
         }
       },
       error: () => {

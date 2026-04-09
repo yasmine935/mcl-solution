@@ -55,7 +55,9 @@
       <a class="nav-item" [class.active]="currentPage === 'documents'" (click)="currentPage = 'documents'">
         <mat-icon>folder_open</mat-icon> Documents
       </a>
-
+<a class="nav-item" [class.active]="currentPage === 'voitures'" (click)="currentPage = 'voitures'">
+  <mat-icon>directions_car</mat-icon> Parc Automobile
+</a>
       <div class="nav-divider"></div>
       <div class="nav-section-label">Support</div>
 
@@ -250,7 +252,10 @@
     }
   </div>
 }
-
+<!-- ══ VOITURES ══ -->
+@if (currentPage === 'voitures') {
+  <app-voitures></app-voitures>
+}
     </div><!-- /page-content -->
   </div><!-- /main-content -->
 </div>

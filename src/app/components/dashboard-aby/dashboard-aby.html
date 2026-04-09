@@ -1,0 +1,294 @@
+<div class="aby-layout">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-logo">MCL</div>
+        <div class="brand-text">
+          <strong>MCL Groupe</strong>
+          <span>Supply Chain</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div>
+          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <span class="role-tag">Supply Chain</span>
+        </div>
+      </div>
+    </div>
+
+    <nav>
+      <div class="nav-section-label">Tableau de Bord</div>
+      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+        <mat-icon>dashboard</mat-icon> Accueil
+        @if (demandesEnAttente.length > 0) {
+          <span class="nav-badge">{{ demandesEnAttente.length }}</span>
+        }
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Gestion</div>
+
+      <a class="nav-item" [class.active]="currentPage === 'demandes'" (click)="currentPage = 'demandes'">
+        <mat-icon>inbox</mat-icon> Demandes Matériel
+        @if (demandesEnAttente.length > 0) {
+          <span class="nav-badge">{{ demandesEnAttente.length }}</span>
+        }
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
+        <mat-icon>shopping_cart</mat-icon> Commandes & Achats
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'logistique'" (click)="currentPage = 'logistique'">
+        <mat-icon>inventory</mat-icon> Logistique & Stock
+      </a>
+
+      <div class="nav-divider"></div>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Déconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- ══════════ MAIN CONTENT ══════════ -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left"><h3>{{ getPageTitle() }}</h3></div>
+      <div class="topbar-right">
+        <span class="topbar-greeting">Bonjour, <strong>{{ user.prenom }}</strong> 👋</span>
+        <span class="role-badge-top">SUPPLY CHAIN</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ══ HOME ══ -->
+      @if (currentPage === 'home') {
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-orange" (click)="currentPage = 'demandes'">
+            <div class="kpi-icon">📥</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ demandesEnAttente.length }}</span>
+              <span class="kpi-label">Demandes en attente</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-bleu" (click)="currentPage = 'commandes'">
+            <div class="kpi-icon">🛒</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ commandesEnCours.length }}</span>
+              <span class="kpi-label">Commandes en cours</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-vert" (click)="currentPage = 'commandes'">
+            <div class="kpi-icon">✅</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ commandes.length }}</span>
+              <span class="kpi-label">Total commandes</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-violet" (click)="currentPage = 'logistique'">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ stocks.length }}</span>
+              <span class="kpi-label">Articles en stock</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEMANDES URGENTES -->
+        @if (demandesEnAttente.length > 0) {
+          <div class="alert-card">
+            <h3>🔔 Demandes en attente de traitement</h3>
+            @for (d of demandesEnAttente; track d.id) {
+              <div class="demande-alert">
+                <div class="demande-alert-left">
+                  <span class="demandeur-badge">{{ d.demandeur }}</span>
+                  <strong>{{ d.materiel }}</strong>
+                  <span class="qty-badge">Qté: {{ d.quantite || 1 }}</span>
+                  @if (d.urgent) { <span class="urgent-badge">🚨 URGENT</span> }
+                </div>
+                <div class="demande-alert-right">
+                  <span class="date-small">{{ d.date }}</span>
+                  <button class="btn-traiter" (click)="traiterDemande(d)">📋 Traiter</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      <!-- ══ DEMANDES MATÉRIEL ══ -->
+      @if (currentPage === 'demandes') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>📥 Demandes Matériel — MCL Solutions</h3>
+            <span class="pill pill-orange">{{ demandesEnAttente.length }} en attente</span>
+          </div>
+
+          @if (demandesMateriel.length === 0) {
+            <div class="empty-state">
+              <span>📭</span>
+              <p>Aucune demande de matériel</p>
+              <small>Les demandes de Ferid et Aurélien apparaîtront ici</small>
+            </div>
+          } @else {
+            <div class="demandes-list">
+              @for (d of demandesMateriel; track d.id) {
+                <div class="demande-card" [class.demande-traitee]="d.statut === 'Traité'">
+                  <div class="demande-top">
+                    <div class="demande-info">
+                      <div class="demandeur-info">
+                        <div class="demandeur-avatar">{{ d.demandeur?.charAt(0) }}</div>
+                        <div>
+                          <strong>{{ d.demandeur }}</strong>
+                          <span class="demande-date">{{ d.date }}</span>
+                        </div>
+                      </div>
+                      @if (d.urgent) { <span class="urgent-tag">🚨 Urgent</span> }
+                    </div>
+                    <span class="statut-pill" [style.background]="getStatutDemandeColor(d.statut)">
+                      {{ d.statut || 'En attente' }}
+                    </span>
+                  </div>
+
+                  <div class="demande-body">
+                    <div class="materiel-info">
+                      <span class="materiel-icon">📦</span>
+                      <div>
+                        <strong>{{ d.materiel }}</strong>
+                        <span class="qty">Quantité demandée : {{ d.quantite || 1 }}</span>
+                      </div>
+                    </div>
+                    @if (d.description) {
+                      <p class="demande-desc">{{ d.description }}</p>
+                    }
+                  </div>
+
+                  @if (d.statut !== 'Traité') {
+                    <div class="demande-actions">
+                      <button class="btn-traiter-full" (click)="traiterDemande(d)">
+                        🛒 Créer une commande
+                      </button>
+                    </div>
+                  } @else {
+                    <div class="demande-traitee-label">✅ Demande traitée</div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ══ COMMANDES ══ -->
+      @if (currentPage === 'commandes') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>🛒 Commandes & Achats</h3>
+            <button class="btn-add" (click)="showFormCommande = !showFormCommande">+ Nouvelle Commande</button>
+          </div>
+
+          @if (showFormCommande) {
+            <div class="form-commande">
+              <h4>📋 Nouvelle Commande</h4>
+              <div class="form-grid-c">
+                <div class="fg"><label>Référence *</label><input type="text" [(ngModel)]="nouvelleCommande.reference" class="fi" placeholder="CMD-2026-001"/></div>
+                <div class="fg"><label>Fournisseur</label><input type="text" [(ngModel)]="nouvelleCommande.fournisseur" class="fi" placeholder="Ex: Amazon, Cdiscount..."/></div>
+                <div class="fg" style="grid-column: 1/-1"><label>Description *</label><input type="text" [(ngModel)]="nouvelleCommande.description" class="fi" placeholder="Description du matériel..."/></div>
+                <div class="fg"><label>Quantité</label><input type="number" [(ngModel)]="nouvelleCommande.quantite" class="fi" placeholder="1"/></div>
+                <div class="fg"><label>Prix unitaire (€)</label><input type="number" [(ngModel)]="nouvelleCommande.prixUnitaire" class="fi" placeholder="0.00"/></div>
+                <div class="fg"><label>Date commande</label><input type="date" [(ngModel)]="nouvelleCommande.dateCommande" class="fi"/></div>
+                <div class="fg"><label>Date livraison prévue</label><input type="date" [(ngModel)]="nouvelleCommande.dateLivraison" class="fi"/></div>
+              </div>
+              <div class="form-actions-c">
+                <button class="btn-save-c" (click)="ajouterCommande()">💾 Créer la Commande</button>
+                <button class="btn-cancel-c" (click)="showFormCommande = false; resetFormCommande()">Annuler</button>
+              </div>
+            </div>
+          }
+
+          @if (commandes.length === 0) {
+            <div class="empty-state"><span>🛒</span><p>Aucune commande</p></div>
+          } @else {
+            <div class="commandes-list">
+              @for (c of commandes; track c.id) {
+                <div class="commande-card">
+                  <div class="commande-top">
+                    <div>
+                      <strong class="cmd-ref">{{ c.numeroCommande || c.reference }}</strong>
+                      <span class="cmd-desc">{{ c.description }}</span>
+                    </div>
+                    <span class="statut-pill" [style.background]="getStatutColor(c.statut)">{{ c.statut }}</span>
+                  </div>
+                  <div class="commande-infos">
+                    <div><label>Fournisseur</label><span>{{ c.fournisseur || '-' }}</span></div>
+                    <div><label>Quantité</label><span>{{ c.quantite || '-' }}</span></div>
+                    <div><label>Prix unit.</label><span>{{ c.prixUnitaire || 0 }}€</span></div>
+                    <div><label>Total</label><span>{{ (c.quantite || 0) * (c.prixUnitaire || 0) }}€</span></div>
+                    <div><label>Date commande</label><span>{{ c.dateCommande || '-' }}</span></div>
+                    <div><label>Livraison prévue</label><span>{{ c.dateLivraisonPrevue || c.dateLivraison || '-' }}</span></div>
+                  </div>
+                  <div class="commande-actions">
+                    @for (s of statutsCommande; track s) {
+                      @if (s !== c.statut) {
+                        <button class="btn-statut" [style.background]="getStatutColor(s)" (click)="updateStatutCommande(c.id, s)">
+                          {{ s }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ══ LOGISTIQUE ══ -->
+      @if (currentPage === 'logistique') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>📦 Logistique & Stock</h3>
+            <span class="pill pill-bleu">{{ stocks.length }} articles</span>
+          </div>
+
+          @if (stocks.length === 0) {
+            <div class="empty-state"><span>📦</span><p>Aucun article en stock</p></div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Désignation</th>
+                  <th>Quantité</th>
+                  <th>Emplacement</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (s of stocks; track s.id) {
+                  <tr>
+                    <td><strong>{{ s.reference }}</strong></td>
+                    <td>{{ s.designation }}</td>
+                    <td>
+                      <span [style.color]="s.quantite < 5 ? '#c62828' : '#2e7d32'">
+                        {{ s.quantite }}
+                        @if (s.quantite < 5) { <span>⚠️</span> }
+                      </span>
+                    </td>
+                    <td>{{ s.emplacement || '-' }}</td>
+                    <td><span class="statut-pill" [style.background]="getStatutColor(s.statut)">{{ s.statut }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

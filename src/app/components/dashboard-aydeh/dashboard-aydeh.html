@@ -1,0 +1,268 @@
+<div class="aydeh-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-logo">MCL</div>
+        <div class="brand-text">
+          <strong>MCL Groupe</strong>
+          <span>Direction Administrative</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div>
+          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <span class="role-tag">DAF</span>
+        </div>
+      </div>
+    </div>
+
+    <nav>
+      <div class="nav-section-label">Tableau de Bord</div>
+      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+        <mat-icon>dashboard</mat-icon> Accueil
+      </a>
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Finance</div>
+      <a class="nav-item" [class.active]="currentPage === 'comptabilite'" (click)="currentPage = 'comptabilite'">
+        <mat-icon>receipt_long</mat-icon> Comptabilite & Factures
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'budget'" (click)="currentPage = 'budget'">
+        <mat-icon>account_balance</mat-icon> Budget & Finance
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'services'" (click)="currentPage = 'services'">
+        <mat-icon>business</mat-icon> Services Generaux
+      </a>
+      <div class="nav-divider"></div>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Deconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-left"><h3>{{ getPageTitle() }}</h3></div>
+      <div class="topbar-right">
+        <span class="topbar-greeting">Bonjour, <strong>{{ user.prenom }}</strong> 👋</span>
+        <span class="role-badge-top">DAF</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- HOME -->
+      @if (currentPage === 'home') {
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-bleu" (click)="currentPage = 'comptabilite'">
+            <div class="kpi-icon">🧾</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ totalFactures }}</span>
+              <span class="kpi-label">Total Factures</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-orange" (click)="currentPage = 'comptabilite'">
+            <div class="kpi-icon">⏳</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ facturesEnAttente }}</span>
+              <span class="kpi-label">Factures en attente</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-vert" (click)="currentPage = 'budget'">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ totalBudgetAlloue | number }}€</span>
+              <span class="kpi-label">Budget total alloue</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-violet" (click)="currentPage = 'budget'">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ totalBudgetDepense | number }}€</span>
+              <span class="kpi-label">Budget depense</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Budgets overview -->
+        <div class="section-card">
+          <h3 class="section-title">📊 Suivi Budgetaire</h3>
+          @for (b of budgets; track b.id) {
+            <div class="budget-row">
+              <div class="budget-info">
+                <strong>{{ b.intitule }}</strong>
+                <span class="budget-cat">{{ b.categorie }}</span>
+              </div>
+              <div class="budget-bar-wrapper">
+                <div class="budget-bar">
+                  <div class="budget-fill" [style.width.%]="getPourcentageBudget(b)" [style.background]="getBudgetColor(getPourcentageBudget(b))"></div>
+                </div>
+                <span class="budget-pct" [style.color]="getBudgetColor(getPourcentageBudget(b))">{{ getPourcentageBudget(b) }}%</span>
+              </div>
+              <div class="budget-amounts">
+                <span>{{ b.montantDepense | number }}€ / {{ b.montantAlloue | number }}€</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- COMPTABILITE -->
+      @if (currentPage === 'comptabilite') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>🧾 Comptabilite & Factures</h3>
+            <span class="pill pill-bleu">{{ factures.length }} factures</span>
+          </div>
+          @if (factures.length === 0) {
+            <div class="empty-state"><span>🧾</span><p>Aucune facture</p></div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Numero</th>
+                  <th>Client</th>
+                  <th>Montant</th>
+                  <th>Date</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of factures; track f.id) {
+                  <tr>
+                    <td><strong>{{ f.numero }}</strong></td>
+                    <td>{{ f.client }}</td>
+                    <td><strong>{{ f.montant }}€</strong></td>
+                    <td>{{ f.dateCreation | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <span class="statut-pill"
+                        [style.background]="f.statut === 'PAYEE' ? '#2e7d32' : f.statut === 'EN_ATTENTE' ? '#f57f17' : '#c62828'">
+                        {{ f.statut }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- BUDGET -->
+      @if (currentPage === 'budget') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>💰 Budget & Finance</h3>
+            <button class="btn-add" (click)="showFormBudget = !showFormBudget">+ Nouveau Budget</button>
+          </div>
+
+          @if (showFormBudget) {
+            <div class="form-card">
+              <div class="form-grid-a">
+                <div class="fg"><label>Intitule *</label><input type="text" [(ngModel)]="nouveauBudget.intitule" class="fi" placeholder="Ex: Budget IT"/></div>
+                <div class="fg"><label>Categorie</label>
+                  <select [(ngModel)]="nouveauBudget.categorie" class="fi">
+                    @for (c of categoriesBudget; track c) { <option [value]="c">{{ c }}</option> }
+                  </select>
+                </div>
+                <div class="fg"><label>Montant alloue (€)</label><input type="number" [(ngModel)]="nouveauBudget.montantAlloue" class="fi"/></div>
+                <div class="fg"><label>Montant depense (€)</label><input type="number" [(ngModel)]="nouveauBudget.montantDepense" class="fi"/></div>
+                <div class="fg"><label>Periode</label><input type="text" [(ngModel)]="nouveauBudget.periode" class="fi" placeholder="2026"/></div>
+              </div>
+              <div class="form-actions-a">
+                <button class="btn-save-a" (click)="ajouterBudget()">💾 Sauvegarder</button>
+                <button class="btn-cancel-a" (click)="showFormBudget = false">Annuler</button>
+              </div>
+            </div>
+          }
+
+          <div class="budgets-list">
+            @for (b of budgets; track b.id) {
+              <div class="budget-card">
+                <div class="budget-card-top">
+                  <div>
+                    <strong>{{ b.intitule }}</strong>
+                    <span class="cat-badge">{{ b.categorie }}</span>
+                  </div>
+                  <div class="budget-card-actions">
+                    <span class="statut-pill" [style.background]="getPourcentageBudget(b) >= 90 ? '#c62828' : getPourcentageBudget(b) >= 70 ? '#f57f17' : '#2e7d32'">
+                      {{ getPourcentageBudget(b) }}%
+                    </span>
+                    <button class="btn-del-a" (click)="supprimerBudget(b.id)">🗑️</button>
+                  </div>
+                </div>
+                <div class="budget-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="getPourcentageBudget(b)" [style.background]="getBudgetColor(getPourcentageBudget(b))"></div>
+                  </div>
+                </div>
+                <div class="budget-card-bottom">
+                  <span>Depense: <strong>{{ b.montantDepense | number }}€</strong></span>
+                  <span>Alloue: <strong>{{ b.montantAlloue | number }}€</strong></span>
+                  <span>Periode: <strong>{{ b.periode }}</strong></span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- SERVICES GENERAUX -->
+      @if (currentPage === 'services') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>🏢 Services Generaux</h3>
+            <button class="btn-add" (click)="showFormService = !showFormService">+ Ajouter Service</button>
+          </div>
+
+          @if (showFormService) {
+            <div class="form-card">
+              <div class="form-grid-a">
+                <div class="fg"><label>Intitule *</label><input type="text" [(ngModel)]="nouveauService.intitule" class="fi"/></div>
+                <div class="fg"><label>Type</label>
+                  <select [(ngModel)]="nouveauService.type" class="fi">
+                    @for (t of typesService; track t) { <option [value]="t">{{ t }}</option> }
+                  </select>
+                </div>
+                <div class="fg"><label>Fournisseur</label><input type="text" [(ngModel)]="nouveauService.fournisseur" class="fi"/></div>
+                <div class="fg"><label>Montant mensuel (€)</label><input type="number" [(ngModel)]="nouveauService.montant" class="fi"/></div>
+                <div class="fg"><label>Date echeance</label><input type="date" [(ngModel)]="nouveauService.dateEcheance" class="fi"/></div>
+              </div>
+              <div class="form-actions-a">
+                <button class="btn-save-a" (click)="ajouterService()">💾 Sauvegarder</button>
+                <button class="btn-cancel-a" (click)="showFormService = false">Annuler</button>
+              </div>
+            </div>
+          }
+
+          <div class="services-grid">
+            @for (s of servicesGeneraux; track s.id) {
+              <div class="service-card">
+                <div class="service-top">
+                  <span class="service-type-icon">🏢</span>
+                  <div>
+                    <strong>{{ s.intitule }}</strong>
+                    <span class="service-type">{{ s.type }}</span>
+                  </div>
+                  <button class="btn-del-a" (click)="supprimerService(s.id)">🗑️</button>
+                </div>
+                <div class="service-infos">
+                  <div><label>Fournisseur</label><span>{{ s.fournisseur || '-' }}</span></div>
+                  <div><label>Montant/mois</label><span>{{ s.montant }}€</span></div>
+                  <div><label>Echeance</label><span>{{ s.dateEcheance || '-' }}</span></div>
+                  <div><label>Statut</label>
+                    <span class="statut-pill" [style.background]="s.statut === 'Actif' ? '#2e7d32' : '#c62828'">{{ s.statut }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

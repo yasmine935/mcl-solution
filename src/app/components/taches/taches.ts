@@ -36,16 +36,9 @@ export class Taches implements OnInit {
   valeurs = ['Bronze', 'Platinum', 'Gold', 'Silver'];
 
   nouvelleTache = {
-    projet: '',
-    statut: 'En Qualification',
-    date: '',
-    priorite: 'Moyenne',
-    fichiers: [] as any[],
-    assignes: [] as any[],
-    echeance: '',
-    valeur: 'Bronze',
-    chiffreAffaire: '',
-    numCommande: ''
+    projet: '', statut: 'En Qualification', date: '',
+    priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
+    echeance: '', valeur: 'Bronze', chiffreAffaire: '', numCommande: ''
   };
 
   tacheEnEdition: any = {};
@@ -68,10 +61,15 @@ export class Taches implements OnInit {
     });
   }
 
-  // ✅ GET depuis backend
   loadTaches() {
     this.http.get<any[]>(API).subscribe({
-      next: (data) => this.taches = data,
+      next: (data) => {
+        this.taches = data.map(t => this.mapFromBackend(t));
+        // Charger les notes depuis localStorage pour chaque tâche
+        this.taches.forEach(tache => {
+          tache.notes = this.loadNotesForTache(tache.id);
+        });
+      },
       error: () => {
         const stored = localStorage.getItem('taches');
         this.taches = stored ? JSON.parse(stored) : [];
@@ -79,32 +77,14 @@ export class Taches implements OnInit {
     });
   }
 
-  // ✅ POST vers backend
-  ajouterTache() {
-    if (!this.nouvelleTache.projet) {
-      alert('Veuillez remplir le nom du projet');
-      return;
-    }
+  // ✅ Notes stockées dans localStorage par tâche
+  loadNotesForTache(tacheId: number): any[] {
+    const stored = localStorage.getItem(`tache_notes_${tacheId}`);
+    return stored ? JSON.parse(stored) : [];
+  }
 
-  const body = {
-  titre: this.nouvelleTache.projet,
-  description: this.nouvelleTache.numCommande,
-  priorite: this.nouvelleTache.priorite,
-  statut: 'A_FAIRE',
-  dateEcheance: this.nouvelleTache.echeance && this.nouvelleTache.echeance.match(/^\d{4}-\d{2}-\d{2}$/) 
-    ? this.nouvelleTache.echeance 
-    : null,
-  utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
-};
-
-    this.http.post<any>(API, body).subscribe({
-      next: (tache) => {
-        this.taches.push(this.mapFromBackend(tache));
-        this.resetFormAdd();
-        this.showFormAdd = false;
-      },
-      error: () => alert('❌ Erreur création tâche')
-    });
+  saveNotesForTache(tacheId: number, notes: any[]) {
+    localStorage.setItem(`tache_notes_${tacheId}`, JSON.stringify(notes));
   }
 
   mapFromBackend(t: any): any {
@@ -126,26 +106,49 @@ export class Taches implements OnInit {
     };
   }
 
+  ajouterTache() {
+    if (!this.nouvelleTache.projet) {
+      alert('Veuillez remplir le nom du projet');
+      return;
+    }
+    const body = {
+      titre: this.nouvelleTache.projet,
+      description: this.nouvelleTache.numCommande,
+      priorite: this.nouvelleTache.priorite,
+      statut: 'A_FAIRE',
+      dateEcheance: this.nouvelleTache.echeance && this.nouvelleTache.echeance.match(/^\d{4}-\d{2}-\d{2}$/)
+        ? this.nouvelleTache.echeance : null,
+      utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
+    };
+    this.http.post<any>(API, body).subscribe({
+      next: (tache) => {
+        const t = this.mapFromBackend(tache);
+        t.notes = [];
+        this.taches.push(t);
+        this.resetFormAdd();
+        this.showFormAdd = false;
+      },
+      error: () => alert('❌ Erreur création tâche')
+    });
+  }
+
   ouvrirEdition(tache: any) {
     this.tacheEnEdition = { ...tache };
     this.selectedTache = tache;
     this.showFormEdit = true;
   }
 
-  // ✅ PUT vers backend
   modifierTache() {
     if (!this.tacheEnEdition.projet) {
       alert('Veuillez remplir le nom du projet');
       return;
     }
-
     const body = {
       titre: this.tacheEnEdition.projet,
       statut: this.tacheEnEdition.statut === 'En cours' ? 'EN_COURS' :
               this.tacheEnEdition.statut === 'Fait' ? 'TERMINEE' : 'A_FAIRE',
       priorite: this.tacheEnEdition.priorite
     };
-
     this.http.put<any>(`${API}/${this.tacheEnEdition.id}`, body).subscribe({
       next: () => {
         const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
@@ -157,25 +160,94 @@ export class Taches implements OnInit {
     });
   }
 
-  // ✅ DELETE vers backend
   supprimerTache(id: number) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+    if (confirm('Supprimer cette tâche ?')) {
       this.http.delete(`${API}/${id}`).subscribe({
-        next: () => this.taches = this.taches.filter((t: any) => t.id !== id),
+        next: () => {
+          this.taches = this.taches.filter((t: any) => t.id !== id);
+          localStorage.removeItem(`tache_notes_${id}`);
+        },
         error: () => alert('❌ Erreur suppression')
       });
     }
   }
+
+  // ✅ CHAT NOTES
+  ouvrirNoteModal(tache: any) {
+    this.selectedTache = tache;
+    if (!this.selectedTache.notes) {
+      this.selectedTache.notes = this.loadNotesForTache(tache.id);
+    }
+    this.noteTemp = '';
+    this.showNoteModal = true;
+    // Scroll vers le bas après ouverture
+    setTimeout(() => this.scrollToBottom(), 100);
+  }
+
+  sauvegarderNote() {
+    if (!this.selectedTache || !this.noteTemp.trim()) return;
+
+    const nouvelleNote = {
+      auteur: `${this.currentUser.prenom} ${this.currentUser.nom}`,
+      auteurId: this.currentUser.id,
+      role: this.currentUser.role,
+      contenu: this.noteTemp.trim(),
+      date: new Date().toLocaleString('fr-FR'),
+      timestamp: new Date().getTime()
+    };
+
+    if (!this.selectedTache.notes) this.selectedTache.notes = [];
+    this.selectedTache.notes.push(nouvelleNote);
+
+    // Sauvegarder dans localStorage
+    this.saveNotesForTache(this.selectedTache.id, this.selectedTache.notes);
+
+    this.noteTemp = '';
+    setTimeout(() => this.scrollToBottom(), 50);
+  }
+
+  // Envoyer avec Entrée (Shift+Entrée pour nouvelle ligne)
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sauvegarderNote();
+    }
+  }
+
+  scrollToBottom() {
+    const container = document.querySelector('.chat-messages');
+    if (container) container.scrollTop = container.scrollHeight;
+  }
+
+  // Est-ce que le message est du user actuel ?
+  isMyMessage(note: any): boolean {
+    return note.auteurId === this.currentUser.id;
+  }
+
+  // Initiales de l'auteur
+  getInitiales(auteur: string): string {
+    const parts = auteur.split(' ');
+    return parts.map(p => p.charAt(0)).join('').toUpperCase().substring(0, 2);
+  }
+
+  // Couleur avatar selon rôle
+  getAvatarColor(note: any): string {
+    const colors: any = {
+      'FERID': '#1565c0', 'AURELIEN': '#283593',
+      'ODILE': '#0277bd', 'TECHNICIEN_SUP': '#4527a0',
+      'TECHNICIEN': '#01579b', 'ESSAN': '#5e35b1'
+    };
+    return colors[note.role] || '#546e7a';
+  }
+
+  fermerNoteModal() { this.showNoteModal = false; this.noteTemp = ''; }
 
   ouvrirDetailModal(tache: any) {
     this.selectedTache = tache;
     this.showDetailModal = true;
   }
 
-  fermerDetailModal() {
-    this.showDetailModal = false;
-    this.selectedTache = null;
-  }
+  fermerDetailModal() { this.showDetailModal = false; this.selectedTache = null; }
 
   resetFormAdd() {
     this.nouvelleTache = {
@@ -186,27 +258,6 @@ export class Taches implements OnInit {
   }
 
   resetFormEdit() { this.tacheEnEdition = {}; }
-
-  ouvrirNoteModal(tache: any) {
-    this.selectedTache = tache;
-    this.noteTemp = '';
-    this.showNoteModal = true;
-  }
-
-  sauvegarderNote() {
-    if (this.selectedTache && this.noteTemp.trim()) {
-      if (!this.selectedTache.notes) this.selectedTache.notes = [];
-      this.selectedTache.notes.push({
-        auteur: `${this.currentUser.prenom} ${this.currentUser.nom}`,
-        contenu: this.noteTemp,
-        date: new Date().toLocaleString('fr-FR')
-      });
-      this.showNoteModal = false;
-      this.noteTemp = '';
-    }
-  }
-
-  fermerNoteModal() { this.showNoteModal = false; this.noteTemp = ''; }
 
   onFileSelectAdd(event: any) {
     const files = event.target.files;

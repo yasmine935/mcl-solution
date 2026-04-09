@@ -1,0 +1,238 @@
+<div class="naccera-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-logo">MCL</div>
+        <div class="brand-text">
+          <strong>MCL Groupe</strong>
+          <span>Comptabilite</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div>
+          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <span class="role-tag">Comptable</span>
+        </div>
+      </div>
+    </div>
+
+    <nav>
+      <div class="nav-section-label">Navigation</div>
+      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+        <mat-icon>dashboard</mat-icon> Accueil
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'ecritures'" (click)="currentPage = 'ecritures'">
+        <mat-icon>book</mat-icon> Journal Comptable
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
+        <mat-icon>receipt</mat-icon> Factures
+      </a>
+      <div class="nav-divider"></div>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Deconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-left"><h3>{{ getPageTitle() }}</h3></div>
+      <div class="topbar-right">
+        <span class="topbar-greeting">Bonjour, <strong>{{ user.prenom }}</strong> 👋</span>
+        <span class="role-badge-top">COMPTABILITE</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- HOME -->
+      @if (currentPage === 'home') {
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-bleu" (click)="currentPage = 'factures'">
+            <div class="kpi-icon">🧾</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ factures.length }}</span>
+              <span class="kpi-label">Total Factures</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-vert" (click)="currentPage = 'factures'">
+            <div class="kpi-icon">✅</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ facturesPayees }}</span>
+              <span class="kpi-label">Factures payees</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-orange" (click)="currentPage = 'factures'">
+            <div class="kpi-icon">⏳</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ facturesEnAttente }}</span>
+              <span class="kpi-label">En attente</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-violet" (click)="currentPage = 'ecritures'">
+            <div class="kpi-icon">📒</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ ecritures.length }}</span>
+              <span class="kpi-label">Ecritures comptables</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOLDE -->
+        <div class="solde-card">
+          <div class="solde-item">
+            <span class="solde-label">Total Debit</span>
+            <span class="solde-num debit">{{ totalDebit | number }}€</span>
+          </div>
+          <div class="solde-sep">-</div>
+          <div class="solde-item">
+            <span class="solde-label">Total Credit</span>
+            <span class="solde-num credit">{{ totalCredit | number }}€</span>
+          </div>
+          <div class="solde-sep">=</div>
+          <div class="solde-item">
+            <span class="solde-label">Solde</span>
+            <span class="solde-num" [style.color]="solde >= 0 ? '#2e7d32' : '#c62828'">{{ solde | number }}€</span>
+          </div>
+        </div>
+
+        <!-- DERNIÈRES ECRITURES -->
+        <div class="section-card">
+          <h3 class="section-title">📒 Dernieres Ecritures</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Libelle</th>
+                <th>Journal</th>
+                <th>Debit</th>
+                <th>Credit</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of ecritures.slice(0, 5); track e.id) {
+                <tr>
+                  <td>{{ e.date }}</td>
+                  <td>{{ e.libelle }}</td>
+                  <td><span class="journal-badge">{{ e.journal }}</span></td>
+                  <td class="td-debit">{{ e.debit ? (e.debit | number) + '€' : '-' }}</td>
+                  <td class="td-credit">{{ e.credit ? (e.credit | number) + '€' : '-' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- JOURNAL COMPTABLE -->
+      @if (currentPage === 'ecritures') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>📒 Journal Comptable</h3>
+            <button class="btn-add" (click)="showFormEcriture = !showFormEcriture">+ Nouvelle Ecriture</button>
+          </div>
+
+          @if (showFormEcriture) {
+            <div class="form-card">
+              <div class="form-grid-n">
+                <div class="fg"><label>Date *</label><input type="date" [(ngModel)]="nouvelleEcriture.date" class="fi"/></div>
+                <div class="fg"><label>Journal</label>
+                  <select [(ngModel)]="nouvelleEcriture.journal" class="fi">
+                    @for (j of journals; track j) { <option [value]="j">{{ j }}</option> }
+                  </select>
+                </div>
+                <div class="fg" style="grid-column:1/-1"><label>Libelle *</label><input type="text" [(ngModel)]="nouvelleEcriture.libelle" class="fi" placeholder="Description de l ecriture"/></div>
+                <div class="fg"><label>Compte</label><input type="text" [(ngModel)]="nouvelleEcriture.compte" class="fi" placeholder="Ex: 411000"/></div>
+                <div class="fg"><label>Debit (€)</label><input type="number" [(ngModel)]="nouvelleEcriture.debit" class="fi"/></div>
+                <div class="fg"><label>Credit (€)</label><input type="number" [(ngModel)]="nouvelleEcriture.credit" class="fi"/></div>
+              </div>
+              <div class="form-actions-n">
+                <button class="btn-save-n" (click)="ajouterEcriture()">💾 Sauvegarder</button>
+                <button class="btn-cancel-n" (click)="showFormEcriture = false">Annuler</button>
+              </div>
+            </div>
+          }
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Libelle</th>
+                <th>Compte</th>
+                <th>Journal</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of ecritures; track e.id) {
+                <tr>
+                  <td>{{ e.date }}</td>
+                  <td>{{ e.libelle }}</td>
+                  <td><code>{{ e.compte || '-' }}</code></td>
+                  <td><span class="journal-badge">{{ e.journal }}</span></td>
+                  <td class="td-debit">{{ e.debit ? (e.debit | number) + '€' : '-' }}</td>
+                  <td class="td-credit">{{ e.credit ? (e.credit | number) + '€' : '-' }}</td>
+                  <td><button class="btn-del-n" (click)="supprimerEcriture(e.id)">🗑️</button></td>
+                </tr>
+              }
+              <tr class="total-row">
+                <td colspan="4"><strong>TOTAUX</strong></td>
+                <td class="td-debit"><strong>{{ totalDebit | number }}€</strong></td>
+                <td class="td-credit"><strong>{{ totalCredit | number }}€</strong></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- FACTURES -->
+      @if (currentPage === 'factures') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>🧾 Factures & Paiements</h3>
+            <span class="pill pill-bleu">{{ factures.length }} factures</span>
+          </div>
+          @if (factures.length === 0) {
+            <div class="empty-state"><span>🧾</span><p>Aucune facture</p></div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Numero</th>
+                  <th>Client</th>
+                  <th>Montant</th>
+                  <th>Date creation</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of factures; track f.id) {
+                  <tr>
+                    <td><strong>{{ f.numero }}</strong></td>
+                    <td>{{ f.client }}</td>
+                    <td><strong>{{ f.montant }}€</strong></td>
+                    <td>{{ f.dateCreation | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <span class="statut-pill"
+                        [style.background]="f.statut === 'PAYEE' ? '#2e7d32' : f.statut === 'EN_ATTENTE' ? '#f57f17' : '#c62828'">
+                        {{ f.statut }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

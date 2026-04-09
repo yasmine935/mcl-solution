@@ -324,59 +324,82 @@
   </div>
 </div>
 
-<!-- MODAL NOTES -->
+<!-- MODAL NOTES CHAT — Remplace l'ancien bloc @if (showNoteModal && selectedTache) -->
+
 @if (showNoteModal && selectedTache) {
   <div class="modal-overlay" (click)="fermerNoteModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>📝 Notes - {{ selectedTache.projet }}</h3>
-        <button mat-icon-button (click)="fermerNoteModal()" class="close-btn">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <!-- NOTES EXISTANTES -->
-        @if (selectedTache.notes && selectedTache.notes.length > 0) {
-          <div class="notes-list">
-            <h4>📋 Historique des Notes</h4>
-            @for (note of selectedTache.notes; track $index) {
-              <div class="note-item">
-                <div class="note-header">
-                  <strong class="note-author">{{ note.auteur }}</strong>
-                  <span class="note-date">{{ note.date }}</span>
-                </div>
-                <p class="note-content">{{ note.contenu }}</p>
-              </div>
-            }
+    <div class="chat-modal" (click)="$event.stopPropagation()">
+
+      <!-- HEADER -->
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <span class="chat-icon">💬</span>
+          <div>
+            <h3>Discussion — {{ selectedTache.projet }}</h3>
+            <p>{{ selectedTache.notes?.length || 0 }} message(s)</p>
           </div>
-          <hr class="notes-separator"/>
+        </div>
+        <button class="chat-close" (click)="fermerNoteModal()">✕</button>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="chat-messages">
+        @if (!selectedTache.notes || selectedTache.notes.length === 0) {
+          <div class="chat-empty">
+            <span>💬</span>
+            <p>Aucun message pour l'instant</p>
+            <small>Commencez la discussion !</small>
+          </div>
         }
 
-        <!-- AJOUTER UNE NOUVELLE NOTE -->
-        <div class="add-note-section">
-          <h4>✍️ Ajouter une Note</h4>
-          <textarea 
-            [(ngModel)]="noteTemp" 
-            placeholder="Écrivez votre note ici..."
-            class="note-textarea"
-            rows="5">
-          </textarea>
-        </div>
+        @for (note of selectedTache.notes; track $index) {
+          <div class="chat-message" [class.my-message]="isMyMessage(note)" [class.other-message]="!isMyMessage(note)">
+
+            @if (!isMyMessage(note)) {
+              <!-- Avatar gauche (autre personne) -->
+              <div class="chat-avatar" [style.background]="getAvatarColor(note)">
+                {{ getInitiales(note.auteur) }}
+              </div>
+            }
+
+            <div class="message-bubble-wrapper">
+              @if (!isMyMessage(note)) {
+                <span class="message-author">{{ note.auteur }}</span>
+              }
+              <div class="message-bubble" [class.bubble-me]="isMyMessage(note)" [class.bubble-other]="!isMyMessage(note)">
+                {{ note.contenu }}
+              </div>
+              <span class="message-time">{{ note.date }}</span>
+            </div>
+
+            @if (isMyMessage(note)) {
+              <!-- Avatar droite (moi) -->
+              <div class="chat-avatar" [style.background]="getAvatarColor(note)">
+                {{ getInitiales(note.auteur) }}
+              </div>
+            }
+
+          </div>
+        }
       </div>
 
-      <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="sauvegarderNote()" [disabled]="!noteTemp.trim()">
-          <mat-icon>save</mat-icon> Ajouter la Note
-        </button>
-        <button mat-stroked-button (click)="fermerNoteModal()">
-          <mat-icon>close</mat-icon> Fermer
+      <!-- INPUT -->
+      <div class="chat-input-area">
+        <textarea
+          [(ngModel)]="noteTemp"
+          (keydown)="onKeyDown($event)"
+          placeholder="Écrire un message... (Entrée pour envoyer, Shift+Entrée pour nouvelle ligne)"
+          class="chat-input"
+          rows="2">
+        </textarea>
+        <button class="chat-send-btn" (click)="sauvegarderNote()" [disabled]="!noteTemp.trim()">
+          ➤
         </button>
       </div>
+
     </div>
   </div>
 }
-
 <!-- MODAL DÉTAILS -->
 @if (showDetailModal && selectedTache) {
   <div class="modal-overlay" (click)="fermerDetailModal()">

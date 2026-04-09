@@ -1,0 +1,243 @@
+<div class="karine-layout">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-logo">MCL</div>
+        <div class="brand-text">
+          <strong>MCL Groupe</strong>
+          <span>Direction des RH</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div>
+          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <span class="role-tag">DRH</span>
+        </div>
+      </div>
+    </div>
+
+    <nav>
+      <div class="nav-section-label">Tableau de Bord</div>
+      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
+        <mat-icon>dashboard</mat-icon> Accueil
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">RH & Personnel</div>
+
+      <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
+        <mat-icon>beach_access</mat-icon> Congés
+        @if (congesEnAttente.length > 0) {
+          <span class="nav-badge">{{ congesEnAttente.length }}</span>
+        }
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
+        <mat-icon>people</mat-icon> Dossiers Personnel
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'sse'" (click)="currentPage = 'sse'">
+        <mat-icon>health_and_safety</mat-icon> SSE Terrain
+        @if (sseEnAttente.length > 0) {
+          <span class="nav-badge nav-badge-orange">{{ sseEnAttente.length }}</span>
+        }
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'voitures'" (click)="currentPage = 'voitures'">
+        <mat-icon>directions_car</mat-icon> Parc Automobile
+      </a>
+
+      <div class="nav-divider"></div>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Déconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- ══════════ MAIN CONTENT ══════════ -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h3>{{ getPageTitle() }}</h3>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-greeting">Bonjour, <strong>{{ user.prenom }}</strong> 👋</span>
+        <span class="role-badge-top">DRH</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ══ HOME ══ -->
+      @if (currentPage === 'home') {
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-rose" (click)="currentPage = 'conges'">
+            <div class="kpi-icon">🏖️</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ congesEnAttente.length }}</span>
+              <span class="kpi-label">Congés en attente</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-vert" (click)="currentPage = 'conges'">
+            <div class="kpi-icon">✅</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ congesApprouves.length }}</span>
+              <span class="kpi-label">Congés approuvés</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-bleu" (click)="currentPage = 'employes'">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ employes.length }}</span>
+              <span class="kpi-label">Employés actifs</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-orange" (click)="currentPage = 'sse'">
+            <div class="kpi-icon">⚠️</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ sseEnAttente.length }}</span>
+              <span class="kpi-label">SSE en attente</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-violet" (click)="currentPage = 'voitures'">
+            <div class="kpi-icon">🚗</div>
+            <div class="kpi-info">
+              <span class="kpi-num">{{ voituresDisponibles.length }}</span>
+              <span class="kpi-label">Véhicules disponibles</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="quick-actions-card">
+          <h3>⚡ Actions Rapides</h3>
+          <div class="quick-grid">
+            <div class="quick-btn" (click)="currentPage = 'conges'">
+              <span>🏖️</span>
+              <strong>Gérer les Congés</strong>
+              <small>{{ congesEnAttente.length }} en attente</small>
+            </div>
+            <div class="quick-btn" (click)="currentPage = 'sse'">
+              <span>⚠️</span>
+              <strong>Remontées SSE</strong>
+              <small>{{ reclamationsSSE.length }} total</small>
+            </div>
+            <div class="quick-btn" (click)="currentPage = 'voitures'">
+              <span>🚗</span>
+              <strong>Parc Auto</strong>
+              <small>{{ voitures.length }} véhicules</small>
+            </div>
+            <div class="quick-btn" (click)="currentPage = 'employes'">
+              <span>👥</span>
+              <strong>Personnel</strong>
+              <small>{{ employes.length }} employés</small>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ══ CONGÉS ══ -->
+      @if (currentPage === 'conges') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>🏖️ Gestion des Congés — Tout le Groupe</h3>
+            <div class="filter-pills">
+              <span class="pill pill-orange">{{ congesEnAttente.length }} en attente</span>
+              <span class="pill pill-green">{{ congesApprouves.length }} approuvés</span>
+            </div>
+          </div>
+
+          @if (conges.length === 0) {
+            <div class="empty-state"><span>🏖️</span><p>Aucune demande de congé</p></div>
+          } @else {
+            <div class="conges-list">
+              @for (c of conges; track c.id) {
+                <div class="conge-card" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
+                  <div class="conge-bar" [class.bar-attente]="c.statut === 'EN_ATTENTE'" [class.bar-approuve]="c.statut === 'APPROUVE'" [class.bar-refuse]="c.statut === 'REFUSE'"></div>
+                  <div class="conge-body">
+                    <div class="conge-top">
+                      <div class="conge-employe">
+                        <div class="emp-avatar">{{ c.utilisateur?.prenom?.charAt(0) }}{{ c.utilisateur?.nom?.charAt(0) }}</div>
+                        <div>
+                          <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
+                          <span class="conge-type">{{ c.type }}</span>
+                        </div>
+                      </div>
+                      <span class="statut-pill"
+                        [class.pill-attente]="c.statut === 'EN_ATTENTE'"
+                        [class.pill-approuve]="c.statut === 'APPROUVE'"
+                        [class.pill-refuse]="c.statut === 'REFUSE'">
+                        {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
+                      </span>
+                    </div>
+                    <div class="conge-dates">
+                      <span>📅 Du {{ c.dateDebut }}</span>
+                      <span>→</span>
+                      <span>Au {{ c.dateFin }}</span>
+                      @if (c.motif) { <span class="motif">💬 {{ c.motif }}</span> }
+                    </div>
+                    <div class="conge-actions">
+                      @if (c.statut !== 'APPROUVE') {
+                        <button class="btn-action btn-approuver" (click)="updateStatutConge(c.id, 'APPROUVE')">✅ Approuver</button>
+                      }
+                      @if (c.statut !== 'REFUSE') {
+                        <button class="btn-action btn-refuser" (click)="updateStatutConge(c.id, 'REFUSE')">❌ Refuser</button>
+                      }
+                      @if (c.statut !== 'EN_ATTENTE') {
+                        <button class="btn-action btn-attente" (click)="updateStatutConge(c.id, 'EN_ATTENTE')">⏳ En attente</button>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ══ DOSSIERS PERSONNEL ══ -->
+      @if (currentPage === 'employes') {
+        <div class="section-card">
+          <div class="section-header">
+            <h3>👥 Dossiers du Personnel</h3>
+            <span class="pill pill-bleu">{{ employes.length }} employés</span>
+          </div>
+<div class="tip-box" style="margin-bottom:16px; background:#fce4ec; border-color:#7b1c1c; color:#7b1c1c;">
+  💡 Pour ajouter un employé, contactez l'administrateur système ou ajoutez-le directement via MySQL.
+</div>
+          <div class="employes-grid">
+            @for (emp of employes; track emp.id) {
+              <div class="emp-card">
+                <div class="emp-card-avatar" [style.background]="getRoleColor(emp.role)">
+                  {{ emp.prenom?.charAt(0) }}{{ emp.nom?.charAt(0) }}
+                </div>
+                <div class="emp-card-info">
+                  <strong>{{ emp.prenom }} {{ emp.nom }}</strong>
+                  <span class="emp-poste">{{ emp.poste || emp.role }}</span>
+                  <span class="emp-email">{{ emp.email || '-' }}</span>
+                  <span class="emp-tel">{{ emp.telephone || '-' }}</span>
+                </div>
+                <span class="emp-role-badge" [style.background]="getRoleColor(emp.role)">{{ emp.role }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══ SSE ══ -->
+     @if (currentPage === 'sse') {
+  <app-remontees-terrain></app-remontees-terrain>
+}
+      <!-- ══ VOITURES ══ -->
+     
+       @if (currentPage === 'voitures') {
+  <app-voitures></app-voitures>
+}  
+           
+      
+
+    </div>
+  </div>
+</div>

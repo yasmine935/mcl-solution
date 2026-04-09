@@ -11,6 +11,10 @@ import { Conges } from './components/conges/conges';
 import { FicheInterventionManager } from './components/fiche-intervention-manager/fiche-intervention-manager';
 import { FicheInterventionTechnicien } from './components/fiche-intervention-technicien/fiche-intervention-technicien';
 import { TicketingComponent } from './components/ticketing/ticketing';
+import { DashboardKarine } from './components/dashboard-karine/dashboard-karine';
+import { DashboardAby } from './components/dashboard-aby/dashboard-aby';
+import { DashboardAydeh } from './components/dashboard-aydeh/dashboard-aydeh';
+import { DashboardNaccera } from './components/dashboard-naccera/dashboard-naccera';
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
@@ -24,5 +28,9 @@ export const appRoutes: Routes = [
   { path: 'employes', component: Employes },
   { path: 'conges', component: Conges },
   { path: 'fiche-intervention', component: FicheInterventionManager },
+  { path: 'dashboard-karine', component: DashboardKarine },
+  { path: 'dashboard-aby', component: DashboardAby },
+  { path: 'dashboard-aydeh', component: DashboardAydeh },
+  { path: 'dashboard-naccera', component: DashboardNaccera },
   { path: 'fiche-intervention-tech/:id', component: FicheInterventionTechnicien }
 ];

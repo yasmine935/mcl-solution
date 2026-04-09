@@ -3,7 +3,7 @@
   <!-- ══════════ HEADER TITRE ══════════ -->
   <div class="page-header">
     <h2>🎫 Tickets Clients</h2>
-    <button class="btn-nouveau" (click)="openNewForm()">+ Nouveau Ticket</button>
+   <button *ngIf="peutCreerTicket" class="btn-nouveau" (click)="openNewForm()">+ Nouveau Ticket</button>
   </div>
 
   <!-- ══════════ KPI BARS (orange + vert comme Fiches) ══════════ -->
@@ -128,7 +128,7 @@
   </div>
 
   <!-- ══════════ MODAL FORMULAIRE CLIENT ══════════ -->
-  <div class="modal-overlay" *ngIf="showForm" (click)="cancel()">
+  <div class="modal-overlay" *ngIf="showForm && peutCreerTicket" (click)="cancel()">
     <div class="modal-box" (click)="$event.stopPropagation()">
 
       <div class="modal-top">

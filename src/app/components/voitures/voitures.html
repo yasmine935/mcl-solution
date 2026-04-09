@@ -1,0 +1,194 @@
+<div class="voitures-wrapper">
+
+  <!-- HEADER -->
+  <div class="voitures-header">
+    <div class="voitures-header-left">
+      <div class="voitures-icon">🚗</div>
+      <div>
+        <h2>Parc Automobile</h2>
+        <p>{{ voitures.length }} véhicule(s) au total</p>
+      </div>
+    </div>
+    <button class="btn-add-voiture" (click)="showFormAdd = !showFormAdd">+ Ajouter un Véhicule</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="voitures-stats">
+    <div class="stat-v stat-green">
+      <span>{{ voituresDisponibles }}</span>
+      <small>Disponibles</small>
+    </div>
+    <div class="stat-v stat-blue">
+      <span>{{ voituresEnService }}</span>
+      <small>En service</small>
+    </div>
+    <div class="stat-v stat-orange">
+      <span>{{ voituresEnMaintenance }}</span>
+      <small>En maintenance</small>
+    </div>
+    <div class="stat-v stat-total">
+      <span>{{ voitures.length }}</span>
+      <small>Total</small>
+    </div>
+  </div>
+
+  <!-- FORMULAIRE AJOUT -->
+  @if (showFormAdd) {
+    <div class="form-voiture-card">
+      <h3>🚗 Nouveau Véhicule</h3>
+      <div class="form-v-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Immatriculation *</mat-label>
+          <input matInput [(ngModel)]="nouvelleVoiture.immatriculation" placeholder="AB-123-CD"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Marque *</mat-label>
+          <input matInput [(ngModel)]="nouvelleVoiture.marque" placeholder="Renault"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Modèle</mat-label>
+          <input matInput [(ngModel)]="nouvelleVoiture.modele" placeholder="Kangoo"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Année</mat-label>
+          <input matInput [(ngModel)]="nouvelleVoiture.annee" placeholder="2022"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Kilométrage</mat-label>
+          <input matInput [(ngModel)]="nouvelleVoiture.kilometrage" placeholder="0"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Carburant</mat-label>
+          <mat-select [(ngModel)]="nouvelleVoiture.carburant">
+            @for (c of carburants; track c) { <mat-option [value]="c">{{ c }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select [(ngModel)]="nouvelleVoiture.statut">
+            @for (s of statutsVoiture; track s) { <mat-option [value]="s">{{ s }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Conducteur assigné</mat-label>
+          <input matInput [(ngModel)]="nouvelleVoiture.conducteur"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Assurance</mat-label>
+          <input matInput [(ngModel)]="nouvelleVoiture.assurance" placeholder="Ex: AXA, Allianz..."/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Expiration assurance</mat-label>
+          <input matInput type="date" [(ngModel)]="nouvelleVoiture.dateExpirationAssurance"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Prochain contrôle</mat-label>
+          <input matInput type="date" [(ngModel)]="nouvelleVoiture.prochainControle"/>
+        </mat-form-field>
+      </div>
+      <div class="form-v-actions">
+        <button class="btn-save-v" (click)="ajouterVoiture()">💾 Sauvegarder</button>
+        <button class="btn-cancel-v" (click)="showFormAdd = false; resetFormAdd()">Annuler</button>
+      </div>
+    </div>
+  }
+
+  <!-- FORMULAIRE EDITION -->
+  @if (showFormEdit && voitureEnEdition) {
+    <div class="form-voiture-card form-edit-v">
+      <h3>✏️ Modifier — {{ voitureEnEdition.immatriculation }}</h3>
+      <div class="form-v-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Immatriculation *</mat-label>
+          <input matInput [(ngModel)]="voitureEnEdition.immatriculation"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Marque *</mat-label>
+          <input matInput [(ngModel)]="voitureEnEdition.marque"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Modèle</mat-label>
+          <input matInput [(ngModel)]="voitureEnEdition.modele"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Année</mat-label>
+          <input matInput [(ngModel)]="voitureEnEdition.annee"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Kilométrage</mat-label>
+          <input matInput [(ngModel)]="voitureEnEdition.kilometrage"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Carburant</mat-label>
+          <mat-select [(ngModel)]="voitureEnEdition.carburant">
+            @for (c of carburants; track c) { <mat-option [value]="c">{{ c }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select [(ngModel)]="voitureEnEdition.statut">
+            @for (s of statutsVoiture; track s) { <mat-option [value]="s">{{ s }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Conducteur assigné</mat-label>
+          <input matInput [(ngModel)]="voitureEnEdition.conducteur"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Assurance</mat-label>
+          <input matInput [(ngModel)]="voitureEnEdition.assurance"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Expiration assurance</mat-label>
+          <input matInput type="date" [(ngModel)]="voitureEnEdition.dateExpirationAssurance"/>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Prochain contrôle</mat-label>
+          <input matInput type="date" [(ngModel)]="voitureEnEdition.prochainControle"/>
+        </mat-form-field>
+      </div>
+      <div class="form-v-actions">
+        <button class="btn-save-v" (click)="modifierVoiture()">💾 Enregistrer</button>
+        <button class="btn-cancel-v" (click)="showFormEdit = false">Annuler</button>
+      </div>
+    </div>
+  }
+
+  <!-- LISTE VOITURES -->
+  @if (voitures.length === 0) {
+    <div class="empty-v"><span>🚗</span><p>Aucun véhicule dans le parc</p></div>
+  } @else {
+    <div class="voitures-grid">
+      @for (v of voitures; track v.id) {
+        <div class="voiture-card">
+          <!-- TOP -->
+          <div class="voiture-card-top">
+            <div class="voiture-emoji">🚗</div>
+            <div class="voiture-title">
+              <strong>{{ v.marque }} {{ v.modele }}</strong>
+              <span class="immat-badge">{{ v.immatriculation }}</span>
+            </div>
+            <span class="statut-v-badge" [style.background]="getStatutColor(v.statut)">{{ v.statut }}</span>
+          </div>
+
+          <!-- INFOS -->
+          <div class="voiture-infos">
+            <div class="vi"><label>📅 Année</label><span>{{ v.annee || '-' }}</span></div>
+            <div class="vi"><label>🛣️ Km</label><span>{{ v.kilometrage || '-' }} km</span></div>
+            <div class="vi"><label>{{ getCarburantIcon(v.carburant) }} Carburant</label><span>{{ v.carburant || '-' }}</span></div>
+            <div class="vi"><label>👤 Conducteur</label><span>{{ v.conducteur || 'Non assigné' }}</span></div>
+            <div class="vi"><label>🛡️ Assurance</label><span>{{ v.assurance || '-' }}</span></div>
+            <div class="vi"><label>📋 Exp. assurance</label><span>{{ v.dateExpirationAssurance || '-' }}</span></div>
+            <div class="vi vi-full"><label>🔧 Prochain contrôle</label><span>{{ v.prochainControle || '-' }}</span></div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="voiture-actions">
+            <button class="btn-v-edit" (click)="ouvrirEdition(v)">✏️ Modifier</button>
+            <button class="btn-v-del" (click)="supprimerVoiture(v.id)">🗑️</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

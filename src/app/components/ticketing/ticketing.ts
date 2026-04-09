@@ -234,7 +234,9 @@ export class TicketingComponent implements OnInit {
     };
     return map[val] || '';
   }
-
+get peutCreerTicket(): boolean {
+  return !['FERID', 'AURELIEN', 'ODILE', 'TECHNICIEN_SUP', 'TECHNICIEN'].includes(this.currentUser?.role);
+}
   formatDate(iso: string | undefined): string {
     if (!iso) return '-';
     const d = new Date(iso);
