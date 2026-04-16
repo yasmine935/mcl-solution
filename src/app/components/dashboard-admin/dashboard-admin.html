@@ -64,6 +64,12 @@
       <a class="nav-item" [class.active]="currentPage === 'reclamations'" (click)="currentPage = 'reclamations'">
         <mat-icon>report_problem</mat-icon> Remontées Terrain
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'minutes-securite'" (click)="currentPage = 'minutes-securite'">
+  <mat-icon>health_and_safety</mat-icon> Minutes Securite
+ @if (minutesAlertes > 0) {
+  <span class="nav-badge" style="background:#c62828;">{{ minutesAlertes }}</span>
+}
+</a>
       <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
         <mat-icon>support_agent</mat-icon> Tickets
       </a>
@@ -161,6 +167,160 @@
         <app-factures></app-factures>
       }
 
+<!-- ══ MINUTES SECURITE ══ -->
+@if (currentPage === 'minutes-securite') {
+  <div class="ms-manager-wrapper">
+
+    <!-- HEADER -->
+    <div class="ms-manager-header">
+      <div class="ms-manager-header-left">
+        <div class="ms-manager-icon">🛡️</div>
+        <div>
+          <h2>Minutes Sécurité</h2>
+          <p>Soumises par les techniciens avant intervention</p>
+        </div>
+      </div>
+      <div class="ms-manager-stats">
+        <div class="ms-stat ms-stat-alerte">
+          <span>{{ minutesAlertes }}</span>
+          <small>🔴 Alertes NON</small>
+        </div>
+        <div class="ms-stat ms-stat-ok">
+          <span>{{ minutesOk }}</span>
+          <small>✅ OK</small>
+        </div>
+        <div class="ms-stat ms-stat-total">
+          <span>{{ minutesSecurite.length }}</span>
+          <small>Total</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNIERE ALERTE -->
+    @if (minutesAlertes > 0) {
+      <div class="ms-alerte-banner">
+        <div class="ms-alerte-banner-icon">🚨</div>
+        <div>
+          <strong>{{ minutesAlertes }} technicien(s) ont répondu NON !</strong>
+          <p>Une intervention a été bloquée — contactez les techniciens concernés.</p>
+        </div>
+      </div>
+    }
+
+    <!-- LISTE VIDE -->
+    @if (minutesSecurite.length === 0) {
+      <div class="ms-empty">
+        <span>🛡️</span>
+        <p>Aucune minute sécurité soumise</p>
+      </div>
+    } @else {
+      <div class="ms-list">
+        @for (m of minutesSecurite; track m.id) {
+          <div class="ms-card"
+            [class.ms-card-alerte]="m.statut === 'ALERTE'"
+            [class.ms-card-ok]="m.statut !== 'ALERTE'">
+
+            <div class="ms-card-bar"
+              [class.bar-alerte]="m.statut === 'ALERTE'"
+              [class.bar-ok]="m.statut !== 'ALERTE'">
+            </div>
+
+            <div class="ms-card-body">
+
+              <!-- TOP -->
+              <div class="ms-card-top">
+                <div class="ms-card-technicien">
+                  <div class="ms-avatar"
+                    [style.background]="m.statut === 'ALERTE' ? '#c62828' : '#2e7d32'">
+                    {{ m.technicien?.prenom?.charAt(0) }}{{ m.technicien?.nom?.charAt(0) }}
+                  </div>
+                  <div>
+                    <strong>{{ m.technicien?.prenom }} {{ m.technicien?.nom }}</strong>
+                    <span class="ms-date">{{ m.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                </div>
+                <div class="ms-card-statut">
+                  @if (m.statut === 'ALERTE') {
+                    <span class="ms-badge ms-badge-alerte">🚨 ALERTE — NON DÉTECTÉ</span>
+                  } @else if (m.statut === 'LU') {
+                    <span class="ms-badge ms-badge-lu">👁️ LU</span>
+                  } @else {
+                    <span class="ms-badge ms-badge-soumis">📬 SOUMIS</span>
+                  }
+                </div>
+              </div>
+
+              <!-- TACHE -->
+              <div class="ms-card-tache">
+                <label>📋 Tâche</label>
+                <strong>{{ m.tacheAEffectuer }}</strong>
+              </div>
+
+              <!-- 5 QUESTIONS -->
+              <div class="ms-questions-recap">
+                <div class="ms-q-item" [class.ms-q-non]="!m.competencesHabilitations">
+                  <span class="ms-q-num">1</span>
+                  <span class="ms-q-text">Compétences</span>
+                  <span class="ms-q-rep">{{ m.competencesHabilitations ? '✅' : '❌' }}</span>
+                </div>
+                <div class="ms-q-item" [class.ms-q-non]="!m.outilsEquipements">
+                  <span class="ms-q-num">2</span>
+                  <span class="ms-q-text">Outils/EPI</span>
+                  <span class="ms-q-rep">{{ m.outilsEquipements ? '✅' : '❌' }}</span>
+                </div>
+                <div class="ms-q-item" [class.ms-q-non]="!m.environnementSecurise">
+                  <span class="ms-q-num">3</span>
+                  <span class="ms-q-text">Environnement</span>
+                  <span class="ms-q-rep">{{ m.environnementSecurise ? '✅' : '❌' }}</span>
+                </div>
+                <div class="ms-q-item" [class.ms-q-non]="!m.modeOperatoire">
+                  <span class="ms-q-num">4</span>
+                  <span class="ms-q-text">Mode op.</span>
+                  <span class="ms-q-rep">{{ m.modeOperatoire ? '✅' : '❌' }}</span>
+                </div>
+                <div class="ms-q-item" [class.ms-q-non]="!m.saitQuoiFaireUrgence">
+                  <span class="ms-q-num">5</span>
+                  <span class="ms-q-text">Urgence</span>
+                  <span class="ms-q-rep">{{ m.saitQuoiFaireUrgence ? '✅' : '❌' }}</span>
+                </div>
+              </div>
+
+              <!-- RISQUES + PREVENTION -->
+              @if (m.risquesSpecifiques || m.mesurePreventionImmediate) {
+                <div class="ms-card-details">
+                  @if (m.risquesSpecifiques) {
+                    <div class="ms-detail-item">
+                      <label>⚠️ Risques identifiés</label>
+                      <p>{{ m.risquesSpecifiques }}</p>
+                    </div>
+                  }
+                  @if (m.mesurePreventionImmediate) {
+                    <div class="ms-detail-item">
+                      <label>🔧 Mesure de prévention</label>
+                      <p>{{ m.mesurePreventionImmediate }}</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- FOOTER -->
+              <div class="ms-card-footer">
+                <span class="ms-signataire">✍️ Signé : <strong>{{ m.nomSignataire }}</strong></span>
+                @if (m.statut !== 'LU') {
+                  <button class="ms-btn-lu" (click)="marquerMinuteLue(m.id)">
+                    👁️ Marquer comme lu
+                  </button>
+                }
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}
       <!-- ══ CONGÉS ══ -->
       @if (currentPage === 'conges') {
         <div class="table-card">

@@ -203,72 +203,120 @@
         </div>
       }
 
-      <!-- ══ MES CONGÉS ══ -->
-      @if (currentPage === 'mes-conges') {
-        <div class="table-card">
-          <div class="page-header">
-            <h3>🏖️ Mes Congés</h3>
-            <button mat-raised-button color="primary" (click)="showCongeForm = !showCongeForm">
-              <mat-icon>add</mat-icon> Nouvelle demande
-            </button>
+    <!-- ══ REMPLACER LE BLOC mes-conges DANS KIA ══ -->
+<!-- KIA utilise mesConges au lieu de conges -->
+
+@if (currentPage === 'mes-conges') {
+  <div class="conge-page">
+
+    <!-- HEADER -->
+    <div class="conge-page-header">
+      <div class="conge-page-header-left">
+        <span class="conge-header-icon">🏖️</span>
+        <div>
+          <h2>Mes Congés</h2>
+          <p>{{ mesConges.length }} demande(s) au total</p>
+        </div>
+      </div>
+      @if (!showCongeForm) {
+        <button class="btn-nouvelle-demande" (click)="showCongeForm = true">
+          + Nouvelle demande
+        </button>
+      }
+    </div>
+
+    @if (showCongeForm) {
+      <div class="conge-form-card">
+        <div class="conge-form-title"><span>✨</span> Nouvelle Demande de Congé</div>
+
+        <div class="conge-field">
+          <label>Type de congé *</label>
+          <div class="conge-types-grid">
+            <button class="type-btn" [class.type-btn-active]="conge.type === 'ANNUEL'" (click)="conge.type = 'ANNUEL'">🌴 Annuel</button>
+            <button class="type-btn" [class.type-btn-active]="conge.type === 'RTT'" (click)="conge.type = 'RTT'">😴 RTT</button>
+            <button class="type-btn" [class.type-btn-active]="conge.type === 'MALADIE'" (click)="conge.type = 'MALADIE'">🏥 Maladie</button>
+            <button class="type-btn" [class.type-btn-active]="conge.type === 'FORMATION'" (click)="conge.type = 'FORMATION'">📚 Formation</button>
+            <button class="type-btn" [class.type-btn-active]="conge.type === 'SANS_SOLDE'" (click)="conge.type = 'SANS_SOLDE'">💼 Sans solde</button>
+            <button class="type-btn" [class.type-btn-active]="conge.type === 'AUTRE'" (click)="conge.type = 'AUTRE'">📋 Autre</button>
           </div>
-          @if (showCongeForm) {
-            <div class="form-card">
-              <div class="form-grid">
-                <mat-form-field appearance="outline">
-                  <mat-label>Date début</mat-label>
-                  <input matInput type="date" [(ngModel)]="conge.dateDebut"/>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Date fin</mat-label>
-                  <input matInput type="date" [(ngModel)]="conge.dateFin"/>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Type</mat-label>
-                  <mat-select [(ngModel)]="conge.type">
-                    <mat-option value="ANNUEL">Congé annuel</mat-option>
-                    <mat-option value="MALADIE">Congé maladie</mat-option>
-                    <mat-option value="SANS_SOLDE">Sans solde</mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Motif</mat-label>
-                  <input matInput [(ngModel)]="conge.motif"/>
-                </mat-form-field>
+        </div>
+
+        <div class="conge-dates-row">
+          <div class="conge-field">
+            <label>📅 Date de début</label>
+            <input type="date" class="conge-input" [(ngModel)]="conge.dateDebut" (ngModelChange)="calculerNombreJours()"/>
+          </div>
+          <div class="conge-jours-display">
+            @if (nombreJours > 0) {
+              <div class="jours-pill">
+                <span class="jours-number">{{ nombreJours }}</span>
+                <span class="jours-text">jour{{ nombreJours > 1 ? 's' : '' }}</span>
               </div>
-              <div class="form-actions">
-                <button mat-raised-button color="primary" (click)="deposerConge()">
-                  <mat-icon>send</mat-icon> Envoyer à Ferid
-                </button>
-                <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
+            } @else {
+              <div class="jours-placeholder"><span>📆</span><small>durée</small></div>
+            }
+          </div>
+          <div class="conge-field">
+            <label>📅 Date de fin</label>
+            <input type="date" class="conge-input" [(ngModel)]="conge.dateFin" (ngModelChange)="calculerNombreJours()"/>
+          </div>
+        </div>
+
+        <div class="conge-field">
+          <label>💬 Motif {{ conge.type === 'AUTRE' ? '*' : '(optionnel)' }}</label>
+          <textarea class="conge-textarea" [(ngModel)]="conge.motif" rows="2"
+            [placeholder]="conge.type === 'AUTRE' ? 'Decrivez votre demande...' : 'Precisez si necessaire...'">
+          </textarea>
+        </div>
+
+        <div class="conge-form-actions">
+          <button class="btn-annuler-conge" (click)="showCongeForm = false; resetCongeForm()">Annuler</button>
+          <button class="btn-envoyer-conge" (click)="deposerConge()"
+            [disabled]="!conge.type || !conge.dateDebut || !conge.dateFin">
+            ➤ Envoyer la demande
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (mesConges.length === 0) {
+      <div class="conge-empty">
+        <span>🏖️</span>
+        <p>Aucune demande de congé</p>
+        <small>Cliquez sur "+ Nouvelle demande" pour commencer</small>
+      </div>
+    } @else {
+      <div class="conge-list">
+        @for (c of mesConges; track c.id) {
+          <div class="conge-item" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
+            <div class="conge-item-left">
+              <span class="conge-type-icon">
+                {{ c.type === 'ANNUEL' ? '🌴' : c.type === 'RTT' ? '😴' : c.type === 'MALADIE' ? '🏥' : c.type === 'FORMATION' ? '📚' : '📋' }}
+              </span>
+              <div>
+                <strong>{{ c.type }}</strong>
+                <span class="conge-dates-text">{{ c.dateDebut }} → {{ c.dateFin }}</span>
+                @if (c.dateDebut && c.dateFin) {
+                  <span class="conge-duree">{{ calculerJours(c.dateDebut, c.dateFin) }} jour(s)</span>
+                }
               </div>
             </div>
-          }
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Date début</th>
-                <th>Date fin</th>
-                <th>Motif</th>
-                <th>Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (c of mesConges; track c.id) {
-                <tr>
-                  <td>{{ c.type }}</td>
-                  <td>{{ c.dateDebut }}</td>
-                  <td>{{ c.dateFin }}</td>
-                  <td>{{ c.motif }}</td>
-                  <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
+            <div class="conge-item-right">
+              @if (c.motif) { <span class="conge-motif-text">{{ c.motif }}</span> }
+              <span class="conge-statut-badge"
+                [class.badge-approuve]="c.statut === 'APPROUVE'"
+                [class.badge-refuse]="c.statut === 'REFUSE'"
+                [class.badge-attente]="c.statut === 'EN_ATTENTE'">
+                {{ c.statut === 'APPROUVE' ? '✅ Approuve' : c.statut === 'REFUSE' ? '❌ Refuse' : '⏳ En attente' }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
+  </div>
+}
     <!-- ══ REMONTÉES TERRAIN ══ -->
 @if (currentPage === 'remonteesTerrain') {
   <app-remontees-terrain></app-remontees-terrain>

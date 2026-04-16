@@ -550,3 +550,184 @@ nav {
 .header {
   display: none;
 }
+/* ============================================================
+   MINUTES SECURITE — VUE MANAGERS
+   Ajouter à la fin du CSS de chaque dashboard manager
+   ============================================================ */
+
+.ms-manager-wrapper { padding: 0; }
+
+/* HEADER */
+.ms-manager-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+  padding: 22px 28px; border-radius: 16px; margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(13,27,42,0.3); flex-wrap: wrap; gap: 16px;
+}
+
+.ms-manager-header-left { display: flex; align-items: center; gap: 16px; }
+
+.ms-manager-icon {
+  width: 52px; height: 52px; background: rgba(255,255,255,0.12);
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; border: 1px solid rgba(255,255,255,0.15);
+}
+
+.ms-manager-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #fff; }
+.ms-manager-header p { margin: 4px 0 0; font-size: 0.8rem; color: rgba(255,255,255,0.55); }
+
+/* STATS */
+.ms-manager-stats { display: flex; gap: 10px; }
+
+.ms-stat {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 18px; border-radius: 12px; min-width: 70px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.ms-stat span { font-size: 1.6rem; font-weight: 900; color: #fff; line-height: 1; }
+.ms-stat small { font-size: 0.68rem; color: rgba(255,255,255,0.7); margin-top: 3px; text-align: center; }
+
+.ms-stat-alerte { background: rgba(198,40,40,0.4); }
+.ms-stat-ok { background: rgba(46,125,50,0.4); }
+.ms-stat-total { background: rgba(255,255,255,0.1); }
+
+/* ALERTE BANNER */
+.ms-alerte-banner {
+  display: flex; align-items: center; gap: 16px;
+  background: #ffebee; border-left: 4px solid #c62828;
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 16px;
+  animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198,40,40,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(198,40,40,0); }
+}
+
+.ms-alerte-banner-icon { font-size: 2rem; flex-shrink: 0; }
+.ms-alerte-banner strong { display: block; font-size: 0.95rem; color: #c62828; font-weight: 800; }
+.ms-alerte-banner p { margin: 4px 0 0; font-size: 0.82rem; color: #e57373; }
+
+/* LISTE */
+.ms-list { display: flex; flex-direction: column; gap: 12px; }
+
+/* CARD */
+.ms-card {
+  background: #fff; border-radius: 14px; display: flex;
+  border: 1.5px solid #e0e0e0; overflow: hidden; transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.ms-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+.ms-card-alerte { border-color: #ef9a9a !important; background: #fff8f8; }
+.ms-card-ok { border-color: #a5d6a7; }
+
+/* BANDE */
+.ms-card-bar { width: 5px; flex-shrink: 0; }
+.bar-alerte { background: linear-gradient(180deg, #c62828, #e53935); }
+.bar-ok { background: linear-gradient(180deg, #2e7d32, #43a047); }
+
+.ms-card-body { flex: 1; padding: 16px 20px; }
+
+/* TOP */
+.ms-card-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+}
+
+.ms-card-technicien { display: flex; align-items: center; gap: 12px; }
+
+.ms-avatar {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+
+.ms-card-technicien strong { display: block; font-size: 0.95rem; color: #0d1b2a; }
+.ms-date { font-size: 0.72rem; color: #90a4ae; }
+
+/* BADGES */
+.ms-badge {
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 700;
+}
+
+.ms-badge-alerte { background: #ffebee; color: #c62828; border: 1.5px solid #ef9a9a; }
+.ms-badge-soumis { background: #e3f2fd; color: #1565c0; }
+.ms-badge-lu { background: #e8f5e9; color: #2e7d32; }
+
+/* TACHE */
+.ms-card-tache {
+  background: #f8fafc; border-radius: 10px; padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.ms-card-tache label { font-size: 0.7rem; color: #90a4ae; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 3px; }
+.ms-card-tache strong { font-size: 0.9rem; color: #0d1b2a; }
+
+/* QUESTIONS RECAP */
+.ms-questions-recap {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px; margin-bottom: 12px;
+}
+
+.ms-q-item {
+  display: flex; flex-direction: column; align-items: center;
+  background: #f8fafc; border-radius: 10px; padding: 8px 6px;
+  text-align: center; border: 1.5px solid transparent;
+  transition: all 0.15s;
+}
+
+.ms-q-non {
+  background: #ffebee !important;
+  border-color: #ef9a9a !important;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.ms-q-num {
+  width: 22px; height: 22px; background: #0d1b2a; color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 800; margin-bottom: 5px; flex-shrink: 0;
+}
+
+.ms-q-non .ms-q-num { background: #c62828; }
+
+.ms-q-text { font-size: 0.65rem; color: #546e7a; line-height: 1.3; margin-bottom: 5px; }
+.ms-q-rep { font-size: 0.72rem; font-weight: 800; }
+
+/* DETAILS */
+.ms-card-details {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  background: #f8fafc; border-radius: 10px; padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.ms-detail-item label { font-size: 0.7rem; color: #90a4ae; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+.ms-detail-item p { font-size: 0.82rem; color: #546e7a; margin: 0; }
+
+/* FOOTER */
+.ms-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 12px; border-top: 1px solid #f0f0f0; flex-wrap: wrap; gap: 10px;
+}
+
+.ms-signataire { font-size: 0.82rem; color: #546e7a; }
+
+.ms-btn-lu {
+  background: #e8f5e9; color: #2e7d32; border: none;
+  padding: 7px 16px; border-radius: 8px; cursor: pointer;
+  font-size: 0.78rem; font-weight: 700; transition: all 0.15s;
+}
+
+.ms-btn-lu:hover { background: #2e7d32; color: #fff; }
+
+/* EMPTY */
+.ms-empty { text-align: center; padding: 60px; color: #b0bec5; background: #fff; border-radius: 14px; }
+.ms-empty span { font-size: 3rem; display: block; margin-bottom: 12px; }

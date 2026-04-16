@@ -25,19 +25,16 @@ import { TicketingComponent } from '../ticketing/ticketing';
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Taches, FichesCompletees,
-    Factures, Documents, Semenier, Planning,
-    TicketingComponent  // ✅ NOUVEAU
+    Factures, Documents, Semenier, Planning, TicketingComponent
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
 })
 export class DashboardAurelien implements OnInit {
   user: any = {};
-  
+
   private _currentPage = 'home';
-  get currentPage(): string {
-    return this._currentPage;
-  }
+  get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) {
     this.fermerDetailFiche();
     this._currentPage = value;
@@ -53,7 +50,8 @@ export class DashboardAurelien implements OnInit {
   fiches: any[] = [];
   selectedFiche: any = null;
 
-  conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
+  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+  nombreJours = 0;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -67,6 +65,7 @@ export class DashboardAurelien implements OnInit {
     this.loadEmployes();
     this.loadDocuments();
     this.loadFiches();
+    this.loadSoldeConges();
   }
 
   loadConges() {
@@ -78,9 +77,9 @@ export class DashboardAurelien implements OnInit {
     this.documents = [
       { id: 1, nom: 'Rapport Intervention Jan 2026', date: '2026-01-15', type: 'PDF' },
       { id: 2, nom: 'Devis Client MCL', date: '2026-01-10', type: 'DOCX' },
-      { id: 3, nom: 'Manuel Technique Caméras', date: '2025-12-20', type: 'PDF' },
+      { id: 3, nom: 'Manuel Technique Cameras', date: '2025-12-20', type: 'PDF' },
       { id: 4, nom: 'Contrats Clients', date: '2025-12-15', type: 'PDF' },
-      { id: 5, nom: 'PV de Réunion', date: '2026-01-08', type: 'DOCX' }
+      { id: 5, nom: 'PV de Reunion', date: '2026-01-08', type: 'DOCX' }
     ];
   }
 
@@ -91,54 +90,67 @@ export class DashboardAurelien implements OnInit {
 
   loadFiches() {
     const stored = localStorage.getItem('interventions');
-    const toutesLesInterventions = stored ? JSON.parse(stored) : [];
-    this.fiches = toutesLesInterventions;
+    this.fiches = stored ? JSON.parse(stored) : [];
   }
 
   deposerConge() {
-    const demande = {
-      ...this.conge,
-      utilisateur: { id: this.user.id },
-      manager: { id: 4 }
-    };
-    this.http.post('http://localhost:8080/api/conges', demande)
-      .subscribe(() => {
-        this.loadConges();
-        this.showCongeForm = false;
-        this.conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
-      }, error => console.error('Erreur envoi congé', error));
+    const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 4 } };
+    this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
+      this.loadConges();
+      this.showCongeForm = false;
+      this.resetCongeForm(); 
+      this.loadSoldeConges();
+    }, error => console.error('Erreur envoi conge', error));
   }
 
-  ouvrirDetailFiche(fiche: any) {
-    this.selectedFiche = fiche;
-    this.showDetailModal = true;
+  calculerNombreJours() {
+    if (this.conge.dateDebut && this.conge.dateFin) {
+      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin);
+    } else {
+      this.nombreJours = 0;
+    }
   }
 
-  fermerDetailFiche() {
-    this.showDetailModal = false;
-    this.selectedFiche = null;
+  calculerJours(dateDebut: string, dateFin: string): number {
+    if (!dateDebut || !dateFin) return 0;
+    const debut = new Date(dateDebut);
+    const fin = new Date(dateFin);
+    if (fin < debut) return 0;
+    return Math.ceil((fin.getTime() - debut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
   }
+
+  resetCongeForm() {
+    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+    this.nombreJours = 0;
+  }
+soldeConges: any = null;
+
+loadSoldeConges() {
+  if (!this.user.id) return;
+  this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+    next: (data) => this.soldeConges = data,
+    error: () => this.soldeConges = null ,
+    
+  });
+}
+  ouvrirDetailFiche(fiche: any) { this.selectedFiche = fiche; this.showDetailModal = true; }
+  fermerDetailFiche() { this.showDetailModal = false; this.selectedFiche = null; }
 
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Mon Dashboard';
-      case 'fiches': return 'Fiches d\'Intervention';
-      case 'fiches-completees': return '✅ Fiches Complétées';
-      case 'taches': return '✓ Tâches';
-      case 'planning': return '📅 Planning';
-      case 'ged': return '📄 Documents';
-      case 'semenier': return '📆 Semenier';
-      case 'tickets': return '🎫 Tickets Clients';
-      case 'rh': return '👥 Ressources Humaines';
-      case 'factures': return '💰 Factures';
-      case 'mes-conges': return '🏖️ Mes Congés';
-      
+      case 'fiches': return 'Fiches Intervention';
+      case 'fiches-completees': return 'Fiches Completees';
+      case 'taches': return 'Taches';
+      case 'planning': return 'Planning';
+      case 'ged': return 'Documents';
+      case 'semenier': return 'Semenier';
+      case 'tickets': return 'Tickets Clients';
+      case 'factures': return 'Factures';
+      case 'mes-conges': return 'Mes Conges';
       default: return 'Dashboard';
     }
   }
 
-  logout() {
-    localStorage.removeItem('user');
-    this.router.navigate(['/login']);
-  }
+  logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }

@@ -1,102 +1,108 @@
 <div class="fiche-container">
+
   <!-- HEADER -->
   <div class="page-header">
-    <h2>🔧 Fiches d'Intervention</h2>
-    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd" class="btn-add">
-      <mat-icon>add</mat-icon> Nouvelle Fiche
+    <div class="page-header-left">
+      <h2>🔧 Fiches d'Intervention</h2>
+      <span class="fiches-count">{{ fiches.length }} fiche(s)</span>
+    </div>
+    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd; showFormEdit = false" class="btn-add">
+      <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
+      {{ showFormAdd ? 'Fermer' : 'Nouvelle Fiche' }}
     </button>
   </div>
 
-  <!-- FORMULAIRE AJOUT -->
   @if (showFormAdd) {
     <div class="form-container">
-      <h3>➕ Nouvelle Fiche d'Intervention</h3>
+      <div class="form-header">
+        <mat-icon>add_circle</mat-icon>
+        <h3>Nouvelle Fiche d'Intervention</h3>
+      </div>
 
-      <!-- 1. INFORMATION PRINCIPALE -->
       <div class="section">
-        <h4>⭐ Informations Principales</h4>
-        <div class="form-grid">
+        <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
+        <div class="form-grid-3">
           <mat-form-field appearance="outline">
             <mat-label>N° Projet *</mat-label>
             <input matInput [(ngModel)]="nouvelleFiche.numProjet" placeholder="PRJ-001"/>
+            <mat-icon matPrefix>tag</mat-icon>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Client</mat-label>
+            <mat-label>Client *</mat-label>
             <input matInput [(ngModel)]="nouvelleFiche.client" placeholder="Ex: Acme Corp"/>
+            <mat-icon matPrefix>business</mat-icon>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Date</mat-label>
-            <input matInput type="date" [(ngModel)]="nouvelleFiche.date"/>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Technicien Assigné</mat-label>
-            <mat-select [(ngModel)]="nouvelleFiche.technicienAssigne">
-              @for (tech of techniciens; track tech.id) {
-                <mat-option [value]="tech.prenom + ' ' + tech.nom">
-                  {{ tech.prenom }} {{ tech.nom }}
-                </mat-option>
-              }
-            </mat-select>
+            <mat-label>Date d'intervention</mat-label>
+            <input matInput [matDatepicker]="pickerAdd" [(ngModel)]="nouvelleFiche.date" placeholder="jj/mm/aaaa" readonly/>
+            <mat-icon matPrefix>calendar_today</mat-icon>
+            <mat-datepicker-toggle matSuffix [for]="pickerAdd"></mat-datepicker-toggle>
+            <mat-datepicker #pickerAdd></mat-datepicker>
           </mat-form-field>
         </div>
-
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Description</mat-label>
+          <mat-label>Technicien Assigné</mat-label>
+          <mat-select [(ngModel)]="nouvelleFiche.technicienAssigne">
+            <mat-option value="">-- Sélectionner un technicien --</mat-option>
+            @for (tech of techniciens; track tech.id) {
+              <mat-option [value]="tech.prenom + ' ' + tech.nom">
+                👷 {{ tech.prenom }} {{ tech.nom }} — {{ tech.role }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>engineering</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description de l'intervention</mat-label>
           <textarea matInput [(ngModel)]="nouvelleFiche.description" rows="3" placeholder="Décrivez l'intervention..."></textarea>
+          <mat-icon matPrefix>description</mat-icon>
         </mat-form-field>
       </div>
 
-      <!-- 2. INFO CLIENTS -->
       <div class="section">
-        <h4>👥 Informations Clients</h4>
-        <div class="form-grid">
+        <div class="section-title"><span class="section-icon">👥</span><h4>Informations Client</h4></div>
+        <div class="form-grid-2">
           <mat-form-field appearance="outline">
             <mat-label>Code Client</mat-label>
             <input matInput [(ngModel)]="nouvelleFiche.codeClient" placeholder="CLI-001"/>
             <mat-hint>Optionnel</mat-hint>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Numéro de Commande *</mat-label>
-            <input matInput [(ngModel)]="nouvelleFiche.numCommande" placeholder="CMD-2025-001"/>
+            <mat-label>Numéro de Commande</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.numCommande" placeholder="CMD-2026-001"/>
           </mat-form-field>
         </div>
-
-        <div class="form-grid">
+        <div class="form-grid-2">
           <mat-form-field appearance="outline">
             <mat-label>Montant (€)</mat-label>
             <input matInput type="number" [(ngModel)]="nouvelleFiche.chiffreAffaire" placeholder="0.00" step="0.01"/>
+            <mat-icon matPrefix>euro</mat-icon>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Adresse *</mat-label>
-            <input matInput [(ngModel)]="nouvelleFiche.adresse" placeholder="123 Rue de Paris, 75001 Paris"/>
+            <mat-label>Adresse</mat-label>
+            <input matInput [(ngModel)]="nouvelleFiche.adresse" placeholder="123 Rue de Paris, 75001"/>
+            <mat-icon matPrefix>location_on</mat-icon>
           </mat-form-field>
         </div>
-
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contact *</mat-label>
-          <input matInput [(ngModel)]="nouvelleFiche.contact" placeholder="Jean Dupont - 01 23 45 67 89"/>
+          <mat-label>Contact</mat-label>
+          <input matInput [(ngModel)]="nouvelleFiche.contact" placeholder="Jean Dupont — 01 23 45 67 89"/>
+          <mat-icon matPrefix>person</mat-icon>
         </mat-form-field>
       </div>
 
-      <!-- 3. MATÉRIEL HORS STANDARD -->
       <div class="section">
-        <h4>🔩 Matériel Hors Standard</h4>
+        <div class="section-title"><span class="section-icon">🔩</span><h4>Matériel Hors Standard</h4></div>
         <div class="materiel-input">
           <mat-form-field appearance="outline" class="flex-grow">
             <mat-label>Ajouter un matériel</mat-label>
             <input matInput [(ngModel)]="nouvelleFiche.nouveauMateriel" placeholder="Ex: Nacelle, Testeur..."/>
           </mat-form-field>
-          <button mat-icon-button color="primary" (click)="ajouterMateriel(nouvelleFiche)" type="button">
-            <mat-icon>add_circle</mat-icon>
+          <button mat-raised-button color="primary" (click)="ajouterMateriel(nouvelleFiche)" type="button" class="btn-add-materiel">
+            <mat-icon>add</mat-icon> Ajouter
           </button>
         </div>
-
-        @if (nouvelleFiche.materielsHorsStandard && nouvelleFiche.materielsHorsStandard.length > 0) {
+        @if (nouvelleFiche.materielsHorsStandard?.length > 0) {
           <div class="chips-container">
             @for (materiel of nouvelleFiche.materielsHorsStandard; track $index) {
               <div class="chip">
@@ -110,21 +116,19 @@
         }
       </div>
 
-      <!-- 4. DOCUMENTS -->
       <div class="section">
-        <h4>📎 Documents / Fonctionnalités</h4>
+        <div class="section-title"><span class="section-icon">📎</span><h4>Documents / Fichiers</h4></div>
         <div class="file-upload-section">
           <input type="file" #fileInput (change)="onFileSelectDocuments($event, nouvelleFiche)" multiple class="file-input" accept="*/*"/>
           <button mat-stroked-button (click)="fileInput.click()" type="button" class="upload-btn">
-            <mat-icon>upload_file</mat-icon> Importer des dossiers/fichiers
+            <mat-icon>upload_file</mat-icon> Importer des fichiers
           </button>
         </div>
-
-        @if (nouvelleFiche.documentsImportes && nouvelleFiche.documentsImportes.length > 0) {
+        @if (nouvelleFiche.documentsImportes?.length > 0) {
           <div class="documents-list">
             @for (doc of nouvelleFiche.documentsImportes; track $index) {
               <div class="document-item">
-                <mat-icon>folder</mat-icon>
+                <mat-icon>insert_drive_file</mat-icon>
                 <div class="doc-info">
                   <p class="doc-nom">{{ doc.nom }}</p>
                   <p class="doc-meta">{{ doc.taille }} KB • {{ doc.dateAjout }}</p>
@@ -138,19 +142,18 @@
         }
       </div>
 
-      <!-- 5. TÂCHES -->
       <div class="section">
-        <h4>✅ Description des Tâches</h4>
+        <div class="section-title"><span class="section-icon">✅</span><h4>Description des Tâches</h4></div>
         <div class="taches-buttons">
           @for (tache of tachesDisponibles; track tache) {
             <button mat-stroked-button (click)="ajouterTache(nouvelleFiche, tache)" type="button"
+              [class.tache-active]="tacheExiste(nouvelleFiche, tache)"
               [disabled]="tacheExiste(nouvelleFiche, tache)" class="tache-btn">
-              <mat-icon>add</mat-icon> {{ tache }}
+              <mat-icon>{{ tacheExiste(nouvelleFiche, tache) ? 'check' : 'add' }}</mat-icon> {{ tache }}
             </button>
           }
         </div>
-
-        @if (nouvelleFiche.taches && nouvelleFiche.taches.length > 0) {
+        @if (nouvelleFiche.taches?.length > 0) {
           <div class="taches-list">
             @for (tache of nouvelleFiche.taches; track $index) {
               <div class="tache-item">
@@ -178,9 +181,8 @@
         }
       </div>
 
-      <!-- BOUTONS ACTION -->
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="ajouterFiche()">
+        <button mat-raised-button color="primary" (click)="ajouterFiche()" class="btn-save">
           <mat-icon>save</mat-icon> Créer la Fiche
         </button>
         <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
@@ -190,96 +192,97 @@
     </div>
   }
 
-  <!-- FORMULAIRE ÉDITION -->
   @if (showFormEdit && ficheEnEdition) {
     <div class="form-container form-edit">
-      <h3>✏️ Modifier - {{ ficheEnEdition.numProjet }}</h3>
+      <div class="form-header form-header-edit">
+        <mat-icon>edit</mat-icon>
+        <h3>Modifier — {{ ficheEnEdition.numProjet }}</h3>
+      </div>
 
-      <!-- 1. INFORMATION PRINCIPALE -->
       <div class="section">
-        <h4>⭐ Informations Principales</h4>
-        <div class="form-grid">
+        <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
+        <div class="form-grid-3">
           <mat-form-field appearance="outline">
             <mat-label>N° Projet *</mat-label>
             <input matInput [(ngModel)]="ficheEnEdition.numProjet"/>
+            <mat-icon matPrefix>tag</mat-icon>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
             <mat-label>Client</mat-label>
             <input matInput [(ngModel)]="ficheEnEdition.client"/>
+            <mat-icon matPrefix>business</mat-icon>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Date</mat-label>
-            <input matInput type="date" [(ngModel)]="ficheEnEdition.date"/>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Technicien Assigné</mat-label>
-            <mat-select [(ngModel)]="ficheEnEdition.technicienAssigne">
-              @for (tech of techniciens; track tech.id) {
-                <mat-option [value]="tech.prenom + ' ' + tech.nom">
-                  {{ tech.prenom }} {{ tech.nom }}
-                </mat-option>
-              }
-            </mat-select>
+            <mat-label>Date d'intervention</mat-label>
+            <input matInput [matDatepicker]="pickerEdit" [(ngModel)]="ficheEnEdition.date" placeholder="jj/mm/aaaa" readonly/>
+            <mat-icon matPrefix>calendar_today</mat-icon>
+            <mat-datepicker-toggle matSuffix [for]="pickerEdit"></mat-datepicker-toggle>
+            <mat-datepicker #pickerEdit></mat-datepicker>
           </mat-form-field>
         </div>
-
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Technicien Assigné</mat-label>
+          <mat-select [(ngModel)]="ficheEnEdition.technicienAssigne">
+            <mat-option value="">-- Sélectionner un technicien --</mat-option>
+            @for (tech of techniciens; track tech.id) {
+              <mat-option [value]="tech.prenom + ' ' + tech.nom">
+                👷 {{ tech.prenom }} {{ tech.nom }} — {{ tech.role }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>engineering</mat-icon>
+        </mat-form-field>
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Description</mat-label>
           <textarea matInput [(ngModel)]="ficheEnEdition.description" rows="3"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
         </mat-form-field>
       </div>
 
-      <!-- 2. INFO CLIENTS -->
       <div class="section">
-        <h4>👥 Informations Clients</h4>
-        <div class="form-grid">
+        <div class="section-title"><span class="section-icon">👥</span><h4>Informations Client</h4></div>
+        <div class="form-grid-2">
           <mat-form-field appearance="outline">
             <mat-label>Code Client</mat-label>
             <input matInput [(ngModel)]="ficheEnEdition.codeClient"/>
             <mat-hint>Optionnel</mat-hint>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Numéro de Commande *</mat-label>
+            <mat-label>Numéro de Commande</mat-label>
             <input matInput [(ngModel)]="ficheEnEdition.numCommande"/>
           </mat-form-field>
         </div>
-
-        <div class="form-grid">
+        <div class="form-grid-2">
           <mat-form-field appearance="outline">
             <mat-label>Montant (€)</mat-label>
-            <input matInput type="number" [(ngModel)]="ficheEnEdition.chiffreAffaire" placeholder="0.00" step="0.01"/>
+            <input matInput type="number" [(ngModel)]="ficheEnEdition.chiffreAffaire" step="0.01"/>
+            <mat-icon matPrefix>euro</mat-icon>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Adresse *</mat-label>
+            <mat-label>Adresse</mat-label>
             <input matInput [(ngModel)]="ficheEnEdition.adresse"/>
+            <mat-icon matPrefix>location_on</mat-icon>
           </mat-form-field>
         </div>
-
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contact *</mat-label>
+          <mat-label>Contact</mat-label>
           <input matInput [(ngModel)]="ficheEnEdition.contact"/>
+          <mat-icon matPrefix>person</mat-icon>
         </mat-form-field>
       </div>
 
-      <!-- 3. MATÉRIEL HORS STANDARD -->
       <div class="section">
-        <h4>🔩 Matériel Hors Standard</h4>
+        <div class="section-title"><span class="section-icon">🔩</span><h4>Matériel Hors Standard</h4></div>
         <div class="materiel-input">
           <mat-form-field appearance="outline" class="flex-grow">
             <mat-label>Ajouter un matériel</mat-label>
-            <input matInput [(ngModel)]="ficheEnEdition.nouveauMateriel" placeholder="Ex: Nacelle, Testeur..."/>
+            <input matInput [(ngModel)]="ficheEnEdition.nouveauMateriel" placeholder="Ex: Nacelle..."/>
           </mat-form-field>
-          <button mat-icon-button color="primary" (click)="ajouterMateriel(ficheEnEdition)" type="button">
-            <mat-icon>add_circle</mat-icon>
+          <button mat-raised-button color="primary" (click)="ajouterMateriel(ficheEnEdition)" type="button" class="btn-add-materiel">
+            <mat-icon>add</mat-icon> Ajouter
           </button>
         </div>
-
-        @if (ficheEnEdition.materielsHorsStandard && ficheEnEdition.materielsHorsStandard.length > 0) {
+        @if (ficheEnEdition.materielsHorsStandard?.length > 0) {
           <div class="chips-container">
             @for (materiel of ficheEnEdition.materielsHorsStandard; track $index) {
               <div class="chip">
@@ -293,21 +296,19 @@
         }
       </div>
 
-      <!-- 4. DOCUMENTS -->
       <div class="section">
-        <h4>📎 Documents / Fonctionnalités</h4>
+        <div class="section-title"><span class="section-icon">📎</span><h4>Documents / Fichiers</h4></div>
         <div class="file-upload-section">
           <input type="file" #fileInputEdit (change)="onFileSelectDocuments($event, ficheEnEdition)" multiple class="file-input" accept="*/*"/>
           <button mat-stroked-button (click)="fileInputEdit.click()" type="button" class="upload-btn">
-            <mat-icon>upload_file</mat-icon> Importer des dossiers/fichiers
+            <mat-icon>upload_file</mat-icon> Importer des fichiers
           </button>
         </div>
-
-        @if (ficheEnEdition.documentsImportes && ficheEnEdition.documentsImportes.length > 0) {
+        @if (ficheEnEdition.documentsImportes?.length > 0) {
           <div class="documents-list">
             @for (doc of ficheEnEdition.documentsImportes; track $index) {
               <div class="document-item">
-                <mat-icon>folder</mat-icon>
+                <mat-icon>insert_drive_file</mat-icon>
                 <div class="doc-info">
                   <p class="doc-nom">{{ doc.nom }}</p>
                   <p class="doc-meta">{{ doc.taille }} KB • {{ doc.dateAjout }}</p>
@@ -321,19 +322,18 @@
         }
       </div>
 
-      <!-- 5. TÂCHES -->
       <div class="section">
-        <h4>✅ Description des Tâches</h4>
+        <div class="section-title"><span class="section-icon">✅</span><h4>Description des Tâches</h4></div>
         <div class="taches-buttons">
           @for (tache of tachesDisponibles; track tache) {
             <button mat-stroked-button (click)="ajouterTache(ficheEnEdition, tache)" type="button"
+              [class.tache-active]="tacheExiste(ficheEnEdition, tache)"
               [disabled]="tacheExiste(ficheEnEdition, tache)" class="tache-btn">
-              <mat-icon>add</mat-icon> {{ tache }}
+              <mat-icon>{{ tacheExiste(ficheEnEdition, tache) ? 'check' : 'add' }}</mat-icon> {{ tache }}
             </button>
           }
         </div>
-
-        @if (ficheEnEdition.taches && ficheEnEdition.taches.length > 0) {
+        @if (ficheEnEdition.taches?.length > 0) {
           <div class="taches-list">
             @for (tache of ficheEnEdition.taches; track $index) {
               <div class="tache-item">
@@ -361,9 +361,8 @@
         }
       </div>
 
-      <!-- BOUTONS ACTION -->
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="modifierFiche()">
+        <button mat-raised-button color="primary" (click)="modifierFiche()" class="btn-save">
           <mat-icon>save</mat-icon> Enregistrer
         </button>
         <button mat-stroked-button (click)="resetFormEdit()">
@@ -373,72 +372,51 @@
     </div>
   }
 
-  <!-- LISTE DES FICHES -->
   <div class="fiches-list-container">
-    <h3>📋 Fiches d'Intervention ({{ fiches.length }})</h3>
-
     @if (fiches.length === 0) {
-      <p class="empty">Aucune fiche d'intervention</p>
+      <div class="empty-state">
+        <mat-icon>engineering</mat-icon>
+        <p>Aucune fiche d'intervention</p>
+        <small>Cliquez sur "Nouvelle Fiche" pour commencer</small>
+      </div>
     } @else {
       @for (fiche of fiches; track fiche.id) {
         <div class="fiche-card">
-          <div class="fiche-header">
-            <div class="fiche-title">
-              <h4>{{ fiche.numProjet }} - {{ fiche.client }}</h4>
-              <p class="fiche-date">{{ fiche.date }} • {{ fiche.technicienAssigne }}</p>
-            </div>
-            <div class="fiche-actions">
-              <button mat-icon-button color="primary" (click)="ouvrirEdition(fiche)" title="Modifier">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="supprimerFiche(fiche.id)" title="Supprimer">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
-
-          <div class="fiche-content">
-            <p class="description">{{ fiche.description }}</p>
-
-            @if (fiche.codeClient || fiche.numCommande || fiche.adresse || fiche.contact) {
-              <div class="fiche-info">
-                <span class="info-item"><strong>N° Commande:</strong> {{ fiche.numCommande }}</span>
-                <span class="info-item"><strong>Montant:</strong> {{ fiche.chiffreAffaire }}€</span>
-                <span class="info-item"><strong>Adresse:</strong> {{ fiche.adresse }}</span>
-                <span class="info-item"><strong>Contact:</strong> {{ fiche.contact }}</span>
-              </div>
-            }
-
-            @if (fiche.materielsHorsStandard && fiche.materielsHorsStandard.length > 0) {
-              <div class="fiche-materiels">
-                <strong>Matériel Hors Standard:</strong>
-                <div class="chips-display">
-                  @for (materiel of fiche.materielsHorsStandard; track $index) {
-                    <span class="chip-display">{{ materiel }}</span>
-                  }
+          <div class="fiche-card-bar"></div>
+          <div class="fiche-card-content">
+            <div class="fiche-header">
+              <div class="fiche-title">
+                <span class="fiche-num">{{ fiche.numProjet }}</span>
+                <h4>{{ fiche.client }}</h4>
+                <div class="fiche-meta">
+                  <span><mat-icon>calendar_today</mat-icon> {{ afficherDate(fiche.date) }}</span>
+                  <span><mat-icon>engineering</mat-icon> {{ fiche.technicienAssigne || 'Non assigné' }}</span>
+                  <span class="badge-statut" [class.statut-en-cours]="fiche.statut === 'EN_COURS'" [class.statut-completee]="fiche.statut === 'COMPLETEE'">
+                    {{ fiche.statut }}
+                  </span>
                 </div>
               </div>
-            }
-
-            @if (fiche.taches && fiche.taches.length > 0) {
-              <div class="fiche-taches">
-                <strong>Tâches:</strong>
-                <div class="taches-display">
-                  @for (tache of fiche.taches; track $index) {
-                    <div class="tache-display" [class.coche]="tache.coche">
-                      <mat-icon class="tache-icon">{{ tache.coche ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-                      <span>{{ tache.nom }}</span>
-                      @if (tache.selection) {
-                        <span class="selection-badge">{{ tache.selection }}</span>
-                      }
-                    </div>
-                  }
-                </div>
+              <div class="fiche-actions">
+                <button mat-icon-button color="primary" (click)="ouvrirEdition(fiche)" title="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="supprimerFiche(fiche.id)" title="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
               </div>
+            </div>
+            @if (fiche.description) {
+              <p class="fiche-description">{{ fiche.description }}</p>
             }
+            <div class="fiche-info-grid">
+              @if (fiche.adresse) { <span class="info-chip"><mat-icon>location_on</mat-icon> {{ fiche.adresse }}</span> }
+              @if (fiche.contact) { <span class="info-chip"><mat-icon>person</mat-icon> {{ fiche.contact }}</span> }
+              @if (fiche.numCommande) { <span class="info-chip"><mat-icon>receipt</mat-icon> {{ fiche.numCommande }}</span> }
+            </div>
           </div>
         </div>
       }
     }
   </div>
+
 </div>

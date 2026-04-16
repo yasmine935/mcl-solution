@@ -21,7 +21,8 @@
     <span class="leg-item"><span class="leg-dot" style="background:#1565c0"></span>Bureau</span>
     <span class="leg-item"><span class="leg-dot" style="background:#e65100"></span>Distance</span>
     <span class="leg-item"><span class="leg-dot" style="background:#6a1b9a"></span>Déplacement</span>
-    <span class="leg-item"><span class="leg-dot" style="background:#c62828"></span>Congé/RTT</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#c62828"></span>Congé/Maladie</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#0277bd"></span>RTT</span>
     <span class="leg-item"><span class="leg-dot" style="background:#2e7d32"></span>Formation</span>
   </div>
 
@@ -40,12 +41,18 @@
         [class.other-month]="jour.jour === 0"
         [class.weekend]="jour.isWeekend && jour.jour !== 0"
         [class.today]="jour.isToday"
-        [class.has-note]="jour.note && jour.jour !== 0"
+        [class.has-note]="(jour.note || jour.conge) && jour.jour !== 0"
+        [class.has-conge]="jour.conge && jour.jour !== 0"
         (click)="ouvrirJour(jour)">
 
         <span class="day-number">{{ jour.affichage }}</span>
 
-        @if (jour.note && jour.jour !== 0) {
+        <!-- ✅ AFFICHER LE CONGE APPROUVE EN PRIORITE -->
+        @if (jour.conge && jour.jour !== 0) {
+          <div class="day-note conge-badge" [style.background]="getCongeColor(jour.conge)">
+            {{ getCongeLabel(jour.conge) }}
+          </div>
+        } @else if (jour.note && jour.jour !== 0) {
           <div class="day-note" [style.background]="getNoteColor(jour.note)">
             {{ jour.note }}
           </div>
@@ -83,14 +90,17 @@
             <ng-container *ngFor="let jour of joursAffiche">
               <td *ngIf="jour.jour !== 0"
                 class="td-note"
-                [class.td-weekend]="jour.isWeekend">
-                @if (getNotesForUser(user.id, jour.jour)) {
-                  <span class="note-pill" [style.background]="getNoteColor(getNotesForUser(user.id, jour.jour))">
-                    {{ getNotesForUser(user.id, jour.jour) }}
-                  </span>
-                } @else {
-                  <span class="td-empty">·</span>
-                }
+                [class.td-weekend]="jour.isWeekend"
+                [class.td-conge]="getCongeForUserOnDay(user.id, jour.date)">
+              @if (getInfoForUserOnDay(user.id, jour)) {
+  <span class="note-pill"
+    [style.background]="getInfoForUserOnDay(user.id, jour)!.color"
+    [class.conge-pill]="getInfoForUserOnDay(user.id, jour)!.isConge">
+    {{ getInfoForUserOnDay(user.id, jour)!.label }}
+  </span>
+} @else {
+  <span class="td-empty">·</span>
+}
               </td>
             </ng-container>
           </tr>
@@ -106,25 +116,58 @@
         <div class="modal-note-header">
           <div>
             <h3>📝 {{ selectedJour.affichage }} {{ getMoisAnnee() }}</h3>
-            <p>Ajouter ou modifier votre note</p>
+            @if (selectedJour.conge) {
+              <p class="conge-info-modal">
+                🏖️ Congé approuvé : <strong>{{ getCongeLabel(selectedJour.conge) }}</strong>
+              </p>
+            } @else {
+              <p>Ajouter ou modifier votre note</p>
+            }
           </div>
           <button class="btn-modal-close" (click)="closeModal()">✕</button>
         </div>
 
-        <div class="note-suggestions">
-          <span *ngFor="let s of ['Bureau', 'Télétravail', 'Déplacement', 'Congé', 'RTT', 'Formation']"
-            class="suggestion-chip" (click)="selectedJour.note = s">
-            {{ s }}
-          </span>
-        </div>
+        @if (!selectedJour.conge) {
+          <div class="note-suggestions">
+            <span *ngFor="let s of ['Bureau', 'Télétravail', 'Déplacement', 'Congé', 'RTT', 'Formation']"
+              class="suggestion-chip" (click)="selectedJour.note = s">
+              {{ s }}
+            </span>
+          </div>
 
-        <textarea class="note-textarea" [(ngModel)]="selectedJour.note"
-          placeholder="Ex: Bureau, Congé, Déplacement client..."></textarea>
+          <textarea class="note-textarea" [(ngModel)]="selectedJour.note"
+            placeholder="Ex: Bureau, Congé, Déplacement client..."></textarea>
 
-        <div class="modal-note-actions">
-          <button class="btn-modal-cancel" (click)="closeModal()">Annuler</button>
-          <button class="btn-modal-save" (click)="sauvegarderNote()">✓ Sauvegarder</button>
-        </div>
+          <div class="modal-note-actions">
+            <button class="btn-modal-cancel" (click)="closeModal()">Annuler</button>
+            <button class="btn-modal-save" (click)="sauvegarderNote()">✓ Sauvegarder</button>
+          </div>
+        } @else {
+          <div class="conge-detail-modal">
+            <div class="conge-detail-row">
+              <span>📋 Type :</span>
+              <strong>{{ selectedJour.conge.type }}</strong>
+            </div>
+            <div class="conge-detail-row">
+              <span>📅 Du :</span>
+              <strong>{{ selectedJour.conge.dateDebut }}</strong>
+            </div>
+            <div class="conge-detail-row">
+              <span>📅 Au :</span>
+              <strong>{{ selectedJour.conge.dateFin }}</strong>
+            </div>
+            @if (selectedJour.conge.motif) {
+              <div class="conge-detail-row">
+                <span>💬 Motif :</span>
+                <strong>{{ selectedJour.conge.motif }}</strong>
+              </div>
+            }
+            <div class="conge-statut-badge">✅ Approuvé</div>
+          </div>
+          <div class="modal-note-actions">
+            <button class="btn-modal-cancel" (click)="closeModal()">Fermer</button>
+          </div>
+        }
       </div>
     </div>
   }

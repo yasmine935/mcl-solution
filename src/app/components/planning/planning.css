@@ -1,428 +1,79 @@
 /* ============================================================
-   PLANNING — MCL Solutions — Design Premium
+   CONGES DANS LE PLANNING — CSS supplementaire
+   Ajouter a la fin de planning.css
    ============================================================ */
 
-.planning-wrapper {
-  padding: 0;
-  font-family: 'Exo 2', 'Segoe UI', sans-serif;
+/* Case du calendrier avec conge */
+.cal-day.has-conge {
+  background: #fff8f8 !important;
 }
 
-/* ── HEADER ── */
-.planning-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 60%, #388e3c 100%);
-  padding: 22px 28px;
-  border-radius: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 8px 24px rgba(27, 94, 32, 0.3);
-  position: relative;
-  overflow: hidden;
+/* Badge conge dans le calendrier */
+.conge-badge {
+  font-size: 0.62rem !important;
+  font-weight: 800 !important;
+  border-radius: 6px !important;
+  padding: 3px 6px !important;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
-.planning-header::after {
-  content: '';
-  position: absolute;
-  bottom: -30px; right: -30px;
-  width: 140px; height: 140px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 50%;
+/* Cellule tableau avec conge */
+.td-conge {
+  background: rgba(198, 40, 40, 0.04);
 }
 
-.planning-header-left { display: flex; align-items: center; gap: 16px; }
-
-.planning-icon {
-  width: 50px; height: 50px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem;
-  border: 1px solid rgba(255,255,255,0.2);
+/* Pill conge dans le tableau equipe */
+.conge-pill {
+  font-weight: 800 !important;
+  font-size: 0.65rem !important;
+  letter-spacing: 0.3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 
-.planning-header-left h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.planning-header-left p {
+/* Info conge dans le modal */
+.conge-info-modal {
+  font-size: 0.82rem;
+  color: #c62828;
+  font-weight: 600;
   margin: 4px 0 0;
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.6);
 }
 
-/* NAV MOIS */
-.nav-mois {
+/* Detail conge dans le modal */
+.conge-detail-modal {
+  background: #fff8f8;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 14px 0;
+  border: 1.5px solid #ef9a9a;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conge-detail-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(255,255,255,0.15);
-  padding: 8px 16px;
-  border-radius: 30px;
-  border: 1px solid rgba(255,255,255,0.2);
+  font-size: 0.88rem;
 }
 
-.nav-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.1rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: background 0.15s;
-  font-weight: 700;
+.conge-detail-row span {
+  color: #90a4ae;
+  min-width: 80px;
 }
 
-.nav-btn:hover { background: rgba(255,255,255,0.2); }
-
-.mois-label {
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 700;
-  min-width: 160px;
-  text-align: center;
-  letter-spacing: 0.5px;
+.conge-detail-row strong {
+  color: #0d1b2a;
 }
 
-/* LÉGENDE */
-.legende {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-  background: #fff;
-  padding: 12px 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.leg-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #546e7a;
-}
-
-.leg-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-/* ── CALENDRIER ── */
-.calendrier-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  margin-bottom: 20px;
-  border: 1px solid #e8f5e9;
-}
-
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-
-.cal-header-row {
-  margin-bottom: 6px;
-}
-
-.cal-day-header {
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 700;
+.conge-statut-badge {
+  background: #e8f5e9;
   color: #2e7d32;
-  padding: 8px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.cal-day {
-  border-radius: 10px;
-  padding: 8px;
-  min-height: 80px;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 1.5px solid transparent;
-  background: #fafafa;
-  position: relative;
-}
-
-.cal-day:hover {
-  border-color: #4caf50;
-  background: #f1f8e9;
-  transform: scale(1.02);
-}
-
-.cal-day.other-month {
-  background: #f5f5f5;
-  cursor: default;
-  opacity: 0.4;
-}
-
-.cal-day.other-month:hover { transform: none; border-color: transparent; }
-
-.cal-day.weekend { background: #f9fbe7; }
-
-.cal-day.today {
-  border-color: #2e7d32 !important;
-  background: #e8f5e9 !important;
-  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
-}
-
-.cal-day.has-note { background: #fff; }
-
-.day-number {
-  display: block;
-  text-align: right;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #546e7a;
-  margin-bottom: 4px;
-}
-
-.today .day-number {
-  color: #2e7d32;
-  font-size: 0.9rem;
-}
-
-.day-note {
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 6px;
-  word-break: break-word;
-  line-height: 1.3;
-}
-
-/* ── TABLEAU ÉQUIPE ── */
-.equipe-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  border: 1px solid #e8f5e9;
-}
-
-.equipe-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #2e7d32;
-  margin: 0 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.equipe-table-wrapper { overflow-x: auto; }
-
-.equipe-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.75rem;
-}
-
-.equipe-table thead th {
-  padding: 10px 8px;
   text-align: center;
-  background: #2e7d32;
-  color: #fff;
-  font-weight: 700;
-  border: 1px solid #388e3c;
-  white-space: nowrap;
-  min-width: 36px;
+  margin-top: 4px;
 }
-
-.equipe-table thead th.th-personne {
-  text-align: left;
-  min-width: 140px;
-  padding-left: 14px;
-}
-
-.equipe-table thead th.th-weekend { background: #1b5e20; }
-.equipe-table thead th.th-today { background: #f9a825; color: #fff; }
-
-.equipe-table tbody tr { border: 1px solid #f0f0f0; }
-.equipe-table tbody tr:hover { background: #f1f8e9; }
-
-.td-personne {
-  padding: 10px 14px;
-  font-weight: 700;
-  color: #2d3748;
-  border: 1px solid #f0f0f0;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user-avatar-sm {
-  width: 28px; height: 28px;
-  background: #e8f5e9;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: #2e7d32;
-  flex-shrink: 0;
-}
-
-.td-note {
-  padding: 6px 4px;
-  text-align: center;
-  border: 1px solid #f0f0f0;
-  min-width: 36px;
-}
-
-.td-note.td-weekend { background: #fafafa; }
-
-.note-pill {
-  display: inline-block;
-  color: #fff;
-  font-size: 0.62rem;
-  font-weight: 700;
-  padding: 3px 6px;
-  border-radius: 6px;
-  white-space: nowrap;
-  max-width: 70px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.td-empty { color: #ddd; font-size: 1rem; }
-
-/* ── MODAL ── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(13, 27, 42, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.modal-note {
-  background: #fff;
-  border-radius: 18px;
-  padding: 28px;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-  animation: popIn 0.2s ease;
-}
-
-@keyframes popIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
-.modal-note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.modal-note-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #1b5e20;
-}
-
-.modal-note-header p {
-  margin: 4px 0 0;
-  font-size: 0.78rem;
-  color: #90a4ae;
-}
-
-.btn-modal-close {
-  background: #f0f4f8;
-  border: none;
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-/* SUGGESTIONS */
-.note-suggestions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-
-.suggestion-chip {
-  padding: 5px 12px;
-  background: #e8f5e9;
-  color: #2e7d32;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 1.5px solid transparent;
-}
-
-.suggestion-chip:hover { background: #2e7d32; color: #fff; }
-
-.note-textarea {
-  width: 100%;
-  border: 1.5px solid #dde2ea;
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 0.9rem;
-  min-height: 80px;
-  resize: vertical;
-  font-family: inherit;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-.note-textarea:focus { border-color: #2e7d32; }
-
-.modal-note-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-
-.btn-modal-cancel {
-  background: #f0f4f8;
-  color: #546e7a;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.btn-modal-save {
-  background: #2e7d32;
-  color: #fff;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-modal-save:hover { background: #1b5e20; }

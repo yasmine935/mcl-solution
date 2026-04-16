@@ -16,6 +16,7 @@ export class Planning implements OnInit {
 
   utilisateurs: any[] = [];
   allNotes: any = {};
+  congesApprouves: any[] = [];
   currentUserId: number | null = null;
   currentMonth: number = new Date().getMonth();
   currentYear: number = new Date().getFullYear();
@@ -32,6 +33,7 @@ export class Planning implements OnInit {
     this.detectCurrentUser();
     this.loadUtilisateurs();
     this.loadAllNotes();
+    this.loadCongesApprouves();
     this.generateCalendrier();
   }
 
@@ -42,7 +44,10 @@ export class Planning implements OnInit {
 
   loadUtilisateurs() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
-      next: (data) => { this.utilisateurs = data; localStorage.setItem('utilisateurs', JSON.stringify(data)); },
+      next: (data) => {
+        this.utilisateurs = data;
+        localStorage.setItem('utilisateurs', JSON.stringify(data));
+      },
       error: () => {
         const stored = localStorage.getItem('utilisateurs');
         this.utilisateurs = stored ? JSON.parse(stored) : [];
@@ -72,6 +77,57 @@ export class Planning implements OnInit {
     });
   }
 
+  // ✅ CHARGER LES CONGES APPROUVES
+  loadCongesApprouves() {
+    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+      next: (data) => {
+        this.congesApprouves = data.filter((c: any) => c.statut === 'APPROUVE');
+        this.generateCalendrier();
+      },
+      error: () => {
+        this.congesApprouves = [];
+      }
+    });
+  }
+
+  // ✅ Vérifie si un jour donné est en congé approuvé pour un user
+  getCongeForUserOnDay(userId: number, date: Date): any | null {
+    return this.congesApprouves.find((c: any) => {
+      if (c.utilisateur?.id !== userId) return false;
+      const debut = new Date(c.dateDebut);
+      const fin = new Date(c.dateFin);
+      debut.setHours(0, 0, 0, 0);
+      fin.setHours(23, 59, 59, 999);
+      return date >= debut && date <= fin;
+    }) || null;
+  }
+
+  // ✅ Libellé du congé selon le type
+  getCongeLabel(conge: any): string {
+    const map: any = {
+      'ANNUEL': '🌴 Congé',
+      'RTT': '😴 RTT',
+      'MALADIE': '🏥 Maladie',
+      'FORMATION': '📚 Formation',
+      'SANS_SOLDE': '💼 Sans solde',
+      'AUTRE': '📋 Congé'
+    };
+    return map[conge.type] || '🏖️ Congé';
+  }
+
+  // ✅ Couleur du congé selon le type
+  getCongeColor(conge: any): string {
+    const map: any = {
+      'ANNUEL': '#1565c0',
+      'RTT': '#0277bd',
+      'MALADIE': '#c62828',
+      'FORMATION': '#2e7d32',
+      'SANS_SOLDE': '#546e7a',
+      'AUTRE': '#6a1b9a'
+    };
+    return map[conge.type] || '#c62828';
+  }
+
   generateCalendrier() {
     this.joursAffiche = [];
     const firstDay = new Date(this.currentYear, this.currentMonth, 1);
@@ -88,14 +144,20 @@ export class Planning implements OnInit {
       const annee = currentDate.getFullYear();
       const key = `${this.currentUserId}_${annee}-${mois + 1}-${jour}`;
       const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
+      const dateObj = new Date(annee, mois, jour);
+
+      // ✅ Vérifier si l'utilisateur courant a un congé ce jour
+      const conge = this.getCongeForUserOnDay(this.currentUserId!, dateObj);
+
       this.joursAffiche.push({
         jour: mois === this.currentMonth ? jour : 0,
         affichage: jour,
-        date: new Date(annee, mois, jour),
+        date: dateObj,
         note: this.allNotes[key] || '',
         key: key,
         isWeekend,
-        isToday: this.isToday(new Date(annee, mois, jour))
+        isToday: this.isToday(dateObj),
+        conge: conge
       });
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -153,6 +215,17 @@ export class Planning implements OnInit {
   getNotesForUser(userId: number, jour: number): string {
     const key = `${userId}_${this.currentYear}-${this.currentMonth + 1}-${jour}`;
     return this.allNotes[key] || '';
+  }
+
+  // ✅ Note ou congé pour affichage dans le tableau équipe
+  getInfoForUserOnDay(userId: number, jourObj: any): { label: string, color: string, isConge: boolean } | null {
+    const note = this.getNotesForUser(userId, jourObj.jour);
+    if (note) return { label: note, color: this.getNoteColor(note), isConge: false };
+
+    const conge = this.getCongeForUserOnDay(userId, jourObj.date);
+    if (conge) return { label: this.getCongeLabel(conge), color: this.getCongeColor(conge), isConge: true };
+
+    return null;
   }
 
   getNoteColor(note: string): string {

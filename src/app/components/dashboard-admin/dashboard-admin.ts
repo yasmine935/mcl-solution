@@ -86,7 +86,31 @@ statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadData();
   }
+minutesSecurite: any[] = [];
 
+loadMinutesSecurite() {
+  this.http.get<any[]>('http://localhost:8080/api/minutes-securite').subscribe({
+    next: (data) => this.minutesSecurite = data,
+    error: () => this.minutesSecurite = []
+  });
+}
+
+marquerMinuteLue(id: number) {
+  this.http.put(`http://localhost:8080/api/minutes-securite/${id}/lu`, {}).subscribe({
+    next: () => {
+      const m = this.minutesSecurite.find(x => x.id === id);
+      if (m) m.statut = 'LU';
+    }
+  });
+}
+
+get minutesAlertes(): number {
+  return this.minutesSecurite.filter(m => m.statut === 'ALERTE').length;
+}
+
+get minutesOk(): number {
+  return this.minutesSecurite.filter(m => m.statut !== 'ALERTE').length;
+}
   loadData() {
   this.loadFiches();
   this.loadConges();
@@ -95,7 +119,8 @@ statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
   this.loadDocuments();
   this.loadTickets();
   this.loadFactures();
-  this.loadVoitures(); // ✅ AJOUTER
+  this.loadVoitures();
+  this.loadMinutesSecurite(); // ✅ AJOUTER
 }
 
   loadFiches() {

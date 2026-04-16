@@ -202,80 +202,372 @@
           }
         </div>
       }
+<!-- ══════════ POPUP MINUTE SECURITE ══════════ -->
+<!-- A ajouter dans dashboard-technicien.html -->
+<!-- Juste avant la fermeture </div> finale -->
 
-      <!-- MES CONGES -->
-      @if (currentPage === 'conges') {
-        <div class="table-card">
-          <h3>🏖️ Mes Demandes de Conges</h3>
-          @if (showCongeForm) {
-            <div class="form-card">
-              <h4>Nouvelle Demande de Conge</h4>
-              <div class="form-grid">
-                <mat-form-field appearance="outline">
-                  <mat-label>Type de Conge</mat-label>
-                  <mat-select [(ngModel)]="conge.type">
-                    <mat-option value="REPOS">Repos</mat-option>
-                    <mat-option value="MALADIE">Maladie</mat-option>
-                    <mat-option value="FORMATION">Formation</mat-option>
-                    <mat-option value="AUTRE">Autre</mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Date Debut</mat-label>
-                  <input matInput type="date" [(ngModel)]="conge.dateDebut"/>
-                </mat-form-field>
-              </div>
-              <div class="form-grid">
-                <mat-form-field appearance="outline">
-                  <mat-label>Date Fin</mat-label>
-                  <input matInput type="date" [(ngModel)]="conge.dateFin"/>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Motif</mat-label>
-                  <input matInput [(ngModel)]="conge.motif"/>
-                </mat-form-field>
-              </div>
-              <div class="form-actions">
-                <button mat-raised-button color="primary" (click)="deposerConge()">
-                  <mat-icon>send</mat-icon> Envoyer
-                </button>
-                <button mat-stroked-button (click)="showCongeForm = false">Annuler</button>
-              </div>
+@if (showMinuteSecurite) {
+  <div class="ms-overlay">
+    <div class="ms-modal">
+
+      <!-- HEADER -->
+      <div class="ms-header">
+        <div class="ms-header-left">
+          <div class="ms-shield">🛡️</div>
+          <div>
+            <h2>LA MINUTE SÉCURITÉ</h2>
+            <p>Obligatoire avant chaque intervention</p>
+          </div>
+        </div>
+        <div class="ms-test-label">
+          Le test des 5 « OUI » — Si un « NON » apparaît, je m'arrête et j'appelle mon responsable
+        </div>
+      </div>
+
+      <div class="ms-body">
+
+        <!-- TACHE -->
+        <div class="ms-field">
+          <label>📋 Tâche à effectuer *</label>
+          <input type="text" [(ngModel)]="minuteForm.tacheAEffectuer"
+            class="ms-input" placeholder="Décrivez la tâche à effectuer..."/>
+        </div>
+
+        <!-- 5 QUESTIONS -->
+        <div class="ms-questions">
+          <h3>✅ Le Test des 5 « OUI »</h3>
+
+          <div class="ms-question">
+            <div class="ms-question-text">
+              <span class="ms-num">1</span>
+              <span>Ai-je les compétences et les habilitations pour cette tâche ?</span>
             </div>
-          }
-          @if (conges.length === 0) {
-            <p class="empty">Aucune demande de conge</p>
-          } @else {
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Date Debut</th>
-                  <th>Date Fin</th>
-                  <th>Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (c of conges; track c.id) {
-                  <tr>
-                    <td>{{ c.type }}</td>
-                    <td>{{ c.dateDebut }}</td>
-                    <td>{{ c.dateFin }}</td>
-                    <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
-          @if (!showCongeForm) {
-            <div style="margin-top:15px;text-align:center">
-              <button mat-raised-button color="primary" (click)="showCongeForm = true">
-                <mat-icon>add</mat-icon> Nouvelle Demande
-              </button>
+            <div class="ms-oui-non">
+              <button class="btn-oui" [class.selected]="minuteForm.competencesHabilitations === true"
+                (click)="minuteForm.competencesHabilitations = true">OUI</button>
+              <button class="btn-non" [class.selected]="minuteForm.competencesHabilitations === false"
+                (click)="minuteForm.competencesHabilitations = false">NON</button>
             </div>
-          }
+          </div>
+
+          <div class="ms-question">
+            <div class="ms-question-text">
+              <span class="ms-num">2</span>
+              <span>Mes outils, EPI et équipements sont-ils en bon état et conformes ?</span>
+            </div>
+            <div class="ms-oui-non">
+              <button class="btn-oui" [class.selected]="minuteForm.outilsEquipements === true"
+                (click)="minuteForm.outilsEquipements = true">OUI</button>
+              <button class="btn-non" [class.selected]="minuteForm.outilsEquipements === false"
+                (click)="minuteForm.outilsEquipements = false">NON</button>
+            </div>
+          </div>
+
+          <div class="ms-question">
+            <div class="ms-question-text">
+              <span class="ms-num">3</span>
+              <span>Mon environnement est-il sécurisé (météo, co-activité, sol) ?</span>
+            </div>
+            <div class="ms-oui-non">
+              <button class="btn-oui" [class.selected]="minuteForm.environnementSecurise === true"
+                (click)="minuteForm.environnementSecurise = true">OUI</button>
+              <button class="btn-non" [class.selected]="minuteForm.environnementSecurise === false"
+                (click)="minuteForm.environnementSecurise = false">NON</button>
+            </div>
+          </div>
+
+          <div class="ms-question">
+            <div class="ms-question-text">
+              <span class="ms-num">4</span>
+              <span>Je connais le mode opératoire et l'analyse de risque ?</span>
+            </div>
+            <div class="ms-oui-non">
+              <button class="btn-oui" [class.selected]="minuteForm.modeOperatoire === true"
+                (click)="minuteForm.modeOperatoire = true">OUI</button>
+              <button class="btn-non" [class.selected]="minuteForm.modeOperatoire === false"
+                (click)="minuteForm.modeOperatoire = false">NON</button>
+            </div>
+          </div>
+
+          <div class="ms-question">
+            <div class="ms-question-text">
+              <span class="ms-num">5</span>
+              <span>Est-ce que je sais quoi faire en cas d'urgence ?</span>
+            </div>
+            <div class="ms-oui-non">
+              <button class="btn-oui" [class.selected]="minuteForm.saitQuoiFaireUrgence === true"
+                (click)="minuteForm.saitQuoiFaireUrgence = true">OUI</button>
+              <button class="btn-non" [class.selected]="minuteForm.saitQuoiFaireUrgence === false"
+                (click)="minuteForm.saitQuoiFaireUrgence = false">NON</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALERTE NON -->
+        @if (hasNonResponse()) {
+          <div class="ms-alerte">
+            🚨 Vous avez répondu NON à une ou plusieurs questions !
+            Arrêtez-vous et contactez votre responsable avant de continuer.
+          </div>
+        }
+
+        <!-- RISQUES -->
+        <div class="ms-field">
+          <label>⚠️ Risques Spécifiques Identifiés sur Place</label>
+          <small>(Ex: passage de piétons, bruit excessif, vent fort...)</small>
+          <textarea [(ngModel)]="minuteForm.risquesSpecifiques"
+            class="ms-textarea" rows="3"
+            placeholder="Décrivez les risques identifiés..."></textarea>
+        </div>
+
+        <!-- PREVENTION -->
+        <div class="ms-field">
+          <label>🔧 Mesure de Prévention Immédiate Prise</label>
+          <textarea [(ngModel)]="minuteForm.mesurePreventionImmediate"
+            class="ms-textarea" rows="3"
+            placeholder="Mesures prises pour sécuriser l'intervention..."></textarea>
+        </div>
+
+        <!-- VALIDATION -->
+        <div class="ms-validation">
+          <div class="ms-field">
+            <label>✍️ Nom et Signature *</label>
+            <input type="text" [(ngModel)]="minuteForm.nomSignataire"
+              class="ms-input" placeholder="Votre nom complet"/>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="ms-footer">
+        <button class="ms-btn-annuler" (click)="annulerMinuteSecurite()">
+          ← Retour au Dashboard
+        </button>
+        <button class="ms-btn-valider"
+          [disabled]="!minuteFormValide()"
+          (click)="validerMinuteSecurite()">
+          ✅ Valider et Accéder aux Interventions
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+   <!-- ══ MES CONGES — Design Premium ══ -->
+@if (currentPage === 'conges') {
+  <div class="conge-page">
+
+    <!-- HEADER -->
+    <div class="conge-page-header">
+      <div class="conge-page-header-left">
+        <span class="conge-header-icon">🏖️</span>
+        <div>
+          <h2>Mes Congés</h2>
+          <p>{{ conges.length }} demande(s) au total</p>
+        </div>
+      </div>
+      
+      @if (!showCongeForm) {
+        <button class="btn-nouvelle-demande" (click)="showCongeForm = true">
+          + Nouvelle demande
+        </button>
+      }
+    </div>
+<!-- ============================================================
+   COMPTEUR SOLDE CONGÉS
+   A ajouter JUSTE AVANT le formulaire dans chaque dashboard
+   (avant conge-form-card)
+   ============================================================ -->
+
+@if (soldeConges) {
+  <div class="solde-card">
+    <h4 class="solde-title">📊 Mon Solde de Congés {{ soldeConges.annee }}</h4>
+    <div class="solde-grid">
+
+      <!-- CONGÉS ANNUELS -->
+      <div class="solde-item">
+        <div class="solde-item-header">
+          <span class="solde-icon">🌴</span>
+          <div>
+            <strong>Congés Annuels</strong>
+            <span class="solde-subtitle">2.5 jours/mois</span>
+          </div>
+        </div>
+        <div class="solde-bar-wrapper">
+          <div class="solde-bar">
+            <div class="solde-fill solde-fill-annuel"
+              [style.width.%]="(soldeConges.joursAnnuelPris / soldeConges.soldeAnnuelTotal) * 100">
+            </div>
+          </div>
+          <div class="solde-numbers">
+            <span class="solde-pris">{{ soldeConges.joursAnnuelPris }}j pris</span>
+            <span class="solde-restant" [class.solde-alert]="soldeConges.soldeAnnuelRestant <= 5">
+              {{ soldeConges.soldeAnnuelRestant }}j restants
+            </span>
+          </div>
+        </div>
+        <div class="solde-total">Sur {{ soldeConges.soldeAnnuelTotal }} jours au total</div>
+      </div>
+
+      <!-- RTT -->
+      <div class="solde-item">
+        <div class="solde-item-header">
+          <span class="solde-icon">😴</span>
+          <div>
+            <strong>RTT</strong>
+            <span class="solde-subtitle">1 jour/mois</span>
+          </div>
+        </div>
+        <div class="solde-bar-wrapper">
+          <div class="solde-bar">
+            <div class="solde-fill solde-fill-rtt"
+              [style.width.%]="(soldeConges.joursRTTPris / soldeConges.soldeRTTTotal) * 100">
+            </div>
+          </div>
+          <div class="solde-numbers">
+            <span class="solde-pris">{{ soldeConges.joursRTTPris }}j pris</span>
+            <span class="solde-restant" [class.solde-alert]="soldeConges.soldeRTTRestant <= 2">
+              {{ soldeConges.soldeRTTRestant }}j restants
+            </span>
+          </div>
+        </div>
+        <div class="solde-total">Sur {{ soldeConges.soldeRTTTotal }} jours au total</div>
+      </div>
+
+      <!-- MALADIE -->
+      @if (soldeConges.joursMaladiePris > 0) {
+        <div class="solde-item solde-item-maladie">
+          <div class="solde-item-header">
+            <span class="solde-icon">🏥</span>
+            <div>
+              <strong>Maladie</strong>
+              <span class="solde-subtitle">Cette année</span>
+            </div>
+          </div>
+          <div class="solde-numbers">
+            <span class="solde-pris">{{ soldeConges.joursMaladiePris }}j pris</span>
+          </div>
         </div>
       }
+
+    </div>
+  </div>
+}
+    <!-- FORMULAIRE COMPACT ET BEAU -->
+    @if (showCongeForm) {
+      <div class="conge-form-card">
+        <div class="conge-form-title">
+          <span>✨</span> Nouvelle Demande de Congé
+        </div>
+
+        <!-- LIGNE 1 : Type + Dates -->
+        <div class="conge-form-row">
+
+          <!-- TYPE -->
+          <div class="conge-field">
+            <label>Type de congé *</label>
+            <div class="conge-types-grid">
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'ANNUEL'" (click)="conge.type = 'ANNUEL'">🌴 Annuel</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'RTT'" (click)="conge.type = 'RTT'">😴 RTT</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'MALADIE'" (click)="conge.type = 'MALADIE'">🏥 Maladie</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'FORMATION'" (click)="conge.type = 'FORMATION'">📚 Formation</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'SANS_SOLDE'" (click)="conge.type = 'SANS_SOLDE'">💼 Sans solde</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'AUTRE'" (click)="conge.type = 'AUTRE'">📋 Autre</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- LIGNE 2 : Dates + Compteur -->
+        <div class="conge-dates-row">
+          <div class="conge-field">
+            <label>📅 Date de début</label>
+            <input type="date" class="conge-input" [(ngModel)]="conge.dateDebut" (ngModelChange)="calculerNombreJours()"/>
+          </div>
+
+          <!-- COMPTEUR JOURS -->
+          <div class="conge-jours-display">
+            @if (nombreJours > 0) {
+              <div class="jours-pill">
+                <span class="jours-number">{{ nombreJours }}</span>
+                <span class="jours-text">jour{{ nombreJours > 1 ? 's' : '' }}</span>
+              </div>
+            } @else {
+              <div class="jours-placeholder">
+                <span>📆</span>
+                <small>durée</small>
+              </div>
+            }
+          </div>
+
+          <div class="conge-field">
+            <label>📅 Date de fin</label>
+            <input type="date" class="conge-input" [(ngModel)]="conge.dateFin" (ngModelChange)="calculerNombreJours()"/>
+          </div>
+        </div>
+
+        <!-- MOTIF -->
+        <div class="conge-field">
+          <label>💬 Motif {{ conge.type === 'AUTRE' ? '*' : '(optionnel)' }}</label>
+          <textarea class="conge-textarea" [(ngModel)]="conge.motif" rows="2"
+            [placeholder]="conge.type === 'AUTRE' ? 'Décrivez votre demande en détail...' : 'Précisez si nécessaire...'">
+          </textarea>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="conge-form-actions">
+          <button class="btn-annuler-conge" (click)="showCongeForm = false; resetCongeForm()">
+            Annuler
+          </button>
+          <button class="btn-envoyer-conge" (click)="deposerConge()"
+            [disabled]="!conge.type || !conge.dateDebut || !conge.dateFin">
+            ➤ Envoyer la demande
+          </button>
+        </div>
+
+      </div>
+    }
+
+    <!-- LISTE DES CONGES -->
+    @if (conges.length === 0) {
+      <div class="conge-empty">
+        <span>🏖️</span>
+        <p>Aucune demande de congé</p>
+        <small>Cliquez sur "+ Nouvelle demande" pour commencer</small>
+      </div>
+    } @else {
+      <div class="conge-list">
+        @for (c of conges; track c.id) {
+          <div class="conge-item" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
+            <div class="conge-item-left">
+              <span class="conge-type-icon">
+                {{ c.type === 'ANNUEL' ? '🌴' : c.type === 'RTT' ? '😴' : c.type === 'MALADIE' ? '🏥' : c.type === 'FORMATION' ? '📚' : '📋' }}
+              </span>
+              <div>
+                <strong>{{ c.type }}</strong>
+                <span class="conge-dates-text">{{ c.dateDebut }} → {{ c.dateFin }}</span>
+                @if (c.dateDebut && c.dateFin) {
+                  <span class="conge-duree">{{ calculerJours(c.dateDebut, c.dateFin) }} jour(s)</span>
+                }
+              </div>
+            </div>
+            <div class="conge-item-right">
+              @if (c.motif) { <span class="conge-motif-text">{{ c.motif }}</span> }
+              <span class="conge-statut-badge"
+                [class.badge-approuve]="c.statut === 'APPROUVE'"
+                [class.badge-refuse]="c.statut === 'REFUSE'"
+                [class.badge-attente]="c.statut === 'EN_ATTENTE'">
+                {{ c.statut === 'APPROUVE' ? '✅ Approuvé' : c.statut === 'REFUSE' ? '❌ Refusé' : '⏳ En attente' }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}
 
       <!-- REMONTEES SSE TERRAIN -->
       @if (currentPage === 'reclamations') {
@@ -284,4 +576,93 @@
 
     </div><!-- /page-content -->
   </div><!-- /main-content -->
-</div>
+
+  <!-- ✅ POPUP ICI — EN DEHORS DU page-content -->
+  @if (showMinuteSecurite) {
+    <div class="ms-overlay">
+      <div class="ms-modal">
+        <!-- HEADER -->
+        <div class="ms-header">
+          <div class="ms-header-left">
+            <div class="ms-shield">🛡️</div>
+            <div>
+              <h2>LA MINUTE SÉCURITÉ</h2>
+              <p>Obligatoire avant chaque intervention</p>
+            </div>
+          </div>
+          <div class="ms-test-label">
+            Le test des 5 OUI — Si un NON apparait, je m'arrete et j'appelle mon responsable
+          </div>
+        </div>
+        <div class="ms-body">
+          <div class="ms-field">
+            <label>Tache a effectuer *</label>
+            <input type="text" [(ngModel)]="minuteForm.tacheAEffectuer" class="ms-input" placeholder="Decrivez la tache..."/>
+          </div>
+          <div class="ms-questions">
+            <h3>Le Test des 5 OUI</h3>
+            <div class="ms-question">
+              <div class="ms-question-text"><span class="ms-num">1</span><span>Ai-je les competences et habilitations pour cette tache ?</span></div>
+              <div class="ms-oui-non">
+                <button class="btn-oui" [class.selected]="minuteForm.competencesHabilitations === true" (click)="minuteForm.competencesHabilitations = true">OUI</button>
+                <button class="btn-non" [class.selected]="minuteForm.competencesHabilitations === false" (click)="minuteForm.competencesHabilitations = false">NON</button>
+              </div>
+            </div>
+            <div class="ms-question">
+              <div class="ms-question-text"><span class="ms-num">2</span><span>Mes outils, EPI et equipements sont-ils en bon etat et conformes ?</span></div>
+              <div class="ms-oui-non">
+                <button class="btn-oui" [class.selected]="minuteForm.outilsEquipements === true" (click)="minuteForm.outilsEquipements = true">OUI</button>
+                <button class="btn-non" [class.selected]="minuteForm.outilsEquipements === false" (click)="minuteForm.outilsEquipements = false">NON</button>
+              </div>
+            </div>
+            <div class="ms-question">
+              <div class="ms-question-text"><span class="ms-num">3</span><span>Mon environnement est-il securise (meteo, co-activite, sol) ?</span></div>
+              <div class="ms-oui-non">
+                <button class="btn-oui" [class.selected]="minuteForm.environnementSecurise === true" (click)="minuteForm.environnementSecurise = true">OUI</button>
+                <button class="btn-non" [class.selected]="minuteForm.environnementSecurise === false" (click)="minuteForm.environnementSecurise = false">NON</button>
+              </div>
+            </div>
+            <div class="ms-question">
+              <div class="ms-question-text"><span class="ms-num">4</span><span>Je connais le mode operatoire et l'analyse de risque ?</span></div>
+              <div class="ms-oui-non">
+                <button class="btn-oui" [class.selected]="minuteForm.modeOperatoire === true" (click)="minuteForm.modeOperatoire = true">OUI</button>
+                <button class="btn-non" [class.selected]="minuteForm.modeOperatoire === false" (click)="minuteForm.modeOperatoire = false">NON</button>
+              </div>
+            </div>
+            <div class="ms-question">
+              <div class="ms-question-text"><span class="ms-num">5</span><span>Est-ce que je sais quoi faire en cas d'urgence ?</span></div>
+              <div class="ms-oui-non">
+                <button class="btn-oui" [class.selected]="minuteForm.saitQuoiFaireUrgence === true" (click)="minuteForm.saitQuoiFaireUrgence = true">OUI</button>
+                <button class="btn-non" [class.selected]="minuteForm.saitQuoiFaireUrgence === false" (click)="minuteForm.saitQuoiFaireUrgence = false">NON</button>
+              </div>
+            </div>
+          </div>
+          @if (hasNonResponse()) {
+            <div class="ms-alerte">Vous avez repondu NON ! Arretez-vous et contactez votre responsable.</div>
+          }
+          <div class="ms-field">
+            <label>Risques Specifiques Identifies sur Place</label>
+            <textarea [(ngModel)]="minuteForm.risquesSpecifiques" class="ms-textarea" rows="3" placeholder="Decrivez les risques..."></textarea>
+          </div>
+          <div class="ms-field">
+            <label>Mesure de Prevention Immediate Prise</label>
+            <textarea [(ngModel)]="minuteForm.mesurePreventionImmediate" class="ms-textarea" rows="3" placeholder="Mesures prises..."></textarea>
+          </div>
+          <div class="ms-validation">
+            <div class="ms-field">
+              <label>Nom et Signature *</label>
+              <input type="text" [(ngModel)]="minuteForm.nomSignataire" class="ms-input" placeholder="Votre nom complet"/>
+            </div>
+          </div>
+        </div>
+        <div class="ms-footer">
+          <button class="ms-btn-annuler" (click)="annulerMinuteSecurite()">← Retour au Dashboard</button>
+          <button class="ms-btn-valider" [disabled]="!minuteFormValide()" (click)="validerMinuteSecurite()">
+            Valider et Acceder aux Interventions
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div><!-- /dashboard-layout -->

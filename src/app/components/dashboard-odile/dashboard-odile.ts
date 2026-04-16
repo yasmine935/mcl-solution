@@ -14,8 +14,9 @@ import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Documents } from '../documents/documents';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
-import { TicketingComponent } from '../ticketing/ticketing'; // ✅ AJOUT
+import { TicketingComponent } from '../ticketing/ticketing';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
+
 @Component({
   selector: 'app-dashboard-odile',
   standalone: true,
@@ -23,16 +24,14 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, FichesCompletees, Factures, Documents, Semenier, Planning, 
-    TicketingComponent , // ✅ AJOUT
-    RemonteesTerrainComponent // ✅ AJOUT
+    FicheInterventionManager, FichesCompletees, Factures, Documents, Semenier, Planning,
+    TicketingComponent, RemonteesTerrainComponent
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
 })
 export class DashboardOdile implements OnInit {
   user: any = {};
-  
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) {
@@ -40,11 +39,9 @@ export class DashboardOdile implements OnInit {
     this.fermerDetailReclamation();
     this._currentPage = value;
   }
-
   showCongeForm = false;
   showDetailModal = false;
   showReclamationDetailModal = false;
-
   conges: any[] = [];
   employes: any[] = [];
   documents: any[] = [];
@@ -54,16 +51,14 @@ export class DashboardOdile implements OnInit {
   fiches: any[] = [];
   selectedFiche: any = null;
   selectedReclamation: any = null;
-
-  conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
-
+  soldeConges: any = null;
+  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+  nombreJours = 0;
   constructor(private http: HttpClient, private router: Router) {}
-
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadData();
   }
-
   loadData() {
     this.loadConges();
     this.loadEmployes();
@@ -71,28 +66,29 @@ export class DashboardOdile implements OnInit {
     this.loadFactures();
     this.loadReclamations();
     this.loadFiches();
+    this.loadSoldeConges();
   }
-
   loadConges() {
     this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
       .subscribe(data => this.conges = data, error => this.conges = []);
   }
-
+  loadSoldeConges() {
+    if (!this.user.id) return;
+    this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+      next: (data) => this.soldeConges = data,
+      error: () => this.soldeConges = null
+    });
+  }
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
       .subscribe(data => this.employes = data, error => this.employes = []);
   }
-
-loadReclamations() {
-  this.http.get<any[]>('http://localhost:8080/api/reclamations-sse')
-    .subscribe({
+  loadReclamations() {
+    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
       next: (data) => this.reclamations = data,
-      error: () => {
-        const stored = localStorage.getItem('reclamations');
-        this.reclamations = stored ? JSON.parse(stored) : [];
-      }
+      error: () => { const s = localStorage.getItem('reclamations'); this.reclamations = s ? JSON.parse(s) : []; }
     });
-}
+  }
   loadDocuments() {
     this.documents = [
       { id: 1, nom: 'Archive 2025', date: '2025-12-31', type: 'PDF' },
@@ -102,56 +98,58 @@ loadReclamations() {
       { id: 5, nom: 'Politique RH', date: '2025-10-01', type: 'DOCX' }
     ];
   }
-
   loadFactures() {
     this.factures = [
-      { id: 1, numero: 'FAC-2026-001', client: 'Client A', montant: '5000€', date: '2026-01-15', statut: 'PAYEE' },
-      { id: 2, numero: 'FAC-2026-002', client: 'Client B', montant: '3500€', date: '2026-01-12', statut: 'EN_ATTENTE' },
-      { id: 3, numero: 'FAC-2026-003', client: 'Client C', montant: '7200€', date: '2026-01-10', statut: 'PAYEE' },
-      { id: 4, numero: 'FAC-2026-004', client: 'Client D', montant: '4100€', date: '2026-01-08', statut: 'EN_ATTENTE' },
-      { id: 5, numero: 'FAC-2026-005', client: 'Client E', montant: '2800€', date: '2026-01-05', statut: 'PAYEE' }
+      { id: 1, numero: 'FAC-2026-001', client: 'Client A', montant: '5000EUR', date: '2026-01-15', statut: 'PAYEE' },
+      { id: 2, numero: 'FAC-2026-002', client: 'Client B', montant: '3500EUR', date: '2026-01-12', statut: 'EN_ATTENTE' },
+      { id: 3, numero: 'FAC-2026-003', client: 'Client C', montant: '7200EUR', date: '2026-01-10', statut: 'PAYEE' },
+      { id: 4, numero: 'FAC-2026-004', client: 'Client D', montant: '4100EUR', date: '2026-01-08', statut: 'EN_ATTENTE' },
+      { id: 5, numero: 'FAC-2026-005', client: 'Client E', montant: '2800EUR', date: '2026-01-05', statut: 'PAYEE' }
     ];
   }
-
   loadFiches() {
     const stored = localStorage.getItem('interventions');
     this.fiches = stored ? JSON.parse(stored) : [];
   }
-
   deposerConge() {
     const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 4 } };
-    this.http.post('http://localhost:8080/api/conges', demande)
-      .subscribe(() => {
-        this.loadConges();
-        this.showCongeForm = false;
-        this.conge = { dateDebut: '', dateFin: '', type: '', motif: '' };
-      }, error => console.error('Erreur', error));
+    this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
+      this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm();
+    }, error => console.error('Erreur', error));
   }
-
+  calculerNombreJours() {
+    if (this.conge.dateDebut && this.conge.dateFin) {
+      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin);
+    } else { this.nombreJours = 0; }
+  }
+  calculerJours(dateDebut: string, dateFin: string): number {
+    if (!dateDebut || !dateFin) return 0;
+    const debut = new Date(dateDebut); const fin = new Date(dateFin);
+    if (fin < debut) return 0;
+    return Math.ceil((fin.getTime() - debut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  }
+  resetCongeForm() {
+    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+    this.nombreJours = 0;
+  }
   ouvrirDetailFiche(fiche: any) { this.selectedFiche = fiche; this.showDetailModal = true; }
   fermerDetailFiche() { this.showDetailModal = false; this.selectedFiche = null; }
   ouvrirDetailReclamation(rec: any) { this.selectedReclamation = rec; this.showReclamationDetailModal = true; }
   fermerDetailReclamation() { this.showReclamationDetailModal = false; this.selectedReclamation = null; }
-
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Tableau de Bord';
-      case 'fiches': return 'Fiches d\'Intervention';
-      case 'fiches-completees': return '✅ Fiches Complétées';
-      case 'ged': return '📄 Documents';
-      case 'tickets': return '🎫 Tickets Clients';
-      case 'rh': return '👥 Ressources Humaines';
-      case 'factures': return '💰 Factures';
-      case 'planning': return '📅 Planning';
-      case 'semenier': return '📆 Semenier';
-      case 'mes-conges': return '🏖️ Mes Congés';
-      case 'remonteesTerrain': return '⚠️ Remontées Terrain';
+      case 'fiches': return 'Fiches Intervention';
+      case 'fiches-completees': return 'Fiches Completees';
+      case 'ged': return 'Documents';
+      case 'tickets': return 'Tickets Clients';
+      case 'factures': return 'Factures';
+      case 'planning': return 'Planning';
+      case 'semenier': return 'Semenier';
+      case 'mes-conges': return 'Mes Conges';
+      case 'remonteesTerrain': return 'Remontees Terrain';
       default: return 'Dashboard Odile';
     }
   }
-
-  logout() {
-    localStorage.removeItem('user');
-    this.router.navigate(['/login']);
-  }
+  logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }
