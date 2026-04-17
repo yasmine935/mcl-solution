@@ -35,14 +35,39 @@ export class FichesCompletees implements OnInit {
 loadFichesCompletees() {
   this.http.get<any[]>(API_FICHES).subscribe({
     next: (data) => {
-      this.fichesCompletees = data.filter((f: any) => 
-        f.statut === 'COMPLETEE' || f.statut === 'VALIDEE'
-      );
+      // ✅ Récupérer les signatures depuis localStorage
+      const stored = localStorage.getItem('fiches_intervention');
+      const local = stored ? JSON.parse(stored) : [];
+
+      this.fichesCompletees = data
+        .filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE')
+        .map((f: any) => {
+          // Chercher la fiche locale correspondante pour récupérer les signatures
+          const localFiche = local.find((l: any) => l.id === f.id);
+          return {
+            ...f,
+            numProjet: f.numProjet,
+            client: f.client,
+            date: f.dateIntervention,
+            technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
+            approuvePar: f.statut === 'VALIDEE' ? 'Manager' : null,
+            // ✅ Signatures depuis localStorage
+            signatureTechnicien: localFiche?.signatureTechnicien || '',
+            signatureClient: localFiche?.signatureClient || '',
+            nomClientSigne: localFiche?.nomClientSigne || '',
+            heureDebut: localFiche?.heureDebut || f.heureDebut || '',
+            heureFin: localFiche?.heureFin || f.heureFin || '',
+            intervenants: localFiche?.intervenants || '',
+            taches: localFiche?.taches || [],
+            photos: localFiche?.photos || [],
+            documentsImportes: localFiche?.documentsImportes || []
+          };
+        });
     },
     error: () => {
       const stored = localStorage.getItem('fiches_intervention');
       const toutes = stored ? JSON.parse(stored) : [];
-      this.fichesCompletees = toutes.filter((f: any) => 
+      this.fichesCompletees = toutes.filter((f: any) =>
         f.statut === 'COMPLETEE' || f.statut === 'VALIDEE'
       );
     }

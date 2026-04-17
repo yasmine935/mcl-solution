@@ -162,10 +162,9 @@
                   <label [for]="'tache-add-' + $index">{{ tache.nom }}</label>
                 </div>
                 @if (getOptionsTache(tache.nom).length > 0) {
-                  <mat-form-field appearance="outline" class="tache-select">
-                    <mat-label>Sélectionner</mat-label>
-                    <mat-select [(ngModel)]="tache.selection">
-                      <mat-option value="">Aucun</mat-option>
+                 <mat-form-field appearance="outline" class="tache-select">
+                    <mat-label>Sélectionner (multiple)</mat-label>
+                    <mat-select [(ngModel)]="tache.selections" multiple>
                       @for (option of getOptionsTache(tache.nom); track option) {
                         <mat-option [value]="option">{{ option }}</mat-option>
                       }

@@ -238,7 +238,7 @@ export class FicheInterventionManager implements OnInit {
   ajouterTache(form: any, tache: string) {
     if (!form.taches) form.taches = [];
     if (!form.taches.some((t: any) => t.nom === tache)) {
-      form.taches.push({ nom: tache, coche: false, selection: '' });
+     form.taches.push({ nom: tache, coche: false, selections: [] });
     }
   }
 
