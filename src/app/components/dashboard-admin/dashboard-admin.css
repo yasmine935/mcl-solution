@@ -730,4 +730,104 @@ nav {
 
 /* EMPTY */
 .ms-empty { text-align: center; padding: 60px; color: #b0bec5; background: #fff; border-radius: 14px; }
-.ms-empty span { font-size: 3rem; display: block; margin-bottom: 12px; }
+.ms-empty span { font-size: 3rem; display: block; margin-bottom: 12px; }/* ============================================================
+   CONGÉS MANAGER — Ajouter dans dashboard-admin.css
+   ============================================================ */
+
+.conges-manager-wrapper { display: flex; flex-direction: column; gap: 16px; }
+
+/* HEADER */
+.conges-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+  padding: 18px 22px; border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(13,27,42,0.25); flex-wrap: wrap; gap: 14px;
+}
+.conges-header-left { display: flex; align-items: center; gap: 14px; }
+.conges-icon { font-size: 1.8rem; width: 48px; height: 48px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.conges-header-left h2 { margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff; }
+.conges-header-left p  { margin: 0; font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+.conges-kpi-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.conge-kpi {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 18px; border-radius: 10px; min-width: 70px;
+}
+.conge-kpi span { font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1; }
+.conge-kpi small { font-size: 0.68rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 0.3px; }
+.conge-kpi.orange { background: #f57c00; }
+.conge-kpi.green  { background: #2e7d32; }
+.conge-kpi.red    { background: #c62828; }
+.conge-kpi.blue   { background: #1565c0; }
+
+/* FILTRES */
+.conges-filtres { display: flex; gap: 8px; flex-wrap: wrap; }
+.filtre-btn {
+  padding: 8px 18px; border-radius: 20px; border: 1.5px solid #e0e0e0;
+  background: #fff; color: #546e7a; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.filtre-btn:hover { border-color: #01579b; color: #01579b; }
+.filtre-btn.active { background: #0d1b2a; color: #fff; border-color: #0d1b2a; }
+.filtre-attente.active { background: #f57c00; border-color: #f57c00; }
+.filtre-approuve.active { background: #2e7d32; border-color: #2e7d32; }
+.filtre-refuse.active  { background: #c62828; border-color: #c62828; }
+
+/* EMPTY */
+.conges-empty { text-align: center; padding: 48px; background: #fff; border-radius: 14px; color: #b0bec5; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.conges-empty span { font-size: 2.5rem; }
+
+/* CARDS */
+.conges-cards { display: flex; flex-direction: column; gap: 12px; }
+
+.conge-card {
+  background: #fff; border-radius: 12px; display: flex;
+  border: 1.5px solid #e0e0e0; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.2s;
+}
+.conge-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.conge-en-attente { border-color: #ffcc80; }
+.conge-approuve   { border-color: #a5d6a7; }
+.conge-refuse     { border-color: #ef9a9a; }
+
+.conge-card-bar { width: 5px; flex-shrink: 0; }
+.conge-card-content { flex: 1; padding: 16px 20px; }
+
+/* TOP */
+.conge-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+.conge-employe { display: flex; align-items: center; gap: 10px; }
+.conge-avatar { width: 38px; height: 38px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 800; flex-shrink: 0; }
+.conge-employe strong { font-size: 0.95rem; color: #0d1b2a; display: block; }
+.conge-role { font-size: 0.72rem; color: #90a4ae; font-weight: 600; }
+
+.conge-statut-badge { padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
+.badge-attente { background: #fff3e0; color: #f57c00; }
+.badge-approuve { background: #e8f5e9; color: #2e7d32; }
+.badge-refuse   { background: #ffebee; color: #c62828; }
+
+/* INFOS */
+.conge-card-infos { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+.conge-info-item { display: flex; flex-direction: column; gap: 3px; }
+.conge-info-item label { font-size: 0.68rem; font-weight: 700; color: #90a4ae; text-transform: uppercase; letter-spacing: 0.3px; }
+.conge-info-item span { font-size: 0.85rem; color: #0d1b2a; font-weight: 600; }
+
+.conge-type-badge { padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; }
+.conge-type-annuel    { background: #e3f2fd; color: #1565c0; }
+.conge-type-rtt       { background: #e1f5fe; color: #0277bd; }
+.conge-type-maladie   { background: #ffebee; color: #c62828; }
+.conge-type-formation { background: #e8f5e9; color: #2e7d32; }
+.conge-type-sans_solde { background: #f5f5f5; color: #546e7a; }
+
+.conge-jours { background: #e3f2fd; color: #1565c0; padding: 2px 8px; border-radius: 10px; font-size: 0.78rem !important; font-weight: 800; }
+
+.conge-motif { background: #f8fafc; padding: 8px 12px; border-radius: 8px; border-left: 3px solid #90caf9; margin-bottom: 12px; font-size: 0.82rem; color: #546e7a; }
+.conge-motif label { font-weight: 700; color: #0d1b2a; margin-right: 6px; }
+
+/* ACTIONS */
+.conge-card-actions { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid #f0f4f8; }
+.btn-approuver { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 700; transition: all 0.15s; }
+.btn-approuver:hover { background: #2e7d32; color: #fff; }
+.btn-refuser { background: #ffebee; color: #c62828; border: 1.5px solid #ef9a9a; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 700; transition: all 0.15s; }
+.btn-refuser:hover { background: #c62828; color: #fff; }
+.btn-remettre { background: #f5f5f5; color: #546e7a; border: 1.5px solid #e0e0e0; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.15s; }
+.btn-remettre:hover { background: #e0e0e0; }

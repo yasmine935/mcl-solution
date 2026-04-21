@@ -133,6 +133,39 @@ get minutesOk(): number {
     this.fiches = toutesLesFiches;
   }
 
+  // ============================================================
+// AJOUTER dans dashboard-admin.ts
+// ============================================================
+
+// 1. Dans les propriétés de la classe (après filtreConge):
+filtreConge = 'TOUS';
+
+// 2. Ajouter ces méthodes dans la classe :
+
+getCongesEnAttente(): number {
+  return this.conges.filter((c: any) => c.statut === 'EN_ATTENTE').length;
+}
+
+getCongesApprouves(): number {
+  return this.conges.filter((c: any) => c.statut === 'APPROUVE').length;
+}
+
+getCongesRefuses(): number {
+  return this.conges.filter((c: any) => c.statut === 'REFUSE').length;
+}
+
+getCongesFiltres(): any[] {
+  if (this.filtreConge === 'TOUS') return this.conges;
+  return this.conges.filter((c: any) => c.statut === this.filtreConge);
+}
+
+calculerJours(dateDebut: string, dateFin: string): string {
+  if (!dateDebut || !dateFin || dateDebut === '-' || dateFin === '-') return '-';
+  const debut = new Date(dateDebut);
+  const fin = new Date(dateFin);
+  const diff = Math.ceil((fin.getTime() - debut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  return diff > 0 ? `${diff}j` : '-';
+}
   loadConges() {
     this.http.get<any[]>('http://localhost:8080/api/conges')
       .subscribe(data => {

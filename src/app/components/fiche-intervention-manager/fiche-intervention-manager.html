@@ -33,24 +33,16 @@
           </div>
           <div class="field-sm">
             <label class="field-label">Date</label>
-            <mat-form-field appearance="outline" class="compact-date">
-              <input matInput [matDatepicker]="pickerAdd" [(ngModel)]="nouvelleFiche.date" placeholder="jj/mm/aaaa" readonly/>
-              <mat-datepicker-toggle matSuffix [for]="pickerAdd"></mat-datepicker-toggle>
-              <mat-datepicker #pickerAdd></mat-datepicker>
-            </mat-form-field>
+            <input type="date" class="compact-input" [(ngModel)]="nouvelleFiche.date"/>
           </div>
           <div class="field-md">
             <label class="field-label">Technicien Assigné</label>
-            <mat-form-field appearance="outline" class="compact-select">
-              <mat-select [(ngModel)]="nouvelleFiche.technicienAssigne">
-                <mat-option value="">-- Sélectionner --</mat-option>
-                @for (tech of techniciens; track tech.id) {
-                  <mat-option [value]="tech.prenom + ' ' + tech.nom">
-                    {{ tech.prenom }} {{ tech.nom }}
-                  </mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
+            <select class="compact-input" [(ngModel)]="nouvelleFiche.technicienAssigne">
+              <option value="">-- Sélectionner --</option>
+              @for (tech of techniciens; track tech.id) {
+                <option [value]="tech.prenom + ' ' + tech.nom">{{ tech.prenom }} {{ tech.nom }}</option>
+              }
+            </select>
           </div>
         </div>
         <div class="field-full">
@@ -158,14 +150,17 @@
                   <label [for]="'tache-add-' + $index">{{ tache.nom }}</label>
                 </div>
                 @if (getOptionsTache(tache.nom).length > 0) {
-                  <mat-form-field appearance="outline" class="tache-select">
-                    <mat-label>Sélectionner (multiple)</mat-label>
-                    <mat-select [(ngModel)]="tache.selections" multiple>
-                      @for (option of getOptionsTache(tache.nom); track option) {
-                        <mat-option [value]="option">{{ option }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
+                  <div class="tache-options">
+                    @for (option of getAllOptions(tache); track option) {
+                      <span class="option-chip" [class.selected]="isSelected(tache, option)" (click)="toggleSelection(tache, option)">
+                        {{ option }}
+                      </span>
+                    }
+                    <div class="autre-inline">
+                      <input class="compact-input-autre" [(ngModel)]="tache.autreTemp" placeholder="+ Autre..." (keyup.enter)="ajouterAutre(tache)"/>
+                      <button class="btn-autre" (click)="ajouterAutre(tache)" [disabled]="!tache.autreTemp?.trim()" type="button">+</button>
+                    </div>
+                  </div>
                 }
                 <button mat-icon-button color="warn" (click)="supprimerTache(nouvelleFiche, $index)" type="button"><mat-icon>delete</mat-icon></button>
               </div>
@@ -205,22 +200,16 @@
           </div>
           <div class="field-sm">
             <label class="field-label">Date</label>
-            <mat-form-field appearance="outline" class="compact-date">
-              <input matInput [matDatepicker]="pickerEdit" [(ngModel)]="ficheEnEdition.date" placeholder="jj/mm/aaaa" readonly/>
-              <mat-datepicker-toggle matSuffix [for]="pickerEdit"></mat-datepicker-toggle>
-              <mat-datepicker #pickerEdit></mat-datepicker>
-            </mat-form-field>
+            <input type="date" class="compact-input" [(ngModel)]="ficheEnEdition.date"/>
           </div>
           <div class="field-md">
             <label class="field-label">Technicien Assigné</label>
-            <mat-form-field appearance="outline" class="compact-select">
-              <mat-select [(ngModel)]="ficheEnEdition.technicienAssigne">
-                <mat-option value="">-- Sélectionner --</mat-option>
-                @for (tech of techniciens; track tech.id) {
-                  <mat-option [value]="tech.prenom + ' ' + tech.nom">{{ tech.prenom }} {{ tech.nom }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
+            <select class="compact-input" [(ngModel)]="ficheEnEdition.technicienAssigne">
+              <option value="">-- Sélectionner --</option>
+              @for (tech of techniciens; track tech.id) {
+                <option [value]="tech.prenom + ' ' + tech.nom">{{ tech.prenom }} {{ tech.nom }}</option>
+              }
+            </select>
           </div>
         </div>
         <div class="field-full">
@@ -319,14 +308,17 @@
                   <label [for]="'tache-edit-' + $index">{{ tache.nom }}</label>
                 </div>
                 @if (getOptionsTache(tache.nom).length > 0) {
-                  <mat-form-field appearance="outline" class="tache-select">
-                    <mat-label>Sélectionner (multiple)</mat-label>
-                    <mat-select [(ngModel)]="tache.selections" multiple>
-                      @for (option of getOptionsTache(tache.nom); track option) {
-                        <mat-option [value]="option">{{ option }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
+                  <div class="tache-options">
+                    @for (option of getAllOptions(tache); track option) {
+                      <span class="option-chip" [class.selected]="isSelected(tache, option)" (click)="toggleSelection(tache, option)">
+                        {{ option }}
+                      </span>
+                    }
+                    <div class="autre-inline">
+                      <input type="text" class="compact-input-autre" [(ngModel)]="tache.autreTemp" placeholder="+ Autre..." (keyup.enter)="ajouterAutre(tache)"/>
+                      <button class="btn-autre" (click)="ajouterAutre(tache)" [disabled]="!tache.autreTemp?.trim()" type="button">+</button>
+                    </div>
+                  </div>
                 }
                 <button mat-icon-button color="warn" (click)="supprimerTache(ficheEnEdition, $index)" type="button"><mat-icon>delete</mat-icon></button>
               </div>

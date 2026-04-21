@@ -89,6 +89,40 @@ export class DashboardKia implements OnInit {
     });
   }
 
+  // ============================================================
+// AJOUTER dans dashboard-kia.ts
+// ============================================================
+
+// 1. Dans les propriétés de la classe :
+filtreConge = 'TOUS';
+
+// 2. Ajouter ces méthodes dans la classe :
+
+getCongesTechEnAttente(): number {
+  return this.congesTechniciens.filter((c: any) => c.statut === 'EN_ATTENTE').length;
+}
+
+getCongesTechApprouves(): number {
+  return this.congesTechniciens.filter((c: any) => c.statut === 'APPROUVE').length;
+}
+
+getCongesTechRefuses(): number {
+  return this.congesTechniciens.filter((c: any) => c.statut === 'REFUSE').length;
+}
+
+getCongesTechFiltres(): any[] {
+  if (this.filtreConge === 'TOUS') return this.congesTechniciens;
+  return this.congesTechniciens.filter((c: any) => c.statut === this.filtreConge);
+}
+
+// ✅ Version string pour affichage (différente de calculerJours qui retourne number)
+calculerJoursStr(dateDebut: string, dateFin: string): string {
+  if (!dateDebut || !dateFin || dateDebut === '-' || dateFin === '-') return '-';
+  const debut = new Date(dateDebut);
+  const fin = new Date(dateFin);
+  const diff = Math.ceil((fin.getTime() - debut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  return diff > 0 ? `${diff}j` : '-';
+}
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
       .subscribe(data => this.employes = data, error => this.employes = []);

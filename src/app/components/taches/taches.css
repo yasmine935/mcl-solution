@@ -224,3 +224,54 @@ mat-form-field { width: 100%; }
   .form-grid { grid-template-columns: 1fr; }
   .detail-grid { grid-template-columns: 1fr; }
 }
+/* AJOUTS CSS pour taches.css */
+
+/* Form header bar */
+.form-header-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #01579b, #0288d1);
+  padding: 12px 20px; color: #fff;
+}
+.form-header-edit { background: linear-gradient(135deg, #e65100, #f57c00) !important; }
+.form-header-bar mat-icon { font-size: 1.1rem; width: 1.1rem; height: 1.1rem; }
+.form-header-bar h3 { margin: 0; font-size: 0.9rem; font-weight: 800; color: #fff; }
+
+/* Form body */
+.form-body { padding: 16px 20px; }
+
+/* Form rows */
+.form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; align-items: flex-end; }
+.field-xl { flex: 2; min-width: 200px; }
+.field-md { flex: 1; min-width: 140px; }
+.field-sm { flex: 0 0 140px; }
+
+/* Compact inputs */
+.field-label { display: block; font-size: 0.7rem; font-weight: 700; color: #546e7a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+.compact-input {
+  width: 100%; height: 38px; border: 1.5px solid #dde2ea; border-radius: 8px;
+  padding: 0 10px; font-size: 0.85rem; font-family: inherit; outline: none;
+  background: #fff; color: #0d1b2a; box-sizing: border-box; transition: border-color 0.15s;
+}
+.compact-input:focus { border-color: #01579b; }
+.compact-select { width: 100% !important; }
+.compact-select .mat-mdc-form-field-infix { padding: 4px 0 !important; }
+
+/* Fichiers inline */
+.fichiers-inline { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f0f8ff; border-radius: 8px; border: 1.5px dashed #90caf9; }
+.fichiers-label { font-size: 0.78rem; font-weight: 700; color: #01579b; }
+.btn-upload { color: #01579b !important; border-color: #01579b !important; font-size: 0.78rem !important; }
+.fichiers-count { font-size: 0.75rem; color: #0288d1; font-weight: 700; }
+
+/* Table header */
+.table-header { padding: 0 0 14px; border-bottom: 1px solid #f0f4f8; margin-bottom: 14px; }
+.table-header h3 { margin: 0; font-size: 0.95rem; font-weight: 800; color: #0d1b2a; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 48px; color: #b0bec5; }
+.empty-state mat-icon { font-size: 2.5rem; width: 2.5rem; height: 2.5rem; display: block; margin: 0 auto 10px; }
+.empty-state p { font-size: 0.95rem; font-weight: 700; margin: 0 0 4px; }
+.empty-state small { font-size: 0.75rem; }
+
+/* Projet nom */
+.projet-nom { font-size: 0.88rem; color: #0d1b2a; }
+.ca-value { color: #01579b; font-size: 0.88rem; }

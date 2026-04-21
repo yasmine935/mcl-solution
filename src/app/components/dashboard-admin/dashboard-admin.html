@@ -322,50 +322,153 @@
   </div>
 }
       <!-- ══ CONGÉS ══ -->
-      @if (currentPage === 'conges') {
-        <div class="table-card">
-          <h3>📋 Tous les Congés</h3>
-          @if (conges.length === 0) {
-            <div class="empty">Aucune demande de congé</div>
-          } @else {
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Employé</th>
-                  <th>Type</th>
-                  <th>Date début</th>
-                  <th>Date fin</th>
-                  <th>Statut</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (c of conges; track c.id) {
-                  <tr>
-                    <td><strong>{{ c.utilisateur?.nom }} {{ c.utilisateur?.prenom }}</strong></td>
-                    <td>{{ c.type }}</td>
-                    <td>{{ c.dateDebut }}</td>
-                    <td>{{ c.dateFin }}</td>
-                    <td><span [class]="'badge ' + c.statut?.toLowerCase()">{{ c.statut }}</span></td>
-                    <td>
-                      @if (c.statut !== 'APPROUVE') {
-                        <button mat-icon-button color="primary" (click)="updateStatut(c.id, 'APPROUVE')">
-                          <mat-icon>check_circle</mat-icon>
-                        </button>
-                      }
-                      @if (c.statut !== 'REFUSE') {
-                        <button mat-icon-button color="warn" (click)="updateStatut(c.id, 'REFUSE')">
-                          <mat-icon>cancel</mat-icon>
-                        </button>
-                      }
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
+   <!-- ══ CONGÉS — Remplace @if (currentPage === 'conges') ══ -->
+
+@if (currentPage === 'conges') {
+  <div class="conges-manager-wrapper">
+
+    <!-- HEADER -->
+    <div class="conges-header">
+      <div class="conges-header-left">
+        <div class="conges-icon">🌴</div>
+        <div>
+          <h2>Gestion des Congés</h2>
+          <p>Validation des demandes de l'équipe</p>
         </div>
-      }
+      </div>
+      <div class="conges-kpi-row">
+        <div class="conge-kpi orange">
+          <span>{{ getCongesEnAttente() }}</span>
+          <small>En attente</small>
+        </div>
+        <div class="conge-kpi green">
+          <span>{{ getCongesApprouves() }}</span>
+          <small>Approuvés</small>
+        </div>
+        <div class="conge-kpi red">
+          <span>{{ getCongesRefuses() }}</span>
+          <small>Refusés</small>
+        </div>
+        <div class="conge-kpi blue">
+          <span>{{ conges.length }}</span>
+          <small>Total</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTRES -->
+    <div class="conges-filtres">
+      <button class="filtre-btn" [class.active]="filtreConge === 'TOUS'" (click)="filtreConge = 'TOUS'">
+        Tous ({{ conges.length }})
+      </button>
+      <button class="filtre-btn filtre-attente" [class.active]="filtreConge === 'EN_ATTENTE'" (click)="filtreConge = 'EN_ATTENTE'">
+        ⏳ En attente ({{ getCongesEnAttente() }})
+      </button>
+      <button class="filtre-btn filtre-approuve" [class.active]="filtreConge === 'APPROUVE'" (click)="filtreConge = 'APPROUVE'">
+        ✅ Approuvés ({{ getCongesApprouves() }})
+      </button>
+      <button class="filtre-btn filtre-refuse" [class.active]="filtreConge === 'REFUSE'" (click)="filtreConge = 'REFUSE'">
+        ❌ Refusés ({{ getCongesRefuses() }})
+      </button>
+    </div>
+
+    <!-- LISTE -->
+    @if (getCongesFiltres().length === 0) {
+      <div class="conges-empty">
+        <span>🌴</span>
+        <p>Aucune demande de congé</p>
+      </div>
+    } @else {
+      <div class="conges-cards">
+        @for (c of getCongesFiltres(); track c.id) {
+          <div class="conge-card" [class.conge-en-attente]="c.statut === 'EN_ATTENTE'" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
+
+            <div class="conge-card-bar"
+              [style.background]="c.statut === 'APPROUVE' ? '#2e7d32' : c.statut === 'REFUSE' ? '#c62828' : '#f57c00'">
+            </div>
+
+            <div class="conge-card-content">
+
+              <!-- TOP -->
+              <div class="conge-card-top">
+                <div class="conge-employe">
+                  <div class="conge-avatar"
+                    [style.background]="c.statut === 'APPROUVE' ? '#2e7d32' : c.statut === 'REFUSE' ? '#c62828' : '#f57c00'">
+                    {{ c.utilisateur?.prenom?.charAt(0) }}{{ c.utilisateur?.nom?.charAt(0) }}
+                  </div>
+                  <div>
+                    <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
+                    <span class="conge-role">{{ c.utilisateur?.role }}</span>
+                  </div>
+                </div>
+                <div class="conge-statut-badge"
+                  [class.badge-attente]="c.statut === 'EN_ATTENTE'"
+                  [class.badge-approuve]="c.statut === 'APPROUVE'"
+                  [class.badge-refuse]="c.statut === 'REFUSE'">
+                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
+                </div>
+              </div>
+
+              <!-- INFOS -->
+              <div class="conge-card-infos">
+                <div class="conge-info-item">
+                  <label>Type</label>
+                  <span class="conge-type-badge" [class]="'conge-type-' + c.type?.toLowerCase()">
+                    {{ c.type === 'ANNUEL' ? '🌴 Annuel' : c.type === 'RTT' ? '😴 RTT' : c.type === 'MALADIE' ? '🏥 Maladie' : c.type === 'FORMATION' ? '📚 Formation' : c.type === 'SANS_SOLDE' ? '💼 Sans solde' : c.type || '-' }}
+                  </span>
+                </div>
+                <div class="conge-info-item">
+                  <label>📅 Du</label>
+                  <span>{{ c.dateDebut || '-' }}</span>
+                </div>
+                <div class="conge-info-item">
+                  <label>📅 Au</label>
+                  <span>{{ c.dateFin || '-' }}</span>
+                </div>
+                <div class="conge-info-item">
+                  <label>📆 Jours</label>
+                 @if (calculerJours(c.dateDebut, c.dateFin) !== '-') {
+  <span class="conge-jours">{{ calculerJours(c.dateDebut, c.dateFin) }}</span>
+} @else {
+  <span>-</span>
+}
+                </div>
+              </div>
+
+              @if (c.motif) {
+                <div class="conge-motif">
+                  <label>💬 Motif :</label>
+                  <span>{{ c.motif }}</span>
+                </div>
+              }
+
+              <!-- ACTIONS -->
+              <div class="conge-card-actions">
+                @if (c.statut !== 'APPROUVE') {
+                  <button class="btn-approuver" (click)="updateStatut(c.id, 'APPROUVE')">
+                    ✅ Approuver
+                  </button>
+                }
+                @if (c.statut !== 'REFUSE') {
+                  <button class="btn-refuser" (click)="updateStatut(c.id, 'REFUSE')">
+                    ❌ Refuser
+                  </button>
+                }
+                @if (c.statut !== 'EN_ATTENTE') {
+                  <button class="btn-remettre" (click)="updateStatut(c.id, 'EN_ATTENTE')">
+                    🔄 Remettre en attente
+                  </button>
+                }
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}
 
     <!-- ══ RÉCLAMATIONS ══ -->
 

@@ -1,74 +1,72 @@
-<div class="gestion-employes-container">
+<div class="employes-container">
+
   <!-- HEADER -->
   <div class="page-header">
-    <h2>👥 Gestion des Employés</h2>
-    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd" class="btn-add">
-      <mat-icon>person_add</mat-icon> Ajouter un Employé
+    <div class="header-left">
+      <mat-icon>group</mat-icon>
+      <h2>Gestion des Employés</h2>
+    </div>
+    <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
+      <mat-icon>{{ showFormAdd ? 'close' : 'person_add' }}</mat-icon>
+      {{ showFormAdd ? 'Fermer' : 'Nouvel Employé' }}
     </button>
   </div>
 
   <!-- FORMULAIRE AJOUT -->
   @if (showFormAdd) {
-    <div class="form-container form-add">
-      <h3>➕ Nouvel Employé</h3>
-      
-      <div class="form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Prénom *</mat-label>
-          <input matInput [(ngModel)]="nouvelEmploye.prenom" placeholder="Ex: Jean"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Nom *</mat-label>
-          <input matInput [(ngModel)]="nouvelEmploye.nom" placeholder="Ex: Dupont"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Email *</mat-label>
-          <input matInput type="email" [(ngModel)]="nouvelEmploye.email" placeholder="jean.dupont@mcl.fr"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Téléphone</mat-label>
-          <input matInput [(ngModel)]="nouvelEmploye.telephone" placeholder="06 12 34 56 78"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Poste</mat-label>
-          <input matInput [(ngModel)]="nouvelEmploye.poste" placeholder="Ex: Électricien"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Département</mat-label>
-          <mat-select [(ngModel)]="nouvelEmploye.departement">
-            @for (dept of departements; track dept) {
-              <mat-option [value]="dept">{{ dept }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Rôle</mat-label>
-          <mat-select [(ngModel)]="nouvelEmploye.role">
-            @for (role of roles; track role.value) {
-              <mat-option [value]="role.value">{{ role.label }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Date d'Embauche</mat-label>
-          <input matInput type="date" [(ngModel)]="nouvelEmploye.dateEmbauche"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Salaire</mat-label>
-          <input matInput type="number" [(ngModel)]="nouvelEmploye.salaire" placeholder="Ex: 2500"/>
-        </mat-form-field>
+    <div class="form-container">
+      <div class="form-header-bar">
+        <mat-icon>person_add</mat-icon>
+        <h3>Nouvel Employé</h3>
       </div>
-
+      <div class="form-body">
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Prénom *</label>
+            <input class="compact-input" [(ngModel)]="nouvelEmploye.prenom" placeholder="Jean"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Nom *</label>
+            <input class="compact-input" [(ngModel)]="nouvelEmploye.nom" placeholder="Dupont"/>
+          </div>
+          <div class="field-xl">
+            <label class="field-label">Email</label>
+            <input class="compact-input" type="email" [(ngModel)]="nouvelEmploye.email" placeholder="jean.dupont@mcl.fr"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Téléphone</label>
+            <input class="compact-input" [(ngModel)]="nouvelEmploye.telephone" placeholder="06 12 34 56 78"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Poste</label>
+            <input class="compact-input" [(ngModel)]="nouvelEmploye.poste" placeholder="Électricien"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Département</label>
+            <select class="compact-input" [(ngModel)]="nouvelEmploye.departement">
+              @for (dept of departements; track dept) { <option [value]="dept">{{ dept }}</option> }
+            </select>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Rôle</label>
+            <select class="compact-input" [(ngModel)]="nouvelEmploye.role">
+              @for (role of roles; track role.value) { <option [value]="role.value">{{ role.label }}</option> }
+            </select>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Date d'embauche</label>
+            <input class="compact-input" type="date" [(ngModel)]="nouvelEmploye.dateEmbauche"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Salaire (€)</label>
+            <input class="compact-input" type="number" [(ngModel)]="nouvelEmploye.salaire" placeholder="2500"/>
+          </div>
+        </div>
+      </div>
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="ajouterEmploye()">
+        <button mat-raised-button color="primary" (click)="ajouterEmploye()" class="btn-save">
           <mat-icon>check</mat-icon> Ajouter
         </button>
         <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
@@ -81,65 +79,58 @@
   <!-- FORMULAIRE ÉDITION -->
   @if (showFormEdit && selectedEmploye) {
     <div class="form-container form-edit">
-      <h3>✏️ Modifier l'Employé - {{ selectedEmploye.prenom }} {{ selectedEmploye.nom }}</h3>
-      
-      <div class="form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Prénom *</mat-label>
-          <input matInput [(ngModel)]="employeEnEdition.prenom"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Nom *</mat-label>
-          <input matInput [(ngModel)]="employeEnEdition.nom"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Email *</mat-label>
-          <input matInput type="email" [(ngModel)]="employeEnEdition.email"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Téléphone</mat-label>
-          <input matInput [(ngModel)]="employeEnEdition.telephone"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Poste</mat-label>
-          <input matInput [(ngModel)]="employeEnEdition.poste"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Département</mat-label>
-          <mat-select [(ngModel)]="employeEnEdition.departement">
-            @for (dept of departements; track dept) {
-              <mat-option [value]="dept">{{ dept }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Rôle</mat-label>
-          <mat-select [(ngModel)]="employeEnEdition.role">
-            @for (role of roles; track role.value) {
-              <mat-option [value]="role.value">{{ role.label }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Date d'Embauche</mat-label>
-          <input matInput type="date" [(ngModel)]="employeEnEdition.dateEmbauche"/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Salaire</mat-label>
-          <input matInput type="number" [(ngModel)]="employeEnEdition.salaire"/>
-        </mat-form-field>
+      <div class="form-header-bar form-header-edit">
+        <mat-icon>edit</mat-icon>
+        <h3>Modifier — {{ selectedEmploye.prenom }} {{ selectedEmploye.nom }}</h3>
       </div>
-
+      <div class="form-body">
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Prénom *</label>
+            <input class="compact-input" [(ngModel)]="employeEnEdition.prenom"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Nom *</label>
+            <input class="compact-input" [(ngModel)]="employeEnEdition.nom"/>
+          </div>
+          <div class="field-xl">
+            <label class="field-label">Email</label>
+            <input class="compact-input" type="email" [(ngModel)]="employeEnEdition.email"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Téléphone</label>
+            <input class="compact-input" [(ngModel)]="employeEnEdition.telephone"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Poste</label>
+            <input class="compact-input" [(ngModel)]="employeEnEdition.poste"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Département</label>
+            <select class="compact-input" [(ngModel)]="employeEnEdition.departement">
+              @for (dept of departements; track dept) { <option [value]="dept">{{ dept }}</option> }
+            </select>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Rôle</label>
+            <select class="compact-input" [(ngModel)]="employeEnEdition.role">
+              @for (role of roles; track role.value) { <option [value]="role.value">{{ role.label }}</option> }
+            </select>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Date d'embauche</label>
+            <input class="compact-input" type="date" [(ngModel)]="employeEnEdition.dateEmbauche"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Salaire (€)</label>
+            <input class="compact-input" type="number" [(ngModel)]="employeEnEdition.salaire"/>
+          </div>
+        </div>
+      </div>
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="modifierEmploye()">
+        <button mat-raised-button color="primary" (click)="modifierEmploye()" class="btn-save">
           <mat-icon>save</mat-icon> Enregistrer
         </button>
         <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
@@ -149,12 +140,17 @@
     </div>
   }
 
-  <!-- TABLEAU DES EMPLOYÉS -->
+  <!-- TABLEAU -->
   <div class="table-container">
-    <h3>📋 Liste des Employés ({{ employes.length }})</h3>
-    
+    <div class="table-header">
+      <h3>Équipe ({{ employes.length }})</h3>
+    </div>
     @if (employes.length === 0) {
-      <p class="empty">Aucun employé trouvé</p>
+      <div class="empty-state">
+        <mat-icon>group_off</mat-icon>
+        <p>Aucun employé</p>
+        <small>Cliquez sur "Nouvel Employé" pour commencer</small>
+      </div>
     } @else {
       <div class="table-wrapper">
         <table class="employes-table">
@@ -171,22 +167,34 @@
           </thead>
           <tbody>
             @for (employe of employes; track employe.id) {
-              <tr>
+              <tr class="clickable-row" (click)="ouvrirDetailModal(employe)">
                 <td>
                   <div class="employe-name">
-                    <div class="avatar">{{ employe.prenom[0]}}{{ employe.nom[0] }}</div>
-                    <div>
-                      <strong>{{ employe.prenom }} {{ employe.nom }}</strong>
+                    <div class="avatar" [class]="'avatar-' + (employe.role?.toLowerCase() || 'default')">
+                      {{ employe.prenom?.[0] }}{{ employe.nom?.[0] }}
                     </div>
+                    <strong>{{ employe.prenom }} {{ employe.nom }}</strong>
                   </div>
                 </td>
-                <td>{{ employe.email }}</td>
-                <td>{{ employe.telephone || '-' }}</td>
-                <td>{{ employe.poste || '-' }}</td>
-                <td><span class="badge-dept">{{ employe.departement || '-' }}</span></td>
-                <td><span class="badge-role" [class]="employe.role?.toLowerCase()">{{ getRoleLabel(employe.role) }}</span></td>
-                <td class="actions-cell">
-                  <button mat-icon-button color="primary" (click)="ouvrirEdition(employe)" title="Modifier">
+                <td>
+                  @if (employe.email) {
+                    <a class="email-link" [href]="'mailto:' + employe.email">{{ employe.email }}</a>
+                  } @else { <span class="empty-val">—</span> }
+                </td>
+                <td>{{ employe.telephone || '—' }}</td>
+                <td>{{ employe.poste || '—' }}</td>
+                <td>
+                  @if (employe.departement && employe.departement !== '-') {
+                    <span class="badge-dept">{{ employe.departement }}</span>
+                  } @else { <span class="empty-val">—</span> }
+                </td>
+                <td>
+                  <span class="badge-role" [class]="'role-' + (employe.role?.toLowerCase() || 'default')">
+                    {{ getRoleLabel(employe.role) }}
+                  </span>
+                </td>
+                <td class="actions-cell" (click)="$event.stopPropagation()">
+                  <button mat-icon-button color="accent" (click)="ouvrirEdition(employe)" title="Modifier">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button mat-icon-button color="warn" (click)="supprimerEmploye(employe.id)" title="Supprimer">
@@ -202,72 +210,92 @@
   </div>
 </div>
 
-<!-- MODAL - DÉTAIL EMPLOYÉ (Optionnel) -->
+<!-- MODAL DÉTAIL -->
 @if (showDetailModal && selectedEmploye) {
   <div class="modal-overlay" (click)="fermerDetailModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>📇 Fiche Employé</h2>
-        <button mat-icon-button (click)="fermerDetailModal()">
-          <mat-icon>close</mat-icon>
-        </button>
+    <div class="modal-fiche" (click)="$event.stopPropagation()">
+
+      <!-- HEADER -->
+      <div class="modal-fiche-header">
+        <div class="modal-avatar-wrap">
+          <div class="modal-avatar" [class]="'avatar-' + (selectedEmploye.role?.toLowerCase() || 'default')">
+            {{ selectedEmploye.prenom?.[0] }}{{ selectedEmploye.nom?.[0] }}
+          </div>
+          <div>
+            <h3>{{ selectedEmploye.prenom }} {{ selectedEmploye.nom }}</h3>
+            <span class="badge-role" [class]="'role-' + (selectedEmploye.role?.toLowerCase() || 'default')">
+              {{ getRoleLabel(selectedEmploye.role) }}
+            </span>
+          </div>
+        </div>
+        <button class="modal-close-x" (click)="fermerDetailModal()">✕</button>
       </div>
 
-      <div class="modal-body">
-        <div class="detail-section">
-          <h3>📌 Informations Personnelles</h3>
-          <div class="detail-grid">
-            <div class="detail-item">
-              <span class="label">Prénom</span>
-              <span class="value">{{ selectedEmploye.prenom }}</span>
+      <!-- INFOS GRID -->
+      <div class="modal-fiche-body">
+        <div class="fiche-info-row">
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>email</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Email</p>
+              <p class="fiche-info-val">{{ selectedEmploye.email || '—' }}</p>
             </div>
-            <div class="detail-item">
-              <span class="label">Nom</span>
-              <span class="value">{{ selectedEmploye.nom }}</span>
+          </div>
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>phone</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Téléphone</p>
+              <p class="fiche-info-val">{{ selectedEmploye.telephone || '—' }}</p>
             </div>
-            <div class="detail-item">
-              <span class="label">Email</span>
-              <span class="value">{{ selectedEmploye.email }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Téléphone</span>
-              <span class="value">{{ selectedEmploye.telephone || '-' }}</span>
+          </div>
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>work</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Poste</p>
+              <p class="fiche-info-val">{{ selectedEmploye.poste || '—' }}</p>
             </div>
           </div>
         </div>
-
-        <div class="detail-section">
-          <h3>💼 Informations Professionnelles</h3>
-          <div class="detail-grid">
-            <div class="detail-item">
-              <span class="label">Poste</span>
-              <span class="value">{{ selectedEmploye.poste }}</span>
+        <div class="fiche-info-row">
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>corporate_fare</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Département</p>
+              <p class="fiche-info-val">{{ selectedEmploye.departement || '—' }}</p>
             </div>
-            <div class="detail-item">
-              <span class="label">Département</span>
-              <span class="value">{{ selectedEmploye.departement }}</span>
+          </div>
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>calendar_today</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Date d'embauche</p>
+              <p class="fiche-info-val">{{ selectedEmploye.dateEmbauche || '—' }}</p>
             </div>
-            <div class="detail-item">
-              <span class="label">Rôle</span>
-              <span class="badge-role" [class]="selectedEmploye.role?.toLowerCase()">{{ getRoleLabel(selectedEmploye.role) }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Salaire</span>
-              <span class="value">{{ selectedEmploye.salaire }}€</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Date d'Embauche</span>
-              <span class="value">{{ selectedEmploye.dateEmbauche }}</span>
+          </div>
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>payments</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Salaire</p>
+              <p class="fiche-info-val highlight-number">{{ selectedEmploye.salaire ? selectedEmploye.salaire + ' €' : '—' }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="fermerDetailModal()">
-          <mat-icon>close</mat-icon> Fermer
+      <!-- FOOTER -->
+      <div class="modal-fiche-footer">
+        <button mat-raised-button color="warn" (click)="supprimerEmploye(selectedEmploye.id); fermerDetailModal()">
+          <mat-icon>delete</mat-icon> Supprimer
         </button>
+        <div class="footer-right">
+          <button mat-raised-button color="primary" (click)="ouvrirEdition(selectedEmploye); fermerDetailModal()">
+            <mat-icon>edit</mat-icon> Modifier
+          </button>
+          <button mat-stroked-button (click)="fermerDetailModal()">
+            <mat-icon>close</mat-icon> Fermer
+          </button>
+        </div>
       </div>
+
     </div>
   </div>
 }

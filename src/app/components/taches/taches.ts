@@ -88,6 +88,7 @@ export class Taches implements OnInit {
   }
 
   mapFromBackend(t: any): any {
+    const extras = this.loadExtrasForTache(t.id);
     return {
       id: t.id,
       projet: t.titre,
@@ -95,15 +96,33 @@ export class Taches implements OnInit {
               t.statut === 'EN_COURS' ? 'En cours' :
               t.statut === 'TERMINEE' ? 'Fait' : t.statut,
       date: t.dateCreation ? new Date(t.dateCreation).toLocaleDateString('fr-FR') : '',
-      priorite: t.priorite,
-      echeance: t.dateEcheance || '-',
-      valeur: 'Bronze',
-      chiffreAffaire: '',
-      numCommande: t.description || '',
-      fichiers: [],
-      assignes: [],
+      priorite: t.priorite || extras.priorite || 'Moyenne',
+      echeance: t.dateEcheance || extras.echeance || '',
+      valeur: extras.valeur || 'Bronze',
+      chiffreAffaire: extras.chiffreAffaire || '',
+      numCommande: t.description || extras.numCommande || '',
+      fichiers: extras.fichiers || [],
+      assignes: extras.assignes || [],
       notes: []
     };
+  }
+
+  loadExtrasForTache(tacheId: number): any {
+    const stored = localStorage.getItem(`tache_extras_${tacheId}`);
+    return stored ? JSON.parse(stored) : {};
+  }
+
+  saveExtrasForTache(tacheId: number, tache: any) {
+    const extras = {
+      priorite: tache.priorite,
+      echeance: tache.echeance,
+      valeur: tache.valeur,
+      chiffreAffaire: tache.chiffreAffaire,
+      numCommande: tache.numCommande,
+      assignes: tache.assignes,
+      fichiers: tache.fichiers || []
+    };
+    localStorage.setItem(`tache_extras_${tacheId}`, JSON.stringify(extras));
   }
 
   ajouterTache() {
@@ -122,13 +141,14 @@ export class Taches implements OnInit {
     };
     this.http.post<any>(API, body).subscribe({
       next: (tache) => {
+        this.saveExtrasForTache(tache.id, this.nouvelleTache);
         const t = this.mapFromBackend(tache);
         t.notes = [];
         this.taches.push(t);
         this.resetFormAdd();
         this.showFormAdd = false;
       },
-      error: () => alert('❌ Erreur création tâche')
+      error: () => alert('Erreur création projet')
     });
   }
 
@@ -147,16 +167,19 @@ export class Taches implements OnInit {
       titre: this.tacheEnEdition.projet,
       statut: this.tacheEnEdition.statut === 'En cours' ? 'EN_COURS' :
               this.tacheEnEdition.statut === 'Fait' ? 'TERMINEE' : 'A_FAIRE',
-      priorite: this.tacheEnEdition.priorite
+      priorite: this.tacheEnEdition.priorite,
+      dateEcheance: this.tacheEnEdition.echeance || null,
+      description: this.tacheEnEdition.numCommande
     };
     this.http.put<any>(`${API}/${this.tacheEnEdition.id}`, body).subscribe({
       next: () => {
+        this.saveExtrasForTache(this.tacheEnEdition.id, this.tacheEnEdition);
         const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
         if (index !== -1) this.taches[index] = { ...this.tacheEnEdition };
         this.resetFormEdit();
         this.showFormEdit = false;
       },
-      error: () => alert('❌ Erreur modification')
+      error: () => alert('Erreur modification')
     });
   }
 

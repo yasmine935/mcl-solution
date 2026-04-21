@@ -3,7 +3,7 @@
   <!-- HEADER -->
   <div class="page-header">
     <h2>📊 Gestion des Projets</h2>
-    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd" class="btn-add">
+    <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
       <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
       {{ showFormAdd ? 'Fermer' : 'Nouveau Projet' }}
     </button>
@@ -12,88 +12,81 @@
   <!-- FORMULAIRE AJOUT -->
   @if (showFormAdd) {
     <div class="form-container">
-      <h3>➕ Nouveau Projet</h3>
-      <div class="form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Nom du Projet *</mat-label>
-          <input matInput [(ngModel)]="nouvelleTache.projet" placeholder="Ex: Projet MCL..."/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Statut</mat-label>
-          <mat-select [(ngModel)]="nouvelleTache.statut">
-            @for (statut of statuts; track statut) {
-              <mat-option [value]="statut">{{ statut }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Date</mat-label>
-          <input matInput [(ngModel)]="nouvelleTache.date" placeholder="Ex: 2026-01-15"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Priorité</mat-label>
-          <mat-select [(ngModel)]="nouvelleTache.priorite">
-            @for (priorite of priorites; track priorite) {
-              <mat-option [value]="priorite">{{ priorite }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Personnes assignées</mat-label>
-          <mat-select [(ngModel)]="nouvelleTache.assignes" multiple>
-            @for (emp of employes; track emp.id) {
-              <mat-option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Échéance</mat-label>
-          <input matInput [(ngModel)]="nouvelleTache.echeance" placeholder="Ex: 2026-03-01"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Valeur</mat-label>
-          <mat-select [(ngModel)]="nouvelleTache.valeur">
-            @for (valeur of valeurs; track valeur) {
-              <mat-option [value]="valeur">{{ valeur }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Chiffre d'affaire (€)</mat-label>
-          <input matInput type="number" [(ngModel)]="nouvelleTache.chiffreAffaire" placeholder="0"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Numéro de commande</mat-label>
-          <input matInput [(ngModel)]="nouvelleTache.numCommande" placeholder="CMD-001"/>
-        </mat-form-field>
+      <div class="form-header-bar">
+        <mat-icon>add_circle</mat-icon>
+        <h3>Nouveau Projet</h3>
       </div>
-      <div class="fichiers-section">
-        <h4>📎 Fichiers</h4>
-        <div class="file-upload-box">
-          <input type="file" #fileInput (change)="onFileSelectAdd($event)" multiple class="file-input" accept="*/*"/>
-          <button mat-stroked-button (click)="fileInput.click()" type="button">
-            <mat-icon>upload_file</mat-icon> Ajouter des fichiers
-          </button>
-        </div>
-       @if (nouvelleTache.fichiers?.length) {
-          <div class="fichiers-list">
-            @for (fichier of nouvelleTache.fichiers; track $index) {
-              <div class="fichier-item">
-                <mat-icon>description</mat-icon>
-                <div class="fichier-info">
-                  <p class="fichier-nom">{{ fichier.nom }}</p>
-                  <p class="fichier-meta">{{ fichier.taille }} KB • {{ fichier.date }}</p>
-                </div>
-                <button mat-icon-button color="warn" (click)="supprimerFichier($index)" type="button">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-            }
+
+      <div class="form-body">
+        <!-- LIGNE 1 -->
+        <div class="form-row">
+          <div class="field-xl">
+            <label class="field-label">Nom du Projet *</label>
+            <input class="compact-input" [(ngModel)]="nouvelleTache.projet" placeholder="Ex: Projet MCL..."/>
           </div>
-        }
+          <div class="field-md">
+            <label class="field-label">Statut</label>
+            <select class="compact-input" [(ngModel)]="nouvelleTache.statut">
+              @for (s of statuts; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Priorité</label>
+            <select class="compact-input" [(ngModel)]="nouvelleTache.priorite">
+              @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
+            </select>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Valeur</label>
+            <select class="compact-input" [(ngModel)]="nouvelleTache.valeur">
+              @for (v of valeurs; track v) { <option [value]="v">{{ v }}</option> }
+            </select>
+          </div>
+        </div>
+
+        <!-- LIGNE 2 -->
+        <div class="form-row">
+          <div class="field-xl">
+            <label class="field-label">Personnes assignées</label>
+            <select class="compact-input" [(ngModel)]="nouvelleTache.assignes" multiple style="height:60px">
+              @for (emp of employes; track emp.id) {
+                <option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</option>
+              }
+            </select>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Date</label>
+            <input class="compact-input" [(ngModel)]="nouvelleTache.date" placeholder="2026-01-15" type="date"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Échéance</label>
+            <input class="compact-input" [(ngModel)]="nouvelleTache.echeance" placeholder="2026-03-01" type="date"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">CA (€)</label>
+            <input class="compact-input" type="number" [(ngModel)]="nouvelleTache.chiffreAffaire" placeholder="0"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">N° Commande</label>
+            <input class="compact-input" [(ngModel)]="nouvelleTache.numCommande" placeholder="CMD-001"/>
+          </div>
+        </div>
+
+        <!-- FICHIERS -->
+        <div class="fichiers-inline">
+          <span class="fichiers-label">📎 Fichiers</span>
+          <input type="file" #fileInput (change)="onFileSelectAdd($event)" multiple class="file-input" accept="*/*"/>
+          <button mat-stroked-button (click)="fileInput.click()" type="button" class="btn-upload">
+            <mat-icon>upload_file</mat-icon> Ajouter
+          </button>
+          @if (nouvelleTache.fichiers?.length) {
+            <span class="fichiers-count">{{ nouvelleTache.fichiers.length }} fichier(s)</span>
+          }
+        </div>
       </div>
+
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="ajouterTache()">
+        <button mat-raised-button color="primary" (click)="ajouterTache()" class="btn-save">
           <mat-icon>check</mat-icon> Créer le projet
         </button>
         <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
@@ -106,88 +99,73 @@
   <!-- FORMULAIRE ÉDITION -->
   @if (showFormEdit && selectedTache) {
     <div class="form-container form-edit">
-      <h3>✏️ Modifier — {{ selectedTache.projet }}</h3>
-      <div class="form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Nom du Projet *</mat-label>
-          <input matInput [(ngModel)]="tacheEnEdition.projet"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Statut</mat-label>
-          <mat-select [(ngModel)]="tacheEnEdition.statut">
-            @for (statut of statuts; track statut) {
-              <mat-option [value]="statut">{{ statut }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Date</mat-label>
-          <input matInput [(ngModel)]="tacheEnEdition.date"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Priorité</mat-label>
-          <mat-select [(ngModel)]="tacheEnEdition.priorite">
-            @for (priorite of priorites; track priorite) {
-              <mat-option [value]="priorite">{{ priorite }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Personnes assignées</mat-label>
-          <mat-select [(ngModel)]="tacheEnEdition.assignes" multiple>
-            @for (emp of employes; track emp.id) {
-              <mat-option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Échéance</mat-label>
-          <input matInput [(ngModel)]="tacheEnEdition.echeance"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Valeur</mat-label>
-          <mat-select [(ngModel)]="tacheEnEdition.valeur">
-            @for (valeur of valeurs; track valeur) {
-              <mat-option [value]="valeur">{{ valeur }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Chiffre d'affaire (€)</mat-label>
-          <input matInput type="number" [(ngModel)]="tacheEnEdition.chiffreAffaire"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Numéro de commande</mat-label>
-          <input matInput [(ngModel)]="tacheEnEdition.numCommande"/>
-        </mat-form-field>
+      <div class="form-header-bar form-header-edit">
+        <mat-icon>edit</mat-icon>
+        <h3>Modifier — {{ selectedTache.projet }}</h3>
       </div>
-      <div class="fichiers-section">
-        <h4>📎 Fichiers</h4>
-        <div class="file-upload-box">
+
+      <div class="form-body">
+        <div class="form-row">
+          <div class="field-xl">
+            <label class="field-label">Nom du Projet *</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.projet"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Statut</label>
+            <select class="compact-input" [(ngModel)]="tacheEnEdition.statut">
+              @for (s of statuts; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Priorité</label>
+            <select class="compact-input" [(ngModel)]="tacheEnEdition.priorite">
+              @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
+            </select>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Valeur</label>
+            <select class="compact-input" [(ngModel)]="tacheEnEdition.valeur">
+              @for (v of valeurs; track v) { <option [value]="v">{{ v }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-xl">
+            <label class="field-label">Personnes assignées</label>
+            <select class="compact-input" [(ngModel)]="tacheEnEdition.assignes" multiple style="height:60px">
+              @for (emp of employes; track emp.id) {
+                <option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</option>
+              }
+            </select>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Date</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.date" type="date"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Échéance</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.echeance" type="date"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">CA (€)</label>
+            <input class="compact-input" type="number" [(ngModel)]="tacheEnEdition.chiffreAffaire"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">N° Commande</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.numCommande"/>
+          </div>
+        </div>
+        <div class="fichiers-inline">
+          <span class="fichiers-label">📎 Fichiers</span>
           <input type="file" #fileInputEdit (change)="onFileSelectEdit($event)" multiple class="file-input" accept="*/*"/>
-          <button mat-stroked-button (click)="fileInputEdit.click()" type="button">
-            <mat-icon>upload_file</mat-icon> Ajouter des fichiers
+          <button mat-stroked-button (click)="fileInputEdit.click()" type="button" class="btn-upload">
+            <mat-icon>upload_file</mat-icon> Ajouter
           </button>
         </div>
-        @if (tacheEnEdition.fichiers?.length > 0) {
-          <div class="fichiers-list">
-            @for (fichier of tacheEnEdition.fichiers; track $index) {
-              <div class="fichier-item">
-                <mat-icon>description</mat-icon>
-                <div class="fichier-info">
-                  <p class="fichier-nom">{{ fichier.nom }}</p>
-                  <p class="fichier-meta">{{ fichier.taille }} KB</p>
-                </div>
-                <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-            }
-          </div>
-        }
       </div>
+
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="modifierTache()">
+        <button mat-raised-button color="primary" (click)="modifierTache()" class="btn-save">
           <mat-icon>save</mat-icon> Enregistrer
         </button>
         <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
@@ -197,11 +175,17 @@
     </div>
   }
 
-  <!-- TABLEAU DES PROJETS -->
+  <!-- TABLEAU -->
   <div class="table-container">
-    <h3>📊 Liste des Projets ({{ taches.length }})</h3>
+    <div class="table-header">
+      <h3>📊 Liste des Projets ({{ taches.length }})</h3>
+    </div>
     @if (taches.length === 0) {
-      <p class="empty">Aucun projet</p>
+      <div class="empty-state">
+        <mat-icon>folder_open</mat-icon>
+        <p>Aucun projet</p>
+        <small>Cliquez sur "Nouveau Projet" pour commencer</small>
+      </div>
     } @else {
       <div class="table-wrapper">
         <table class="taches-table">
@@ -213,8 +197,8 @@
               <th>Priorité</th>
               <th>Échéance</th>
               <th>Valeur</th>
-              <th>Chiffre d'affaire</th>
-              <th>N° Commande</th>
+              <th>CA (€)</th>
+              <th>N° CMD</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -223,7 +207,7 @@
               <tr>
                 <td>
                   <div class="projet-with-note">
-                    <strong>{{ tache.projet }}</strong>
+                    <strong class="projet-nom">{{ tache.projet }}</strong>
                     <button mat-icon-button (click)="ouvrirNoteModal(tache)" title="Discussion" class="note-btn">
                       <mat-icon [class.has-note]="tache.notes?.length > 0">chat</mat-icon>
                       @if (tache.notes?.length > 0) {
@@ -235,26 +219,38 @@
                 <td>
                   <div class="assignes-container">
                     @if (tache.assignes?.length > 0) {
-                      @for (assigneId of tache.assignes; track assigneId) {
-                        <span class="assignee-badge">{{ getEmployeeName(assigneId) }}</span>
+                      @for (id of tache.assignes; track id) {
+                        <span class="assignee-badge">{{ getEmployeeName(id) }}</span>
                       }
                     } @else {
                       <span class="assignee-empty">—</span>
                     }
                   </div>
                 </td>
+                <td><span class="badge-statut" [style.background]="getStatutColor(tache.statut)">{{ tache.statut }}</span></td>
+                <td><span class="badge-priorite" [style.background]="getPrioriteColor(tache.priorite)">{{ tache.priorite }}</span></td>
                 <td>
-                  <span class="badge-statut" [style.background]="getStatutColor(tache.statut)">{{ tache.statut }}</span>
+                  @if (tache.echeance) {
+                    <span class="badge-echeance">{{ tache.echeance }}</span>
+                  } @else {
+                    <span class="assignee-empty">—</span>
+                  }
+                </td>
+                <td><span class="badge-valeur" [style.background]="getValeurColor(tache.valeur)">{{ tache.valeur }}</span></td>
+                <td>
+                  @if (tache.chiffreAffaire) {
+                    <strong class="ca-value">{{ tache.chiffreAffaire }}€</strong>
+                  } @else {
+                    <span class="assignee-empty">—</span>
+                  }
                 </td>
                 <td>
-                  <span class="badge-priorite" [style.background]="getPrioriteColor(tache.priorite)">{{ tache.priorite }}</span>
+                  @if (tache.numCommande) {
+                    <strong>{{ tache.numCommande }}</strong>
+                  } @else {
+                    <span class="assignee-empty">—</span>
+                  }
                 </td>
-                <td><span class="badge-echeance">{{ tache.echeance }}</span></td>
-                <td>
-                  <span class="badge-valeur" [style.background]="getValeurColor(tache.valeur)">{{ tache.valeur }}</span>
-                </td>
-                <td><strong style="color:#01579b">{{ tache.chiffreAffaire }}€</strong></td>
-                <td><strong>{{ tache.numCommande }}</strong></td>
                 <td class="actions-cell">
                   <button mat-icon-button color="primary" (click)="ouvrirDetailModal(tache)" title="Détails">
                     <mat-icon>visibility</mat-icon>
@@ -293,7 +289,7 @@
         @if (!selectedTache.notes || selectedTache.notes.length === 0) {
           <div class="chat-empty">
             <span>💬</span>
-            <p>Aucun message pour l'instant</p>
+            <p>Aucun message</p>
             <small>Commencez la discussion !</small>
           </div>
         }
@@ -304,9 +300,7 @@
             }
             <div class="message-bubble-wrapper">
               @if (!isMyMessage(note)) { <span class="message-author">{{ note.auteur }}</span> }
-              <div class="message-bubble" [class.bubble-me]="isMyMessage(note)" [class.bubble-other]="!isMyMessage(note)">
-                {{ note.contenu }}
-              </div>
+              <div class="message-bubble" [class.bubble-me]="isMyMessage(note)" [class.bubble-other]="!isMyMessage(note)">{{ note.contenu }}</div>
               <span class="message-time">{{ note.date }}</span>
             </div>
             @if (isMyMessage(note)) {
@@ -316,8 +310,7 @@
         }
       </div>
       <div class="chat-input-area">
-        <textarea [(ngModel)]="noteTemp" (keydown)="onKeyDown($event)"
-          placeholder="Écrire un message... (Entrée pour envoyer)" class="chat-input" rows="2"></textarea>
+        <textarea [(ngModel)]="noteTemp" (keydown)="onKeyDown($event)" placeholder="Écrire un message... (Entrée pour envoyer)" class="chat-input" rows="2"></textarea>
         <button class="chat-send-btn" (click)="sauvegarderNote()" [disabled]="!noteTemp.trim()">➤</button>
       </div>
     </div>
@@ -329,14 +322,11 @@
   <div class="modal-overlay" (click)="fermerDetailModal()">
     <div class="modal-content modal-detail" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>📊 Détails — {{ selectedTache.projet }}</h3>
-        <button mat-icon-button (click)="fermerDetailModal()" class="close-btn">
-          <mat-icon>close</mat-icon>
-        </button>
+        <h3>📊 {{ selectedTache.projet }}</h3>
+        <button mat-icon-button (click)="fermerDetailModal()" class="close-btn"><mat-icon>close</mat-icon></button>
       </div>
       <div class="modal-body">
         <div class="detail-grid">
-          <div class="detail-item"><strong>Projet</strong><p>{{ selectedTache.projet }}</p></div>
           <div class="detail-item">
             <strong>Statut</strong>
             <span class="badge-statut" [style.background]="getStatutColor(selectedTache.statut)">{{ selectedTache.statut }}</span>
@@ -349,42 +339,27 @@
             <strong>Valeur</strong>
             <span class="badge-valeur" [style.background]="getValeurColor(selectedTache.valeur)">{{ selectedTache.valeur }}</span>
           </div>
-          <div class="detail-item"><strong>Date</strong><p>{{ selectedTache.date }}</p></div>
-          <div class="detail-item"><strong>Échéance</strong><p>{{ selectedTache.echeance }}</p></div>
-          <div class="detail-item"><strong>Chiffre d'affaire</strong><p class="highlight-number">{{ selectedTache.chiffreAffaire }}€</p></div>
-          <div class="detail-item"><strong>N° Commande</strong><p>{{ selectedTache.numCommande }}</p></div>
+          <div class="detail-item"><strong>Date</strong><p>{{ selectedTache.date || '—' }}</p></div>
+          <div class="detail-item"><strong>Échéance</strong><p>{{ selectedTache.echeance || '—' }}</p></div>
+          <div class="detail-item"><strong>CA</strong><p class="highlight-number">{{ selectedTache.chiffreAffaire ? selectedTache.chiffreAffaire + '€' : '—' }}</p></div>
+          <div class="detail-item"><strong>N° Commande</strong><p>{{ selectedTache.numCommande || '—' }}</p></div>
           <div class="detail-item full-width">
             <strong>Personnes assignées</strong>
             <div class="assignes-container" style="margin-top:6px">
               @if (selectedTache.assignes?.length > 0) {
-                @for (assigneId of selectedTache.assignes; track assigneId) {
-                  <span class="assignee-badge">{{ getEmployeeName(assigneId) }}</span>
+                @for (id of selectedTache.assignes; track id) {
+                  <span class="assignee-badge">{{ getEmployeeName(id) }}</span>
                 }
               } @else { <span class="assignee-empty">—</span> }
             </div>
           </div>
-          @if (selectedTache.fichiers?.length > 0) {
-            <div class="detail-item full-width">
-              <strong>Fichiers ({{ selectedTache.fichiers.length }})</strong>
-              <div class="fichiers-list" style="margin-top:8px">
-                @for (fichier of selectedTache.fichiers; track $index) {
-                  <div class="fichier-item">
-                    <mat-icon>description</mat-icon>
-                    <div class="fichier-info"><p class="fichier-nom">{{ fichier.nom }}</p><p class="fichier-meta">{{ fichier.taille }} KB</p></div>
-                  </div>
-                }
-              </div>
-            </div>
-          }
         </div>
       </div>
       <div class="modal-footer">
         <button mat-raised-button color="primary" (click)="ouvrirEdition(selectedTache); fermerDetailModal()">
           <mat-icon>edit</mat-icon> Modifier
         </button>
-        <button mat-stroked-button (click)="fermerDetailModal()">
-          <mat-icon>close</mat-icon> Fermer
-        </button>
+        <button mat-stroked-button (click)="fermerDetailModal()"><mat-icon>close</mat-icon> Fermer</button>
       </div>
     </div>
   </div>
