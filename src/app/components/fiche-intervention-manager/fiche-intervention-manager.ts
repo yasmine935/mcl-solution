@@ -49,7 +49,8 @@ export class FicheInterventionManager implements OnInit {
     numProjet: '', client: '', date: null, technicienAssigne: '',
     description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
     adresse: '', contact: '', materielsHorsStandard: [],
-    nouveauMateriel: '', documentsImportes: [], taches: []
+    nouveauMateriel: '', documentsImportes: [], taches: [],
+    nouvelleTacheManuelle: ''
   };
 
   constructor(private http: HttpClient) {}
@@ -105,7 +106,8 @@ export class FicheInterventionManager implements OnInit {
       heureFin: f.heureFin,
       materielsHorsStandard: [],
       documentsImportes: [],
-      taches: []
+      taches: [],
+      nouvelleTacheManuelle: ''
     };
   }
 
@@ -155,7 +157,9 @@ export class FicheInterventionManager implements OnInit {
     if (this.ficheEnEdition.date && typeof this.ficheEnEdition.date === 'string') {
       this.ficheEnEdition.date = new Date(this.ficheEnEdition.date);
     }
+    if (!this.ficheEnEdition.nouvelleTacheManuelle) this.ficheEnEdition.nouvelleTacheManuelle = '';
     this.showFormEdit = true;
+    this.showFormAdd = false;
   }
 
   modifierFiche() {
@@ -203,7 +207,8 @@ export class FicheInterventionManager implements OnInit {
       numProjet: '', client: '', date: null, technicienAssigne: '',
       description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
       adresse: '', contact: '', materielsHorsStandard: [],
-      nouveauMateriel: '', documentsImportes: [], taches: []
+      nouveauMateriel: '', documentsImportes: [], taches: [],
+      nouvelleTacheManuelle: ''
     };
   }
 
@@ -212,7 +217,7 @@ export class FicheInterventionManager implements OnInit {
   ajouterMateriel(form: any) {
     if (form.nouveauMateriel?.trim()) {
       if (!form.materielsHorsStandard) form.materielsHorsStandard = [];
-      form.materielsHorsStandard.push(form.nouveauMateriel);
+      form.materielsHorsStandard.push(form.nouveauMateriel.trim());
       form.nouveauMateriel = '';
     }
   }
@@ -238,12 +243,25 @@ export class FicheInterventionManager implements OnInit {
   ajouterTache(form: any, tache: string) {
     if (!form.taches) form.taches = [];
     if (!form.taches.some((t: any) => t.nom === tache)) {
-     form.taches.push({ nom: tache, coche: false, selections: [] });
+      form.taches.push({ nom: tache, coche: false, selections: [] });
     }
   }
 
+  // ✅ TACHE MANUELLE — Camera HD 4K, Câble RJ45, etc.
+  ajouterTacheManuelle(form: any) {
+    const nom = form.nouvelleTacheManuelle?.trim();
+    if (!nom) return;
+    if (!form.taches) form.taches = [];
+    if (!form.taches.some((t: any) => t.nom === nom)) {
+      form.taches.push({ nom: nom, coche: false, selections: [] });
+    }
+    form.nouvelleTacheManuelle = '';
+  }
+
   supprimerTache(form: any, index: number) { form.taches.splice(index, 1); }
+
   getOptionsTache(nomTache: string): string[] { return this.optionsTaches[nomTache] || []; }
+
   tacheExiste(form: any, nomTache: string): boolean {
     return form.taches?.some((t: any) => t.nom === nomTache) || false;
   }

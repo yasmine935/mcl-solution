@@ -18,6 +18,7 @@ import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { Voitures } from '../voitures/voitures';
+import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 
 
 @Component({
@@ -27,7 +28,7 @@ import { Voitures } from '../voitures/voitures';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent , Voitures
+    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent , Voitures, RemonteesTerrainComponent
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'

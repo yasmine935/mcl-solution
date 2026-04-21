@@ -31,112 +31,71 @@ export class FichesCompletees implements OnInit {
     this.loadFichesCompletees();
   }
 
-  // ✅ GET fiches avec statut COMPLETEE depuis backend
-loadFichesCompletees() {
-  this.http.get<any[]>(API_FICHES).subscribe({
-    next: (data) => {
-      // ✅ Récupérer les signatures depuis localStorage
-      const stored = localStorage.getItem('fiches_intervention');
-      const local = stored ? JSON.parse(stored) : [];
+  // ✅ VERSION QUI MARCHE — backend + localStorage pour signatures
+  loadFichesCompletees() {
+    this.http.get<any[]>(API_FICHES).subscribe({
+      next: (data) => {
+        const stored = localStorage.getItem('fiches_intervention');
+        const local = stored ? JSON.parse(stored) : [];
 
-      this.fichesCompletees = data
-        .filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE')
-        .map((f: any) => {
-          // Chercher la fiche locale correspondante pour récupérer les signatures
-          const localFiche = local.find((l: any) => l.id === f.id);
-          return {
-            ...f,
-            numProjet: f.numProjet,
-            client: f.client,
-            date: f.dateIntervention,
-            technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
-            approuvePar: f.statut === 'VALIDEE' ? 'Manager' : null,
-            // ✅ Signatures depuis localStorage
-            signatureTechnicien: localFiche?.signatureTechnicien || '',
-            signatureClient: localFiche?.signatureClient || '',
-            nomClientSigne: localFiche?.nomClientSigne || '',
-            heureDebut: localFiche?.heureDebut || f.heureDebut || '',
-            heureFin: localFiche?.heureFin || f.heureFin || '',
-            intervenants: localFiche?.intervenants || '',
-            taches: localFiche?.taches || [],
-            photos: localFiche?.photos || [],
-            documentsImportes: localFiche?.documentsImportes || []
-          };
-        });
-    },
-    error: () => {
-      const stored = localStorage.getItem('fiches_intervention');
-      const toutes = stored ? JSON.parse(stored) : [];
-      this.fichesCompletees = toutes.filter((f: any) =>
-        f.statut === 'COMPLETEE' || f.statut === 'VALIDEE'
-      );
-    }
-  });
-}
-
-getFichesAffichees(): any[] {
-  if (this.filterStatut === 'PENDING') {
-    return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE');
-  } else if (this.filterStatut === 'VALIDEE') {
-    return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE');
-  }
-  return this.fichesCompletees;
-}
-  ouvrirDetail(fiche: any) {
-    this.selectedFiche = JSON.parse(JSON.stringify(fiche));
-    this.showDetailModal = true;
+        this.fichesCompletees = data
+          .filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE')
+          .map((f: any) => {
+            const localFiche = local.find((l: any) => l.id === f.id);
+            return {
+              ...f,
+              date: f.dateIntervention,
+              technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
+              approuvePar: f.statut === 'VALIDEE' ? 'Manager' : null,
+              signatureTechnicien: localFiche?.signatureTechnicien || '',
+              signatureClient: localFiche?.signatureClient || '',
+              nomClientSigne: localFiche?.nomClientSigne || '',
+              heureDebut: localFiche?.heureDebut || f.heureDebut || '',
+              heureFin: localFiche?.heureFin || f.heureFin || '',
+              intervenants: localFiche?.intervenants || '',
+              taches: localFiche?.taches || [],
+              photos: localFiche?.photos || [],
+              documentsImportes: localFiche?.documentsImportes || []
+            };
+          });
+      },
+      error: () => this.fichesCompletees = []
+    });
   }
 
-  fermerDetail() {
-    this.showDetailModal = false;
-    this.selectedFiche = null;
+  getFichesAffichees(): any[] {
+    if (this.filterStatut === 'PENDING') return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE');
+    if (this.filterStatut === 'VALIDEE') return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE');
+    return this.fichesCompletees;
   }
 
-  // ✅ PUT statut VALIDEE + POST facture vers backend
+  ouvrirDetail(fiche: any) { this.selectedFiche = JSON.parse(JSON.stringify(fiche)); this.showDetailModal = true; }
+  fermerDetail() { this.showDetailModal = false; this.selectedFiche = null; }
+
   validerFiche(fiche: any) {
     const nomManager = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-    if (confirm(`Valider le travail du technicien ?`)) {
-
-      // 1. Changer statut de la fiche
+    if (confirm('Valider le travail du technicien ?')) {
       this.http.put(`${API_FICHES}/${fiche.id}/statut?statut=VALIDEE`, {}).subscribe({
         next: () => {
           fiche.statut = 'VALIDEE';
           fiche.approuvePar = nomManager;
-
-          // 2. Créer la facture automatiquement
           const facture = {
-            client: fiche.client,
-            montantHT: fiche.chiffreAffaire || 0,
-            tva: 20,
-            statut: 'EN_ATTENTE',
-            dateFacture: new Date().toISOString().split('T')[0],
+            client: fiche.client, montantHT: fiche.chiffreAffaire || 0, tva: 20,
+            statut: 'EN_ATTENTE', dateFacture: new Date().toISOString().split('T')[0],
             utilisateur: { id: this.currentUser.id }
           };
-
           this.http.post<any>(API_FACTURES, facture).subscribe({
-            next: (f) => {
-              alert(`✅ Fiche validée !\n💰 Facture créée: ${f.numero}`);
-              this.loadFichesCompletees();
-              this.fermerDetail();
-            },
-            error: () => {
-              alert('✅ Fiche validée ! (Erreur création facture)');
-              this.loadFichesCompletees();
-              this.fermerDetail();
-            }
+            next: (f) => { alert(`Fiche validee !\nFacture creee: ${f.numero}`); this.loadFichesCompletees(); this.fermerDetail(); },
+            error: () => { alert('Fiche validee ! (Erreur creation facture)'); this.loadFichesCompletees(); this.fermerDetail(); }
           });
         },
-        error: () => alert('❌ Erreur validation')
+        error: () => alert('Erreur validation')
       });
     }
   }
-getCountPending(): number { 
-  return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE').length; 
-}
 
-getCountValidees(): number { 
-  return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE').length; 
-}
+  getCountPending(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE').length; }
+  getCountValidees(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE').length; }
 
   getStatutBadgeClass(statut: string): string {
     switch(statut) {

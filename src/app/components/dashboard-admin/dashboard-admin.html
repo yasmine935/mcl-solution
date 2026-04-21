@@ -34,7 +34,7 @@
         <mat-icon>check_circle</mat-icon> Fiches Complétées
       </a>
       <a class="nav-item" [class.active]="currentPage === 'taches'" (click)="currentPage = 'taches'">
-        <mat-icon>task_alt</mat-icon> Tâches
+        <mat-icon>task_alt</mat-icon> Gestion des Projets
       </a>
       <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
         <mat-icon>calendar_month</mat-icon> Planning
@@ -368,49 +368,9 @@
       }
 
     <!-- ══ RÉCLAMATIONS ══ -->
+
 @if (currentPage === 'reclamations') {
-  <div class="table-card">
-    <h3>⚠️ Remontées Terrain ({{ reclamations.length }})</h3>
-    @if (reclamations.length === 0) {
-      <div class="empty">Aucune remontée terrain</div>
-    } @else {
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Numero</th>
-            <th>Technicien</th>
-            <th>Type</th>
-            <th>Lieu</th>
-            <th>Gravite</th>
-            <th>Date</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (rec of reclamations; track rec.id) {
-            <tr (click)="ouvrirDetailReclamation(rec)" style="cursor:pointer">
-              <td><strong>{{ rec.numero }}</strong></td>
-              <td><strong>{{ rec.technicien?.prenom }} {{ rec.technicien?.nom }}</strong></td>
-              <td>
-                @if (rec.typeSituationDangereuse) { <span class="badge" style="background:#fff3e0;color:#e65100">⚠️ Danger</span> }
-                @if (rec.typePresquAccident) { <span class="badge" style="background:#ffebee;color:#c62828">💥 Presqu'acc.</span> }
-                @if (rec.typeSuggestion) { <span class="badge" style="background:#e8f5e9;color:#2e7d32">💡 Suggestion</span> }
-              </td>
-              <td>{{ rec.lieu }}</td>
-              <td>
-                @if (rec.gravite === 'Grave') { <span style="color:#c62828">🔴 Grave</span> }
-                @else if (rec.gravite === 'Moyen') { <span style="color:#f57f17">🟡 Moyen</span> }
-                @else if (rec.gravite === 'Faible') { <span style="color:#2e7d32">🟢 Faible</span> }
-                @else { <span style="color:#ccc">-</span> }
-              </td>
-              <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td><span class="badge" style="background:#fff3e0;color:#e65100">{{ rec.statut }}</span></td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
-  </div>
+  <app-remontees-terrain></app-remontees-terrain>
 }
 <!-- ══ VOITURES ══ -->
 @if (currentPage === 'voitures') {

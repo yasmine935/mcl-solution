@@ -88,7 +88,7 @@ export class RemonteesTerrainComponent implements OnInit {
       responsableAction: f.responsableAction,
       echeance: f.echeance,
       informationDeclarant: f.informationDeclarant,
-      photos: [],
+      photos: f.photos || [],
       statut: f.statut
     };
   }
@@ -120,30 +120,31 @@ export class RemonteesTerrainComponent implements OnInit {
 
   // ✅ POST vers backend
   soumettre() {
-    if (!this.form.descriptionFaits || !this.form.lieu || !this.form.date) {
-      alert('Veuillez remplir les champs obligatoires (*)');
-      return;
-    }
-    if (!this.form.typeSituationDangereuse && !this.form.typePresquAccident && !this.form.typeSuggestion) {
-      alert('Veuillez choisir au moins un type de signalement');
-      return;
-    }
-
-    const body = {
-      ...this.form,
-      technicien: { id: this.currentUser.id },
-      statut: 'EN_ATTENTE'
-    };
-
-    this.http.post<any>(API, body).subscribe({
-      next: (fiche) => {
-        this.fiches.unshift(this.mapFromBackend(fiche));
-        this.view = 'liste';
-        alert(`✅ Fiche ${fiche.numero} envoyee !`);
-      },
-      error: () => alert('❌ Erreur envoi fiche')
-    });
+  if (!this.form.descriptionFaits || !this.form.lieu || !this.form.date) {
+    alert('Veuillez remplir les champs obligatoires (*)');
+    return;
   }
+  if (!this.form.typeSituationDangereuse && !this.form.typePresquAccident && !this.form.typeSuggestion) {
+    alert('Veuillez choisir au moins un type de signalement');
+    return;
+  }
+
+  const body = {
+    ...this.form,
+    photos: this.photosTemp,  // ✅ inclure les photos
+    technicien: { id: this.currentUser.id },
+    statut: 'EN_ATTENTE'
+  };
+
+  this.http.post<any>(API, body).subscribe({
+    next: (fiche) => {
+      this.fiches.unshift(this.mapFromBackend(fiche));
+      this.view = 'liste';
+      alert(`✅ Fiche ${fiche.numero} envoyée !`);
+    },
+    error: () => alert('❌ Erreur envoi fiche')
+  });
+}
 
   voirDetail(fiche: FicheSSE) {
     this.selectedFiche = { ...fiche };
@@ -168,15 +169,19 @@ export class RemonteesTerrainComponent implements OnInit {
 
   // ✅ PUT statut
   changerStatut(fiche: FicheSSE, statut: FicheSSE['statut']) {
-    this.http.put(`${API}/${fiche.id}/statut?statut=${statut}`, {}).subscribe({
-      next: () => {
+  this.http.put(`${API}/${fiche.id}/statut?statut=${statut}`, {}).subscribe({
+    next: () => {
+      // ✅ Force Angular à détecter le changement
+      this.selectedFiche = null;
+      setTimeout(() => {
         fiche.statut = statut;
-        if (this.selectedFiche?.id === fiche.id) this.selectedFiche.statut = statut;
+        this.selectedFiche = { ...fiche };
         this.loadFiches();
-      },
-      error: () => alert('❌ Erreur')
-    });
-  }
+      }, 50);
+    },
+    error: () => alert('Erreur')
+  });
+}
 
   // ✅ DELETE
   supprimerFiche(fiche: FicheSSE) {

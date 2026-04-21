@@ -37,6 +37,10 @@
       <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
         <mat-icon>people</mat-icon> Dossiers Personnel
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'reclamations'" 
+   (click)="currentPage = 'reclamations'">
+  <mat-icon>report_problem</mat-icon> Remontées Terrain
+</a>
       <a class="nav-item" [class.active]="currentPage === 'sse'" (click)="currentPage = 'sse'">
         <mat-icon>health_and_safety</mat-icon> SSE Terrain
         @if (sseEnAttente.length > 0) {
@@ -137,7 +141,10 @@
           </div>
         </div>
       }
-
+<!--remontees terrain -->
+@if (currentPage === 'reclamations') {
+  <app-remontees-terrain></app-remontees-terrain>
+}
       <!-- ══ CONGÉS ══ -->
       @if (currentPage === 'conges') {
         <div class="section-card">
