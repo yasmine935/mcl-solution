@@ -31,33 +31,26 @@ export class FichesCompletees implements OnInit {
     this.loadFichesCompletees();
   }
 
-  // ✅ VERSION QUI MARCHE — backend + localStorage pour signatures
   loadFichesCompletees() {
     this.http.get<any[]>(API_FICHES).subscribe({
       next: (data) => {
-        const stored = localStorage.getItem('fiches_intervention');
-        const local = stored ? JSON.parse(stored) : [];
-
         this.fichesCompletees = data
           .filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE')
-          .map((f: any) => {
-            const localFiche = local.find((l: any) => l.id === f.id);
-            return {
-              ...f,
-              date: f.dateIntervention,
-              technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
-              approuvePar: f.statut === 'VALIDEE' ? 'Manager' : null,
-              signatureTechnicien: localFiche?.signatureTechnicien || '',
-              signatureClient: localFiche?.signatureClient || '',
-              nomClientSigne: localFiche?.nomClientSigne || '',
-              heureDebut: localFiche?.heureDebut || f.heureDebut || '',
-              heureFin: localFiche?.heureFin || f.heureFin || '',
-              intervenants: localFiche?.intervenants || '',
-              taches: localFiche?.taches || [],
-              photos: localFiche?.photos || [],
-              documentsImportes: localFiche?.documentsImportes || []
-            };
-          });
+          .map((f: any) => ({
+            ...f,
+            date: f.dateIntervention,
+            technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
+            approuvePar: f.approuvePar || (f.statut === 'VALIDEE' ? 'Manager' : null),
+            signatureTechnicien: f.signatureTechnicien || '',
+            signatureClient: f.signatureClient || '',
+            nomClientSigne: f.nomClientSigne || '',
+            heureDebut: f.heureDebut || '',
+            heureFin: f.heureFin || '',
+            intervenants: f.intervenants || '',
+            taches: f.taches || [],
+            photos: f.photos || [],
+            documentsImportes: f.documentsImportes || []
+          }));
       },
       error: () => this.fichesCompletees = []
     });
@@ -75,10 +68,16 @@ export class FichesCompletees implements OnInit {
   validerFiche(fiche: any) {
     const nomManager = `${this.currentUser.prenom} ${this.currentUser.nom}`;
     if (confirm('Valider le travail du technicien ?')) {
-      this.http.put(`${API_FICHES}/${fiche.id}/statut?statut=VALIDEE`, {}).subscribe({
+      // 1. Mettre à jour le statut + approuvePar dans le backend
+      const body = {
+        approuvePar: nomManager,
+        dateApprobation: new Date().toISOString()
+      };
+      this.http.put<any>(`${API_FICHES}/${fiche.id}/valider`, body).subscribe({
         next: () => {
           fiche.statut = 'VALIDEE';
           fiche.approuvePar = nomManager;
+          // 2. Créer la facture
           const facture = {
             client: fiche.client, montantHT: fiche.chiffreAffaire || 0, tva: 20,
             statut: 'EN_ATTENTE', dateFacture: new Date().toISOString().split('T')[0],

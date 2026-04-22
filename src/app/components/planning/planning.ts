@@ -27,10 +27,24 @@ export class Planning implements OnInit {
   showModal = false;
   selectedJour: any = null;
 
+  // ✅ Manager assignment
+  isManager = false;
+  showManagerModal = false;
+  managerCell: { user: any; jour: any } | null = null;
+  managerType = '';
+  managerLieu = '';
+  readonly typeOptions = ['Bureau', 'Distance', 'Déplacement', 'Formation', 'RTT', 'Absent'];
+
+  // ✅ Grille semaine manager
+  currentWeekStart: Date = new Date();
+  weekDays: any[] = [];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.detectCurrentUser();
+    this.currentWeekStart = this.getMondayOf(new Date());
+    this.generateSemaine();
     this.loadUtilisateurs();
     this.loadAllNotes();
     this.loadCongesApprouves();
@@ -40,6 +54,8 @@ export class Planning implements OnInit {
   detectCurrentUser() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     this.currentUserId = user.id || 1;
+    const role = (user.role || '').toUpperCase();
+    this.isManager = role !== 'TECHNICIEN';
   }
 
   loadUtilisateurs() {
@@ -183,7 +199,7 @@ export class Planning implements OnInit {
   }
 
   ouvrirJour(jour: any) {
-    if (jour.jour !== 0) { this.selectedJour = { ...jour }; this.showModal = true; }
+    if (jour.jour !== 0 && this.isManager) { this.selectedJour = { ...jour }; this.showModal = true; }
   }
 
   closeModal() { this.showModal = false; this.selectedJour = null; }
@@ -250,5 +266,120 @@ export class Planning implements OnInit {
 
   get joursAvecJour() {
     return this.joursAffiche.filter(j => j.jour !== 0);
+  }
+
+  get techniciens(): any[] {
+    return this.utilisateurs.filter(u => (u.role || '').toUpperCase() === 'TECHNICIEN');
+  }
+
+  // ✅ Ouvre le modal d'assignation pour un technicien × jour
+  ouvrirCelluleEquipe(user: any, jour: any) {
+    if (!this.isManager || jour.jour === 0 || this.getCongeForUserOnDay(user.id, jour.date)) return;
+    const existing = this.getInfoForUserOnDay(user.id, jour);
+    const existingLabel = existing ? existing.label : '';
+    // Extraire le type et le lieu si note composée "Type - Lieu"
+    const parts = existingLabel.split(' - ');
+    this.managerType = parts[0] || '';
+    this.managerLieu = parts.slice(1).join(' - ') || '';
+    this.managerCell = { user, jour };
+    this.showManagerModal = true;
+  }
+
+  fermerManagerModal() {
+    this.showManagerModal = false;
+    this.managerCell = null;
+    this.managerType = '';
+    this.managerLieu = '';
+  }
+
+  sauvegarderAssignation() {
+    if (!this.managerCell || !this.managerType) return;
+    const { user, jour } = this.managerCell;
+    const d = jour.date as Date;
+    const note = this.managerLieu.trim()
+      ? `${this.managerType} - ${this.managerLieu.trim()}`
+      : this.managerType;
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const body = { note, date: dateStr, utilisateur: { id: user.id } };
+    const key = `${user.id}_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    this.http.post<any>(`${API}/sauvegarder`, body).subscribe({
+      next: () => { this.allNotes[key] = note; this.applyAndClose(); },
+      error: () => { this.allNotes[key] = note; this.applyAndClose(); }
+    });
+  }
+
+  private applyAndClose() {
+    this.allNotes = { ...this.allNotes };
+    localStorage.setItem('planningNotes', JSON.stringify(this.allNotes));
+    this.generateCalendrier();
+    this.fermerManagerModal();
+  }
+
+  // ===== GRILLE SEMAINE =====
+
+  getMondayOf(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  generateSemaine() {
+    this.weekDays = [];
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(this.currentWeekStart);
+      d.setDate(d.getDate() + i);
+      this.weekDays.push({
+        date: d, jour: d.getDate(),
+        abbr: this.joursAbbr[i],
+        isToday: this.isToday(d)
+      });
+    }
+  }
+
+  prevWeek() { const d = new Date(this.currentWeekStart); d.setDate(d.getDate() - 7); this.currentWeekStart = d; this.generateSemaine(); }
+  nextWeek() { const d = new Date(this.currentWeekStart); d.setDate(d.getDate() + 7); this.currentWeekStart = d; this.generateSemaine(); }
+  goToCurrentWeek() { this.currentWeekStart = this.getMondayOf(new Date()); this.generateSemaine(); }
+
+  getWeekLabel(): string {
+    const end = new Date(this.currentWeekStart);
+    end.setDate(end.getDate() + 4);
+    const s = this.currentWeekStart;
+    if (s.getMonth() === end.getMonth()) {
+      return `${s.getDate()} – ${end.getDate()} ${this.moisNoms[s.getMonth()]} ${s.getFullYear()}`;
+    }
+    return `${s.getDate()} ${this.moisNoms[s.getMonth()]} – ${end.getDate()} ${this.moisNoms[end.getMonth()]} ${s.getFullYear()}`;
+  }
+
+  getNoteForDay(userId: number, date: Date): string {
+    const key = `${userId}_${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    return this.allNotes[key] || '';
+  }
+
+  getCellInfo(userId: number, date: Date): { label: string; color: string } | null {
+    const conge = this.getCongeForUserOnDay(userId, date);
+    if (conge) return { label: this.getCongeLabel(conge), color: this.getCongeColor(conge) };
+    const note = this.getNoteForDay(userId, date);
+    if (note) return { label: note, color: this.getNoteColor(note) };
+    return null;
+  }
+
+  ouvrirCelluleSemaine(user: any, weekDay: any) {
+    if (!this.isManager || this.getCongeForUserOnDay(user.id, weekDay.date)) return;
+    const note = this.getNoteForDay(user.id, weekDay.date);
+    const parts = note.split(' - ');
+    this.managerType = parts[0] || 'Bureau';
+    this.managerLieu = parts.slice(1).join(' - ') || '';
+    this.managerCell = { user, jour: { date: weekDay.date, jour: weekDay.jour, affichage: weekDay.jour } };
+    this.showManagerModal = true;
+  }
+
+  getJourLabel(jour: any): string {
+    if (!jour) return '';
+    const d = jour.date as Date;
+    const j = this.joursAbbr[(d.getDay() + 6) % 7];
+    return `${j} ${d.getDate()} ${this.moisNoms[d.getMonth()]}`;
   }
 }

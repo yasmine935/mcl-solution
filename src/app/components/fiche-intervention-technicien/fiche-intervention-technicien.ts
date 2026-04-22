@@ -172,23 +172,23 @@ export class FicheInterventionTechnicien implements OnInit {
 
   supprimerPhoto(index: number) { this.photos.splice(index, 1); }
 
-  // ✅ VERSION QUI MARCHE
   envoyerFiche() {
     if (!this.form.signatureTechnicien) { alert('Veuillez signer en tant que technicien'); return; }
     if (!this.form.signatureClient) { alert('Veuillez signer en tant que client'); return; }
     if (!this.form.nomClientSigne) { alert('Veuillez entrer le nom du client'); return; }
 
-    this.http.put(`${API}/${this.intervention.id}/statut?statut=COMPLETEE`, {}).subscribe({
+    const body = {
+      heureDebut: this.form.heureDebut,
+      heureFin: this.form.heureFin,
+      intervenants: this.form.intervenants,
+      signatureTechnicien: this.form.signatureTechnicien,
+      signatureClient: this.form.signatureClient,
+      nomClientSigne: this.form.nomClientSigne,
+      dateCompletion: new Date().toISOString()
+    };
+
+    this.http.put<any>(`${API}/${this.intervention.id}/completer`, body).subscribe({
       next: () => {
-        const stored = localStorage.getItem('fiches_intervention');
-        const fiches = stored ? JSON.parse(stored) : [];
-        const index = fiches.findIndex((f: any) => f.id === this.intervention.id);
-        if (index !== -1) {
-          fiches[index] = { ...fiches[index], ...this.form, statut: 'COMPLETEE', dateCompletion: new Date().toISOString() };
-        } else {
-          fiches.push({ ...this.intervention, ...this.form, statut: 'COMPLETEE', dateCompletion: new Date().toISOString() });
-        }
-        localStorage.setItem('fiches_intervention', JSON.stringify(fiches));
         alert('Fiche envoyee avec succes !');
         this.router.navigate(['/dashboard-technicien']);
       },

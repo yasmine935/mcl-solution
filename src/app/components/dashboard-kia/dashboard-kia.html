@@ -324,6 +324,79 @@
       }
     </div>
 
+    <!-- SOLDE DE CONGÉS -->
+    @if (soldeConges) {
+      <div class="solde-card">
+        <h4 class="solde-title">📊 Mon Solde de Congés {{ soldeConges.annee }}</h4>
+        <div class="solde-grid">
+
+          <div class="solde-item">
+            <div class="solde-item-header">
+              <span class="solde-icon">🌴</span>
+              <div>
+                <strong>Congés Annuels</strong>
+                <span class="solde-subtitle">2.5 jours/mois</span>
+              </div>
+            </div>
+            <div class="solde-bar-wrapper">
+              <div class="solde-bar">
+                <div class="solde-fill solde-fill-annuel"
+                  [style.width.%]="(soldeConges.joursAnnuelPris / soldeConges.soldeAnnuelTotal) * 100">
+                </div>
+              </div>
+              <div class="solde-numbers">
+                <span class="solde-pris">{{ soldeConges.joursAnnuelPris }}j pris</span>
+                <span class="solde-restant" [class.solde-alert]="soldeConges.soldeAnnuelRestant <= 5">
+                  {{ soldeConges.soldeAnnuelRestant }}j restants
+                </span>
+              </div>
+            </div>
+            <div class="solde-total">Sur {{ soldeConges.soldeAnnuelTotal }} jours au total</div>
+          </div>
+
+          <div class="solde-item">
+            <div class="solde-item-header">
+              <span class="solde-icon">😴</span>
+              <div>
+                <strong>RTT</strong>
+                <span class="solde-subtitle">1 jour/mois</span>
+              </div>
+            </div>
+            <div class="solde-bar-wrapper">
+              <div class="solde-bar">
+                <div class="solde-fill solde-fill-rtt"
+                  [style.width.%]="(soldeConges.joursRTTPris / soldeConges.soldeRTTTotal) * 100">
+                </div>
+              </div>
+              <div class="solde-numbers">
+                <span class="solde-pris">{{ soldeConges.joursRTTPris }}j pris</span>
+                <span class="solde-restant" [class.solde-alert]="soldeConges.soldeRTTRestant <= 2">
+                  {{ soldeConges.soldeRTTRestant }}j restants
+                </span>
+              </div>
+            </div>
+            <div class="solde-total">Sur {{ soldeConges.soldeRTTTotal }} jours au total</div>
+          </div>
+
+          @if (soldeConges.joursMaladiePris > 0) {
+            <div class="solde-item solde-item-maladie">
+              <div class="solde-item-header">
+                <span class="solde-icon">🏥</span>
+                <div>
+                  <strong>Maladie</strong>
+                  <span class="solde-subtitle">Cette année</span>
+                </div>
+              </div>
+              <div class="solde-numbers">
+                <span class="solde-pris">{{ soldeConges.joursMaladiePris }}j pris</span>
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+    }
+
     @if (showCongeForm) {
       <div class="conge-form-card">
         <div class="conge-form-title"><span>✨</span> Nouvelle Demande de Congé</div>

@@ -26,6 +26,34 @@
     <span class="leg-item"><span class="leg-dot" style="background:#2e7d32"></span>Formation</span>
   </div>
 
+  <!-- BANDEAU TECH : MA SEMAINE EN COURS -->
+  @if (!isManager) {
+    <div class="tech-semaine-card">
+      <div class="tech-semaine-header">
+        <span class="tech-semaine-icon">📋</span>
+        <div>
+          <h4>Ma semaine — {{ getWeekLabel() }}</h4>
+          <p>Planning assigné par votre responsable</p>
+        </div>
+      </div>
+      <div class="tech-semaine-days">
+        @for (wd of weekDays; track wd.jour) {
+          <div class="tech-day-card" [class.tech-day-today]="wd.isToday">
+            <div class="tech-day-label">
+              <span class="tech-day-abbr">{{ wd.abbr }}</span>
+              <span class="tech-day-num">{{ wd.jour }}</span>
+            </div>
+            @if (getCellInfo(currentUserId!, wd.date); as info) {
+              <div class="tech-day-badge" [style.background]="info.color">{{ info.label }}</div>
+            } @else {
+              <div class="tech-day-empty">Non assigné</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
   <!-- CALENDRIER -->
   <div class="calendrier-card">
 
@@ -43,6 +71,7 @@
         [class.today]="jour.isToday"
         [class.has-note]="(jour.note || jour.conge) && jour.jour !== 0"
         [class.has-conge]="jour.conge && jour.jour !== 0"
+        [class.cal-day-readonly]="!isManager"
         (click)="ouvrirJour(jour)">
 
         <span class="day-number">{{ jour.affichage }}</span>
@@ -61,7 +90,69 @@
     </div>
   </div>
 
-  <!-- TABLEAU ÉQUIPE -->
+  <!-- GRILLE MANAGER SEMAINE -->
+  @if (isManager) {
+    <div class="grille-card">
+
+      <div class="grille-header">
+        <div class="grille-header-left">
+          <div class="grille-icon">🖊</div>
+          <div>
+            <h3>Grille d'Assignation</h3>
+            <p>Cliquez sur une cellule pour assigner un technicien</p>
+          </div>
+        </div>
+        <div class="grille-nav">
+          <button type="button" class="grille-nav-btn" (click)="prevWeek()">←</button>
+          <span class="grille-semaine-label">{{ getWeekLabel() }}</span>
+          <button type="button" class="grille-nav-btn" (click)="nextWeek()">→</button>
+          <button type="button" class="grille-today-btn" (click)="goToCurrentWeek()">Aujourd'hui</button>
+        </div>
+      </div>
+
+      <div class="grille-table-wrapper">
+        <table class="grille-table">
+          <thead>
+            <tr>
+              <th class="grille-th-personne">Technicien</th>
+              @for (wd of weekDays; track wd.jour) {
+                <th class="grille-th-day" [class.grille-th-today]="wd.isToday">
+                  <span class="grille-day-abbr">{{ wd.abbr }}</span>
+                  <span class="grille-day-num" [class.grille-day-today]="wd.isToday">{{ wd.jour }}</span>
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of techniciens; track user.id) {
+              <tr class="grille-row">
+                <td class="grille-td-personne">
+                  <div class="grille-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+                  <span>{{ user.prenom }} {{ user.nom }}</span>
+                </td>
+                @for (wd of weekDays; track wd.jour) {
+                  <td class="grille-cell"
+                    [class.grille-cell-filled]="getCellInfo(user.id, wd.date)"
+                    [class.grille-cell-conge]="getCongeForUserOnDay(user.id, wd.date)"
+                    (click)="ouvrirCelluleSemaine(user, wd)">
+                    @if (getCellInfo(user.id, wd.date); as info) {
+                      <div class="grille-badge" [style.background]="info.color">{{ info.label }}</div>
+                    } @else {
+                      <div class="grille-empty-cell">+</div>
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  }
+
+  <!-- TABLEAU ÉQUIPE : visible uniquement pour les managers -->
+  @if (isManager) {
   <div class="equipe-card">
     <h3 class="equipe-title">
       <span>👥</span> Planning Toute l'Équipe — {{ getMoisAnnee() }}
@@ -91,16 +182,26 @@
               <td *ngIf="jour.jour !== 0"
                 class="td-note"
                 [class.td-weekend]="jour.isWeekend"
-                [class.td-conge]="getCongeForUserOnDay(user.id, jour.date)">
-              @if (getInfoForUserOnDay(user.id, jour)) {
-  <span class="note-pill"
-    [style.background]="getInfoForUserOnDay(user.id, jour)!.color"
-    [class.conge-pill]="getInfoForUserOnDay(user.id, jour)!.isConge">
-    {{ getInfoForUserOnDay(user.id, jour)!.label }}
-  </span>
-} @else {
-  <span class="td-empty">·</span>
-}
+                [class.td-conge]="getCongeForUserOnDay(user.id, jour.date)"
+                [class.td-assignable]="isManager && !jour.isWeekend && !getCongeForUserOnDay(user.id, jour.date)"
+                (click)="ouvrirCelluleEquipe(user, jour)">
+                @if (getInfoForUserOnDay(user.id, jour)) {
+                  <span class="note-pill"
+                    [style.background]="getInfoForUserOnDay(user.id, jour)!.color"
+                    [class.conge-pill]="getInfoForUserOnDay(user.id, jour)!.isConge">
+                    {{ getInfoForUserOnDay(user.id, jour)!.label }}
+                  </span>
+                } @else {
+                  @if (isManager) {
+                    @if (!jour.isWeekend) {
+                      <span class="td-add-hint">+</span>
+                    } @else {
+                      <span class="td-empty">·</span>
+                    }
+                  } @else {
+                    <span class="td-empty">·</span>
+                  }
+                }
               </td>
             </ng-container>
           </tr>
@@ -108,6 +209,56 @@
       </table>
     </div>
   </div>
+  }
+
+  <!-- MODAL ASSIGNATION MANAGER -->
+  @if (showManagerModal) {
+    @if (managerCell) {
+      <div class="modal-overlay" (click)="fermerManagerModal()">
+        <div class="modal-assign" (click)="$event.stopPropagation()">
+
+          <div class="modal-assign-header">
+            <div class="assign-header-info">
+              <div class="assign-avatar">
+                {{ managerCell.user.prenom?.charAt(0) }}{{ managerCell.user.nom?.charAt(0) }}
+              </div>
+              <div>
+                <h3>{{ managerCell.user.prenom }} {{ managerCell.user.nom }}</h3>
+                <p>{{ getJourLabel(managerCell.jour) }}</p>
+              </div>
+            </div>
+            <button type="button" class="btn-modal-close" (click)="fermerManagerModal()">✕</button>
+          </div>
+
+          <div class="modal-assign-body">
+            <p class="assign-label">Type de journée</p>
+            <div class="assign-chips">
+              @for (t of typeOptions; track t) {
+                <span class="assign-chip"
+                  [class.assign-chip-selected]="managerType === t"
+                  (click)="managerType = t">
+                  {{ t }}
+                </span>
+              }
+            </div>
+
+            <p class="assign-label assign-label-lieu">Client / Lieu <span class="assign-optional">(optionnel)</span></p>
+            <input type="text" class="assign-input"
+              [(ngModel)]="managerLieu"
+              placeholder="Ex: MCL Paris, Chantier Lyon...">
+          </div>
+
+          <div class="modal-assign-footer">
+            <button type="button" class="btn-modal-cancel" (click)="fermerManagerModal()">Annuler</button>
+            <button type="button" class="btn-modal-save" (click)="sauvegarderAssignation()" [disabled]="!managerType">
+              ✓ Assigner
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }
+  }
 
   <!-- MODAL NOTE -->
   @if (showModal && selectedJour) {

@@ -185,6 +185,202 @@
   font-size: 0.82rem; font-weight: 700; text-align: center; margin-top: 4px;
 }
 
+/* ===== BANDEAU SEMAINE TECHNICIEN ===== */
+.tech-semaine-card {
+  background: #fff; border-radius: 14px; padding: 18px 20px; margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #eef0f5;
+}
+.tech-semaine-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 1px solid #f0f4f8;
+}
+.tech-semaine-icon { font-size: 1.5rem; }
+.tech-semaine-header h4 { margin: 0; font-size: 0.95rem; font-weight: 800; color: #0d1b2a; }
+.tech-semaine-header p  { margin: 3px 0 0; font-size: 0.72rem; color: #90a4ae; }
+.tech-semaine-days { display: flex; gap: 10px; flex-wrap: wrap; }
+.tech-day-card {
+  flex: 1; min-width: 90px; background: #f8fafc; border-radius: 10px;
+  padding: 12px; text-align: center; border: 1.5px solid #eef0f5;
+  transition: border-color 0.15s;
+}
+.tech-day-today { border-color: #1565c0 !important; background: #e3f2fd; }
+.tech-day-label { margin-bottom: 8px; }
+.tech-day-abbr { display: block; font-size: 0.65rem; font-weight: 700; color: #90a4ae; text-transform: uppercase; }
+.tech-day-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 0.88rem; font-weight: 800; color: #0d1b2a; margin-top: 4px;
+}
+.tech-day-today .tech-day-num { background: #1565c0; color: #fff; }
+.tech-day-badge {
+  display: inline-block; color: #fff; font-size: 0.7rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.tech-day-empty { font-size: 0.72rem; color: #b0bec5; font-weight: 600; }
+
+/* Calendrier lecture seule pour les techs */
+.cal-day-readonly { cursor: default !important; }
+.cal-day-readonly:hover { background: #fafafa !important; border-color: transparent !important; transform: none !important; }
+
+/* ===== GRILLE SEMAINE MANAGER ===== */
+.grille-card {
+  background: #fff; border-radius: 16px; margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #eef0f5; overflow: hidden;
+}
+.grille-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #1a237e, #283593);
+  padding: 18px 24px; flex-wrap: wrap; gap: 12px;
+}
+.grille-header-left { display: flex; align-items: center; gap: 14px; }
+.grille-icon {
+  font-size: 1.5rem; width: 48px; height: 48px;
+  background: rgba(255,255,255,0.15); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;
+}
+.grille-header h3 { margin: 0; font-size: 1.05rem; font-weight: 800; color: #fff; }
+.grille-header p  { margin: 3px 0 0; font-size: 0.72rem; color: rgba(255,255,255,0.6); }
+
+.grille-nav { display: flex; align-items: center; gap: 8px; }
+.grille-nav-btn {
+  width: 34px; height: 34px; background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+  color: #fff; font-size: 1rem; cursor: pointer; transition: background 0.15s;
+}
+.grille-nav-btn:hover { background: rgba(255,255,255,0.28); }
+.grille-semaine-label { font-size: 0.88rem; font-weight: 800; color: #fff; min-width: 200px; text-align: center; }
+.grille-today-btn {
+  background: rgba(255,255,255,0.9); color: #1a237e; border: none;
+  padding: 6px 14px; border-radius: 8px; font-size: 0.78rem; font-weight: 800;
+  cursor: pointer; transition: background 0.15s;
+}
+.grille-today-btn:hover { background: #fff; }
+
+.grille-table-wrapper { overflow-x: auto; }
+.grille-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+
+.grille-th-personne {
+  background: #f8fafc; color: #546e7a; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 12px 16px; text-align: left; border-bottom: 2px solid #eef0f5;
+  min-width: 160px; position: sticky; left: 0; z-index: 2;
+}
+.grille-th-day {
+  background: #f8fafc; text-align: center; padding: 10px 8px;
+  border-bottom: 2px solid #eef0f5; border-left: 1px solid #f0f4f8; min-width: 110px;
+}
+.grille-th-today { background: #e8eaf6 !important; }
+.grille-day-abbr { display: block; font-size: 0.65rem; font-weight: 700; color: #90a4ae; text-transform: uppercase; letter-spacing: 0.5px; }
+.grille-day-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; font-size: 0.9rem; font-weight: 800; color: #0d1b2a;
+  margin-top: 4px; border-radius: 50%;
+}
+.grille-day-today { background: #3949ab; color: #fff !important; }
+
+.grille-row:hover { background: #fafbff; }
+.grille-row td { border-bottom: 1px solid #f0f4f8; }
+
+.grille-td-personne {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; font-size: 0.83rem; font-weight: 700; color: #0d1b2a;
+  white-space: nowrap; position: sticky; left: 0; background: #fff; z-index: 1;
+  border-right: 1px solid #eef0f5;
+}
+.grille-row:hover .grille-td-personne { background: #fafbff; }
+.grille-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #3949ab, #5c6bc0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+
+.grille-cell {
+  padding: 6px 8px; text-align: center; border-left: 1px solid #f0f4f8;
+  cursor: pointer; transition: background 0.12s; vertical-align: middle;
+}
+.grille-cell:hover { background: #e8eaf6; }
+.grille-cell-conge { cursor: default; }
+.grille-cell-conge:hover { background: transparent; }
+
+.grille-badge {
+  display: inline-block; color: #fff; font-size: 0.7rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  max-width: 100px; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.grille-empty-cell {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #f0f4f8; color: #546e7a; font-size: 1rem; font-weight: 300;
+  transition: all 0.15s;
+}
+.grille-cell:hover .grille-empty-cell { background: #c5cae9; color: #3949ab; font-weight: 700; }
+
+/* ===== CELLULES ASSIGNABLES (manager) ===== */
+.td-assignable { cursor: pointer; transition: background 0.12s; }
+.td-assignable:hover { background: #e3f2fd !important; }
+.td-add-hint {
+  color: #b0c4d8; font-size: 1rem; font-weight: 300;
+  display: block; text-align: center; transition: color 0.12s;
+}
+.td-assignable:hover .td-add-hint { color: #1565c0; font-weight: 700; }
+
+/* ===== MODAL ASSIGNATION MANAGER ===== */
+.modal-assign {
+  background: #fff; border-radius: 16px; width: 100%; max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25); animation: popIn 0.25s ease; overflow: hidden;
+}
+.modal-assign-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+}
+.assign-header-info { display: flex; align-items: center; gap: 12px; }
+.assign-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #01579b, #0288d1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; font-weight: 800; color: #fff;
+  border: 2px solid rgba(255,255,255,0.25); flex-shrink: 0;
+}
+.modal-assign-header h3 { margin: 0 0 3px; font-size: 0.95rem; font-weight: 800; color: #fff; }
+.modal-assign-header p { margin: 0; font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+.modal-assign-body { padding: 20px; }
+.assign-label {
+  margin: 0 0 8px; font-size: 0.7rem; font-weight: 700; color: #546e7a;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.assign-label-lieu { margin-top: 16px; }
+.assign-optional { font-weight: 400; text-transform: none; color: #607d8b; font-size: 0.68rem; }
+
+.assign-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.assign-chip {
+  padding: 6px 14px; border-radius: 20px;
+  background: #f0f4f8; color: #546e7a;
+  font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  border: 1.5px solid transparent; transition: all 0.15s;
+}
+.assign-chip:hover { background: #e3f2fd; color: #01579b; border-color: #90caf9; }
+.assign-chip-selected { background: #01579b !important; color: #fff !important; border-color: #01579b !important; }
+
+.assign-input {
+  width: 100%; height: 38px; border: 1.5px solid #dde2ea; border-radius: 8px;
+  padding: 0 12px; font-size: 0.85rem; font-family: inherit; outline: none;
+  box-sizing: border-box; transition: border-color 0.15s; color: #0d1b2a;
+}
+.assign-input:focus { border-color: #01579b; }
+
+.modal-assign-footer {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 14px 20px; border-top: 1px solid #f0f4f8;
+}
+.btn-modal-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
 @media (max-width: 768px) {
   .cal-day { min-height: 55px; }
   .planning-header { padding: 14px 16px; }
