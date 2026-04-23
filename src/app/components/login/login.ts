@@ -48,7 +48,8 @@ export class Login {
           case 'AYDEH':    this.router.navigate(['/dashboard-aydeh']); break;
           case 'NACCERA':  this.router.navigate(['/dashboard-naccera']); break;
           case 'ABY':      this.router.navigate(['/dashboard-aby']); break;
-         
+          case 'UN':       this.router.navigate(['/dashboard-technicien']); break;
+
           default:             this.router.navigate(['/login']);
           
         }

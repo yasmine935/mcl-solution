@@ -54,6 +54,77 @@
     </div>
   }
 
+  <!-- MON ÉQUIPE (techniciens seulement) -->
+  @if (!isManager) {
+    <div class="collegues-card">
+      <div class="collegues-header">
+        <span class="collegues-icon">👥</span>
+        <div>
+          <h4>Mon Équipe</h4>
+          <p>Cliquez sur un collègue pour voir son planning</p>
+        </div>
+      </div>
+      <div class="collegues-list">
+        @for (u of collegues; track u.id) {
+          <div class="collegue-chip" (click)="voirCollegue(u)">
+            <div class="collegue-avatar">{{ u.prenom?.charAt(0) }}{{ u.nom?.charAt(0) }}</div>
+            <span class="collegue-nom">{{ u.prenom }} {{ u.nom }}</span>
+            <span class="collegue-voir">Voir →</span>
+          </div>
+        }
+        @if (collegues.length === 0) {
+          <p class="collegues-empty">Aucun autre technicien dans l'équipe</p>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- MODAL PLANNING COLLÈGUE -->
+  @if (showCollegueModal) {
+    @if (selectedCollegue) {
+      <div class="modal-overlay" (click)="fermerCollegue()">
+        <div class="modal-collegue" (click)="$event.stopPropagation()">
+
+          <div class="modal-collegue-header">
+            <div class="collegue-modal-info">
+              <div class="collegue-modal-avatar">
+                {{ selectedCollegue.prenom?.charAt(0) }}{{ selectedCollegue.nom?.charAt(0) }}
+              </div>
+              <div>
+                <h3>{{ selectedCollegue.prenom }} {{ selectedCollegue.nom }}</h3>
+                <p>Semaine du {{ getWeekLabel() }}</p>
+              </div>
+            </div>
+            <button type="button" class="btn-modal-close" (click)="fermerCollegue()">✕</button>
+          </div>
+
+          <div class="modal-collegue-body">
+            <div class="tech-semaine-days">
+              @for (wd of weekDays; track wd.jour) {
+                <div class="tech-day-card" [class.tech-day-today]="wd.isToday">
+                  <div class="tech-day-label">
+                    <span class="tech-day-abbr">{{ wd.abbr }}</span>
+                    <span class="tech-day-num">{{ wd.jour }}</span>
+                  </div>
+                  @if (getCellInfo(selectedCollegue.id, wd.date); as info) {
+                    <div class="tech-day-badge" [style.background]="info.color">{{ info.label }}</div>
+                  } @else {
+                    <div class="tech-day-empty">Non assigné</div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="modal-collegue-footer">
+            <button type="button" class="btn-modal-cancel" (click)="fermerCollegue()">Fermer</button>
+          </div>
+
+        </div>
+      </div>
+    }
+  }
+
   <!-- CALENDRIER -->
   <div class="calendrier-card">
 

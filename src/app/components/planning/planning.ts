@@ -272,6 +272,23 @@ export class Planning implements OnInit {
     return this.utilisateurs.filter(u => (u.role || '').toUpperCase() === 'TECHNICIEN');
   }
 
+  get collegues(): any[] {
+    return this.techniciens.filter(u => u.id !== this.currentUserId);
+  }
+
+  selectedCollegue: any = null;
+  showCollegueModal = false;
+
+  voirCollegue(user: any) {
+    this.selectedCollegue = user;
+    this.showCollegueModal = true;
+  }
+
+  fermerCollegue() {
+    this.showCollegueModal = false;
+    this.selectedCollegue = null;
+  }
+
   // ✅ Ouvre le modal d'assignation pour un technicien × jour
   ouvrirCelluleEquipe(user: any, jour: any) {
     if (!this.isManager || jour.jour === 0 || this.getCongeForUserOnDay(user.id, jour.date)) return;
