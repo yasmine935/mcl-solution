@@ -542,3 +542,122 @@ nav { padding: 0 12px 20px; flex: 1; }
 /* EMPTY STATE */
 .empty-state { text-align: center; padding: 48px; color: #b0bec5; }
 .empty-state span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+/* ══════════ BOUTON TRAITER ══════════ */
+.btn-traiter {
+  background: #1565c0;
+  color: #fff;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-traiter:hover { background: #0d47a1; }
+
+.pill-grey { background: #eceff1; color: #546e7a; font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+
+/* ══════════ MODAL TRAITER CONGÉ ══════════ */
+.modal-overlay-traiter {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+
+.modal-traiter {
+  background: #fff;
+  border-radius: 16px;
+  width: 560px;
+  max-width: 95vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column;
+}
+
+.modal-traiter-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px 14px;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  border-radius: 16px 16px 0 0;
+}
+
+.modal-traiter-id { display: flex; align-items: center; gap: 12px; }
+
+.conge-ref {
+  font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: 0.5px;
+}
+
+.badge-approuve {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.4);
+  letter-spacing: 0.5px;
+}
+
+.modal-traiter-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+
+.traiter-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.traiter-info-cell { display: flex; align-items: flex-start; gap: 10px; }
+.ti-icon { font-size: 1.2rem; margin-top: 2px; }
+.ti-label { font-size: 0.68rem; font-weight: 700; color: #90a4ae; letter-spacing: 0.5px; margin-bottom: 2px; }
+.ti-val { font-size: 0.88rem; font-weight: 600; color: #263238; }
+
+.traiter-section { display: flex; flex-direction: column; gap: 8px; }
+.traiter-section-title { font-size: 0.72rem; font-weight: 800; color: #546e7a; letter-spacing: 0.5px; }
+
+.traiter-text-box {
+  background: #f8f9fa; border-radius: 10px;
+  padding: 12px 14px; font-size: 0.85rem; color: #37474f;
+  border: 1.5px solid #e0e0e0;
+}
+
+.traiter-textarea {
+  width: 100%; min-height: 80px; resize: vertical;
+  border: 1.5px solid #e0e0e0; border-radius: 10px;
+  padding: 10px 14px; font-size: 0.85rem; font-family: inherit;
+  outline: none; transition: border-color 0.2s;
+}
+.traiter-textarea:focus { border-color: #1565c0; }
+
+.traiter-success {
+  background: #e8f5e9; color: #2e7d32;
+  border-radius: 10px; padding: 12px 16px;
+  font-size: 0.88rem; font-weight: 700; text-align: center;
+}
+
+.modal-traiter-footer {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-traiter-confirm {
+  background: #1565c0; color: #fff;
+  border: none; padding: 10px 22px;
+  border-radius: 10px; font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-traiter-confirm:hover:not(:disabled) { background: #0d47a1; }
+.btn-traiter-confirm:disabled { background: #b0bec5; cursor: not-allowed; }
+
+.btn-traiter-close {
+  background: #f0f4f8; color: #546e7a;
+  border: none; padding: 10px 18px;
+  border-radius: 10px; font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-traiter-close:hover { background: #e0e0e0; }

@@ -121,7 +121,8 @@ get minutesOk(): number {
   this.loadTickets();
   this.loadFactures();
   this.loadVoitures();
-  this.loadMinutesSecurite(); // ✅ AJOUTER
+  this.loadMinutesSecurite();
+  this.loadResetRequests();
 }
 
   loadFiches() {
@@ -320,6 +321,44 @@ getStatutVoitureColor(statut: string): string {
   const map: any = { 'Disponible': '#2e7d32', 'En service': '#1565c0', 'En maintenance': '#f57f17', 'Hors service': '#c62828' };
   return map[statut] || '#546e7a';
 }
+  // ===== RESET PASSWORD =====
+  resetRequests: any[] = [];
+  showResetModal = false;
+  selectedReset: any = null;
+  newPassword = '';
+  resetSuccess = '';
+
+  loadResetRequests() {
+    this.http.get<any[]>('http://localhost:8080/api/auth/reset-requests').subscribe({
+      next: (data) => this.resetRequests = data,
+      error: () => this.resetRequests = []
+    });
+  }
+
+  ouvrirReset(req: any) {
+    this.selectedReset = req;
+    this.newPassword = '';
+    this.resetSuccess = '';
+    this.showResetModal = true;
+  }
+
+  fermerReset() { this.showResetModal = false; this.selectedReset = null; }
+
+  confirmerReset() {
+    if (!this.newPassword.trim()) { alert('Entrez un nouveau mot de passe'); return; }
+    this.http.put(`http://localhost:8080/api/auth/reset-requests/${this.selectedReset.id}/reset`,
+      { newPassword: this.newPassword }, { responseType: 'text' }).subscribe({
+      next: () => {
+        this.resetSuccess = 'Mot de passe réinitialisé avec succès !';
+        this.loadResetRequests();
+        setTimeout(() => this.fermerReset(), 1500);
+      },
+      error: () => alert('Erreur lors de la réinitialisation')
+    });
+  }
+
+  get countResetPending(): number { return this.resetRequests.length; }
+
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);

@@ -37,10 +37,24 @@
             </select>
           </div>
           <div class="field-md">
-            <label class="field-label">Valeur</label>
-            <select class="compact-input" [(ngModel)]="nouvelleTache.valeur">
-              @for (v of valeurs; track v) { <option [value]="v">{{ v }}</option> }
-            </select>
+            <label class="field-label">Client</label>
+            <div class="client-select-wrap">
+              <select class="compact-input" [(ngModel)]="nouvelleTache.client">
+                <option value="">— Sélectionner —</option>
+                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('add')" title="Nouveau client">+</button>
+            </div>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Client Final</label>
+            <div class="client-select-wrap">
+              <select class="compact-input" [(ngModel)]="nouvelleTache.clientFinal">
+                <option value="">— Sélectionner —</option>
+                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('add')" title="Nouveau client">+</button>
+            </div>
           </div>
         </div>
 
@@ -123,10 +137,24 @@
             </select>
           </div>
           <div class="field-md">
-            <label class="field-label">Valeur</label>
-            <select class="compact-input" [(ngModel)]="tacheEnEdition.valeur">
-              @for (v of valeurs; track v) { <option [value]="v">{{ v }}</option> }
-            </select>
+            <label class="field-label">Client</label>
+            <div class="client-select-wrap">
+              <select class="compact-input" [(ngModel)]="tacheEnEdition.client">
+                <option value="">— Sélectionner —</option>
+                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('edit')" title="Nouveau client">+</button>
+            </div>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Client Final</label>
+            <div class="client-select-wrap">
+              <select class="compact-input" [(ngModel)]="tacheEnEdition.clientFinal">
+                <option value="">— Sélectionner —</option>
+                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('edit')" title="Nouveau client">+</button>
+            </div>
           </div>
         </div>
         <div class="form-row">
@@ -196,7 +224,8 @@
               <th>Statut</th>
               <th>Priorité</th>
               <th>Échéance</th>
-              <th>Valeur</th>
+              <th>Client</th>
+              <th>Client Final</th>
               <th>CA (€)</th>
               <th>N° CMD</th>
               <th>Actions</th>
@@ -227,7 +256,7 @@
                     }
                   </div>
                 </td>
-                <td><span class="badge-statut" [style.background]="getStatutColor(tache.statut)">{{ tache.statut }}</span></td>
+                <td><span class="badge-priorite" [style.background]="getStatutColor(tache.statut)">{{ tache.statut }}</span></td>
                 <td><span class="badge-priorite" [style.background]="getPrioriteColor(tache.priorite)">{{ tache.priorite }}</span></td>
                 <td>
                   @if (tache.echeance) {
@@ -236,7 +265,8 @@
                     <span class="assignee-empty">—</span>
                   }
                 </td>
-                <td><span class="badge-valeur" [style.background]="getValeurColor(tache.valeur)">{{ tache.valeur }}</span></td>
+                <td><span class="badge-client">{{ tache.client || '—' }}</span></td>
+                <td><span class="badge-client">{{ tache.clientFinal || '—' }}</span></td>
                 <td>
                   @if (tache.chiffreAffaire) {
                     <strong class="ca-value">{{ tache.chiffreAffaire }}€</strong>
@@ -270,6 +300,29 @@
     }
   </div>
 </div>
+
+<!-- MODAL NOUVEAU CLIENT -->
+@if (showAddClientModal) {
+  <div class="modal-overlay" (click)="showAddClientModal = false">
+    <div class="modal-client" (click)="$event.stopPropagation()">
+      <div class="modal-client-header">
+        <span>🏢 Ajouter un Client</span>
+        <button type="button" class="chat-close" (click)="showAddClientModal = false">✕</button>
+      </div>
+      <div class="modal-client-body">
+        <label class="field-label">Nom du client</label>
+        <input class="compact-input" [(ngModel)]="nouveauClientNom"
+          placeholder="Ex: Total Energies" (keyup.enter)="confirmerNouveauClient()">
+      </div>
+      <div class="modal-client-footer">
+        <button type="button" class="btn-save-client" (click)="confirmerNouveauClient()" [disabled]="!nouveauClientNom.trim()">
+          ✅ Ajouter
+        </button>
+        <button type="button" class="btn-cancel-client" (click)="showAddClientModal = false">Annuler</button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- MODAL CHAT -->
 @if (showNoteModal && selectedTache) {
@@ -336,8 +389,12 @@
             <span class="badge-priorite" [style.background]="getPrioriteColor(selectedTache.priorite)">{{ selectedTache.priorite }}</span>
           </div>
           <div class="detail-item">
-            <strong>Valeur</strong>
-            <span class="badge-valeur" [style.background]="getValeurColor(selectedTache.valeur)">{{ selectedTache.valeur }}</span>
+            <strong>Client</strong>
+            <p>{{ selectedTache.client || '—' }}</p>
+          </div>
+          <div class="detail-item">
+            <strong>Client Final</strong>
+            <p>{{ selectedTache.clientFinal || '—' }}</p>
           </div>
           <div class="detail-item"><strong>Date</strong><p>{{ selectedTache.date || '—' }}</p></div>
           <div class="detail-item"><strong>Échéance</strong><p>{{ selectedTache.echeance || '—' }}</p></div>

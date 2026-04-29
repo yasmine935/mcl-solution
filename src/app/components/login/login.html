@@ -84,7 +84,50 @@
         </div>
       </div>
 
-      <a class="forgot">Mot de passe oublié ?</a>
+      <a class="forgot" (click)="ouvrirForgot()">Mot de passe oublié ?</a>
+
+      @if (showForgotModal) {
+        <div class="forgot-overlay" (click)="fermerForgot()">
+          <div class="forgot-modal" (click)="$event.stopPropagation()">
+
+            <div class="forgot-modal-header">
+              <div class="forgot-icon">🔑</div>
+              <div>
+                <h4>Mot de passe oublié</h4>
+                <p>L'admin réinitialisera votre mot de passe</p>
+              </div>
+              <button type="button" class="forgot-close" (click)="fermerForgot()">✕</button>
+            </div>
+
+            @if (!forgotMessage) {
+              <div class="forgot-modal-body">
+                <label class="forgot-label">Nom d'utilisateur</label>
+                <div class="forgot-input-wrap">
+                  <span class="forgot-input-icon">👤</span>
+                  <input type="text" class="forgot-input" [(ngModel)]="forgotUsername"
+                    placeholder="Entrez votre username" (keyup.enter)="envoyerDemande()">
+                </div>
+                @if (forgotError) {
+                  <div class="forgot-error">⚠️ {{ forgotError }}</div>
+                }
+              </div>
+              <div class="forgot-modal-footer">
+                <button type="button" class="forgot-btn-cancel" (click)="fermerForgot()">Annuler</button>
+                <button type="button" class="forgot-btn-send" (click)="envoyerDemande()" [disabled]="forgotLoading">
+                  {{ forgotLoading ? 'Envoi...' : 'Envoyer la demande' }}
+                </button>
+              </div>
+            } @else {
+              <div class="forgot-success">
+                <div class="forgot-success-icon">✅</div>
+                <p>{{ forgotMessage }}</p>
+                <button type="button" class="forgot-btn-send" (click)="fermerForgot()">Fermer</button>
+              </div>
+            }
+
+          </div>
+        </div>
+      }
 
       @if (errorMessage) {
         <div class="error-msg">
@@ -106,3 +149,66 @@
   </div>
 
 </div>
+
+<!-- ══ MODAL PREMIER CONNEXION ══ -->
+@if (showChangePasswordModal) {
+  <div class="chpwd-overlay">
+    <div class="chpwd-modal">
+
+      <div class="chpwd-header">
+        <div class="chpwd-icon-wrap">🔐</div>
+        <div>
+          <h3>Bienvenue, {{ pendingUser?.prenom }} !</h3>
+          <p>Pour votre sécurité, choisissez votre propre mot de passe</p>
+        </div>
+      </div>
+
+      @if (!changePasswordSuccess) {
+        <div class="chpwd-body">
+          <div class="chpwd-field">
+            <label class="chpwd-label" for="chpwd-new">Nouveau mot de passe</label>
+            <div class="chpwd-input-wrap">
+              <span class="chpwd-input-icon">🔒</span>
+              <input id="chpwd-new" type="password" class="chpwd-input" [(ngModel)]="newPassword"
+                placeholder="Choisissez un mot de passe" autocomplete="new-password">
+            </div>
+          </div>
+          <div class="chpwd-field">
+            <label class="chpwd-label" for="chpwd-confirm">Confirmer le mot de passe</label>
+            <div class="chpwd-input-wrap">
+              <span class="chpwd-input-icon">✅</span>
+              <input id="chpwd-confirm" type="password" class="chpwd-input" [(ngModel)]="confirmPassword"
+                placeholder="Répétez le mot de passe" autocomplete="new-password"
+                (keyup.enter)="confirmerNouveauMotDePasse()">
+            </div>
+          </div>
+
+          @if (newPassword && confirmPassword) {
+            <div class="chpwd-match" [class.match-ok]="newPassword === confirmPassword" [class.match-ko]="newPassword !== confirmPassword">
+              {{ newPassword === confirmPassword ? '✅ Les mots de passe correspondent' : '❌ Ne correspondent pas' }}
+            </div>
+          }
+
+          @if (changePasswordError) {
+            <div class="chpwd-error">⚠️ {{ changePasswordError }}</div>
+          }
+        </div>
+
+        <div class="chpwd-footer">
+          <button type="button" class="chpwd-btn-confirm"
+            (click)="confirmerNouveauMotDePasse()"
+            [disabled]="changePasswordLoading || newPassword !== confirmPassword || !newPassword">
+            {{ changePasswordLoading ? 'Enregistrement...' : 'Confirmer mon mot de passe' }}
+          </button>
+        </div>
+      } @else {
+        <div class="chpwd-success">
+          <div class="chpwd-success-icon">🎉</div>
+          <p>Mot de passe créé avec succès !</p>
+          <small>Redirection en cours...</small>
+        </div>
+      }
+
+    </div>
+  </div>
+}

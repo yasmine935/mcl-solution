@@ -33,12 +33,20 @@ export class Taches implements OnInit {
 
   statuts = ['En Qualification', 'En cours', 'Fait', 'Perdu', 'En Attente'];
   priorites = ['Faible', 'Élevé', 'Moyenne'];
-  valeurs = ['Bronze', 'Platinum', 'Gold', 'Silver'];
+
+  clients: string[] = [
+    'MCL Solutions', 'Bouygues', 'Vinci', 'Eiffage', 'Engie',
+    'Veolia', 'Sodexo', 'Elior', 'Spie', 'GTM'
+  ];
+
+  showAddClientModal = false;
+  nouveauClientNom = '';
+  clientModalTarget: 'add' | 'edit' = 'add';
 
   nouvelleTache = {
     projet: '', statut: 'En Qualification', date: '',
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
-    echeance: '', valeur: 'Bronze', chiffreAffaire: '', numCommande: ''
+    echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: ''
   };
 
   tacheEnEdition: any = {};
@@ -47,8 +55,31 @@ export class Taches implements OnInit {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const stored = localStorage.getItem('mcl_clients');
+    if (stored) this.clients = JSON.parse(stored);
     this.loadEmployes();
     this.loadTaches();
+  }
+
+  ouvrirAddClient(target: 'add' | 'edit') {
+    this.clientModalTarget = target;
+    this.nouveauClientNom = '';
+    this.showAddClientModal = true;
+  }
+
+  confirmerNouveauClient() {
+    const nom = this.nouveauClientNom.trim();
+    if (!nom) return;
+    if (!this.clients.includes(nom)) {
+      this.clients.push(nom);
+      localStorage.setItem('mcl_clients', JSON.stringify(this.clients));
+    }
+    if (this.clientModalTarget === 'add') {
+      this.nouvelleTache.client = nom;
+    } else {
+      this.tacheEnEdition.client = nom;
+    }
+    this.showAddClientModal = false;
   }
 
   loadEmployes() {
@@ -98,7 +129,8 @@ export class Taches implements OnInit {
       date: t.dateCreation ? new Date(t.dateCreation).toLocaleDateString('fr-FR') : '',
       priorite: t.priorite || extras.priorite || 'Moyenne',
       echeance: t.dateEcheance || extras.echeance || '',
-      valeur: extras.valeur || 'Bronze',
+      client: extras.client || '',
+      clientFinal: extras.clientFinal || '',
       chiffreAffaire: extras.chiffreAffaire || '',
       numCommande: t.description || extras.numCommande || '',
       fichiers: extras.fichiers || [],
@@ -116,7 +148,8 @@ export class Taches implements OnInit {
     const extras = {
       priorite: tache.priorite,
       echeance: tache.echeance,
-      valeur: tache.valeur,
+      client: tache.client,
+      clientFinal: tache.clientFinal,
       chiffreAffaire: tache.chiffreAffaire,
       numCommande: tache.numCommande,
       assignes: tache.assignes,
@@ -276,7 +309,7 @@ export class Taches implements OnInit {
     this.nouvelleTache = {
       projet: '', statut: 'En Qualification', date: '',
       priorite: 'Moyenne', fichiers: [], assignes: [],
-      echeance: '', valeur: 'Bronze', chiffreAffaire: '', numCommande: ''
+      echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: ''
     };
   }
 
@@ -321,15 +354,8 @@ export class Taches implements OnInit {
   }
 
   getPrioriteColor(priorite: string): string {
-    const colors: any = { 'Faible': '#0066FF', 'Élevé': '#7700CC', 'Moyenne': '#0066FF' };
-    return colors[priorite] || '#0066FF';
-  }
-
-  getValeurColor(valeur: string): string {
-    const colors: any = {
-      'Bronze': '#CD7F32', 'Platinum': '#E5E4E2', 'Gold': '#FFD700', 'Silver': '#C0C0C0'
-    };
-    return colors[valeur] || '#CCCCCC';
+    const colors: any = { 'Faible': '#26a69a', 'Élevé': '#7700CC', 'Moyenne': '#e65100' };
+    return colors[priorite] || '#546e7a';
   }
 
   getEmployeeName(employeId: number): string {

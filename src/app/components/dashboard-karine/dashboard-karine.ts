@@ -7,11 +7,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { Voitures } from '../voitures/voitures';
+import { Employes } from '../employes/employes';
 
 @Component({
   selector: 'app-dashboard-karine',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, RemonteesTerrainComponent, Voitures],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, RemonteesTerrainComponent, Voitures, Employes],
   templateUrl: './dashboard-karine.html',
   styleUrl: './dashboard-karine.css'
 })
@@ -29,6 +30,12 @@ export class DashboardKarine implements OnInit {
   voitures: any[] = [];
   showFormVoiture = false;
   showDetailConge: any = null;
+
+  // Modal traiter congé
+  showTraiterModal = false;
+  congeSelectionne: any = null;
+  noteTraitement = '';
+  traitementSuccess = false;
 
  nouvelleVoiture = {
   immatriculation: '', marque: '', modele: '',
@@ -126,6 +133,40 @@ export class DashboardKarine implements OnInit {
 
   get congesEnAttente() { return this.conges.filter(c => c.statut === 'EN_ATTENTE'); }
   get congesApprouves() { return this.conges.filter(c => c.statut === 'APPROUVE'); }
+  get congesTraites() { return this.conges.filter(c => c.statut === 'TRAITE'); }
+
+  ouvrirTraiter(conge: any) {
+    this.congeSelectionne = conge;
+    this.noteTraitement = '';
+    this.traitementSuccess = false;
+    this.showTraiterModal = true;
+  }
+
+  fermerTraiter() {
+    this.showTraiterModal = false;
+    this.congeSelectionne = null;
+    this.noteTraitement = '';
+    this.traitementSuccess = false;
+  }
+
+  confirmerTraitement() {
+    if (!this.congeSelectionne) return;
+    this.http.put(`http://localhost:8080/api/conges/${this.congeSelectionne.id}/statut?statut=TRAITE`, {})
+      .subscribe({
+        next: () => {
+          this.traitementSuccess = true;
+          this.loadConges();
+          setTimeout(() => this.fermerTraiter(), 1500);
+        },
+        error: () => {
+          // Fallback local
+          const idx = this.conges.findIndex(c => c.id === this.congeSelectionne.id);
+          if (idx !== -1) this.conges[idx].statut = 'TRAITE';
+          this.traitementSuccess = true;
+          setTimeout(() => this.fermerTraiter(), 1500);
+        }
+      });
+  }
   get sseEnAttente() { return this.reclamationsSSE.filter(r => r.statut === 'EN_ATTENTE'); }
   get voituresDisponibles() { return this.voitures.filter((v: any) => v.statut === 'Disponible'); }
 

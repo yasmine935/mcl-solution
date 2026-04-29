@@ -6,10 +6,12 @@
       <mat-icon>group</mat-icon>
       <h2>Gestion des Employés</h2>
     </div>
-    <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
-      <mat-icon>{{ showFormAdd ? 'close' : 'person_add' }}</mat-icon>
-      {{ showFormAdd ? 'Fermer' : 'Nouvel Employé' }}
-    </button>
+    @if (canAdd) {
+      <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
+        <mat-icon>{{ showFormAdd ? 'close' : 'person_add' }}</mat-icon>
+        {{ showFormAdd ? 'Fermer' : 'Nouvel Employé' }}
+      </button>
+    }
   </div>
 
   <!-- FORMULAIRE AJOUT -->
@@ -62,6 +64,16 @@
           <div class="field-sm">
             <label class="field-label">Salaire (€)</label>
             <input class="compact-input" type="number" [(ngModel)]="nouvelEmploye.salaire" placeholder="2500"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Nom d'utilisateur (login) *</label>
+            <input class="compact-input" type="text" [(ngModel)]="nouvelEmploye.username" placeholder="jean.dupont">
+          </div>
+          <div class="field-md">
+            <label class="field-label">Mot de passe *</label>
+            <input class="compact-input" type="password" autocomplete="new-password" [(ngModel)]="nouvelEmploye.password" placeholder="Mot de passe">
           </div>
         </div>
       </div>

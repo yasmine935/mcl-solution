@@ -136,6 +136,65 @@
             </div>
           </div>
         </div>
+
+        <!-- DEMANDES DE RÉINITIALISATION -->
+        @if (resetRequests.length) {
+          <div class="reset-section">
+            <div class="reset-section-header">
+              <mat-icon>lock_reset</mat-icon>
+              <h3>Demandes de réinitialisation de mot de passe</h3>
+              <span class="reset-badge">{{ resetRequests.length }}</span>
+            </div>
+            <div class="reset-list">
+              @for (req of resetRequests; track req.id) {
+                <div class="reset-item">
+                  <div class="reset-item-info">
+                    <div class="reset-avatar">{{ req.username?.charAt(0)?.toUpperCase() }}</div>
+                    <div>
+                      <strong>{{ req.username }}</strong>
+                      <p>{{ req.datedemande | slice:0:10 }}</p>
+                    </div>
+                  </div>
+                  <button type="button" class="reset-btn" (click)="ouvrirReset(req)">
+                    <mat-icon>lock_reset</mat-icon> Réinitialiser
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- MODAL RESET PASSWORD -->
+      @if (showResetModal) {
+        @if (selectedReset) {
+          <div class="modal-overlay-reset" (click)="fermerReset()">
+            <div class="modal-reset" (click)="$event.stopPropagation()">
+              <div class="modal-reset-header">
+                <mat-icon>lock_reset</mat-icon>
+                <div>
+                  <h3>Réinitialiser le mot de passe</h3>
+                  <p>Utilisateur : <strong>{{ selectedReset.username }}</strong></p>
+                </div>
+                <button type="button" class="close-btn" (click)="fermerReset()"><mat-icon>close</mat-icon></button>
+              </div>
+              <div class="modal-reset-body">
+                @if (!resetSuccess) {
+                  <label class="reset-label">Nouveau mot de passe</label>
+                  <input type="text" class="compact-input" [(ngModel)]="newPassword" placeholder="Entrez le nouveau mot de passe">
+                } @else {
+                  <div class="reset-success">✅ {{ resetSuccess }}</div>
+                }
+              </div>
+              @if (!resetSuccess) {
+                <div class="modal-reset-footer">
+                  <button type="button" mat-stroked-button (click)="fermerReset()">Annuler</button>
+                  <button type="button" mat-raised-button color="primary" (click)="confirmerReset()">Confirmer</button>
+                </div>
+              }
+            </div>
+          </div>
+        }
       }
 
       <!-- ══ MODULES ══ -->

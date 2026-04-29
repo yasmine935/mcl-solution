@@ -831,3 +831,64 @@ nav {
 .btn-refuser:hover { background: #c62828; color: #fff; }
 .btn-remettre { background: #f5f5f5; color: #546e7a; border: 1.5px solid #e0e0e0; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.15s; }
 .btn-remettre:hover { background: #e0e0e0; }
+
+/* ===== RESET PASSWORD ===== */
+.reset-section {
+  margin-top: 20px; background: #fff; border-radius: 14px;
+  border: 1.5px solid #fce4ec; box-shadow: 0 2px 12px rgba(198,40,40,0.07); overflow: hidden;
+}
+.reset-section-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px; background: linear-gradient(135deg, #b71c1c, #c62828); color: #fff;
+}
+.reset-section-header mat-icon { font-size: 1.3rem; width: 1.3rem; height: 1.3rem; }
+.reset-section-header h3 { margin: 0; font-size: 0.92rem; font-weight: 800; flex: 1; }
+.reset-badge {
+  background: #fff; color: #c62828; border-radius: 20px;
+  padding: 2px 10px; font-size: 0.78rem; font-weight: 800;
+}
+.reset-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.reset-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fff8f8; border-radius: 10px; padding: 12px 16px;
+  border: 1px solid #ffcdd2; flex-wrap: wrap; gap: 10px;
+}
+.reset-item-info { display: flex; align-items: center; gap: 12px; }
+.reset-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #c62828, #e53935);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.reset-item-info strong { display: block; font-size: 0.88rem; color: #0d1b2a; font-weight: 800; }
+.reset-item-info p { margin: 2px 0 0; font-size: 0.72rem; color: #90a4ae; }
+.reset-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: #c62828; color: #fff; border: none;
+  padding: 8px 16px; border-radius: 8px; font-size: 0.82rem;
+  font-weight: 700; cursor: pointer; transition: all 0.15s;
+}
+.reset-btn mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
+.reset-btn:hover { background: #b71c1c; transform: translateY(-1px); }
+
+/* Modal reset */
+.modal-overlay-reset {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 9999;
+  backdrop-filter: blur(3px);
+}
+.modal-reset {
+  background: #fff; border-radius: 16px; width: 90%; max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25); overflow: hidden;
+}
+.modal-reset-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 22px; background: linear-gradient(135deg, #b71c1c, #c62828); color: #fff;
+}
+.modal-reset-header mat-icon { font-size: 1.4rem; width: 1.4rem; height: 1.4rem; }
+.modal-reset-header h3 { margin: 0; font-size: 0.95rem; font-weight: 800; flex: 1; }
+.modal-reset-header p { margin: 3px 0 0; font-size: 0.75rem; color: rgba(255,255,255,0.75); }
+.modal-reset-body { padding: 20px 22px; }
+.reset-label { display: block; font-size: 0.7rem; font-weight: 700; color: #546e7a; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+.modal-reset-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 14px 22px; border-top: 1px solid #f0f4f8; }
+.reset-success { text-align: center; font-size: 0.88rem; color: #2e7d32; font-weight: 700; padding: 10px 0; }

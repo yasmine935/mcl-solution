@@ -149,20 +149,20 @@
       @if (currentPage === 'conges') {
         <div class="section-card">
           <div class="section-header">
-            <h3>🏖️ Gestion des Congés — Tout le Groupe</h3>
+            <h3>🏖️ Congés Approuvés — À Traiter</h3>
             <div class="filter-pills">
-              <span class="pill pill-orange">{{ congesEnAttente.length }} en attente</span>
               <span class="pill pill-green">{{ congesApprouves.length }} approuvés</span>
+              <span class="pill pill-grey">{{ congesTraites.length }} traités</span>
             </div>
           </div>
 
-          @if (conges.length === 0) {
-            <div class="empty-state"><span>🏖️</span><p>Aucune demande de congé</p></div>
+          @if (congesApprouves.length === 0) {
+            <div class="empty-state"><span>🏖️</span><p>Aucun congé approuvé à traiter</p></div>
           } @else {
             <div class="conges-list">
-              @for (c of conges; track c.id) {
-                <div class="conge-card" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
-                  <div class="conge-bar" [class.bar-attente]="c.statut === 'EN_ATTENTE'" [class.bar-approuve]="c.statut === 'APPROUVE'" [class.bar-refuse]="c.statut === 'REFUSE'"></div>
+              @for (c of congesApprouves; track c.id) {
+                <div class="conge-card conge-approuve">
+                  <div class="conge-bar bar-approuve"></div>
                   <div class="conge-body">
                     <div class="conge-top">
                       <div class="conge-employe">
@@ -172,12 +172,7 @@
                           <span class="conge-type">{{ c.type }}</span>
                         </div>
                       </div>
-                      <span class="statut-pill"
-                        [class.pill-attente]="c.statut === 'EN_ATTENTE'"
-                        [class.pill-approuve]="c.statut === 'APPROUVE'"
-                        [class.pill-refuse]="c.statut === 'REFUSE'">
-                        {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
-                      </span>
+                      <span class="statut-pill pill-approuve">✅ Approuvé</span>
                     </div>
                     <div class="conge-dates">
                       <span>📅 Du {{ c.dateDebut }}</span>
@@ -186,15 +181,7 @@
                       @if (c.motif) { <span class="motif">💬 {{ c.motif }}</span> }
                     </div>
                     <div class="conge-actions">
-                      @if (c.statut !== 'APPROUVE') {
-                        <button class="btn-action btn-approuver" (click)="updateStatutConge(c.id, 'APPROUVE')">✅ Approuver</button>
-                      }
-                      @if (c.statut !== 'REFUSE') {
-                        <button class="btn-action btn-refuser" (click)="updateStatutConge(c.id, 'REFUSE')">❌ Refuser</button>
-                      }
-                      @if (c.statut !== 'EN_ATTENTE') {
-                        <button class="btn-action btn-attente" (click)="updateStatutConge(c.id, 'EN_ATTENTE')">⏳ En attente</button>
-                      }
+                      <button class="btn-action btn-traiter" (click)="ouvrirTraiter(c)">📋 Traiter</button>
                     </div>
                   </div>
                 </div>
@@ -204,33 +191,88 @@
         </div>
       }
 
+      <!-- ══ MODAL TRAITER CONGÉ ══ -->
+      @if (showTraiterModal) {
+        @if (congeSelectionne) {
+          <div class="modal-overlay-traiter" (click)="fermerTraiter()">
+            <div class="modal-traiter" (click)="$event.stopPropagation()">
+
+              <!-- HEADER -->
+              <div class="modal-traiter-header">
+                <div class="modal-traiter-id">
+                  <span class="conge-ref">CONGÉ-{{ congeSelectionne.id }}</span>
+                  <span class="badge-approuve">APPROUVÉ</span>
+                </div>
+                <button type="button" class="modal-close-x" (click)="fermerTraiter()">✕</button>
+              </div>
+
+              <!-- INFOS -->
+              <div class="modal-traiter-body">
+                <div class="traiter-info-grid">
+                  <div class="traiter-info-cell">
+                    <span class="ti-icon">👤</span>
+                    <div>
+                      <p class="ti-label">EMPLOYÉ</p>
+                      <p class="ti-val">{{ congeSelectionne.utilisateur?.prenom }} {{ congeSelectionne.utilisateur?.nom }}</p>
+                    </div>
+                  </div>
+                  <div class="traiter-info-cell">
+                    <span class="ti-icon">📅</span>
+                    <div>
+                      <p class="ti-label">DATE DÉBUT</p>
+                      <p class="ti-val">{{ congeSelectionne.dateDebut }}</p>
+                    </div>
+                  </div>
+                  <div class="traiter-info-cell">
+                    <span class="ti-icon">📅</span>
+                    <div>
+                      <p class="ti-label">DATE FIN</p>
+                      <p class="ti-val">{{ congeSelectionne.dateFin }}</p>
+                    </div>
+                  </div>
+                  <div class="traiter-info-cell">
+                    <span class="ti-icon">🏷️</span>
+                    <div>
+                      <p class="ti-label">TYPE</p>
+                      <p class="ti-val">{{ congeSelectionne.type || '—' }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                @if (congeSelectionne.motif) {
+                  <div class="traiter-section">
+                    <div class="traiter-section-title">💬 MOTIF</div>
+                    <div class="traiter-text-box">{{ congeSelectionne.motif }}</div>
+                  </div>
+                }
+
+                <div class="traiter-section">
+                  <div class="traiter-section-title">📝 NOTE DE TRAITEMENT (optionnel)</div>
+                  <textarea class="traiter-textarea" [(ngModel)]="noteTraitement"
+                    placeholder="Ajouter une note de traitement RH..."></textarea>
+                </div>
+
+                @if (traitementSuccess) {
+                  <div class="traiter-success">✅ Congé marqué comme traité !</div>
+                }
+              </div>
+
+              <!-- FOOTER -->
+              <div class="modal-traiter-footer">
+                <button type="button" class="btn-traiter-confirm" (click)="confirmerTraitement()" [disabled]="traitementSuccess">
+                  📋 Marquer comme Traité
+                </button>
+                <button type="button" class="btn-traiter-close" (click)="fermerTraiter()">✕ Fermer</button>
+              </div>
+
+            </div>
+          </div>
+        }
+      }
+
       <!-- ══ DOSSIERS PERSONNEL ══ -->
       @if (currentPage === 'employes') {
-        <div class="section-card">
-          <div class="section-header">
-            <h3>👥 Dossiers du Personnel</h3>
-            <span class="pill pill-bleu">{{ employes.length }} employés</span>
-          </div>
-<div class="tip-box" style="margin-bottom:16px; background:#fce4ec; border-color:#7b1c1c; color:#7b1c1c;">
-  💡 Pour ajouter un employé, contactez l'administrateur système ou ajoutez-le directement via MySQL.
-</div>
-          <div class="employes-grid">
-            @for (emp of employes; track emp.id) {
-              <div class="emp-card">
-                <div class="emp-card-avatar" [style.background]="getRoleColor(emp.role)">
-                  {{ emp.prenom?.charAt(0) }}{{ emp.nom?.charAt(0) }}
-                </div>
-                <div class="emp-card-info">
-                  <strong>{{ emp.prenom }} {{ emp.nom }}</strong>
-                  <span class="emp-poste">{{ emp.poste || emp.role }}</span>
-                  <span class="emp-email">{{ emp.email || '-' }}</span>
-                  <span class="emp-tel">{{ emp.telephone || '-' }}</span>
-                </div>
-                <span class="emp-role-badge" [style.background]="getRoleColor(emp.role)">{{ emp.role }}</span>
-              </div>
-            }
-          </div>
-        </div>
+        <app-employes></app-employes>
       }
 
       <!-- ══ SSE ══ -->

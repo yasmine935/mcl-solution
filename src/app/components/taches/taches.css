@@ -105,9 +105,14 @@ mat-form-field { width: 100%; }
 }
 
 /* BADGES */
-.badge-statut, .badge-priorite, .badge-valeur {
+.badge-priorite {
   display: inline-block; padding: 5px 12px; border-radius: 6px;
   font-size: 0.72rem; font-weight: 700; color: #fff; text-align: center; white-space: nowrap;
+}
+
+/* STATUT — texte coloré sans cadre */
+.statut-text {
+  font-size: 0.85rem; font-weight: 700;
 }
 .badge-echeance {
   display: inline-block; padding: 4px 10px; background: #f0f4f8; color: #546e7a;
@@ -117,9 +122,8 @@ mat-form-field { width: 100%; }
 /* ASSIGNES */
 .assignes-container { display: flex; flex-wrap: wrap; gap: 5px; }
 .assignee-badge {
-  display: inline-block; padding: 3px 8px;
-  background: #e3f2fd; color: #01579b;
-  border-radius: 12px; font-size: 0.68rem; font-weight: 700;
+  display: inline-block;
+  font-size: 0.85rem; font-weight: 500; color: #37474f;
 }
 .assignee-empty { color: #ccc; }
 
@@ -275,3 +279,62 @@ mat-form-field { width: 100%; }
 /* Projet nom */
 .projet-nom { font-size: 0.88rem; color: #0d1b2a; }
 .ca-value { color: #01579b; font-size: 0.88rem; }
+/* ══ CLIENT SELECT ══ */
+.client-select-wrap {
+  display: flex; gap: 6px; align-items: center;
+}
+.client-select-wrap .compact-input { flex: 1; }
+
+.btn-add-client {
+  width: 30px; height: 30px; flex-shrink: 0;
+  background: #1565c0; color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 1.1rem; font-weight: 700;
+  cursor: pointer; line-height: 1;
+  transition: background 0.2s;
+}
+.btn-add-client:hover { background: #0d47a1; }
+
+.badge-client {
+  display: inline-block;
+  font-size: 0.85rem; font-weight: 500; color: #37474f;
+  font-size: 0.75rem; font-weight: 600;
+}
+
+/* ══ MODAL NOUVEAU CLIENT ══ */
+.modal-client {
+  background: #fff; border-radius: 16px;
+  width: 380px; max-width: 95vw;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.modal-client-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  color: #fff; font-weight: 700; font-size: 0.95rem;
+}
+
+.modal-client-body { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+.modal-client-footer {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 0 20px 18px;
+}
+
+.btn-save-client {
+  background: #1565c0; color: #fff;
+  border: none; padding: 9px 20px;
+  border-radius: 10px; font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-save-client:hover:not(:disabled) { background: #0d47a1; }
+.btn-save-client:disabled { background: #b0bec5; cursor: not-allowed; }
+
+.btn-cancel-client {
+  background: #f0f4f8; color: #546e7a;
+  border: none; padding: 9px 16px;
+  border-radius: 10px; font-size: 0.88rem;
+  cursor: pointer;
+}

@@ -20,6 +20,7 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class Employes implements OnInit {
   employes: any[] = [];
+  canAdd = false;
   showFormAdd = false;
   showFormEdit = false;
   showDetailModal = false;
@@ -53,7 +54,9 @@ export class Employes implements OnInit {
     departement: '',
     role: '',
     dateEmbauche: '',
-    salaire: ''
+    salaire: '',
+    username: '',
+    password: ''
   };
 
   employeEnEdition: any = {};
@@ -61,6 +64,8 @@ export class Employes implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.canAdd = (user.role || '').toUpperCase() === 'KARINE';
     this.loadEmployes();
   }
 
@@ -84,23 +89,30 @@ export class Employes implements OnInit {
       return;
     }
 
-    const idIncrement = Math.max(...this.employes.map((e: any) => e.id || 0), 0) + 1;
-
-    const employee = {
-      id: idIncrement,
-      ...this.nouvelEmploye,
-      dateCreation: new Date().toISOString(),
+    // Payload envoyé au backend (sans id — généré par la DB)
+    const payload = {
+      prenom: this.nouvelEmploye.prenom,
+      nom: this.nouvelEmploye.nom,
+      email: this.nouvelEmploye.email,
+      telephone: this.nouvelEmploye.telephone,
+      poste: this.nouvelEmploye.poste,
+      departement: this.nouvelEmploye.departement,
+      role: this.nouvelEmploye.role,
+      dateEmbauche: this.nouvelEmploye.dateEmbauche,
+      salaire: this.nouvelEmploye.salaire,
+      username: this.nouvelEmploye.username,
+      password: this.nouvelEmploye.password,
       statut: 'ACTIF'
     };
 
-    this.employes.push(employee);
-    localStorage.setItem('employes', JSON.stringify(this.employes));
-
-    this.http.post('http://localhost:8080/api/utilisateurs', employee)
-      .subscribe(
-        () => {},
-        (error: any) => console.error('Erreur création', error)
-      );
+    this.http.post<any>('http://localhost:8080/api/utilisateurs', payload)
+      .subscribe({
+        next: (created: any) => {
+          this.employes.push(created);
+          localStorage.setItem('employes', JSON.stringify(this.employes));
+        },
+        error: (err: any) => console.error('Erreur création', err)
+      });
 
     this.resetFormAdd();
     this.showFormAdd = false;
@@ -167,7 +179,9 @@ export class Employes implements OnInit {
       departement: '',
       role: '',
       dateEmbauche: '',
-      salaire: ''
+      salaire: '',
+      username: '',
+      password: ''
     };
   }
 
