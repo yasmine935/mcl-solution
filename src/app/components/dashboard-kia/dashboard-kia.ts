@@ -15,6 +15,7 @@ import { Semenier } from '../semenier/semenier';
 import { Documents } from '../documents/documents';
 import { MiseAuTravail } from '../mise-au-travail/mise-au-travail';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
+import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 
 @Component({
   selector: 'app-dashboard-kia',
@@ -25,7 +26,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees,
     Planning, Semenier, Documents,
-    MiseAuTravail, RemonteesTerrainComponent
+    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'

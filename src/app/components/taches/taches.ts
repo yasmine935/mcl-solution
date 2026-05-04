@@ -10,6 +10,15 @@ import { MatSelectModule } from '@angular/material/select';
 
 const API = 'http://localhost:8080/api/taches';
 
+const ETAPES_PROJET = [
+  'Qualification',
+  'Devis',
+  'Validation Resp',
+  'Bon de commande',
+  'Réalisation',
+  'Clôture'
+];
+
 @Component({
   selector: 'app-taches',
   standalone: true,
@@ -135,7 +144,8 @@ export class Taches implements OnInit {
       numCommande: t.description || extras.numCommande || '',
       fichiers: extras.fichiers || [],
       assignes: extras.assignes || [],
-      notes: []
+      notes: [],
+      etapes: extras.etapes || ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' }))
     };
   }
 
@@ -153,9 +163,38 @@ export class Taches implements OnInit {
       chiffreAffaire: tache.chiffreAffaire,
       numCommande: tache.numCommande,
       assignes: tache.assignes,
-      fichiers: tache.fichiers || []
+      fichiers: tache.fichiers || [],
+      etapes: tache.etapes || ETAPES_PROJET.map((nom: string) => ({ nom, done: false, doneBy: '', doneAt: '' }))
     };
     localStorage.setItem(`tache_extras_${tacheId}`, JSON.stringify(extras));
+  }
+
+  getAvancement(tache: any): number {
+    if (!tache.etapes?.length) return 0;
+    const done = tache.etapes.filter((e: any) => e.done).length;
+    return Math.round((done / tache.etapes.length) * 100);
+  }
+
+  marquerEtape(tache: any, index: number) {
+    if (!tache.etapes) return;
+    const etape = tache.etapes[index];
+    etape.done = !etape.done;
+    if (etape.done) {
+      etape.doneBy = `${this.currentUser.prenom} ${this.currentUser.nom}`;
+      etape.doneAt = new Date().toLocaleString('fr-FR');
+    } else {
+      etape.doneBy = '';
+      etape.doneAt = '';
+    }
+    this.saveExtrasForTache(tache.id, tache);
+  }
+
+  getActiviteRecente(tache: any): any[] {
+    if (!tache.etapes) return [];
+    return tache.etapes
+      .filter((e: any) => e.done && e.doneAt)
+      .slice(-3)
+      .reverse();
   }
 
   ajouterTache() {

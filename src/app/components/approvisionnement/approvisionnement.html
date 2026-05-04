@@ -1,0 +1,559 @@
+<div class="appro-wrapper">
+
+  <!-- ══════════ VUE LISTE ══════════ -->
+  @if (view === 'liste') {
+
+    <!-- HEADER -->
+    <div class="appro-header">
+      <div class="appro-header-left">
+        <div class="appro-icon">🛒</div>
+        <div>
+          <h2>Demandes d'Approvisionnement</h2>
+          <p>{{ modeaby ? 'Toutes les demandes reçues' : 'Vos demandes envoyées à Aby' }}</p>
+        </div>
+      </div>
+      @if (!modeaby) {
+        <div class="header-btns">
+          <button class="btn-attente-toggle" (click)="showListeAttente = !showListeAttente">
+            📌 Articles en attente
+            @if (listeAttente.length > 0) {
+              <span class="attente-count">{{ listeAttente.length }}</span>
+            }
+          </button>
+          <button class="btn-new-appro" (click)="ouvrirNouveau()">+ Nouvelle Demande</button>
+        </div>
+      }
+    </div>
+
+    <!-- ══ PANNEAU LISTE D'ATTENTE ══ -->
+    @if (!modeaby && showListeAttente) {
+      <div class="attente-panel">
+        <div class="attente-panel-header">
+          <div class="attente-panel-title">
+            <span>📌</span>
+            <div>
+              <h3>Mes articles en attente</h3>
+              <p>Articles à approvisionner plus tard — {{ listeAttente.length }} article(s)</p>
+            </div>
+          </div>
+          <button class="btn-add-attente" (click)="showAddAttenteForm = !showAddAttenteForm">
+            {{ showAddAttenteForm ? '✕ Annuler' : '+ Ajouter un article' }}
+          </button>
+        </div>
+
+        @if (showAddAttenteForm) {
+          <div class="attente-add-form">
+            <div class="attente-form-row">
+              <div class="attente-field">
+                <label>Marque</label>
+                <input type="text" [(ngModel)]="nouvelArticleAttente.marque" class="tbl-input" placeholder="REXEL"/>
+              </div>
+              <div class="attente-field attente-field-lg">
+                <label>Désignation <span class="req">*</span></label>
+                <input type="text" [(ngModel)]="nouvelArticleAttente.designation" class="tbl-input" placeholder="Désignation du produit..."/>
+              </div>
+              <div class="attente-field">
+                <label>Réf. Fournisseur</label>
+                <input type="text" [(ngModel)]="nouvelArticleAttente.refFournisseur" class="tbl-input" placeholder="BIZ710375"/>
+              </div>
+              <div class="attente-field">
+                <label>Fournisseur</label>
+                <input type="text" [(ngModel)]="nouvelArticleAttente.nomFournisseur" class="tbl-input" placeholder="Nom fournisseur"/>
+              </div>
+              <div class="attente-field">
+                <label>Réf. MCL</label>
+                <input type="text" [(ngModel)]="nouvelArticleAttente.refMCL" class="tbl-input"/>
+              </div>
+              <div class="attente-field attente-field-sm">
+                <label>Qté</label>
+                <input type="number" [(ngModel)]="nouvelArticleAttente.quantite" class="tbl-input" min="1"/>
+              </div>
+            </div>
+            <div class="attente-form-actions">
+              <button class="btn-save-attente" (click)="ajouterAListe()">📌 Mettre en attente</button>
+            </div>
+          </div>
+        }
+
+        @if (listeAttente.length === 0 && !showAddAttenteForm) {
+          <div class="attente-empty">
+            <span>📌</span>
+            <p>Aucun article en attente</p>
+            <small>Cliquez sur "+ Ajouter un article" pour commencer votre liste</small>
+          </div>
+        }
+
+        @if (listeAttente.length > 0) {
+          <div class="attente-list">
+            @for (article of listeAttente; track article.id) {
+              <div class="attente-item">
+                <div class="attente-item-info">
+                  <div class="attente-dot">📌</div>
+                  <div>
+                    <strong>{{ article.designation }}</strong>
+                    <span>
+                      @if (article.marque) { {{ article.marque }} · }
+                      @if (article.nomFournisseur) { {{ article.nomFournisseur }} · }
+                      Qté : {{ article.quantite }}
+                      · Ajouté le {{ article.dateAjout }}
+                    </span>
+                  </div>
+                </div>
+                <div class="attente-item-actions">
+                  <button class="btn-del-attente" (click)="supprimerDeListe(article.id)" title="Supprimer">🗑️</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- KPI -->
+    <div class="appro-kpi-row">
+      <div class="appro-kpi kpi-orange">
+        <span class="kpi-icon">⏳</span>
+        <span class="kpi-num">{{ demandesEnAttente.length }}</span>
+        <span class="kpi-lbl">En attente</span>
+      </div>
+      <div class="appro-kpi kpi-blue">
+        <span class="kpi-icon">⚙️</span>
+        <span class="kpi-num">{{ demandesEnCours.length }}</span>
+        <span class="kpi-lbl">En cours</span>
+      </div>
+      <div class="appro-kpi kpi-green">
+        <span class="kpi-icon">✅</span>
+        <span class="kpi-num">{{ demandesTraitees.length }}</span>
+        <span class="kpi-lbl">Traitées</span>
+      </div>
+      <div class="appro-kpi kpi-total">
+        <span class="kpi-icon">📋</span>
+        <span class="kpi-num">{{ demandes.length }}</span>
+        <span class="kpi-lbl">Total</span>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    @if (demandes.length === 0) {
+      <div class="appro-empty">
+        <span>🛒</span>
+        <p>Aucune demande d'approvisionnement</p>
+        @if (!modeaby) {
+          <button class="btn-new-appro" (click)="ouvrirNouveau()">+ Nouvelle Demande</button>
+        }
+      </div>
+    } @else {
+      <div class="appro-table-card">
+        <table class="appro-table">
+          <thead>
+            <tr>
+              <th>N° Dossier</th>
+              @if (modeaby) { <th>Demandeur</th> }
+              <th>Projet</th>
+              <th>Code Affaire</th>
+              <th>Date Attendue</th>
+              <th>Produits</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of demandes; track d.numero) {
+              <tr class="appro-tr" (click)="voirDetail(d)">
+                <td><strong class="num-badge">{{ d.numero }}</strong></td>
+                @if (modeaby) {
+                  <td>
+                    <div class="dem-cell">
+                      <div class="dem-avatar">{{ d.demandeur?.charAt(0) || 'U' }}</div>
+                      <strong>{{ d.demandeur }}</strong>
+                    </div>
+                  </td>
+                }
+                <td><strong>{{ d.nomProjet || '—' }}</strong></td>
+                <td><span class="code-badge">{{ d.codeAffaire || '—' }}</span></td>
+                <td>{{ d.dateAttendue || '—' }}</td>
+                <td>
+                  <span class="lignes-count">{{ d.lignes?.length || 0 }} article(s)</span>
+                </td>
+                <td>
+                  <span class="statut-badge" [class]="getStatutClass(d.statut)">{{ d.statut }}</span>
+                </td>
+                <td (click)="$event.stopPropagation()">
+                  <button class="btn-voir" (click)="voirDetail(d)">👁️ Voir</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  <!-- ══════════ FORMULAIRE NOUVEAU ══════════ -->
+  @if (view === 'nouveau') {
+    <div class="appro-form-page">
+
+      <div class="form-breadcrumb">
+        <button class="btn-back" (click)="retour()">← Retour</button>
+        <span class="breadcrumb-title">Demande d'Approvisionnement MCL Solutions from {{ form.demandeur }}</span>
+      </div>
+
+      <!-- SECTION 1 : FICHE -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div>
+            <h3>Fiche de Demande d'Approvisionnement</h3>
+            <p>Basic information about the purchase request</p>
+          </div>
+        </div>
+
+        <div class="form-grid-4">
+          <!-- Numéro -->
+          <div class="form-field">
+            <label>Numéro de Dossier</label>
+            <input type="text" [value]="form.numero" readonly class="field-auto"/>
+            <span class="auto-label">Auto Generated</span>
+          </div>
+          <!-- Date création -->
+          <div class="form-field">
+            <label>Date de la Demande</label>
+            <input type="text" [value]="form.dateCreation" readonly class="field-auto"/>
+            <span class="auto-label">Auto Generated</span>
+          </div>
+          <!-- Demandeur -->
+          <div class="form-field field-wide">
+            <label>Nom du Demandeur</label>
+            <input type="text" [value]="form.demandeur" readonly class="field-auto"/>
+            <span class="auto-label">Auto Generated</span>
+          </div>
+          <!-- Date attendue -->
+          <div class="form-field">
+            <label>Date Attendue <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="form.dateAttendue" class="field-input"/>
+          </div>
+        </div>
+
+        <div class="form-grid-5">
+          <!-- Département -->
+          <div class="form-field">
+            <label>Department <span class="req">*</span></label>
+            <select [(ngModel)]="form.department" class="field-input">
+              @for (d of departments; track d) { <option [value]="d">{{ d }}</option> }
+            </select>
+          </div>
+          <!-- Projet -->
+          <div class="form-field field-wide2">
+            <label>Nom du Projet <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="form.nomProjet" class="field-input" placeholder="Ex: SIKA Paviers"/>
+          </div>
+          <!-- Code Affaire -->
+          <div class="form-field">
+            <label>Code Affaire <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="form.codeAffaire" class="field-input" placeholder="Ex: Solutions Install"/>
+          </div>
+          <!-- Responsable -->
+          <div class="form-field">
+            <label>Responsable de Projet</label>
+            <input type="text" [(ngModel)]="form.responsableProjet" class="field-input" placeholder="Nom du responsable"/>
+          </div>
+          <!-- Commande client -->
+          <div class="form-field">
+            <label>Commande Client Reçue</label>
+            <select [(ngModel)]="form.commandeClientRecue" class="field-input">
+              <option value="">— Sélectionner —</option>
+              @for (o of oui_non; track o) { <option [value]="o">{{ o }}</option> }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-4">
+          <!-- Montant -->
+          <div class="form-field">
+            <label>Montant Total du Projet Client</label>
+            <input type="number" [(ngModel)]="form.montantTotal" class="field-input" placeholder="80 000"/>
+          </div>
+          <!-- Quotations obtenues -->
+          <div class="form-field">
+            <label>Quotations Obtenues</label>
+            <select [(ngModel)]="form.quotationsObtenues" class="field-input">
+              <option value="">— Sélectionner —</option>
+              @for (o of oui_non; track o) { <option [value]="o">{{ o }}</option> }
+            </select>
+          </div>
+          <!-- Devis file -->
+          <div class="form-field">
+            <label>Quotations ou Devis</label>
+            <div class="upload-zone-small">
+              <input type="file" id="devisInput" (change)="onDevisSelect($event)"
+                accept=".pdf,.jpg,.png,.doc,.docx" style="display:none"/>
+              @if (!form.devisFile) {
+                <label for="devisInput" class="upload-label-small">
+                  📎 Joindre un fichier
+                  <span>JPG, PNG, PDF and DOC</span>
+                </label>
+              } @else {
+                <div class="file-preview">
+                  <div class="file-icon" [class.pdf-icon]="form.devisFile.type === 'PDF'">
+                    {{ form.devisFile.type }}
+                  </div>
+                  <div class="file-info">
+                    <strong>{{ form.devisFile.nom }}</strong>
+                    <span>{{ form.devisFile.taille }}</span>
+                  </div>
+                  <button type="button" class="btn-remove-file" (click)="form.devisFile = null">✕</button>
+                </div>
+              }
+            </div>
+          </div>
+          <!-- Commentaires -->
+          <div class="form-field field-wide2">
+            <label>Commentaires et Indications Particulières</label>
+            <input type="text" [(ngModel)]="form.commentaires" class="field-input" placeholder="Ex: Livraison chez MCL demain"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2 : PRODUITS -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div>
+            <h3>Produits ou Services à Approvisionner</h3>
+            <p>Enter the item details with price</p>
+          </div>
+          <div class="produits-header-actions">
+            @if (listeAttente.length > 0) {
+              <button type="button" class="btn-import-attente" (click)="showImportPanel = !showImportPanel">
+                📌 Importer depuis ma liste ({{ listeAttente.length }})
+              </button>
+            }
+            <button type="button" class="btn-add-ligne" (click)="ajouterLigne()">+ Ajouter une ligne</button>
+          </div>
+        </div>
+
+        @if (showImportPanel && listeAttente.length > 0) {
+          <div class="import-panel">
+            <div class="import-panel-header">
+              <span>📌 Mes articles en attente — cliquez pour importer</span>
+              <div class="import-header-right">
+                <button type="button" class="btn-import-all" (click)="importerTout()">Tout importer</button>
+                <button type="button" class="btn-close-import" (click)="showImportPanel = false">✕</button>
+              </div>
+            </div>
+            @for (article of listeAttente; track article.id) {
+              <div class="import-item" (click)="importerDansFormulaire(article)">
+                <div class="import-item-info">
+                  <span class="import-dot">📌</span>
+                  <div>
+                    <strong>{{ article.designation }}</strong>
+                    <span>{{ article.marque }} · Qté : {{ article.quantite }}</span>
+                  </div>
+                </div>
+                <span class="import-arrow">→ Importer</span>
+              </div>
+            }
+          </div>
+        }
+
+
+        <div class="produits-table-wrap">
+          <table class="produits-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Marque</th>
+                <th>Désignation Produit <span class="req">*</span></th>
+                <th>Référence Fournisseur</th>
+                <th>Nom du Fournisseur <span class="req">*</span></th>
+                <th>Référence MCL</th>
+                <th>Quantité</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ligne of lignes; track $index) {
+                <tr>
+                  <td class="td-num">{{ $index + 1 }}</td>
+                  <td><input type="text" [(ngModel)]="ligne.marque" class="tbl-input" placeholder="REXEL"/></td>
+                  <td><input type="text" [(ngModel)]="ligne.designation" class="tbl-input req-input" placeholder="Désignation *"/></td>
+                  <td><input type="text" [(ngModel)]="ligne.refFournisseur" class="tbl-input" placeholder="BIZ710375"/></td>
+                  <td><input type="text" [(ngModel)]="ligne.nomFournisseur" class="tbl-input" placeholder="Fournisseur *"/></td>
+                  <td><input type="text" [(ngModel)]="ligne.refMCL" class="tbl-input" placeholder="IC8M1882"/></td>
+                  <td><input type="number" [(ngModel)]="ligne.quantite" class="tbl-input tbl-qty" min="1"/></td>
+                  <td>
+                    @if (lignes.length > 1) {
+                      <button type="button" class="btn-del-ligne" (click)="supprimerLigne($index)">🗑️</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions-bar">
+        <button class="btn-cancel-appro" (click)="retour()">Annuler</button>
+        <button class="btn-submit-appro" (click)="soumettre()">📤 Envoyer à Aby</button>
+      </div>
+
+    </div>
+  }
+
+  <!-- ══════════ VUE DÉTAIL ══════════ -->
+  @if (view === 'detail' && selectedDemande) {
+    <div class="appro-form-page">
+
+      <div class="form-breadcrumb">
+        <button class="btn-back" (click)="retour()">← Retour</button>
+        <span class="breadcrumb-title">Demande d'Approvisionnement MCL Solutions from {{ selectedDemande.demandeur }}</span>
+        <span class="statut-badge detail-statut" [class]="getStatutClass(selectedDemande.statut)">{{ selectedDemande.statut }}</span>
+      </div>
+
+      <!-- FICHE EN LECTURE SEULE -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div>
+            <h3>Fiche de Demande d'Approvisionnement</h3>
+            <p>Basic information about the purchase request</p>
+          </div>
+          @if (modeaby && selectedDemande.statut === 'En attente') {
+            <div class="aby-actions">
+              <button class="btn-encours" (click)="changerStatut('En cours')">⚙️ En cours</button>
+              <button class="btn-refuser" (click)="changerStatut('Refusé')">✕ Refuser</button>
+            </div>
+          }
+          @if (modeaby && selectedDemande.statut === 'En cours') {
+            <div class="aby-actions">
+              <button class="btn-traiter" (click)="changerStatut('Traité')">✅ Marquer Traitée</button>
+              <button class="btn-refuser" (click)="changerStatut('Refusé')">✕ Refuser</button>
+            </div>
+          }
+        </div>
+
+        <div class="detail-grid-4">
+          <div class="detail-field">
+            <label>Numéro de Dossier</label>
+            <div class="detail-val auto-val">{{ selectedDemande.numero }}</div>
+            <span class="auto-label">Auto Generated</span>
+          </div>
+          <div class="detail-field">
+            <label>Date de la Demande</label>
+            <div class="detail-val auto-val">{{ selectedDemande.dateCreation }}</div>
+            <span class="auto-label">Auto Generated</span>
+          </div>
+          <div class="detail-field field-wide">
+            <label>Nom du Demandeur</label>
+            <div class="detail-val auto-val">{{ selectedDemande.demandeur }}</div>
+            <span class="auto-label">Auto Generated</span>
+          </div>
+          <div class="detail-field">
+            <label>Date Attendue</label>
+            <div class="detail-val">{{ selectedDemande.dateAttendue || '—' }}</div>
+          </div>
+        </div>
+
+        <div class="detail-grid-5">
+          <div class="detail-field">
+            <label>Department</label>
+            <div class="detail-val">{{ selectedDemande.department || '—' }}</div>
+          </div>
+          <div class="detail-field field-wide2">
+            <label>Nom du Projet</label>
+            <div class="detail-val">{{ selectedDemande.nomProjet || '—' }}</div>
+          </div>
+          <div class="detail-field">
+            <label>Code Affaire</label>
+            <div class="detail-val">{{ selectedDemande.codeAffaire || '—' }}</div>
+          </div>
+          <div class="detail-field">
+            <label>Responsable de Projet</label>
+            <div class="detail-val">{{ selectedDemande.responsableProjet || '—' }}</div>
+          </div>
+          <div class="detail-field">
+            <label>Commande Client Reçue</label>
+            <div class="detail-val">{{ selectedDemande.commandeClientRecue || '—' }}</div>
+          </div>
+        </div>
+
+        <div class="detail-grid-4">
+          <div class="detail-field">
+            <label>Montant Total du Projet Client</label>
+            <div class="detail-val">{{ selectedDemande.montantTotal ? (selectedDemande.montantTotal | number) : '—' }}</div>
+          </div>
+          <div class="detail-field">
+            <label>Quotations Obtenues</label>
+            <div class="detail-val">{{ selectedDemande.quotationsObtenues || '—' }}</div>
+          </div>
+          <div class="detail-field">
+            <label>Quotations ou Devis</label>
+            @if (selectedDemande.devisFile) {
+              <div class="file-preview">
+                <div class="file-icon" [class.pdf-icon]="selectedDemande.devisFile.type === 'PDF'">
+                  {{ selectedDemande.devisFile.type }}
+                </div>
+                <div class="file-info">
+                  <strong>{{ selectedDemande.devisFile.nom }}</strong>
+                  <span>{{ selectedDemande.devisFile.taille }}</span>
+                </div>
+              </div>
+            } @else {
+              <div class="detail-val">—</div>
+            }
+          </div>
+          <div class="detail-field field-wide2">
+            <label>Commentaires et Indications Particulières</label>
+            <div class="detail-val">{{ selectedDemande.commentaires || '—' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUITS EN LECTURE SEULE -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div>
+            <h3>Produits ou Services à Approvisionner</h3>
+            <p>{{ selectedDemande.lignes?.length || 0 }} article(s)</p>
+          </div>
+        </div>
+
+        <div class="produits-table-wrap">
+          <table class="produits-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Marque</th>
+                <th>Désignation Produit</th>
+                <th>Référence Fournisseur</th>
+                <th>Nom du Fournisseur</th>
+                <th>Référence MCL</th>
+                <th>Quantité</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ligne of selectedDemande.lignes; track $index) {
+                <tr>
+                  <td class="td-num">{{ $index + 1 }}</td>
+                  <td>{{ ligne.marque || '—' }}</td>
+                  <td><strong>{{ ligne.designation }}</strong></td>
+                  <td>{{ ligne.refFournisseur || '—' }}</td>
+                  <td>{{ ligne.nomFournisseur || '—' }}</td>
+                  <td>{{ ligne.refMCL || '—' }}</td>
+                  <td><span class="qty-badge">{{ ligne.quantite }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (selectedDemande.traitePar) {
+          <div class="traite-info">
+            ✅ Traitée par <strong>{{ selectedDemande.traitePar }}</strong> le {{ selectedDemande.dateTraitement }}
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>

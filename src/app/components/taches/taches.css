@@ -146,7 +146,7 @@ mat-form-field { width: 100%; }
   background: #fff; border-radius: 16px; width: 90%; max-width: 600px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.25); animation: slideUp 0.25s ease; overflow: hidden;
 }
-.modal-detail { max-width: 720px; }
+.modal-detail { max-width: 780px; }
 @keyframes slideUp {
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
@@ -158,7 +158,7 @@ mat-form-field { width: 100%; }
 }
 .modal-header h3 { margin: 0; font-size: 1rem; font-weight: 800; color: #fff; }
 .close-btn mat-icon { color: #fff !important; }
-.modal-body { padding: 20px 24px; max-height: 500px; overflow-y: auto; }
+.modal-body { padding: 20px 24px; max-height: 70vh; overflow-y: auto; }
 
 .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
 .detail-item {
@@ -337,4 +337,79 @@ mat-form-field { width: 100%; }
   border: none; padding: 9px 16px;
   border-radius: 10px; font-size: 0.88rem;
   cursor: pointer;
+}
+
+/* ══ AVANCEMENT ══ */
+.avancement-section {
+  margin-top: 20px;
+  background: #f8fafc;
+  border: 1.5px solid #e1f0ff;
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.avancement-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.avancement-title {
+  font-size: 0.82rem; font-weight: 800;
+  color: #0d1b2a; text-transform: uppercase; letter-spacing: 0.4px;
+}
+.avancement-pct-badge {
+  background: #1565c0; color: #fff;
+  padding: 3px 12px; border-radius: 20px;
+  font-size: 0.82rem; font-weight: 800;
+}
+.avancement-pct-badge.pct-done { background: #2e7d32; }
+
+.progress-bar-wrap {
+  height: 10px; background: #dde2ea;
+  border-radius: 10px; overflow: hidden; margin-bottom: 18px;
+}
+.progress-bar-fill {
+  height: 100%; border-radius: 10px;
+  transition: width 0.5s ease;
+  min-width: 4px;
+}
+
+/* ÉTAPES */
+.etapes-list {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;
+}
+.etape-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; background: #fff;
+  border: 1.5px solid #e8ecf0; border-radius: 10px;
+  cursor: pointer; transition: all 0.18s;
+}
+.etape-row:hover { border-color: #90caf9; background: #f0f8ff; transform: translateX(3px); }
+.etape-row.etape-done { background: #f1f8e9; border-color: #a5d6a7; }
+.etape-row.etape-done:hover { background: #e8f5e9; }
+
+.etape-check { font-size: 1.1rem; flex-shrink: 0; }
+.etape-content { display: flex; flex-direction: column; gap: 2px; }
+.etape-nom { font-size: 0.85rem; font-weight: 700; color: #0d1b2a; }
+.etape-row.etape-done .etape-nom { color: #2e7d32; }
+.etape-meta { font-size: 0.7rem; color: #78909c; font-style: italic; }
+
+/* ACTIVITÉ */
+.activite-section {
+  border-top: 1px solid #e8ecf0; padding-top: 14px;
+}
+.activite-title {
+  font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  color: #546e7a; margin-bottom: 10px;
+}
+.activite-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 12px; background: #e8f4ff;
+  border-radius: 8px; margin-bottom: 6px;
+  font-size: 0.82rem; color: #1a3a5c;
+  border-left: 3px solid #1565c0;
+}
+.activite-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #1565c0; flex-shrink: 0; margin-top: 4px;
 }

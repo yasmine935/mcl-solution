@@ -16,6 +16,7 @@ import { Documents } from '../documents/documents';
 import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
+import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 
 @Component({
   selector: 'app-dashboard-aurelien',
@@ -25,7 +26,8 @@ import { TicketingComponent } from '../ticketing/ticketing';
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Taches, FichesCompletees,
-    Factures, Documents, Semenier, Planning, TicketingComponent
+    Factures, Documents, Semenier, Planning, TicketingComponent,
+    ApprovisionnementComponent
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
@@ -148,6 +150,7 @@ loadSoldeConges() {
       case 'tickets': return 'Tickets Clients';
       case 'factures': return 'Factures';
       case 'mes-conges': return 'Mes Conges';
+      case 'approvisionnement': return 'Demandes d\'Approvisionnement';
       default: return 'Dashboard';
     }
   }

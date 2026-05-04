@@ -170,35 +170,67 @@
 
       <!-- INTERVENTIONS COMPLETEES -->
       @if (currentPage === 'completees') {
-        <div class="table-card">
-          <h3>✅ Interventions Completees ({{ interventionsCompletees.length }})</h3>
+        <div class="completees-page">
+
+          <!-- HEADER -->
+          <div class="completees-header">
+            <div class="completees-title">
+              <div class="completees-icon">✅</div>
+              <div>
+                <h2>Interventions Complétées</h2>
+                <p>{{ interventionsCompletees.length }} intervention(s) réalisée(s)</p>
+              </div>
+            </div>
+          </div>
+
           @if (interventionsCompletees.length === 0) {
-            <p class="empty">Aucune intervention completee</p>
+            <div class="completees-empty">
+              <div class="empty-icon">📋</div>
+              <p>Aucune intervention complétée pour le moment</p>
+            </div>
           } @else {
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>N° Projet</th>
-                  <th>Client</th>
-                  <th>Date</th>
-                  <th>Heure Debut</th>
-                  <th>Heure Fin</th>
-                  <th>Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (int of interventionsCompletees; track int.id) {
-                  <tr>
-                    <td><strong>{{ int.numeroProjet }}</strong></td>
-                    <td>{{ int.client }}</td>
-                    <td>{{ int.dateIntervention }}</td>
-                    <td>{{ int.heureDebut || '-' }}</td>
-                    <td>{{ int.heureFin || '-' }}</td>
-                    <td><span class="badge completee">COMPLETEE</span></td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+            <div class="completees-grid">
+              @for (int of interventionsCompletees; track int.id) {
+                <div class="completee-card">
+                  <div class="completee-card-top">
+                    <div class="completee-num">
+                      <span class="num-label">N° PROJET</span>
+                      <span class="num-val">{{ int.numeroProjet || '—' }}</span>
+                    </div>
+                    <span class="badge-done">✅ Complétée</span>
+                  </div>
+
+                  <div class="completee-client">
+                    <span class="cc-icon">🏢</span>
+                    <span class="cc-name">{{ int.client || '—' }}</span>
+                  </div>
+
+                  <div class="completee-infos">
+                    <div class="ci-item">
+                      <span class="ci-icon">📅</span>
+                      <div>
+                        <span class="ci-label">Date</span>
+                        <span class="ci-val">{{ int.dateIntervention || '—' }}</span>
+                      </div>
+                    </div>
+                    <div class="ci-item">
+                      <span class="ci-icon">🕐</span>
+                      <div>
+                        <span class="ci-label">Début</span>
+                        <span class="ci-val">{{ int.heureDebut || '—' }}</span>
+                      </div>
+                    </div>
+                    <div class="ci-item">
+                      <span class="ci-icon">🕔</span>
+                      <div>
+                        <span class="ci-label">Fin</span>
+                        <span class="ci-val">{{ int.heureFin || '—' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
           }
         </div>
       }

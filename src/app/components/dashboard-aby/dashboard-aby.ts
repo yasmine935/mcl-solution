@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 
 @Component({
   selector: 'app-dashboard-aby',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, ApprovisionnementComponent],
   templateUrl: './dashboard-aby.html',
   styleUrl: './dashboard-aby.css'
 })
@@ -184,7 +185,8 @@ export class DashboardAby implements OnInit {
       'home': 'Tableau de Bord Supply Chain',
       'demandes': 'Demandes Matériel',
       'commandes': 'Commandes & Achats',
-      'logistique': 'Logistique & Stock'
+      'logistique': 'Logistique & Stock',
+      'approvisionnement': 'Fiches Approvisionnement'
     };
     return map[this.currentPage] || 'Supply Chain';
   }

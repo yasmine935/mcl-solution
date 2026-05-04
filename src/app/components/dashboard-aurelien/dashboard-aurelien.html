@@ -65,6 +65,12 @@
       </a>
 
       <div class="nav-divider"></div>
+      <div class="nav-section-label">Approvisionnement</div>
+      <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
+        <mat-icon>shopping_cart</mat-icon> Demandes Appro.
+      </a>
+
+      <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
@@ -146,6 +152,10 @@
       
    <!-- ══ REMPLACER LE BLOC mes-conges DANS AURELIEN ET ODILE ══ -->
 <!-- currentPage === 'mes-conges' -->
+
+      @if (currentPage === 'approvisionnement') {
+        <app-approvisionnement></app-approvisionnement>
+      }
 
 @if (currentPage === 'mes-conges') {
   <div class="conge-page">

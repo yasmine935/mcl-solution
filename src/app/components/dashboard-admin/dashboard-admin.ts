@@ -19,6 +19,7 @@ import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { Voitures } from '../voitures/voitures';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
+import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 
 
 @Component({
@@ -28,7 +29,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent , Voitures, RemonteesTerrainComponent
+    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent , Voitures, RemonteesTerrainComponent, ApprovisionnementComponent
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'

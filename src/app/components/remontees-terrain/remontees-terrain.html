@@ -223,52 +223,6 @@
               </div>
             }
 
-            <!-- ENCADREMENT MANAGER -->
-            <div class="modal-section encadrement-section">
-              <h4 class="modal-section-title encadrement-title">
-                📋 Partie réservée à l'Encadrement
-                <span class="mase-badge">Suivi MASE</span>
-              </h4>
-              @if (isManager) {
-                <div class="encadrement-grid">
-                  <div class="field-row full">
-                    <label>Analyse des causes</label>
-                    <input type="text" [(ngModel)]="selectedFiche.analyseCauses" class="field-input" placeholder="Analyser les causes..."/>
-                  </div>
-                  <div class="field-row full">
-                    <label>Action corrective décidée</label>
-                    <input type="text" [(ngModel)]="selectedFiche.actionCorrective" class="field-input" placeholder="Action à mettre en place..."/>
-                  </div>
-                  <div class="field-row">
-                    <label>Responsable de l'action</label>
-                    <input type="text" [(ngModel)]="selectedFiche.responsableAction" class="field-input"/>
-                  </div>
-                  <div class="field-row">
-                    <label>Échéance</label>
-                    <input type="date" [(ngModel)]="selectedFiche.echeance" class="field-input"/>
-                  </div>
-                  <div class="field-row full radio-row">
-                    <label>Information au déclarant (Boucle fermée)</label>
-                    <div class="radio-group">
-                      <label class="radio-label"><input type="radio" [(ngModel)]="selectedFiche.informationDeclarant" [value]="true"/> OUI</label>
-                      <label class="radio-label"><input type="radio" [(ngModel)]="selectedFiche.informationDeclarant" [value]="false"/> NON</label>
-                    </div>
-                  </div>
-                </div>
-                <button class="btn-save-encadrement" (click)="sauvegarderEncadrement()">💾 Sauvegarder l'encadrement</button>
-              } @else {
-                <div class="encadrement-readonly">
-                  <div class="modal-info-item"><label>Analyse des causes</label><span>{{ selectedFiche.analyseCauses || 'En attente...' }}</span></div>
-                  <div class="modal-info-item"><label>Action corrective</label><span>{{ selectedFiche.actionCorrective || '-' }}</span></div>
-                  <div class="modal-info-item"><label>Responsable</label><span>{{ selectedFiche.responsableAction || '-' }}</span></div>
-                  <div class="modal-info-item"><label>Échéance</label><span>{{ selectedFiche.echeance || '-' }}</span></div>
-                  <div class="modal-info-item">
-                    <label>Information déclarant</label>
-                    <span>{{ selectedFiche.informationDeclarant === true ? '✅ OUI' : selectedFiche.informationDeclarant === false ? '❌ NON' : '-' }}</span>
-                  </div>
-                </div>
-              }
-            </div>
 
           </div>
 

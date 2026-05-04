@@ -411,6 +411,51 @@
             </div>
           </div>
         </div>
+
+        <!-- AVANCEMENT -->
+        <div class="avancement-section">
+          <div class="avancement-header">
+            <span class="avancement-title">📈 Avancement du projet</span>
+            <span class="avancement-pct-badge" [class.pct-done]="getAvancement(selectedTache) === 100">
+              {{ getAvancement(selectedTache) }}%
+            </span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill"
+              [style.width.%]="getAvancement(selectedTache)"
+              [style.background]="getAvancement(selectedTache) === 100 ? '#2e7d32' : getAvancement(selectedTache) >= 50 ? '#1565c0' : '#e65100'">
+            </div>
+          </div>
+
+          <!-- ÉTAPES -->
+          <div class="etapes-list">
+            @for (etape of selectedTache.etapes; track $index) {
+              <div class="etape-row" [class.etape-done]="etape.done" (click)="marquerEtape(selectedTache, $index)">
+                <div class="etape-check">{{ etape.done ? '✅' : '⬜' }}</div>
+                <div class="etape-content">
+                  <span class="etape-nom">{{ etape.nom }}</span>
+                  @if (etape.done && etape.doneBy) {
+                    <span class="etape-meta">{{ etape.doneBy }} · {{ etape.doneAt }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- ACTIVITÉ RÉCENTE -->
+          @if (getActiviteRecente(selectedTache).length > 0) {
+            <div class="activite-section">
+              <div class="activite-title">Activité récente</div>
+              @for (act of getActiviteRecente(selectedTache); track $index) {
+                <div class="activite-item">
+                  <span class="activite-dot"></span>
+                  <span>Vous avez validé l'étape <strong>{{ act.nom }}</strong> le {{ act.doneAt }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
       </div>
       <div class="modal-footer">
         <button mat-raised-button color="primary" (click)="ouvrirEdition(selectedTache); fermerDetailModal()">

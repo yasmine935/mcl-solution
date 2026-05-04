@@ -67,6 +67,12 @@
       </a>
 
       <div class="nav-divider"></div>
+      <div class="nav-section-label">Approvisionnement</div>
+      <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
+        <mat-icon>shopping_cart</mat-icon> Demandes Appro.
+      </a>
+
+      <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
@@ -139,6 +145,10 @@
       <!-- ✅ NOUVEAU : Mise au Travail -->
       @if (currentPage === 'mise-au-travail') {
         <app-mise-au-travail></app-mise-au-travail>
+      }
+
+      @if (currentPage === 'approvisionnement') {
+        <app-approvisionnement></app-approvisionnement>
       }
 
       <!-- ══ COMING SOON ══ -->

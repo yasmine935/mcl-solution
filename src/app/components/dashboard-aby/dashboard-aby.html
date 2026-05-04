@@ -45,6 +45,12 @@
       </a>
 
       <div class="nav-divider"></div>
+      <div class="nav-section-label">Approvisionnement</div>
+      <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
+        <mat-icon>assignment</mat-icon> Fiches Appro. Reçues
+      </a>
+
+      <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
@@ -118,6 +124,11 @@
             }
           </div>
         }
+      }
+
+      <!-- ══ FICHES APPROVISIONNEMENT ══ -->
+      @if (currentPage === 'approvisionnement') {
+        <app-approvisionnement [modeaby]="true"></app-approvisionnement>
       }
 
       <!-- ══ DEMANDES MATÉRIEL ══ -->
