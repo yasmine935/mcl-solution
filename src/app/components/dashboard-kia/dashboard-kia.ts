@@ -33,6 +33,7 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
 })
 export class DashboardKia implements OnInit {
   user: any = {};
+  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
@@ -206,6 +207,9 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
       default: return 'KIA Dashboard';
     }
   }
+
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar() { this.sidebarOpen = false; }
 
   logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }

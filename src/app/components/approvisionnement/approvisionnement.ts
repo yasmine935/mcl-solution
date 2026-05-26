@@ -14,6 +14,7 @@ const API = 'http://localhost:8080/api';
 })
 export class ApprovisionnementComponent implements OnInit {
   @Input() modeaby = false;
+  @Input() modetous = false;
 
   currentUser: any = {};
   view: 'liste' | 'nouveau' | 'detail' = 'liste';
@@ -43,7 +44,7 @@ export class ApprovisionnementComponent implements OnInit {
   // ══════════ DEMANDES — BACKEND ══════════
 
   loadDemandes() {
-    const url = this.modeaby
+    const url = (this.modeaby || this.modetous)
       ? `${API}/demandes-appro`
       : `${API}/demandes-appro/demandeur/${this.currentUser.id}`;
     this.http.get<any[]>(url).subscribe({

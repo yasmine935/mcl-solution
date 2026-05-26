@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Program Files/**)",
+      "PowerShell(& \"C:\\\\Program Files\\\\MySQL\\\\MySQL Server 9.6\\\\bin\\\\mysql.exe\" -u yasmine -pyasmine123 mon_projet -e \"UPDATE utilisateur SET role = 'HAIDEH' WHERE role = 'AYDEH';\")",
+      "Read(//c/Users/Yasmine/Downloads/backend/backend/src/main/java/com/monprojet/backend/model/**)",
+      "Read(//c/Users/Yasmine/Downloads/backend/backend/src/main/java/com/monprojet/backend/controller/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Yasmine\\Downloads\\backend\\backend\\src\\main\\java\\com\\monprojet\\backend\\model",
+      "c:\\Users\\Yasmine\\Downloads\\backend\\backend\\src\\main\\java\\com\\monprojet\\backend\\controller"
+    ]
+  }
+}

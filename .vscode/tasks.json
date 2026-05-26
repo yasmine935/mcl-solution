@@ -8,14 +8,13 @@
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
-        "patte
-        rn": "$tsc",
+        "pattern": "$tsc",
         "background": {
           "activeOnStart": true,
-          "beginsPattern": {
+          "beginPattern": {
             "regexp": "Changes detected"
           },
-          "endsPattern": {
+          "endPattern": {
             "regexp": "bundle generation (complete|failed)"
           }
         }
@@ -30,10 +29,10 @@
         "pattern": "$tsc",
         "background": {
           "activeOnStart": true,
-          "beginsPattern": {
+          "beginPattern": {
             "regexp": "Changes detected"
           },
-          "endsPattern": {
+          "endPattern": {
             "regexp": "bundle generation (complete|failed)"
           }
         }

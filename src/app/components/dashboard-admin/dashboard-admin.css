@@ -890,5 +890,18 @@ nav {
 .modal-reset-header p { margin: 3px 0 0; font-size: 0.75rem; color: rgba(255,255,255,0.75); }
 .modal-reset-body { padding: 20px 22px; }
 .reset-label { display: block; font-size: 0.7rem; font-weight: 700; color: #546e7a; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+
+/* ══════════════════════════════════════════
+   INLINE STYLES EXTRACTED TO CSS
+   ══════════════════════════════════════════ */
+.nav-badge-alert { background: #c62828; }
+
+.badge-orange { background: #fff3e0; color: #e65100; }
+
+.photos-title { color: #1565c0; margin: 20px 0 12px; font-size: 0.95rem; }
+
+.photo-name { padding: 8px; font-size: 12px; color: #555; }
+
+.no-photos { color: #999; }
 .modal-reset-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 14px 22px; border-top: 1px solid #f0f4f8; }
 .reset-success { text-align: center; font-size: 0.88rem; color: #2e7d32; font-weight: 700; padding: 10px 0; }

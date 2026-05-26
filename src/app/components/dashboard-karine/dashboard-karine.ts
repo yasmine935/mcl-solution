@@ -18,6 +18,7 @@ import { Employes } from '../employes/employes';
 })
 export class DashboardKarine implements OnInit {
   user: any = {};
+  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
@@ -184,11 +185,14 @@ getRoleColor(role: string): string {
   const map: any = {
     'FERID': '#1565c0', 'AURELIEN': '#283593', 'ODILE': '#0277bd',
     'TECHNICIEN_SUP': '#4527a0', 'TECHNICIEN': '#01579b',
-    'ESSAN': '#5e35b1', 'KARINE': '#7b1c1c', 'AYDEH': '#4e342e',
+    'ESSAN': '#5e35b1', 'KARINE': '#7b1c1c', 'HAIDEH': '#4e342e',
     'NACCERA': '#880e4f', 'ABY': '#1a237e'
   };
   return map[role] || '#546e7a';
 }
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar() { this.sidebarOpen = false; }
+
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);

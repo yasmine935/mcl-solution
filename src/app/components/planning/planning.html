@@ -24,6 +24,7 @@
     <span class="leg-item"><span class="leg-dot" style="background:#c62828"></span>Congé/Maladie</span>
     <span class="leg-item"><span class="leg-dot" style="background:#0277bd"></span>RTT</span>
     <span class="leg-item"><span class="leg-dot" style="background:#2e7d32"></span>Formation</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#1a6b3c"></span>Intervention</span>
   </div>
 
   <!-- BANDEAU TECH : MA SEMAINE EN COURS -->
@@ -219,6 +220,43 @@
         </table>
       </div>
 
+    </div>
+  }
+
+  <!-- INTERVENTIONS EN COURS -->
+  @if (isManager && fichesIntervention.length > 0) {
+    <div class="interventions-card">
+      <h3 class="interventions-title">🔧 Interventions en cours</h3>
+      <div class="interventions-list">
+        @for (f of fichesIntervention; track f.id) {
+          @if (f.dateDebut && f.technicienId) {
+            <div class="intervention-row">
+              <div class="intervention-tech">
+                @for (u of techniciens; track u.id) {
+                  @if (u.id === f.technicienId) {
+                    <div class="intervention-avatar">{{ u.prenom?.charAt(0) }}{{ u.nom?.charAt(0) }}</div>
+                    <span class="intervention-tech-name">{{ u.prenom }} {{ u.nom }}</span>
+                  }
+                }
+              </div>
+              <div class="intervention-info">
+                <span class="intervention-projet">{{ f.numProjet }}</span>
+                <span class="intervention-client">{{ f.client }}</span>
+              </div>
+              <div class="intervention-dates">
+                <span class="intervention-date-badge">{{ f.dateDebut }}</span>
+                @if (f.dateFin) {
+                  <span class="intervention-arrow">→</span>
+                  <span class="intervention-date-badge">{{ f.dateFin }}</span>
+                }
+              </div>
+              <div class="intervention-statut" [style.background]="f.statut === 'COMPLETEE' ? '#2e7d32' : '#e65100'">
+                {{ f.statut === 'COMPLETEE' ? '✅ Terminée' : '⏳ En cours' }}
+              </div>
+            </div>
+          }
+        }
+      </div>
     </div>
   }
 

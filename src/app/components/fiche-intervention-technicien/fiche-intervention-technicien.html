@@ -1,204 +1,219 @@
-<div class="fiche-container">
-  <div class="fiche-header">
-    <h2>🔧 Fiche d'Intervention</h2>
-    @if (intervention && intervention.numProjet) {
-      <div class="fiche-info-header">
-        <span><strong>{{ intervention.numProjet }}</strong> - {{ intervention.client }}</span>
-        <span>{{ intervention.date }}</span>
-      </div>
-    }
+<div class="fit-layout">
+
+  <!-- ══ TOPBAR ══ -->
+  <div class="fit-topbar">
+    <button class="fit-back-btn" (click)="annuler()" type="button">
+      ← Retour
+    </button>
+    <div class="fit-topbar-center">
+      <span class="fit-topbar-title">📋 Fiche d'Intervention</span>
+      @if (intervention) {
+        <span class="fit-topbar-sub">{{ intervention.numProjet }} — {{ intervention.client }}</span>
+      }
+    </div>
+    <button class="fit-send-btn" (click)="envoyerFiche()" type="button">
+      ✅ Envoyer la Fiche
+    </button>
   </div>
 
   @if (intervention && intervention.id) {
-    <div class="fiche-content">
-      <!-- SECTION 1: INFORMATIONS PRINCIPALES -->
-      <div class="section">
-        <h3>⭐ Informations Principales</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <strong>N° Projet:</strong> 
-            <p>{{ intervention.numProjet }}</p>
-          </div>
-          <div class="info-item">
-            <strong>Client:</strong> 
-            <p>{{ intervention.client }}</p>
-          </div>
-          <div class="info-item">
-            <strong>Date:</strong> 
-            <p>{{ intervention.date }}</p>
-          </div>
-          <div class="info-item">
-            <strong>Technicien:</strong> 
-            <p>{{ intervention.technicienAssigne }}</p>
-          </div>
-        </div>
-        <div class="info-full">
-          <strong>Description:</strong>
-          <p>{{ intervention.description }}</p>
-        </div>
-      </div>
 
-      <!-- SECTION 2: INFOS CLIENT -->
-      @if (intervention.numCommande || intervention.adresse || intervention.contact) {
-        <div class="section">
-          <h3>👥 Informations Client</h3>
-          <div class="info-grid">
-            @if (intervention.numCommande) {
-              <div class="info-item">
-                <strong>N° Commande:</strong> 
-                <p>{{ intervention.numCommande }}</p>
-              </div>
-            }
-            @if (intervention.adresse) {
-              <div class="info-item">
-                <strong>Adresse:</strong> 
-                <p>{{ intervention.adresse }}</p>
-              </div>
-            }
-            @if (intervention.contact) {
-              <div class="info-item">
-                <strong>Contact:</strong> 
-                <p>{{ intervention.contact }}</p>
-              </div>
-            }
-          </div>
-        </div>
-      }
+    <div class="fit-body">
 
-      <!-- SECTION 3: TÂCHES -->
-      @if (intervention.taches && intervention.taches.length > 0) {
-        <div class="section">
-          <h3>✅ Tâches à Effectuer</h3>
-          <div class="taches-list">
-            @for (tache of intervention.taches; track $index) {
-              <div class="tache-item">
-                <input type="checkbox" [(ngModel)]="tache.coche" [id]="'tache-' + $index"/>
-                <label [for]="'tache-' + $index">
-                  {{ tache.nom }}
+      <!-- ══ COLONNE GAUCHE ══ -->
+      <div class="fit-left">
+
+        <!-- INFO CARD -->
+        <div class="fit-card">
+          <div class="fit-card-title">⭐ Informations</div>
+          <div class="fit-info-grid">
+            <div class="fit-info-cell">
+              <span class="fit-label">N° Projet</span>
+              <span class="fit-val">{{ intervention.numProjet || '—' }}</span>
+            </div>
+            <div class="fit-info-cell">
+              <span class="fit-label">Client</span>
+              <span class="fit-val">{{ intervention.client || '—' }}</span>
+            </div>
+            <div class="fit-info-cell">
+              <span class="fit-label">Technicien</span>
+              <span class="fit-val">{{ intervention.technicienAssigne || '—' }}</span>
+            </div>
+            <div class="fit-info-cell">
+              <span class="fit-label">Date</span>
+              <span class="fit-val">{{ intervention.date || '—' }}</span>
+            </div>
+          </div>
+          @if (intervention.adresse || intervention.contact) {
+            <div class="fit-chips-row">
+              @if (intervention.adresse) {
+                <span class="fit-chip"><span class="fit-chip-icon">📍</span>{{ intervention.adresse }}</span>
+              }
+              @if (intervention.contact) {
+                <span class="fit-chip"><span class="fit-chip-icon">👤</span>{{ intervention.contact }}</span>
+              }
+            </div>
+          }
+          @if (intervention.description) {
+            <div class="fit-desc">
+              <span class="fit-label">Description</span>
+              <p>{{ intervention.description }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- TÂCHES -->
+        @if (intervention.taches && intervention.taches.length > 0) {
+          <div class="fit-card">
+            <div class="fit-card-title">✅ Tâches à Effectuer</div>
+            <div class="fit-taches">
+              @for (tache of intervention.taches; track $index) {
+                <label class="fit-tache-row" [class.fit-tache-checked]="tache.coche">
+                  <input type="checkbox" [(ngModel)]="tache.coche"/>
+                  <span class="fit-tache-check">{{ tache.coche ? '✓' : '' }}</span>
+                  <span class="fit-tache-name">{{ tache.nom }}</span>
                   @if (tache.selection) {
-                    <span class="selection-badge">{{ tache.selection }}</span>
+                    <span class="fit-tache-badge">{{ tache.selection }}</span>
                   }
                 </label>
-              </div>
-            }
+              }
+            </div>
+          </div>
+        }
+
+        <!-- DONNÉES D'EXÉCUTION -->
+        <div class="fit-card">
+          <div class="fit-card-title">⏱ Données d'Exécution</div>
+          <div class="fit-form-grid">
+            <div class="fit-field">
+              <label>Date</label>
+              <input type="date" [(ngModel)]="form.dateDebut" class="fit-input"/>
+            </div>
+            <div class="fit-field">
+              <label>Heure début</label>
+              <input type="time" [(ngModel)]="form.heureDebut" class="fit-input"/>
+            </div>
+            <div class="fit-field">
+              <label>Heure fin</label>
+              <input type="time" [(ngModel)]="form.heureFin" class="fit-input"/>
+            </div>
+            <div class="fit-field fit-field-full">
+              <label>Intervenants</label>
+              <input type="text" [(ngModel)]="form.intervenants" class="fit-input" placeholder="Noms des personnes présentes"/>
+            </div>
           </div>
         </div>
-      }
 
-      <!-- SECTION 4: DONNÉES D'EXÉCUTION -->
-      <div class="section">
-        <h3>⏱️ Données d'Exécution</h3>
-        <div class="form-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Date de début</mat-label>
-            <input matInput type="date" [(ngModel)]="form.dateDebut"/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Heure début</mat-label>
-            <input matInput type="time" [(ngModel)]="form.heureDebut"/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Heure fin</mat-label>
-            <input matInput type="time" [(ngModel)]="form.heureFin"/>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Intervenants</mat-label>
-            <input matInput [(ngModel)]="form.intervenants" placeholder="Noms des personnes"/>
-          </mat-form-field>
+        <!-- MATÉRIEL HORS STANDARD -->
+        <div class="fit-card">
+          <div class="fit-card-title">🔩 Matériel Hors Standard</div>
+          <div class="fit-materiel-row">
+            <input type="text" class="fit-input" [(ngModel)]="nouveauMateriel"
+              placeholder="Ex: Nacelle, Testeur..."
+              (keyup.enter)="ajouterMateriel()">
+            <button class="fit-materiel-btn" (click)="ajouterMateriel()" type="button">+ Ajouter</button>
+          </div>
+          @if (materielsHorsStandard.length > 0) {
+            <div class="fit-materiel-chips">
+              @for (m of materielsHorsStandard; track $index) {
+                <span class="fit-materiel-chip">
+                  {{ m }}
+                  <button (click)="supprimerMateriel($index)" type="button">✕</button>
+                </span>
+              }
+            </div>
+          }
         </div>
-      </div>
 
-      <!-- SECTION 5: PHOTOS -->
-      <div class="section">
-        <h3>📸 Photos</h3>
-        <div class="photo-upload">
+        <!-- PHOTOS -->
+        <div class="fit-card">
+          <div class="fit-card-title">📸 Photos</div>
           <input type="file" #photoInput multiple accept="image/*" (change)="onPhotoSelect($event)" style="display:none;"/>
-          <button mat-raised-button color="primary" (click)="photoInput.click()" type="button">
-            <mat-icon>add_photo_alternate</mat-icon> Ajouter des photos
+          <button class="fit-photo-btn" (click)="photoInput.click()" type="button">
+            + Ajouter des photos
           </button>
+          @if (photos.length > 0) {
+            <div class="fit-photos-list">
+              @for (photo of photos; track $index) {
+                <div class="fit-photo-item">
+                  <span>📄 {{ photo.nom }}</span>
+                  <button class="fit-photo-del" (click)="supprimerPhoto($index)" type="button">✕</button>
+                </div>
+              }
+            </div>
+          }
         </div>
-        @if (photos.length > 0) {
-          <div class="photos-list">
-            @for (photo of photos; track $index) {
-              <div class="photo-item">
-                <span>{{ photo.nom }}</span>
-                <button mat-icon-button color="warn" (click)="supprimerPhoto($index)" type="button">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-            }
+
+      </div>
+
+      <!-- ══ COLONNE DROITE — SIGNATURES ══ -->
+      <div class="fit-right">
+
+        <!-- SIGNATURE TECHNICIEN -->
+        <div class="fit-card fit-sig-card">
+          <div class="fit-card-title fit-sig-title">✍️ Signature Technicien</div>
+
+          <div class="fit-sig-wrap">
+            <canvas #signatureTechnicien class="fit-canvas"></canvas>
           </div>
-        }
-      </div>
 
-      <!-- SECTION 6: SIGNATURE TECHNICIEN -->
-      <div class="section signature-section">
-        <h3>✍️ Signature du Technicien</h3>
-        <div class="signature-container">
-          <canvas #signatureTechnicien class="signature-canvas"></canvas>
-        </div>
-        <div class="signature-buttons">
-          <button mat-raised-button color="primary" (click)="sauvegarderSignature('tech')" type="button">
-            <mat-icon>check</mat-icon> Valider Signature Technicien
-          </button>
-          <button mat-stroked-button (click)="effacerSignature('tech')" type="button">
-            <mat-icon>delete</mat-icon> Effacer
-          </button>
-        </div>
-        @if (signatureTechnicienData) {
-          <div class="signature-preview">
-            <strong>✅ Signature Technicien Validée</strong>
-            <img [src]="signatureTechnicienData" alt="Signature Technicien"/>
+          <div class="fit-sig-actions">
+            <button class="fit-sig-btn-clear" (click)="effacerSignature('tech')" type="button">
+              🗑 Effacer
+            </button>
+            <button class="fit-sig-btn-save" (click)="sauvegarderSignature('tech')" type="button">
+              ✓ Valider
+            </button>
           </div>
-        }
-      </div>
 
-      <!-- SECTION 7: SIGNATURE CLIENT -->
-      <div class="section signature-section">
-        <h3>✍️ Signature du Client</h3>
-        
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Nom du client (pour signature)</mat-label>
-          <input matInput [(ngModel)]="form.nomClientSigne" placeholder="Nom du représentant client"/>
-        </mat-form-field>
+          @if (signatureTechnicienData) {
+            <div class="fit-sig-ok">
+              <span class="fit-sig-ok-badge">✅ Signature validée</span>
+              <img [src]="signatureTechnicienData" alt="Signature technicien" class="fit-sig-preview"/>
+            </div>
+          }
+        </div>
 
-        <div class="signature-container">
-          <canvas #signatureClient class="signature-canvas"></canvas>
-        </div>
-        <div class="signature-buttons">
-          <button mat-raised-button color="primary" (click)="sauvegarderSignature('client')" type="button">
-            <mat-icon>check</mat-icon> Valider Signature Client
-          </button>
-          <button mat-stroked-button (click)="effacerSignature('client')" type="button">
-            <mat-icon>delete</mat-icon> Effacer
-          </button>
-        </div>
-        @if (signatureClientData) {
-          <div class="signature-preview">
-            <strong>✅ Signature Client Validée - {{ form.nomClientSigne }}</strong>
-            <img [src]="signatureClientData" alt="Signature Client"/>
+        <!-- SIGNATURE CLIENT -->
+        <div class="fit-card fit-sig-card fit-sig-client">
+          <div class="fit-card-title fit-sig-title">✍️ Signature Client</div>
+
+          <div class="fit-field" style="margin-bottom:12px;">
+            <label>Nom du représentant client</label>
+            <input type="text" [(ngModel)]="form.nomClientSigne" class="fit-input" placeholder="Prénom Nom"/>
           </div>
-        }
+
+          <div class="fit-sig-wrap">
+            <canvas #signatureClient class="fit-canvas"></canvas>
+          </div>
+
+          <div class="fit-sig-actions">
+            <button class="fit-sig-btn-clear" (click)="effacerSignature('client')" type="button">
+              🗑 Effacer
+            </button>
+            <button class="fit-sig-btn-save" (click)="sauvegarderSignature('client')" type="button">
+              ✓ Valider
+            </button>
+          </div>
+
+          @if (signatureClientData) {
+            <div class="fit-sig-ok">
+              <span class="fit-sig-ok-badge">✅ {{ form.nomClientSigne || 'Client' }} — Signé</span>
+              <img [src]="signatureClientData" alt="Signature client" class="fit-sig-preview"/>
+            </div>
+          }
+        </div>
+
       </div>
 
-      <!-- SECTION 8: ACTIONS FINALES -->
-      <div class="section">
-        <div class="form-actions">
-          <button mat-raised-button color="primary" (click)="envoyerFiche()" type="button">
-            <mat-icon>send</mat-icon> Envoyer la Fiche
-          </button>
-          <button mat-stroked-button (click)="annuler()" type="button">
-            <mat-icon>close</mat-icon> Annuler
-          </button>
-        </div>
-      </div>
     </div>
+
   } @else {
-    <div class="empty">
-      <p>❌ Aucune intervention assignée</p>
-      <button mat-raised-button color="primary" (click)="annuler()">
-        <mat-icon>arrow_back</mat-icon> Retour
-      </button>
+    <div class="fit-empty">
+      <div class="fit-empty-icon">📋</div>
+      <p>Aucune intervention trouvée</p>
+      <button class="fit-back-btn" (click)="annuler()" type="button">← Retour</button>
     </div>
   }
+
 </div>

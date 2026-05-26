@@ -41,7 +41,7 @@
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="nouvelleTache.client">
                 <option value="">— Sélectionner —</option>
-                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
               </select>
               <button type="button" class="btn-add-client" (click)="ouvrirAddClient('add')" title="Nouveau client">+</button>
             </div>
@@ -51,7 +51,7 @@
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="nouvelleTache.clientFinal">
                 <option value="">— Sélectionner —</option>
-                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
               </select>
               <button type="button" class="btn-add-client" (click)="ouvrirAddClient('add')" title="Nouveau client">+</button>
             </div>
@@ -87,16 +87,36 @@
         </div>
 
         <!-- FICHIERS -->
-        <div class="fichiers-inline">
-          <span class="fichiers-label">📎 Fichiers</span>
-          <input type="file" #fileInput (change)="onFileSelectAdd($event)" multiple class="file-input" accept="*/*"/>
-          <button mat-stroked-button (click)="fileInput.click()" type="button" class="btn-upload">
-            <mat-icon>upload_file</mat-icon> Ajouter
-          </button>
-          @if (nouvelleTache.fichiers?.length) {
-            <span class="fichiers-count">{{ nouvelleTache.fichiers.length }} fichier(s)</span>
-          }
+        <div class="doc-section-label">📎 Documents / Fichiers</div>
+        <div class="doc-categories">
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📅 Planning</span>
+            <input type="file" #filePlanningAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Planning')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="filePlanningAdd.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📄 Devis / Bon de commande</span>
+            <input type="file" #fileDevisAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Devis')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileDevisAdd.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📁 Autres documents</span>
+            <input type="file" #fileAutresAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Autre')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileAutresAdd.click()" type="button">Importer</button>
+          </div>
         </div>
+        @if (nouvelleTache.fichiers?.length) {
+          <div class="fichiers-liste">
+            @for (f of nouvelleTache.fichiers; track $index) {
+              <div class="fichier-item">
+                <span class="doc-type-badge">{{ f.type }}</span>
+                <span class="fichier-nom">{{ f.nom }}</span>
+                <span class="fichier-taille">{{ f.taille }} KB</span>
+                <button mat-icon-button color="warn" (click)="supprimerFichier($index)" type="button"><mat-icon>delete</mat-icon></button>
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <div class="form-actions">
@@ -141,7 +161,7 @@
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="tacheEnEdition.client">
                 <option value="">— Sélectionner —</option>
-                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
               </select>
               <button type="button" class="btn-add-client" (click)="ouvrirAddClient('edit')" title="Nouveau client">+</button>
             </div>
@@ -151,7 +171,7 @@
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="tacheEnEdition.clientFinal">
                 <option value="">— Sélectionner —</option>
-                @for (c of clients; track c) { <option [value]="c">{{ c }}</option> }
+                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
               </select>
               <button type="button" class="btn-add-client" (click)="ouvrirAddClient('edit')" title="Nouveau client">+</button>
             </div>
@@ -183,13 +203,36 @@
             <input class="compact-input" [(ngModel)]="tacheEnEdition.numCommande"/>
           </div>
         </div>
-        <div class="fichiers-inline">
-          <span class="fichiers-label">📎 Fichiers</span>
-          <input type="file" #fileInputEdit (change)="onFileSelectEdit($event)" multiple class="file-input" accept="*/*"/>
-          <button mat-stroked-button (click)="fileInputEdit.click()" type="button" class="btn-upload">
-            <mat-icon>upload_file</mat-icon> Ajouter
-          </button>
+        <div class="doc-section-label">📎 Documents / Fichiers</div>
+        <div class="doc-categories">
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📅 Planning</span>
+            <input type="file" #filePlanningEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Planning')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="filePlanningEdit.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📄 Devis / Bon de commande</span>
+            <input type="file" #fileDevisEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Devis')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileDevisEdit.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📁 Autres documents</span>
+            <input type="file" #fileAutresEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Autre')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileAutresEdit.click()" type="button">Importer</button>
+          </div>
         </div>
+        @if (tacheEnEdition.fichiers?.length) {
+          <div class="fichiers-liste">
+            @for (f of tacheEnEdition.fichiers; track $index) {
+              <div class="fichier-item">
+                <span class="doc-type-badge">{{ f.type }}</span>
+                <span class="fichier-nom">{{ f.nom }}</span>
+                <span class="fichier-taille">{{ f.taille }} KB</span>
+                <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <div class="form-actions">

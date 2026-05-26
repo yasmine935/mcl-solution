@@ -13,7 +13,7 @@ import { FicheInterventionTechnicien } from './components/fiche-intervention-tec
 import { TicketingComponent } from './components/ticketing/ticketing';
 import { DashboardKarine } from './components/dashboard-karine/dashboard-karine';
 import { DashboardAby } from './components/dashboard-aby/dashboard-aby';
-import { DashboardAydeh } from './components/dashboard-aydeh/dashboard-aydeh';
+import { DashboardHaideh } from './components/dashboard-haideh/dashboard-haideh';
 import { DashboardNaccera } from './components/dashboard-naccera/dashboard-naccera';
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -30,7 +30,7 @@ export const appRoutes: Routes = [
   { path: 'fiche-intervention', component: FicheInterventionManager },
   { path: 'dashboard-karine', component: DashboardKarine },
   { path: 'dashboard-aby', component: DashboardAby },
-  { path: 'dashboard-aydeh', component: DashboardAydeh },
+  { path: 'dashboard-haideh', component: DashboardHaideh },
   { path: 'dashboard-naccera', component: DashboardNaccera },
   { path: 'fiche-intervention-tech/:id', component: FicheInterventionTechnicien }
 ];

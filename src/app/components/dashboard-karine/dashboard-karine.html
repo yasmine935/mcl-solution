@@ -1,7 +1,8 @@
-<div class="karine-layout">
+<div class="karine-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
+    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
     <div class="sidebar-header">
       <div class="sidebar-brand">
         <div class="brand-logo">MCL</div>
@@ -41,12 +42,6 @@
    (click)="currentPage = 'reclamations'">
   <mat-icon>report_problem</mat-icon> Remontées Terrain
 </a>
-      <a class="nav-item" [class.active]="currentPage === 'sse'" (click)="currentPage = 'sse'">
-        <mat-icon>health_and_safety</mat-icon> SSE Terrain
-        @if (sseEnAttente.length > 0) {
-          <span class="nav-badge nav-badge-orange">{{ sseEnAttente.length }}</span>
-        }
-      </a>
       <a class="nav-item" [class.active]="currentPage === 'voitures'" (click)="currentPage = 'voitures'">
         <mat-icon>directions_car</mat-icon> Parc Automobile
       </a>
@@ -64,6 +59,7 @@
     <!-- TOPBAR -->
     <div class="topbar">
       <div class="topbar-left">
+        <button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button>
         <h3>{{ getPageTitle() }}</h3>
       </div>
       <div class="topbar-right">
@@ -289,4 +285,5 @@
 
     </div>
   </div>
+  <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
 </div>

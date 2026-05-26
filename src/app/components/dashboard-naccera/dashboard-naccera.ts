@@ -15,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class DashboardNaccera implements OnInit {
   user: any = {};
+  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
@@ -92,6 +93,9 @@ export class DashboardNaccera implements OnInit {
     };
     return map[this.currentPage] || 'Comptabilite';
   }
+
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar() { this.sidebarOpen = false; }
 
   logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }

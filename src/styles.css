@@ -1,1 +1,139 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* ============================================================
+   RESPONSIVE SIDEBAR — Global rules for all dashboards
+   ============================================================ */
+
+/* ── Hamburger button (hidden on desktop) ── */
+.hamburger-btn {
+  display: none;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.hamburger-btn:hover { background: rgba(255,255,255,0.22); }
+
+/* ── Close button hidden on desktop ── */
+.sidebar-close-btn { display: none; }
+
+/* ── Overlay (appears behind open sidebar on mobile) ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 199;
+  backdrop-filter: blur(2px);
+}
+
+/* ── TABLET (≤ 1024px) ── */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed !important;
+    left: -280px;
+    top: 0;
+    height: 100vh;
+    z-index: 200;
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+  }
+
+  .dashboard-layout.sidebar-open .sidebar {
+    left: 0;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.35) !important;
+  }
+
+  .dashboard-layout.sidebar-open .sidebar-overlay {
+    display: block;
+  }
+
+  .main-content {
+    width: 100% !important;
+    min-width: 0;
+  }
+
+  .hamburger-btn { display: flex; align-items: center; }
+
+  /* Close button inside sidebar on mobile */
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 12px 14px 6px;
+  }
+
+  .sidebar-close-btn button {
+    background: rgba(255,255,255,0.18);
+    border: 1.5px solid rgba(255,255,255,0.35);
+    color: #fff;
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+
+  .sidebar-close-btn button:hover {
+    background: rgba(255,255,255,0.28);
+  }
+}
+
+/* ── MOBILE (≤ 600px) ── */
+@media (max-width: 600px) {
+  .topbar {
+    padding: 0 12px !important;
+    height: 52px !important;
+  }
+
+  .topbar-greeting { display: none !important; }
+
+  .page-content {
+    padding: 12px !important;
+  }
+
+  /* Stats grid → 2 columns on mobile */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Cards full width */
+  .interventions-grid,
+  .completees-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Tables → scroll horizontal */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 500px;
+  }
+
+  /* Modals full screen on mobile */
+  .fd-overlay,
+  .ms-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .fd-modal,
+  .ms-modal {
+    border-radius: 18px 18px 0 0 !important;
+    max-height: 92vh !important;
+    width: 100% !important;
+  }
+}

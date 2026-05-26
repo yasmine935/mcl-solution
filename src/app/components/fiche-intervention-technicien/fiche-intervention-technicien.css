@@ -1,402 +1,563 @@
-.fiche-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 25px;
-  background: linear-gradient(135deg, #f5f5f5 0%, #f9f9f9 100%);
+/* ============================================================
+   FICHE INTERVENTION TECHNICIEN — Design Premium
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.fit-layout {
+  font-family: 'Exo 2', 'Segoe UI', sans-serif;
+  background: #f0f4f8;
   min-height: 100vh;
-}
-
-.fiche-header {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
-  border-left: 5px solid #1565C0;
-}
-
-.fiche-header h2 {
-  color: #1565C0;
-  margin: 0 0 15px 0;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.fiche-info-header {
   display: flex;
+  flex-direction: column;
+}
+
+/* ══ TOPBAR ══ */
+.fit-topbar {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  color: #666;
-  font-size: 14px;
+  background: linear-gradient(135deg, #020c1b 0%, #01579b 100%);
+  padding: 0 24px;
+  height: 58px;
+  box-shadow: 0 3px 16px rgba(1,87,155,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 16px;
 }
 
-.fiche-content {
+.fit-topbar-center {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-}
-
-/* ===== SECTIONS ===== */
-.section {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid #1565C0;
-}
-
-.section h3 {
-  color: #1565C0;
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 18px;
-  font-weight: 700;
-  display: flex;
   align-items: center;
-  gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
-/* ===== INFO GRID ===== */
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  margin-bottom: 15px;
+.fit-topbar-title {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
-.info-item {
-  padding: 12px;
-  background: #F9F9F9;
-  border-radius: 6px;
-  border-left: 3px solid #1565C0;
+.fit-topbar-sub {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
 }
 
-.info-item strong {
-  color: #1565C0;
-  display: block;
-  margin-bottom: 6px;
-  font-size: 12px;
-  text-transform: uppercase;
+.fit-back-btn {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
   font-weight: 700;
-}
-
-.info-item p {
-  color: #333;
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.info-full {
-  padding: 15px;
-  background: #F9F9F9;
-  border-radius: 6px;
-  border-left: 3px solid #1565C0;
-}
-
-.info-full strong {
-  color: #1565C0;
-  display: block;
-  margin-bottom: 10px;
-  font-size: 12px;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.info-full p {
-  color: #333;
-  margin: 0;
-  line-height: 1.6;
-}
-
-/* ===== TÂCHES ===== */
-.taches-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tache-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: #F9F9F9;
-  border-radius: 6px;
-  border-left: 3px solid #1565C0;
-}
-
-.tache-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: #1565C0;
+  font-family: inherit;
   cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
   flex-shrink: 0;
 }
 
-.tache-item label {
-  margin: 0;
+.fit-back-btn:hover {
+  background: rgba(255,255,255,0.22);
+}
+
+.fit-send-btn {
+  background: linear-gradient(135deg, #1a6b3c, #2e7d32);
+  border: none;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-family: inherit;
   cursor: pointer;
-  flex: 1;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(26,107,60,0.4);
+}
+
+.fit-send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(26,107,60,0.5);
+}
+
+/* ══ BODY (2 colonnes) ══ */
+.fit-body {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  align-items: start;
+}
+
+/* ══ CARDS ══ */
+.fit-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  margin-bottom: 14px;
+}
+
+.fit-card:last-child { margin-bottom: 0; }
+
+.fit-card-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #01579b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8f0f8;
+}
+
+/* ══ INFO GRID ══ */
+.fit-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.fit-info-cell {
+  background: #f5f8fc;
+  border-radius: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid #01579b;
+}
+
+.fit-label {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #90a4ae;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.fit-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a2533;
+}
+
+.fit-chips-row {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.fit-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  color: #333;
+  gap: 5px;
+  background: #e8f0f8;
+  color: #01579b;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
   font-weight: 600;
 }
 
-.selection-badge {
-  display: inline-block;
-  background: #1565C0;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
+.fit-chip-icon { font-size: 0.85rem; }
+
+.fit-desc {
+  background: #f5f8fc;
+  border-radius: 8px;
+  padding: 10px;
+  border-left: 3px solid #cfd8dc;
+}
+
+.fit-desc p {
+  font-size: 0.85rem;
+  color: #546e7a;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ══ TÂCHES ══ */
+.fit-taches {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fit-tache-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #f5f8fc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-left: 3px solid #cfd8dc;
+}
+
+.fit-tache-row input[type="checkbox"] { display: none; }
+
+.fit-tache-row.fit-tache-checked {
+  background: #e8f5e9;
+  border-left-color: #2e7d32;
+}
+
+.fit-tache-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 2px solid #90a4ae;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+  background: #fff;
+  transition: all 0.15s;
+}
+
+.fit-tache-checked .fit-tache-check {
+  background: #2e7d32;
+  border-color: #2e7d32;
+}
+
+.fit-tache-name {
+  flex: 1;
+  font-size: 0.85rem;
   font-weight: 600;
-  margin-left: auto;
+  color: #37474f;
+}
+
+.fit-tache-checked .fit-tache-name {
+  text-decoration: line-through;
+  color: #90a4ae;
+}
+
+.fit-tache-badge {
+  background: #01579b;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* ══ MATÉRIEL HORS STANDARD ══ */
+.fit-materiel-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fit-materiel-btn {
+  background: #1565c0;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
   white-space: nowrap;
 }
 
-/* ===== FORMS ===== */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  margin-bottom: 15px;
-}
+.fit-materiel-btn:hover { background: #0d47a1; }
 
-.full-width {
-  grid-column: 1 / -1;
-}
-
-mat-form-field {
-  width: 100%;
-}
-
-/* ===== PHOTOS ===== */
-.photo-upload {
+.fit-materiel-chips {
   display: flex;
-  gap: 12px;
-  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.photo-upload button {
-  background: #1565C0 !important;
-  color: #FFFFFF !important;
-}
-
-.photo-upload button:hover {
-  background: #0D47A1 !important;
-}
-
-.photo-upload button mat-icon {
-  color: #FFFFFF;
-}
-
-.photos-list {
+.fit-materiel-chip {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.photo-item {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  background: #F9F9F9;
-  border-radius: 6px;
-  border-left: 3px solid #1565C0;
-}
-
-.photo-item span {
-  color: #333;
+  gap: 6px;
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
   font-weight: 600;
 }
 
-.photo-item button {
-  color: #f44336 !important;
+.fit-materiel-chip button {
+  background: none;
+  border: none;
+  color: #1565c0;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0;
+  line-height: 1;
 }
 
-/* ===== SIGNATURES ===== */
-.signature-section {
-  border: 2px solid #FF9800 !important;
-  background: #FFF9F5 !important;
+/* ══ FORM ══ */
+.fit-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
-.signature-section h3 {
-  color: #FF9800;
+.fit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.signature-container {
+.fit-field-full { grid-column: 1 / -1; }
+
+.fit-field label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #78909c;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fit-input {
+  border: 1.5px solid #e0e7f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #1a2533;
+  background: #f8fafc;
+  transition: border 0.2s;
+  outline: none;
+  width: 100%;
+}
+
+.fit-input:focus {
+  border-color: #01579b;
+  background: #fff;
+}
+
+/* ══ PHOTOS ══ */
+.fit-photo-btn {
+  background: #e8f0f8;
+  color: #01579b;
+  border: 2px dashed #90c4e8;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.fit-photo-btn:hover {
+  background: #d6e8f7;
+  border-color: #01579b;
+}
+
+.fit-photos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.fit-photo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f8fc;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+  color: #546e7a;
+  font-weight: 600;
+}
+
+.fit-photo-del {
+  background: none;
+  border: none;
+  color: #ef5350;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.fit-photo-del:hover { background: #fdecea; }
+
+/* ══ SIGNATURES ══ */
+.fit-sig-card {
+  border: 2px solid #ffe0b2;
+  background: linear-gradient(135deg, #fffde7 0%, #fff8f0 100%);
+}
+
+.fit-sig-client {
+  border-color: #b2dfdb;
+  background: linear-gradient(135deg, #f0fdfa 0%, #e8f5f3 100%);
+}
+
+.fit-sig-title {
+  color: #e65100;
+  border-bottom-color: #ffe0b2;
+}
+
+.fit-sig-client .fit-sig-title {
+  color: #00695c;
+  border-bottom-color: #b2dfdb;
+}
+
+.fit-sig-wrap {
+  background: #fff;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+  padding: 6px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
-  padding: 15px;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #E0E0E0;
 }
 
-.signature-canvas {
-  border: 2px solid #1565C0;
-  border-radius: 8px;
-  cursor: crosshair;
-  background: white;
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-.signature-buttons {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.signature-buttons button {
-  background: #FF9800 !important;
-  color: #FFFFFF !important;
-  font-weight: 700;
-}
-
-.signature-buttons button:hover {
-  background: #F57C00 !important;
-}
-
-.signature-buttons button mat-icon {
-  color: #FFFFFF;
-}
-
-.signature-preview {
-  padding: 20px;
-  background: #E8F5E9;
-  border: 2px solid #4CAF50;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.signature-preview strong {
-  display: block;
-  color: #2E7D32;
-  margin-bottom: 15px;
-  font-weight: 700;
-}
-
-.signature-preview img {
-  max-width: 100%;
-  height: auto;
-  max-height: 150px;
+.fit-canvas {
   border-radius: 6px;
+  cursor: crosshair;
+  display: block;
+  background: #fff;
+  max-width: 100%;
 }
 
-/* ===== ACTIONS ===== */
-.form-actions {
+.fit-sig-actions {
   display: flex;
-  gap: 15px;
-  justify-content: center;
-  padding: 20px;
-  background: #F9F9F9;
-  border-radius: 8px;
-  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.form-actions button {
-  min-width: 200px;
+.fit-sig-btn-clear {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  color: #78909c;
+  font-size: 0.82rem;
   font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fit-sig-btn-clear:hover { background: #fdecea; color: #c62828; border-color: #ef9a9a; }
+
+.fit-sig-btn-save {
+  flex: 2;
+  padding: 8px;
   border-radius: 8px;
-  color: #FFFFFF !important;
+  border: none;
+  background: linear-gradient(135deg, #e65100, #f57c00);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 3px 8px rgba(230,81,0,0.25);
 }
 
-.form-actions button:first-child {
-  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+.fit-sig-client .fit-sig-btn-save {
+  background: linear-gradient(135deg, #00695c, #00897b);
+  box-shadow: 0 3px 8px rgba(0,105,92,0.25);
 }
 
-.form-actions button:first-child:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+.fit-sig-btn-save:hover { transform: translateY(-1px); }
+
+.fit-sig-ok {
+  background: #e8f5e9;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #a5d6a7;
 }
 
-.form-actions button mat-icon {
-  color: #FFFFFF;
+.fit-sig-ok-badge {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #2e7d32;
 }
 
-/* ===== EMPTY ===== */
-.empty {
-  background: white;
-  padding: 60px 25px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.fit-sig-preview {
+  max-width: 100%;
+  max-height: 80px;
+  border-radius: 6px;
+  border: 1px solid #c8e6c9;
 }
 
-.empty p {
-  color: #999;
-  font-size: 16px;
-  margin-bottom: 20px;
+/* ══ EMPTY STATE ══ */
+.fit-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  gap: 16px;
 }
 
-.empty button {
-  background: #1565C0 !important;
-  color: #FFFFFF !important;
+.fit-empty-icon { font-size: 3rem; }
+
+.fit-empty p {
+  color: #78909c;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ══ RESPONSIVE ══ */
 @media (max-width: 768px) {
-  .fiche-container {
-    padding: 15px;
-  }
-
-  .section {
-    padding: 20px;
-  }
-
-  .info-grid {
+  .fit-body {
     grid-template-columns: 1fr;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .signature-container {
     padding: 10px;
   }
 
-  .signature-canvas {
-    max-width: 100%;
-    height: auto;
+  .fit-info-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .signature-buttons {
-    flex-direction: column;
+  .fit-form-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .signature-buttons button {
-    width: 100%;
+  .fit-topbar-sub { display: none; }
+}
+
+@media (max-width: 480px) {
+  .fit-info-grid,
+  .fit-form-grid { grid-template-columns: 1fr; }
+
+  .fit-topbar {
+    padding: 0 12px;
+    gap: 8px;
   }
 
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .form-actions button {
-    width: 100%;
-  }
-
-  .fiche-info-header {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .tache-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .selection-badge {
-    margin-left: 32px;
-    margin-top: 5px;
-  }
+  .fit-back-btn,
+  .fit-send-btn { padding: 7px 10px; font-size: 0.78rem; }
 }

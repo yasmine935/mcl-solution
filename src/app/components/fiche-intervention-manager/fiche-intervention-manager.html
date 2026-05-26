@@ -6,11 +6,48 @@
       <h2>🔧 Fiches d'Intervention</h2>
       <span class="fiches-count">{{ fiches.length }} fiche(s)</span>
     </div>
-    <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd; showFormEdit = false" class="btn-add">
-      <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
-      {{ showFormAdd ? 'Fermer' : 'Nouvelle Fiche' }}
-    </button>
+    <div class="header-actions">
+      <button class="btn-clients" (click)="showClientManager = !showClientManager; showFormAdd = false; showFormEdit = false">
+        <mat-icon>people</mat-icon> Clients ({{ clients.length }})
+      </button>
+      <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd; showFormEdit = false; showClientManager = false" class="btn-add">
+        <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
+        {{ showFormAdd ? 'Fermer' : 'Nouvelle Fiche' }}
+      </button>
+    </div>
   </div>
+
+  <!-- ══ GESTIONNAIRE CLIENTS ══ -->
+  @if (showClientManager) {
+    <div class="client-manager">
+      <div class="client-manager-header">
+        <h4><mat-icon>people</mat-icon> Gestion des Clients</h4>
+        <button mat-icon-button (click)="showClientManager = false"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="client-add-row">
+        <input class="compact-input" [(ngModel)]="nouveauClient.nom" placeholder="Nom du client *"/>
+        <input class="compact-input" [(ngModel)]="nouveauClient.codeClient" placeholder="Code client (ex: CLI-001)"/>
+        <input class="compact-input" [(ngModel)]="nouveauClient.adresse" placeholder="Adresse"/>
+        <input class="compact-input" [(ngModel)]="nouveauClient.contact" placeholder="Contact — Téléphone"/>
+        <button class="btn-inline-add" (click)="ajouterClientLocal()">+ Ajouter</button>
+      </div>
+      @if (clients.length === 0) {
+        <p class="client-empty">Aucun client. Ajoutez-en un ci-dessus.</p>
+      } @else {
+        <div class="clients-list">
+          @for (c of clients; track c.id; let i = $index) {
+            <div class="client-row">
+              <span class="client-nom">{{ c.nom }}</span>
+              @if (c.codeClient) { <span class="client-code">{{ c.codeClient }}</span> }
+              @if (c.adresse) { <span class="client-detail">{{ c.adresse }}</span> }
+              @if (c.contact) { <span class="client-detail">{{ c.contact }}</span> }
+              <button mat-icon-button color="warn" (click)="supprimerClientLocal(i)"><mat-icon>delete</mat-icon></button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
 
   @if (showFormAdd) {
     <div class="form-container">
@@ -29,12 +66,26 @@
           </div>
           <div class="field-lg">
             <label class="field-label">Client *</label>
-            <input class="compact-input" [(ngModel)]="nouvelleFiche.client" placeholder="Nom du client"/>
+            <select class="compact-input" [(ngModel)]="nouvelleFiche.client" (ngModelChange)="onClientChange($event, nouvelleFiche)">
+              <option value="">-- Sélectionner un client --</option>
+              @for (c of clients; track c.id) {
+                <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option>
+              }
+            </select>
           </div>
           <div class="field-sm">
-            <label class="field-label">Date</label>
-            <input type="date" class="compact-input" [(ngModel)]="nouvelleFiche.date"/>
+            <label class="field-label">Date Début *</label>
+            <input type="date" class="compact-input" [(ngModel)]="nouvelleFiche.dateDebut">
           </div>
+          <div class="field-sm">
+            <label class="field-label">Date Fin</label>
+            <input type="date" class="compact-input" [(ngModel)]="nouvelleFiche.dateFin">
+          </div>
+          @if (nouvelleFiche.dateDebut && nouvelleFiche.dateFin) {
+            <div class="field-sm duree-badge">
+              <span>⏱ {{ getDuree(nouvelleFiche.dateDebut, nouvelleFiche.dateFin) }} jour(s)</span>
+            </div>
+          }
           <div class="field-md">
             <label class="field-label">Technicien Assigné</label>
             <select class="compact-input" [(ngModel)]="nouvelleFiche.technicienAssigne">
@@ -99,16 +150,28 @@
       <!-- DOCUMENTS -->
       <div class="section">
         <div class="section-title"><span class="section-icon">📎</span><h4>Documents / Fichiers</h4></div>
-        <div class="file-upload-section">
-          <input type="file" #fileInput (change)="onFileSelectDocuments($event, nouvelleFiche)" multiple class="file-input" accept="*/*"/>
-          <button mat-stroked-button (click)="fileInput.click()" type="button" class="upload-btn">
-            <mat-icon>upload_file</mat-icon> Importer des fichiers
-          </button>
+        <div class="doc-categories">
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📅 Planning</span>
+            <input type="file" #filePlanning (change)="onFileSelectCategorie($event, nouvelleFiche, 'Planning')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="filePlanning.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📄 Devis / Bon de commande</span>
+            <input type="file" #fileDevis (change)="onFileSelectCategorie($event, nouvelleFiche, 'Devis')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileDevis.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📁 Autres documents</span>
+            <input type="file" #fileAutres (change)="onFileSelectCategorie($event, nouvelleFiche, 'Autre')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileAutres.click()" type="button">Importer</button>
+          </div>
         </div>
         @if (nouvelleFiche.documentsImportes?.length) {
           <div class="documents-list">
             @for (doc of nouvelleFiche.documentsImportes; track $index) {
               <div class="document-item">
+                <span class="doc-type-badge">{{ doc.type }}</span>
                 <mat-icon>insert_drive_file</mat-icon>
                 <div class="doc-info"><p class="doc-nom">{{ doc.nom }}</p><p class="doc-meta">{{ doc.taille }} KB</p></div>
                 <button mat-icon-button color="warn" (click)="supprimerDocument(nouvelleFiche, $index)" type="button"><mat-icon>delete</mat-icon></button>
@@ -196,12 +259,26 @@
           </div>
           <div class="field-lg">
             <label class="field-label">Client</label>
-            <input class="compact-input" [(ngModel)]="ficheEnEdition.client"/>
+            <select class="compact-input" [(ngModel)]="ficheEnEdition.client" (ngModelChange)="onClientChange($event, ficheEnEdition)">
+              <option value="">-- Sélectionner un client --</option>
+              @for (c of clients; track c.id) {
+                <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option>
+              }
+            </select>
           </div>
           <div class="field-sm">
-            <label class="field-label">Date</label>
-            <input type="date" class="compact-input" [(ngModel)]="ficheEnEdition.date"/>
+            <label class="field-label">Date Début</label>
+            <input type="date" class="compact-input" [(ngModel)]="ficheEnEdition.dateDebut">
           </div>
+          <div class="field-sm">
+            <label class="field-label">Date Fin</label>
+            <input type="date" class="compact-input" [(ngModel)]="ficheEnEdition.dateFin">
+          </div>
+          @if (ficheEnEdition.dateDebut && ficheEnEdition.dateFin) {
+            <div class="field-sm duree-badge">
+              <span>⏱ {{ getDuree(ficheEnEdition.dateDebut, ficheEnEdition.dateFin) }} jour(s)</span>
+            </div>
+          }
           <div class="field-md">
             <label class="field-label">Technicien Assigné</label>
             <select class="compact-input" [(ngModel)]="ficheEnEdition.technicienAssigne">
@@ -263,16 +340,28 @@
 
       <div class="section">
         <div class="section-title"><span class="section-icon">📎</span><h4>Documents / Fichiers</h4></div>
-        <div class="file-upload-section">
-          <input type="file" #fileInputEdit (change)="onFileSelectDocuments($event, ficheEnEdition)" multiple class="file-input" accept="*/*"/>
-          <button mat-stroked-button (click)="fileInputEdit.click()" type="button" class="upload-btn">
-            <mat-icon>upload_file</mat-icon> Importer des fichiers
-          </button>
+        <div class="doc-categories">
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📅 Planning</span>
+            <input type="file" #filePlanningEdit (change)="onFileSelectCategorie($event, ficheEnEdition, 'Planning')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="filePlanningEdit.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📄 Devis / Bon de commande</span>
+            <input type="file" #fileDevisEdit (change)="onFileSelectCategorie($event, ficheEnEdition, 'Devis')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileDevisEdit.click()" type="button">Importer</button>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">📁 Autres documents</span>
+            <input type="file" #fileAutresEdit (change)="onFileSelectCategorie($event, ficheEnEdition, 'Autre')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileAutresEdit.click()" type="button">Importer</button>
+          </div>
         </div>
         @if (ficheEnEdition.documentsImportes?.length) {
           <div class="documents-list">
             @for (doc of ficheEnEdition.documentsImportes; track $index) {
               <div class="document-item">
+                <span class="doc-type-badge">{{ doc.type }}</span>
                 <mat-icon>insert_drive_file</mat-icon>
                 <div class="doc-info"><p class="doc-nom">{{ doc.nom }}</p><p class="doc-meta">{{ doc.taille }} KB</p></div>
                 <button mat-icon-button color="warn" (click)="supprimerDocument(ficheEnEdition, $index)" type="button"><mat-icon>delete</mat-icon></button>
@@ -361,6 +450,9 @@
                   <span class="badge-statut" [class.statut-en-cours]="fiche.statut === 'EN_COURS'" [class.statut-completee]="fiche.statut === 'COMPLETEE'">
                     {{ fiche.statut }}
                   </span>
+                  @if (fiche.dateFin) {
+                    <span class="duree-chip">⏱ {{ getDuree(fiche.dateDebut, fiche.dateFin) }}j — {{ fiche.dateDebut | date:'dd/MM' }} → {{ fiche.dateFin | date:'dd/MM' }}</span>
+                  }
                 </div>
               </div>
               <div class="fiche-actions">

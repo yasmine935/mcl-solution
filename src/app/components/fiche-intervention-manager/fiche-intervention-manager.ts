@@ -27,10 +27,15 @@ export class FicheInterventionManager implements OnInit {
   fiches: any[] = [];
   employes: any[] = [];
   techniciens: any[] = [];
+  clients: any[] = [];
   showFormAdd = false;
   showFormEdit = false;
   ficheEnEdition: any = null;
   currentUser: any = {};
+
+  // ── GESTION CLIENTS ──
+  showClientManager = false;
+  nouveauClient: any = { nom: '', codeClient: '', adresse: '', contact: '' };
 
   optionsTaches: any = {
     'Installation des cameras': ['Camera HD 4K', 'Camera IP', 'Camera Thermique', 'Camera PTZ'],
@@ -46,7 +51,7 @@ export class FicheInterventionManager implements OnInit {
   ];
 
   nouvelleFiche: any = {
-    numProjet: '', client: '', date: '', technicienAssigne: '',
+    numProjet: '', client: '', dateDebut: '', dateFin: '', technicienAssigne: '',
     description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
     adresse: '', contact: '', materielsHorsStandard: [],
     nouveauMateriel: '', documentsImportes: [], taches: [],
@@ -59,6 +64,63 @@ export class FicheInterventionManager implements OnInit {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadEmployes();
     this.loadFiches();
+    this.loadClients();
+  }
+
+  loadClients() {
+    this.http.get<any[]>('http://localhost:8080/api/clients').subscribe({
+      next: (data) => {
+        this.clients = data;
+        localStorage.setItem('mcl_clients', JSON.stringify(data));
+      },
+      error: () => {
+        const stored = localStorage.getItem('mcl_clients');
+        this.clients = stored ? JSON.parse(stored) : [];
+      }
+    });
+  }
+
+  ajouterClientLocal() {
+    if (!this.nouveauClient.nom.trim()) { alert('Le nom du client est obligatoire'); return; }
+    const client = { ...this.nouveauClient, id: Date.now() };
+    this.clients.push(client);
+    localStorage.setItem('mcl_clients', JSON.stringify(this.clients));
+    this.http.post('http://localhost:8080/api/clients', client).subscribe();
+    this.nouveauClient = { nom: '', codeClient: '', adresse: '', contact: '' };
+  }
+
+  supprimerClientLocal(index: number) {
+    if (confirm('Supprimer ce client ?')) {
+      const id = this.clients[index].id;
+      this.clients.splice(index, 1);
+      localStorage.setItem('mcl_clients', JSON.stringify(this.clients));
+      this.http.delete(`http://localhost:8080/api/clients/${id}`).subscribe();
+    }
+  }
+
+  onClientChange(clientNom: any, form: any) {
+    const client = this.clients.find((c: any) => c.nom === clientNom);
+    if (client) {
+      form.client = client.nom;
+      form.codeClient = client.codeClient || '';
+      form.adresse = client.adresse || form.adresse || '';
+      form.contact = client.contact || form.contact || '';
+    }
+  }
+
+  onFileSelectCategorie(event: any, form: any, categorie: string) {
+    const files = event.target.files;
+    if (!files) return;
+    if (!form.documentsImportes) form.documentsImportes = [];
+    for (let i = 0; i < files.length; i++) {
+      form.documentsImportes.push({
+        nom: files[i].name.replace(/\.[^/.]+$/, ''),
+        type: categorie,
+        taille: (files[i].size / 1024).toFixed(2),
+        dateAjout: new Date().toLocaleString('fr-FR')
+      });
+    }
+    event.target.value = '';
   }
 
   loadEmployes() {
@@ -96,17 +158,19 @@ export class FicheInterventionManager implements OnInit {
       client: f.client,
       dateIntervention: f.dateIntervention,
       date: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
+      dateDebut: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
+      dateFin: '',
       technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
-      technicienId: f.technicien?.id,
+      technicienId: f.technicien?.id || null,
       description: f.description,
       adresse: f.adresse,
       contact: f.contact,
       statut: f.statut,
       heureDebut: f.heureDebut,
       heureFin: f.heureFin,
-      materielsHorsStandard: [],
+      materielsHorsStandard: f.materielsHorsStandard ? JSON.parse(f.materielsHorsStandard) : [],
       documentsImportes: [],
-      taches: [],
+      taches: f.taches ? JSON.parse(f.taches) : [],
       nouvelleTacheManuelle: ''
     };
   }
@@ -134,15 +198,21 @@ export class FicheInterventionManager implements OnInit {
       client: this.nouvelleFiche.client,
       adresse: this.nouvelleFiche.adresse,
       contact: this.nouvelleFiche.contact,
-      dateIntervention: this.formatDate(this.nouvelleFiche.date),
+      dateIntervention: this.formatDate(this.nouvelleFiche.dateDebut),
       description: this.nouvelleFiche.description,
+      taches: JSON.stringify(this.nouvelleFiche.taches || []),
       statut: 'EN_COURS',
       technicien: tech ? { id: tech.id } : null,
       manager: { id: this.currentUser.id }
     };
     this.http.post<any>(API, body).subscribe({
       next: (fiche) => {
-        this.fiches.push(this.mapFromBackend(fiche));
+        const ficheData = this.mapFromBackend(fiche);
+        ficheData.dateDebut = this.nouvelleFiche.dateDebut;
+        ficheData.dateFin = this.nouvelleFiche.dateFin;
+        ficheData.technicienId = tech?.id || null;
+        ficheData.client = this.nouvelleFiche.client;
+        this.fiches.push(ficheData);
         localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
         alert('Fiche creee et envoyee au technicien !');
         this.resetFormAdd();
@@ -173,15 +243,21 @@ export class FicheInterventionManager implements OnInit {
       client: this.ficheEnEdition.client,
       adresse: this.ficheEnEdition.adresse,
       contact: this.ficheEnEdition.contact,
-      dateIntervention: this.formatDate(this.ficheEnEdition.date),
+      dateIntervention: this.formatDate(this.ficheEnEdition.dateDebut || this.ficheEnEdition.date),
       description: this.ficheEnEdition.description,
+      taches: JSON.stringify(this.ficheEnEdition.taches || []),
       statut: this.ficheEnEdition.statut,
       technicien: tech ? { id: tech.id } : null
     };
     this.http.put<any>(`${API}/${this.ficheEnEdition.id}`, body).subscribe({
       next: (fiche) => {
         const index = this.fiches.findIndex((f: any) => f.id === this.ficheEnEdition.id);
-        if (index !== -1) this.fiches[index] = this.mapFromBackend(fiche);
+        if (index !== -1) {
+          const ficheData = this.mapFromBackend(fiche);
+          ficheData.dateDebut = this.ficheEnEdition.dateDebut || ficheData.dateDebut;
+          ficheData.dateFin = this.ficheEnEdition.dateFin || '';
+          this.fiches[index] = ficheData;
+        }
         localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
         this.showFormEdit = false;
         this.ficheEnEdition = null;
@@ -204,12 +280,20 @@ export class FicheInterventionManager implements OnInit {
 
   resetFormAdd() {
     this.nouvelleFiche = {
-      numProjet: '', client: '', date: '', technicienAssigne: '',
+      numProjet: '', client: '', dateDebut: '', dateFin: '', technicienAssigne: '',
       description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
       adresse: '', contact: '', materielsHorsStandard: [],
       nouveauMateriel: '', documentsImportes: [], taches: [],
       nouvelleTacheManuelle: ''
     };
+  }
+
+  getDuree(dateDebut: string, dateFin: string): number {
+    if (!dateDebut || !dateFin) return 0;
+    const d1 = new Date(dateDebut);
+    const d2 = new Date(dateFin);
+    if (d2 < d1) return 0;
+    return Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) + 1;
   }
 
   resetFormEdit() { this.ficheEnEdition = null; this.showFormEdit = false; }
@@ -227,11 +311,11 @@ export class FicheInterventionManager implements OnInit {
   onFileSelectDocuments(event: any, form: any) {
     const files = event.target.files;
     if (files) {
-      for (let i = 0; i < files.length; i++) {
+      for (const file of Array.from(files) as File[]) {
         form.documentsImportes.push({
-          nom: files[i].name.replace(/\.[^/.]+$/, ''),
+          nom: file.name.replace(/\.[^/.]+$/, ''),
           type: 'file',
-          taille: (files[i].size / 1024).toFixed(2),
+          taille: (file.size / 1024).toFixed(2),
           dateAjout: new Date().toLocaleString('fr-FR')
         });
       }

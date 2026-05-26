@@ -441,3 +441,36 @@
   .planning-header { padding: 14px 16px; }
   .mois-label { min-width: 120px; font-size: 0.88rem; }
 }
+
+/* INTERVENTIONS */
+.interventions-card {
+  background: #fff; border-radius: 16px; padding: 20px 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07); margin-bottom: 24px;
+  border-left: 4px solid #1a6b3c;
+}
+.interventions-title { margin: 0 0 16px; font-size: 0.95rem; font-weight: 800; color: #0d1b2a; }
+.interventions-list { display: flex; flex-direction: column; gap: 10px; }
+.intervention-row {
+  display: flex; align-items: center; gap: 16px; padding: 10px 16px;
+  background: #f0faf4; border: 1.5px solid #a5d6a7; border-radius: 10px; flex-wrap: wrap;
+}
+.intervention-tech { display: flex; align-items: center; gap: 8px; min-width: 140px; }
+.intervention-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #1a6b3c;
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
+}
+.intervention-tech-name { font-weight: 700; font-size: 0.82rem; color: #0d1b2a; }
+.intervention-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.intervention-projet { font-weight: 800; font-size: 0.82rem; color: #0d1b2a; }
+.intervention-client { font-size: 0.72rem; color: #546e7a; }
+.intervention-dates { display: flex; align-items: center; gap: 6px; }
+.intervention-date-badge {
+  background: #e8f5e9; color: #2e7d32; padding: 2px 10px;
+  border-radius: 12px; font-size: 0.72rem; font-weight: 700;
+}
+.intervention-arrow { color: #78909c; font-size: 0.75rem; }
+.intervention-statut {
+  padding: 3px 10px; border-radius: 12px; font-size: 0.68rem;
+  font-weight: 800; color: #fff; white-space: nowrap;
+}

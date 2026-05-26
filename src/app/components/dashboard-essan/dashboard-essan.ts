@@ -23,7 +23,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 })
 export class DashboardEssan implements OnInit {
   user: any = {};
-  
+  sidebarOpen = false;
+
   private _currentPage = 'dashboard';
   get currentPage(): string {
     return this._currentPage;
@@ -227,6 +228,9 @@ export class DashboardEssan implements OnInit {
   }
 
   // ==================== LOGOUT ====================
+
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar() { this.sidebarOpen = false; }
 
   logout() {
     localStorage.removeItem('user');

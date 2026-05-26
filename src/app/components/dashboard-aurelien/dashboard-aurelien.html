@@ -1,7 +1,8 @@
-<div class="dashboard-layout">
+<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
+    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
     <div class="sidebar-header">
       <div class="sidebar-brand">
         <div class="brand-icon">⚡</div>
@@ -71,7 +72,7 @@
       </a>
 
       <div class="nav-divider"></div>
-      <a class="nav-item logout" (click)="logout()">
+      <a class="nav-item logout" (click)="logout(); closeSidebar()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
     </nav>
@@ -83,6 +84,7 @@
     <!-- TOP BAR -->
     <div class="topbar">
       <div class="topbar-left">
+        <button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button>
         <h3>{{ getPageTitle() }}</h3>
       </div>
       <div class="topbar-right">
@@ -154,7 +156,7 @@
 <!-- currentPage === 'mes-conges' -->
 
       @if (currentPage === 'approvisionnement') {
-        <app-approvisionnement></app-approvisionnement>
+        <app-approvisionnement [modetous]="true"></app-approvisionnement>
       }
 
 @if (currentPage === 'mes-conges') {
@@ -349,7 +351,8 @@
 }
     </div><!-- /page-content -->
   </div><!-- /main-content -->
-</div>
+  <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+</div><!-- /dashboard-layout -->
 
 <!-- ══ MODAL FICHE ══ -->
 @if (showDetailModal && selectedFiche) {

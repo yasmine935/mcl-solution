@@ -1,7 +1,8 @@
-<div class="dashboard-layout">
+<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
+    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
     <div class="sidebar-header">
       <div class="sidebar-brand">
         <div class="brand-icon">🔧</div>
@@ -63,6 +64,7 @@
     <!-- TOP BAR -->
     <div class="topbar">
       <div class="topbar-left">
+        <button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button>
         <h3>{{ getPageTitle() }}</h3>
       </div>
       <div class="topbar-right">
@@ -130,40 +132,90 @@
 
       <!-- MES INTERVENTIONS EN COURS -->
       @if (currentPage === 'interventions') {
-        <div class="table-card">
-          <h3>⏳ Interventions En Cours ({{ interventions.length }})</h3>
+        <div class="interventions-page">
+
+          <div class="interventions-page-header">
+            <div class="interventions-header-left">
+              <div class="interventions-header-icon">🔧</div>
+              <div>
+                <h2>Mes Interventions</h2>
+                <p>{{ interventions.length }} intervention(s) en cours</p>
+              </div>
+            </div>
+          </div>
+
           @if (interventions.length === 0) {
-            <p class="empty">Aucune intervention en cours</p>
+            <div class="interventions-empty">
+              <div class="empty-icon">✅</div>
+              <p>Aucune intervention en cours</p>
+              <small>Toutes vos interventions sont à jour !</small>
+            </div>
           } @else {
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>N° Projet</th>
-                  <th>Client</th>
-                  <th>Date</th>
-                  <th>Statut</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (int of interventions; track int.id) {
-                  <tr>
-                    <td><strong>{{ int.numeroProjet }}</strong></td>
-                    <td>{{ int.client }}</td>
-                    <td>{{ int.dateIntervention }}</td>
-                    <td><span class="badge en_cours">EN COURS</span></td>
-                    <td>
-                      <button mat-icon-button color="primary" (click)="ouvrirFiche(int.id)">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button mat-icon-button color="accent" (click)="ouvrirFiche(int.id)">
-                        <mat-icon>visibility</mat-icon>
-                      </button>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+            <div class="interventions-grid">
+              @for (int of interventions; track int.id) {
+                <div class="intervention-card">
+
+                  <!-- CARD HEADER -->
+                  <div class="int-card-header">
+                    <div class="int-card-header-left">
+                      <span class="int-num-badge">{{ int.numProjet || '—' }}</span>
+                      @if (int.dateFin) {
+                        <span class="int-duree-badge">⏱ {{ getDuree(int.dateDebut, int.dateFin) }} jour(s)</span>
+                      }
+                    </div>
+                    <span class="int-statut-pill">⏳ En cours</span>
+                  </div>
+
+                  <!-- CLIENT -->
+                  <div class="int-client-row">
+                    <span class="int-client-icon">🏢</span>
+                    <span class="int-client-name">{{ int.client || 'Client non défini' }}</span>
+                  </div>
+
+                  <!-- DATES -->
+                  <div class="int-dates-row">
+                    @if (int.dateDebut) {
+                      <div class="int-date-item">
+                        <span class="int-date-label">Début</span>
+                        <span class="int-date-val">{{ formatDateFr(int.dateDebut) }}</span>
+                      </div>
+                    }
+                    @if (int.dateFin) {
+                      <div class="int-date-arrow">→</div>
+                      <div class="int-date-item">
+                        <span class="int-date-label">Fin</span>
+                        <span class="int-date-val">{{ formatDateFr(int.dateFin) }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- INFOS -->
+                  <div class="int-infos-row">
+                    @if (int.adresse) {
+                      <div class="int-info-chip"><mat-icon>location_on</mat-icon>{{ int.adresse }}</div>
+                    }
+                    @if (int.contact) {
+                      <div class="int-info-chip"><mat-icon>person</mat-icon>{{ int.contact }}</div>
+                    }
+                  </div>
+
+                  @if (int.description) {
+                    <p class="int-description">{{ int.description }}</p>
+                  }
+
+                  <!-- ACTION -->
+                  <div class="int-card-footer">
+                    <button class="btn-remplir" (click)="ouvrirFiche(int.id)" type="button">
+                      📋 Remplir &amp; Signer la Fiche
+                    </button>
+                    <button class="btn-terminer" (click)="marquerTerminee(int.id)" type="button">
+                      ✅ Terminée
+                    </button>
+                  </div>
+
+                </div>
+              }
+            </div>
           }
         </div>
       }
@@ -191,11 +243,11 @@
           } @else {
             <div class="completees-grid">
               @for (int of interventionsCompletees; track int.id) {
-                <div class="completee-card">
+                <div class="completee-card completee-card-clickable" (click)="voirDetailFiche(int)">
                   <div class="completee-card-top">
                     <div class="completee-num">
                       <span class="num-label">N° PROJET</span>
-                      <span class="num-val">{{ int.numeroProjet || '—' }}</span>
+                      <span class="num-val">{{ int.numProjet || int.numeroProjet || '—' }}</span>
                     </div>
                     <span class="badge-done">✅ Complétée</span>
                   </div>
@@ -210,7 +262,7 @@
                       <span class="ci-icon">📅</span>
                       <div>
                         <span class="ci-label">Date</span>
-                        <span class="ci-val">{{ int.dateIntervention || '—' }}</span>
+                        <span class="ci-val">{{ formatDateFr(int.dateDebut) }}</span>
                       </div>
                     </div>
                     <div class="ci-item">
@@ -228,11 +280,139 @@
                       </div>
                     </div>
                   </div>
+
+                  <div class="completee-card-footer">
+                    <span class="completee-voir">👁 Voir le détail</span>
+                  </div>
                 </div>
               }
             </div>
           }
         </div>
+
+        <!-- MODAL DÉTAIL FICHE COMPLÉTÉE -->
+        @if (ficheDetail) {
+          <div class="fd-overlay" (click)="ficheDetail = null">
+            <div class="fd-modal" (click)="$event.stopPropagation()">
+
+              <div class="fd-header">
+                <div class="fd-header-left">
+                  <span class="fd-header-icon">📋</span>
+                  <div>
+                    <h2>Fiche d'Intervention</h2>
+                    <span class="fd-header-sub">{{ ficheDetail.numProjet || ficheDetail.numeroProjet }} — {{ ficheDetail.client }}</span>
+                  </div>
+                </div>
+                <button class="fd-close" (click)="ficheDetail = null" type="button">✕</button>
+              </div>
+
+              <div class="fd-body">
+
+                <!-- INFOS PRINCIPALES -->
+                <div class="fd-section">
+                  <div class="fd-section-title">⭐ Informations Principales</div>
+                  <div class="fd-grid2">
+                    <div class="fd-cell">
+                      <span class="fd-label">N° Projet</span>
+                      <span class="fd-val">{{ ficheDetail.numProjet || ficheDetail.numeroProjet || '—' }}</span>
+                    </div>
+                    <div class="fd-cell">
+                      <span class="fd-label">Client</span>
+                      <span class="fd-val">{{ ficheDetail.client || '—' }}</span>
+                    </div>
+                    <div class="fd-cell">
+                      <span class="fd-label">Technicien</span>
+                      <span class="fd-val">{{ ficheDetail.technicien ? ficheDetail.technicien.prenom + ' ' + ficheDetail.technicien.nom : '—' }}</span>
+                    </div>
+                    <div class="fd-cell">
+                      <span class="fd-label">Statut</span>
+                      <span class="fd-val fd-statut-ok">✅ {{ ficheDetail.statut }}</span>
+                    </div>
+                  </div>
+                  @if (ficheDetail.description) {
+                    <div class="fd-desc">
+                      <span class="fd-label">Description</span>
+                      <p>{{ ficheDetail.description }}</p>
+                    </div>
+                  }
+                </div>
+
+                <!-- DATES -->
+                <div class="fd-section">
+                  <div class="fd-section-title">📅 Période d'intervention</div>
+                  <div class="fd-grid3">
+                    <div class="fd-cell">
+                      <span class="fd-label">Date début</span>
+                      <span class="fd-val">{{ formatDateFr(ficheDetail.dateDebut) }}</span>
+                    </div>
+                    <div class="fd-cell">
+                      <span class="fd-label">Date fin</span>
+                      <span class="fd-val">{{ formatDateFr(ficheDetail.dateFin) }}</span>
+                    </div>
+                    <div class="fd-cell">
+                      <span class="fd-label">Durée</span>
+                      <span class="fd-val">{{ getDuree(ficheDetail.dateDebut, ficheDetail.dateFin) }} jour(s)</span>
+                    </div>
+                    @if (ficheDetail.heureDebut) {
+                      <div class="fd-cell">
+                        <span class="fd-label">Heure début</span>
+                        <span class="fd-val">{{ ficheDetail.heureDebut }}</span>
+                      </div>
+                    }
+                    @if (ficheDetail.heureFin) {
+                      <div class="fd-cell">
+                        <span class="fd-label">Heure fin</span>
+                        <span class="fd-val">{{ ficheDetail.heureFin }}</span>
+                      </div>
+                    }
+                    @if (ficheDetail.intervenants) {
+                      <div class="fd-cell">
+                        <span class="fd-label">Intervenants</span>
+                        <span class="fd-val">{{ ficheDetail.intervenants }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- INFOS CLIENT -->
+                @if (ficheDetail.adresse || ficheDetail.contact || ficheDetail.numCommande) {
+                  <div class="fd-section">
+                    <div class="fd-section-title">🏢 Informations Client</div>
+                    <div class="fd-chips">
+                      @if (ficheDetail.adresse) {
+                        <span class="fd-chip">📍 {{ ficheDetail.adresse }}</span>
+                      }
+                      @if (ficheDetail.contact) {
+                        <span class="fd-chip">👤 {{ ficheDetail.contact }}</span>
+                      }
+                      @if (ficheDetail.numCommande) {
+                        <span class="fd-chip">🔖 {{ ficheDetail.numCommande }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- TÂCHES -->
+                @if (ficheDetail.taches && ficheDetail.taches.length > 0) {
+                  <div class="fd-section">
+                    <div class="fd-section-title">✅ Tâches réalisées</div>
+                    <div class="fd-taches">
+                      @for (t of ficheDetail.taches; track $index) {
+                        <div class="fd-tache" [class.fd-tache-ok]="t.coche">
+                          <span class="fd-tache-check">{{ t.coche ? '✓' : '○' }}</span>
+                          <span>{{ t.nom }}</span>
+                          @if (t.selection) { <span class="fd-tache-badge">{{ t.selection }}</span> }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+              </div>
+
+            </div>
+          </div>
+        }
       }
 <!-- ══════════ POPUP MINUTE SECURITE ══════════ -->
 <!-- A ajouter dans dashboard-technicien.html -->
@@ -697,4 +877,5 @@
     </div>
   }
 
+  <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
 </div><!-- /dashboard-layout -->

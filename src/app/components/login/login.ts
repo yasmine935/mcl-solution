@@ -68,7 +68,7 @@ export class Login {
       case 'FERID':          this.router.navigate(['/dashboard-admin']); break;
       case 'ESSAN':          this.router.navigate(['/dashboard-essan']); break;
       case 'KARINE':         this.router.navigate(['/dashboard-karine']); break;
-      case 'AYDEH':          this.router.navigate(['/dashboard-aydeh']); break;
+      case 'HAIDEH':         this.router.navigate(['/dashboard-haideh']); break;
       case 'NACCERA':        this.router.navigate(['/dashboard-naccera']); break;
       case 'ABY':            this.router.navigate(['/dashboard-aby']); break;
       case 'UN':             this.router.navigate(['/dashboard-technicien']); break;

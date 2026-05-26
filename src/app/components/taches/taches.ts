@@ -43,10 +43,7 @@ export class Taches implements OnInit {
   statuts = ['En Qualification', 'En cours', 'Fait', 'Perdu', 'En Attente'];
   priorites = ['Faible', 'Élevé', 'Moyenne'];
 
-  clients: string[] = [
-    'MCL Solutions', 'Bouygues', 'Vinci', 'Eiffage', 'Engie',
-    'Veolia', 'Sodexo', 'Elior', 'Spie', 'GTM'
-  ];
+  clients: any[] = [];
 
   showAddClientModal = false;
   nouveauClientNom = '';
@@ -64,10 +61,34 @@ export class Taches implements OnInit {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    const stored = localStorage.getItem('mcl_clients');
-    if (stored) this.clients = JSON.parse(stored);
+    this.loadClients();
     this.loadEmployes();
     this.loadTaches();
+  }
+
+  loadClients() {
+    this.http.get<any[]>('http://localhost:8080/api/clients').subscribe({
+      next: (data) => { this.clients = data; localStorage.setItem('mcl_clients', JSON.stringify(data)); },
+      error: () => {
+        const stored = localStorage.getItem('mcl_clients');
+        this.clients = stored ? JSON.parse(stored) : [];
+      }
+    });
+  }
+
+  onFileSelectCategorie(event: any, form: any, categorie: string) {
+    const files = event.target.files;
+    if (!files) return;
+    if (!form.fichiers) form.fichiers = [];
+    for (let i = 0; i < files.length; i++) {
+      form.fichiers.push({
+        nom: files[i].name,
+        type: categorie,
+        taille: (files[i].size / 1024).toFixed(2),
+        date: new Date().toLocaleString('fr-FR')
+      });
+    }
+    event.target.value = '';
   }
 
   ouvrirAddClient(target: 'add' | 'edit') {
@@ -79,8 +100,9 @@ export class Taches implements OnInit {
   confirmerNouveauClient() {
     const nom = this.nouveauClientNom.trim();
     if (!nom) return;
-    if (!this.clients.includes(nom)) {
-      this.clients.push(nom);
+    if (!this.clients.find((c: any) => c.nom === nom)) {
+      const client = { id: Date.now(), nom, codeClient: '', adresse: '', contact: '' };
+      this.clients.push(client);
       localStorage.setItem('mcl_clients', JSON.stringify(this.clients));
     }
     if (this.clientModalTarget === 'add') {

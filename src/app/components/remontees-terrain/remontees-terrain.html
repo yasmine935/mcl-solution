@@ -327,7 +327,9 @@
 
       <div class="form-actions">
         <button class="btn-cancel" (click)="retour()">Annuler</button>
-        <button class="btn-submit" (click)="soumettre()">📤 Envoyer la Fiche SSE</button>
+        <button class="btn-submit" (click)="soumettre()" [disabled]="isSubmitting">
+          {{ isSubmitting ? '⏳ Envoi en cours...' : '📤 Envoyer la Fiche SSE' }}
+        </button>
       </div>
     </div>
   }

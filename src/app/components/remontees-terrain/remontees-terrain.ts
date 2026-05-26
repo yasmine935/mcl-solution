@@ -48,6 +48,7 @@ export class RemonteesTerrainComponent implements OnInit {
   form: Partial<FicheSSE> = {};
   photosTemp: { nom: string; data: string }[] = [];
   isManager = false;
+  isSubmitting = false;
 
   constructor(private http: HttpClient) {}
 
@@ -120,6 +121,7 @@ export class RemonteesTerrainComponent implements OnInit {
 
   // ✅ POST vers backend
   soumettre() {
+  if (this.isSubmitting) return;
   if (!this.form.descriptionFaits || !this.form.lieu || !this.form.date) {
     alert('Veuillez remplir les champs obligatoires (*)');
     return;
@@ -129,9 +131,10 @@ export class RemonteesTerrainComponent implements OnInit {
     return;
   }
 
+  this.isSubmitting = true;
   const body = {
     ...this.form,
-    photos: this.photosTemp,  // ✅ inclure les photos
+    photos: this.photosTemp,
     technicien: { id: this.currentUser.id },
     statut: 'EN_ATTENTE'
   };
@@ -140,9 +143,13 @@ export class RemonteesTerrainComponent implements OnInit {
     next: (fiche) => {
       this.fiches.unshift(this.mapFromBackend(fiche));
       this.view = 'liste';
+      this.isSubmitting = false;
       alert(`✅ Fiche ${fiche.numero} envoyée !`);
     },
-    error: () => alert('❌ Erreur envoi fiche')
+    error: () => {
+      this.isSubmitting = false;
+      alert('❌ Erreur envoi fiche');
+    }
   });
 }
 

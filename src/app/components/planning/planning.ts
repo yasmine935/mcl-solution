@@ -17,6 +17,7 @@ export class Planning implements OnInit {
   utilisateurs: any[] = [];
   allNotes: any = {};
   congesApprouves: any[] = [];
+  fichesIntervention: any[] = [];
   currentUserId: number | null = null;
   currentMonth: number = new Date().getMonth();
   currentYear: number = new Date().getFullYear();
@@ -48,7 +49,33 @@ export class Planning implements OnInit {
     this.loadUtilisateurs();
     this.loadAllNotes();
     this.loadCongesApprouves();
+    this.loadFichesIntervention();
     this.generateCalendrier();
+  }
+
+  loadFichesIntervention() {
+    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+      next: (data) => {
+        const stored = localStorage.getItem('fiches_intervention');
+        const local: any[] = stored ? JSON.parse(stored) : [];
+        this.fichesIntervention = data.map(f => {
+          const localF = local.find((l: any) => l.id === f.id);
+          return {
+            id: f.id,
+            numProjet: f.numProjet,
+            client: f.client,
+            technicienId: f.technicien?.id || localF?.technicienId || null,
+            dateDebut: localF?.dateDebut || (f.dateIntervention ? f.dateIntervention.split('T')[0] : ''),
+            dateFin: localF?.dateFin || '',
+            statut: f.statut
+          };
+        });
+      },
+      error: () => {
+        const stored = localStorage.getItem('fiches_intervention');
+        this.fichesIntervention = stored ? JSON.parse(stored) : [];
+      }
+    });
   }
 
   detectCurrentUser() {
@@ -241,6 +268,9 @@ export class Planning implements OnInit {
     const conge = this.getCongeForUserOnDay(userId, jourObj.date);
     if (conge) return { label: this.getCongeLabel(conge), color: this.getCongeColor(conge), isConge: true };
 
+    const fiche = this.getFicheForUserOnDay(userId, jourObj.date);
+    if (fiche) return { label: `🔧 ${fiche.client || fiche.numProjet}`, color: '#1a6b3c', isConge: false };
+
     return null;
   }
 
@@ -375,9 +405,25 @@ export class Planning implements OnInit {
     return this.allNotes[key] || '';
   }
 
+  getFicheForUserOnDay(userId: number, date: Date): any | null {
+    return this.fichesIntervention.find(f => {
+      if (f.technicienId !== userId) return false;
+      if (!f.dateDebut) return false;
+      const debut = new Date(f.dateDebut);
+      const fin = f.dateFin ? new Date(f.dateFin) : new Date(f.dateDebut);
+      debut.setHours(0, 0, 0, 0);
+      fin.setHours(23, 59, 59, 999);
+      const d = new Date(date);
+      d.setHours(12, 0, 0, 0);
+      return d >= debut && d <= fin;
+    }) || null;
+  }
+
   getCellInfo(userId: number, date: Date): { label: string; color: string } | null {
     const conge = this.getCongeForUserOnDay(userId, date);
     if (conge) return { label: this.getCongeLabel(conge), color: this.getCongeColor(conge) };
+    const fiche = this.getFicheForUserOnDay(userId, date);
+    if (fiche) return { label: `🔧 ${fiche.client || fiche.numProjet}`, color: '#1a6b3c' };
     const note = this.getNoteForDay(userId, date);
     if (note) return { label: note, color: this.getNoteColor(note) };
     return null;

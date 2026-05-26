@@ -16,6 +16,7 @@ import { Semenier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
+import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 
 @Component({
   selector: 'app-dashboard-odile',
@@ -25,13 +26,14 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees, Factures, Documents, Semenier, Planning,
-    TicketingComponent, RemonteesTerrainComponent
+    TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
 })
 export class DashboardOdile implements OnInit {
   user: any = {};
+  sidebarOpen = false;
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) {
@@ -148,8 +150,12 @@ export class DashboardOdile implements OnInit {
       case 'semenier': return 'Semenier';
       case 'mes-conges': return 'Mes Conges';
       case 'remonteesTerrain': return 'Remontees Terrain';
+      case 'approvisionnement': return 'Demandes d\'Approvisionnement';
       default: return 'Dashboard Odile';
     }
   }
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar() { this.sidebarOpen = false; }
+
   logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }

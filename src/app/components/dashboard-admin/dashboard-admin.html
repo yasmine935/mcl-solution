@@ -1,7 +1,8 @@
-<div class="dashboard-layout">
+<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
+    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
     <div class="sidebar-header">
       <div class="sidebar-brand">
         <div class="brand-icon">⚡</div>
@@ -74,7 +75,7 @@
       <a class="nav-item" [class.active]="currentPage === 'minutes-securite'" (click)="currentPage = 'minutes-securite'">
   <mat-icon>health_and_safety</mat-icon> Minutes Securite
  @if (minutesAlertes > 0) {
-  <span class="nav-badge" style="background:#c62828;">{{ minutesAlertes }}</span>
+  <span class="nav-badge nav-badge-alert">{{ minutesAlertes }}</span>
 }
 </a>
       <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
@@ -85,7 +86,7 @@
       </a>
 
       <div class="nav-divider"></div>
-      <a class="nav-item logout" (click)="logout()">
+      <a class="nav-item logout" (click)="logout(); closeSidebar()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
     </nav>
@@ -97,6 +98,7 @@
     <!-- TOP BAR -->
     <div class="topbar">
       <div class="topbar-left">
+        <button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button>
         <h3>{{ getPageTitle() }}</h3>
       </div>
       <div class="topbar-right">
@@ -233,7 +235,7 @@
         <app-factures></app-factures>
       }
       @if (currentPage === 'approvisionnement') {
-        <app-approvisionnement></app-approvisionnement>
+        <app-approvisionnement [modetous]="true"></app-approvisionnement>
       }
 
 <!-- ══ MINUTES SECURITE ══ -->
@@ -550,7 +552,8 @@
 }
     </div><!-- /page-content -->
   </div><!-- /main-content -->
-</div>
+  <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+</div><!-- /dashboard-layout -->
 
 <!-- ══ MODAL RÉCLAMATION ══ -->
 @if (showReclamationDetailModal && selectedReclamation) {
@@ -581,20 +584,20 @@
         </div>
         <div class="detail-row">
           <span class="label">Statut</span>
-          <span class="badge" style="background:#fff3e0;color:#e65100">{{ selectedReclamation.statut }}</span>
+          <span class="badge badge-orange">{{ selectedReclamation.statut }}</span>
         </div>
-        <h3 style="color:#1565c0;margin:20px 0 12px;font-size:0.95rem">📸 Photos</h3>
+        <h3 class="photos-title">📸 Photos</h3>
         @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
           <div class="photos-gallery-detail">
             @for (photo of selectedReclamation.photos; track $index) {
               <div class="photo-detail-item">
                 <img [src]="photo.data" alt="{{ photo.nom }}">
-                <p style="padding:8px;font-size:12px;color:#555">{{ photo.nom }}</p>
+                <p class="photo-name">{{ photo.nom }}</p>
               </div>
             }
           </div>
         } @else {
-          <p style="color:#999">Aucune photo</p>
+          <p class="no-photos">Aucune photo</p>
         }
       </div>
       <div class="modal-footer">

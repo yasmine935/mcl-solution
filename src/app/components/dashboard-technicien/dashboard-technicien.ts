@@ -26,6 +26,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
 })
 export class DashboardTechnicien implements OnInit {
   user: any = {};
+  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
@@ -44,6 +45,9 @@ export class DashboardTechnicien implements OnInit {
   interventionsCompletees: any[] = [];
   conges: any[] = [];
   soldeConges: any = null;
+  ficheDetail: any = null;
+
+  voirDetailFiche(fiche: any) { this.ficheDetail = fiche; }
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
   nombreJours = 0;
@@ -68,6 +72,10 @@ export class DashboardTechnicien implements OnInit {
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
+    // Vérifie si la minute sécurité a déjà été faite aujourd'hui
+    const today = new Date().toISOString().split('T')[0];
+    const key = `minute_securite_${this.user.id}_${today}`;
+    this.minuteDejaFaite = localStorage.getItem(key) === 'done';
     this.loadData();
   }
 
@@ -80,16 +88,56 @@ export class DashboardTechnicien implements OnInit {
   loadInterventions() {
     this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
       next: (data) => {
+        localStorage.setItem('fiches_intervention', JSON.stringify(data));
         const userFullName = `${this.user.prenom} ${this.user.nom}`;
-        const mesFiches = data.filter((f: any) =>
-          f.technicien && `${f.technicien.prenom} ${f.technicien.nom}` === userFullName
-        );
+        const stored = localStorage.getItem('fiches_intervention');
+        const local: any[] = stored ? JSON.parse(stored) : [];
+        const mesFiches = data
+          .filter((f: any) => f.technicien && `${f.technicien.prenom} ${f.technicien.nom}` === userFullName)
+          .map((f: any) => {
+            const loc = local.find((l: any) => l.id === f.id);
+            return {
+              ...f,
+              numProjet: f.numProjet || f.numeroProjet,
+              dateDebut: loc?.dateDebut || (f.dateIntervention ? f.dateIntervention.split('T')[0] : ''),
+              dateFin: loc?.dateFin || ''
+            };
+          });
         this.interventions = mesFiches.filter((f: any) => f.statut !== 'COMPLETEE' && f.statut !== 'VALIDEE');
         this.interventionsCompletees = mesFiches.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE');
-        localStorage.setItem('fiches_intervention', JSON.stringify(data));
       },
       error: () => console.error('Erreur chargement interventions')
     });
+  }
+
+  marquerTerminee(id: number) {
+    this.http.put<any>(`http://localhost:8080/api/fiches-intervention/${id}/statut`, null, {
+      params: { statut: 'COMPLETEE' }
+    }).subscribe({
+      next: () => {
+        const fiche = this.interventions.find((f: any) => f.id === id);
+        if (fiche) { fiche.statut = 'COMPLETEE'; this.interventionsCompletees.push(fiche); }
+        this.interventions = this.interventions.filter((f: any) => f.id !== id);
+      },
+      error: () => {
+        const fiche = this.interventions.find((f: any) => f.id === id);
+        if (fiche) { fiche.statut = 'COMPLETEE'; this.interventionsCompletees.push(fiche); }
+        this.interventions = this.interventions.filter((f: any) => f.id !== id);
+      }
+    });
+  }
+
+  getDuree(dateDebut: string, dateFin: string): number {
+    if (!dateDebut || !dateFin) return 0;
+    const d1 = new Date(dateDebut); const d2 = new Date(dateFin);
+    if (d2 < d1) return 0;
+    return Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  }
+
+  formatDateFr(d: string): string {
+    if (!d) return '—';
+    const [y, m, j] = d.split('-');
+    return `${j}/${m}/${y}`;
   }
 
   loadConges() {
@@ -184,14 +232,18 @@ export class DashboardTechnicien implements OnInit {
       technicien: { id: this.user.id },
       statut: hasNon ? 'ALERTE' : 'SOUMIS'
     };
+    const today = new Date().toISOString().split('T')[0];
+    const key = `minute_securite_${this.user.id}_${today}`;
     this.http.post('http://localhost:8080/api/minutes-securite', body).subscribe({
       next: () => {
+        localStorage.setItem(key, 'done');
         this.minuteDejaFaite = true;
         this.showMinuteSecurite = false;
         this._currentPage = 'interventions';
         this.resetMinuteForm();
       },
       error: () => {
+        localStorage.setItem(key, 'done');
         this.minuteDejaFaite = true;
         this.showMinuteSecurite = false;
         this._currentPage = 'interventions';
@@ -230,6 +282,9 @@ export class DashboardTechnicien implements OnInit {
       default: return 'Dashboard Technicien';
     }
   }
+
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+  closeSidebar() { this.sidebarOpen = false; }
 
   logout() {
     localStorage.removeItem('user');

@@ -102,7 +102,7 @@
 .avatar-ferid             { background: linear-gradient(135deg, #c62828, #e53935); }
 .avatar-essan             { background: linear-gradient(135deg, #00695c, #00897b); }
 .avatar-karine            { background: linear-gradient(135deg, #0277bd, #0288d1); }
-.avatar-aydeh             { background: linear-gradient(135deg, #37474f, #546e7a); }
+.avatar-haideh             { background: linear-gradient(135deg, #37474f, #546e7a); }
 .avatar-default           { background: linear-gradient(135deg, #1565c0, #0d47a1); }
 
 /* ===== EMAIL ===== */
@@ -128,7 +128,7 @@
 .role-ferid             { background: #c62828; }
 .role-essan             { background: #00695c; }
 .role-karine            { background: #0277bd; }
-.role-aydeh             { background: #37474f; }
+.role-haideh             { background: #37474f; }
 .role-default           { background: #546e7a; }
 
 /* ===== ACTIONS ===== */

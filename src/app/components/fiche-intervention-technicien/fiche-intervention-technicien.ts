@@ -21,6 +21,8 @@ export class FicheInterventionTechnicien implements OnInit {
   intervention: any = {};
   technicienId: number = 0;
   photos: any[] = [];
+  materielsHorsStandard: string[] = [];
+  nouveauMateriel: string = '';
 
   @ViewChild('signatureTechnicien') signatureTechnicienCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('signatureClient') signatureClientCanvas!: ElementRef<HTMLCanvasElement>;
@@ -82,7 +84,8 @@ export class FicheInterventionTechnicien implements OnInit {
       heureDebut: f.heureDebut, heureFin: f.heureFin, description: f.description,
       statut: f.statut,
       technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
-      technicienId: f.technicien?.id
+      technicienId: f.technicien?.id,
+      taches: f.taches ? JSON.parse(f.taches) : []
     };
   }
 
@@ -184,7 +187,8 @@ export class FicheInterventionTechnicien implements OnInit {
       signatureTechnicien: this.form.signatureTechnicien,
       signatureClient: this.form.signatureClient,
       nomClientSigne: this.form.nomClientSigne,
-      dateCompletion: new Date().toISOString()
+      dateCompletion: new Date().toISOString(),
+      materielsHorsStandard: JSON.stringify(this.materielsHorsStandard)
     };
 
     this.http.put<any>(`${API}/${this.intervention.id}/completer`, body).subscribe({
@@ -195,6 +199,16 @@ export class FicheInterventionTechnicien implements OnInit {
       error: () => alert('Erreur envoi fiche')
     });
   }
+
+  ajouterMateriel() {
+    const val = this.nouveauMateriel.trim();
+    if (val && !this.materielsHorsStandard.includes(val)) {
+      this.materielsHorsStandard.push(val);
+    }
+    this.nouveauMateriel = '';
+  }
+
+  supprimerMateriel(index: number) { this.materielsHorsStandard.splice(index, 1); }
 
   annuler() { this.router.navigate(['/dashboard-technicien']); }
 }

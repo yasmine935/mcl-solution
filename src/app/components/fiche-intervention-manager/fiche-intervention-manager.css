@@ -103,17 +103,79 @@
 .chip-delete { padding: 0 !important; width: 18px !important; height: 18px !important; min-width: 18px !important; }
 .chip-delete mat-icon { font-size: 0.75rem !important; width: 0.75rem !important; height: 0.75rem !important; color: #fff; }
 
+/* CLIENTS MANAGER */
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.btn-clients {
+  display: flex; align-items: center; gap: 6px;
+  height: 38px; padding: 0 14px; background: rgba(255,255,255,0.15);
+  color: #fff; border: 1.5px solid rgba(255,255,255,0.4);
+  border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+  font-weight: 700; font-family: inherit; transition: all 0.15s;
+}
+.btn-clients:hover { background: rgba(255,255,255,0.25); }
+.btn-clients mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
+
+.client-manager {
+  background: #fff; border-radius: 14px; margin-bottom: 16px;
+  border: 2px solid #01579b; box-shadow: 0 4px 16px rgba(1,87,155,0.12);
+  overflow: hidden; animation: slideDown 0.2s ease;
+}
+.client-manager-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #01579b, #0288d1);
+  padding: 10px 16px; color: #fff;
+}
+.client-manager-header h4 {
+  display: flex; align-items: center; gap: 6px;
+  margin: 0; font-size: 0.85rem; font-weight: 800; color: #fff;
+}
+.client-manager-header mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
+.client-add-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 12px 16px; background: #f0f7ff; border-bottom: 1px solid #e1f5fe;
+}
+.client-add-row .compact-input { flex: 1; min-width: 140px; }
+.client-empty { padding: 16px; text-align: center; color: #90a4ae; font-size: 0.82rem; margin: 0; }
+.clients-list { padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 6px; }
+.client-row {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  background: #f8fafc; border: 1px solid #e0e0e0; border-radius: 8px;
+  flex-wrap: wrap;
+}
+.client-nom { font-weight: 800; font-size: 0.85rem; color: #0d1b2a; flex: 1; min-width: 120px; }
+.client-code {
+  background: #e3f2fd; color: #01579b; padding: 2px 8px;
+  border-radius: 12px; font-size: 0.7rem; font-weight: 800;
+}
+.client-detail { font-size: 0.75rem; color: #78909c; }
+
 /* DOCUMENTS */
-.file-upload-section { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
 .file-input { display: none; }
-.upload-btn { border: 1.5px solid #01579b !important; color: #01579b !important; border-radius: 8px !important; font-size: 0.82rem !important; }
-.upload-btn:hover { background: #e1f5fe !important; }
+.doc-categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.doc-cat-item {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; border: 1.5px solid #e0e0e0; border-radius: 10px;
+  padding: 8px 12px; flex: 1; min-width: 180px;
+}
+.doc-cat-label { font-size: 0.78rem; font-weight: 700; color: #546e7a; flex: 1; white-space: nowrap; }
+.btn-doc-cat {
+  height: 30px; padding: 0 12px; background: #01579b; color: #fff;
+  border: none; border-radius: 6px; cursor: pointer; font-size: 0.72rem;
+  font-weight: 700; font-family: inherit; white-space: nowrap; transition: all 0.15s;
+  flex-shrink: 0;
+}
+.btn-doc-cat:hover { background: #0277bd; transform: translateY(-1px); }
+
 .documents-list { display: flex; flex-direction: column; gap: 6px; }
 .document-item {
   display: flex; align-items: center; gap: 8px; padding: 8px 12px;
   background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
 }
 .document-item mat-icon { color: #01579b; font-size: 1.1rem; width: 1.1rem; height: 1.1rem; flex-shrink: 0; }
+.doc-type-badge {
+  background: #e3f2fd; color: #01579b; padding: 2px 8px;
+  border-radius: 12px; font-size: 0.65rem; font-weight: 800; white-space: nowrap;
+}
 .doc-info { flex: 1; }
 .doc-nom { margin: 0; font-weight: 700; font-size: 0.82rem; color: #0d1b2a; }
 .doc-meta { margin: 1px 0 0; font-size: 0.68rem; color: #90a4ae; }
@@ -226,4 +288,18 @@
   .form-row-compact { flex-direction: column; }
   .field-sm, .field-md, .field-lg { flex: 1 1 100%; }
   .tache-item { flex-direction: column; align-items: flex-start; }
+}
+
+.duree-badge {
+  display: flex; align-items: center;
+}
+.duree-badge span {
+  background: #e8f5e9; color: #2e7d32; padding: 4px 10px;
+  border-radius: 16px; font-size: 0.75rem; font-weight: 800;
+  border: 1.5px solid #a5d6a7; white-space: nowrap;
+}
+.duree-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: #e8f5e9; color: #2e7d32;
+  padding: 2px 8px; border-radius: 16px; font-size: 0.68rem; font-weight: 700;
 }
