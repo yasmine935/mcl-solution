@@ -17,6 +17,7 @@ import { MiseAuTravail } from '../mise-au-travail/mise-au-travail';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
+import { Taches } from '../taches/taches';
 
 @Component({
   selector: 'app-dashboard-kia',
@@ -27,7 +28,7 @@ import { GestionClients } from '../clients/clients';
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees,
     Planning, Semainier, Documents,
-    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients
+    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'

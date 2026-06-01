@@ -18,6 +18,7 @@ import { TicketingComponent } from '../ticketing/ticketing';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
+import { Taches } from '../taches/taches';
 
 @Component({
   selector: 'app-dashboard-odile',
@@ -27,7 +28,7 @@ import { GestionClients } from '../clients/clients';
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees, Factures, Documents, Semainier, Planning,
-    TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients
+    TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
