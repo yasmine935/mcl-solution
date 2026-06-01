@@ -61,7 +61,7 @@ export class DashboardKia implements OnInit {
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
   nombreJours = 0;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -78,10 +78,13 @@ export class DashboardKia implements OnInit {
   }
 
   loadConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe(data => {
-      this.congesTechniciens = data.filter((c: any) => c.utilisateur?.role === 'TECHNICIEN');
-      this.mesConges = data.filter(c => c.utilisateur?.id === this.user.id);
-    }, error => { this.congesTechniciens = []; this.mesConges = []; });
+    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+      next: (data) => {
+        this.congesTechniciens = data.filter((c: any) => c.utilisateur?.role === 'TECHNICIEN');
+        this.mesConges = data.filter((c: any) => c.utilisateur?.id === this.user.id);
+      },
+      error: () => { this.congesTechniciens = []; this.mesConges = []; }
+    });
   }
 
   loadSoldeConges() {
@@ -127,39 +130,39 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
   return diff > 0 ? `${diff}j` : '-';
 }
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
-      .subscribe(data => this.employes = data, error => this.employes = []);
+    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+      next: (data) => this.employes = data,
+      error: () => this.employes = []
+    });
   }
 
   loadReclamations() {
     this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
       next: (data) => this.reclamations = data,
-      error: () => {
-        const stored = localStorage.getItem('reclamations');
-        this.reclamations = stored ? JSON.parse(stored) : [];
-      }
+      error: () => this.reclamations = []
     });
   }
 
   loadInterventions() {
-    const stored = localStorage.getItem('interventions');
-    this.interventions = stored ? JSON.parse(stored) : [];
+    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+      next: (data) => this.interventions = data,
+      error: () => this.interventions = []
+    });
   }
 
   loadFiches() {
-    const stored = localStorage.getItem('interventions');
-    const all = stored ? JSON.parse(stored) : [];
-    this.fiches = all.filter((f: any) => f.technicienId !== this.user.id);
+    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+      next: (data) => this.fiches = data.filter((f: any) => f.technicienId !== this.user.id),
+      error: () => this.fiches = []
+    });
   }
 
   deposerConge() {
     const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 4 } };
-    this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
-      this.loadConges();
-      this.loadSoldeConges();
-      this.showCongeForm = false;
-      this.resetCongeForm();
-    }, error => console.error('Erreur', error));
+    this.http.post('http://localhost:8080/api/conges', demande).subscribe({
+      next: () => { this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm(); },
+      error: () => {}
+    });
   }
 
   calculerNombreJours() {
@@ -184,8 +187,10 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
   }
 
   updateStatutConge(id: number, statut: string) {
-    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
-      .subscribe(() => this.loadConges(), error => console.error('Erreur', error));
+    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {}).subscribe({
+      next: () => this.loadConges(),
+      error: () => {}
+    });
   }
 
   ouvrirDetailFiche(fiche: any) { this.selectedFiche = fiche; this.showDetailModal = true; }

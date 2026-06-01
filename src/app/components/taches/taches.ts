@@ -94,11 +94,8 @@ export class Taches implements OnInit {
 
   loadClients() {
     this.http.get<any[]>('http://localhost:8080/api/clients').subscribe({
-      next: (data) => { this.clients = data; localStorage.setItem('mcl_clients', JSON.stringify(data)); },
-      error: () => {
-        const stored = localStorage.getItem('mcl_clients');
-        this.clients = stored ? JSON.parse(stored) : [];
-      }
+      next: (data) => this.clients = data,
+      error: () => this.clients = []
     });
   }
 
@@ -164,10 +161,7 @@ export class Taches implements OnInit {
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
       next: (data) => this.employes = data,
-      error: () => {
-        const stored = localStorage.getItem('employes');
-        this.employes = stored ? JSON.parse(stored) : [];
-      }
+      error: () => this.employes = []
     });
   }
 
@@ -175,19 +169,12 @@ export class Taches implements OnInit {
     this.http.get<any[]>(API).subscribe({
       next: (data) => {
         this.taches = data.map(t => this.mapFromBackend(t));
-        // Charger les notes depuis localStorage pour chaque tâche
-        this.taches.forEach(tache => {
-          tache.notes = this.loadNotesForTache(tache.id);
-        });
+        this.taches.forEach(tache => { tache.notes = this.loadNotesForTache(tache.id); });
       },
-      error: () => {
-        const stored = localStorage.getItem('taches');
-        this.taches = stored ? JSON.parse(stored) : [];
-      }
+      error: () => this.taches = []
     });
   }
 
-  // ✅ Notes stockées dans localStorage par tâche
   loadNotesForTache(tacheId: number): any[] {
     const stored = localStorage.getItem(`tache_notes_${tacheId}`);
     return stored ? JSON.parse(stored) : [];
@@ -197,8 +184,13 @@ export class Taches implements OnInit {
     localStorage.setItem(`tache_notes_${tacheId}`, JSON.stringify(notes));
   }
 
+  parseJsonField(val: any, defaultVal: any): any {
+    if (!val) return defaultVal;
+    if (typeof val === 'string') { try { return JSON.parse(val); } catch { return defaultVal; } }
+    return val;
+  }
+
   mapFromBackend(t: any): any {
-    const extras = this.loadExtrasForTache(t.id);
     return {
       id: t.id,
       projet: t.titre,
@@ -206,39 +198,36 @@ export class Taches implements OnInit {
               t.statut === 'EN_COURS' ? 'En cours' :
               t.statut === 'TERMINEE' ? 'Fait' : t.statut,
       date: t.dateCreation ? new Date(t.dateCreation).toLocaleDateString('fr-FR') : '',
-      priorite: t.priorite || extras.priorite || 'Moyenne',
-      echeance: t.dateEcheance || extras.echeance || '',
-      client: extras.client || '',
-      clientFinal: extras.clientFinal || '',
-      chiffreAffaire: extras.chiffreAffaire || '',
-      numCommande: t.description || extras.numCommande || '',
-      numDevis: extras.numDevis || '',
-      fichiers: extras.fichiers || [],
-      assignes: extras.assignes || [],
+      priorite: t.priorite || 'Moyenne',
+      echeance: t.dateEcheance || '',
+      client: t.client || '',
+      clientFinal: t.clientFinal || '',
+      chiffreAffaire: t.chiffreAffaire || '',
+      numCommande: t.description || '',
+      numDevis: t.numDevis || '',
+      fichiers: this.parseJsonField(t.fichiers, []),
+      assignes: this.parseJsonField(t.assignes, []),
       notes: [],
-      etapes: extras.etapes || ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' }))
+      etapes: this.parseJsonField(t.etapes, ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })))
     };
   }
 
-  loadExtrasForTache(tacheId: number): any {
-    const stored = localStorage.getItem(`tache_extras_${tacheId}`);
-    return stored ? JSON.parse(stored) : {};
-  }
-
-  saveExtrasForTache(tacheId: number, tache: any) {
-    const extras = {
+  buildBody(tache: any, statut?: string): any {
+    return {
+      titre: tache.projet,
+      description: tache.numCommande || '',
       priorite: tache.priorite,
-      echeance: tache.echeance,
-      client: tache.client,
-      clientFinal: tache.clientFinal,
-      chiffreAffaire: tache.chiffreAffaire,
-      numCommande: tache.numCommande,
+      statut: statut || (tache.statut === 'En cours' ? 'EN_COURS' : tache.statut === 'Fait' ? 'TERMINEE' : 'A_FAIRE'),
+      dateEcheance: tache.echeance && tache.echeance.match(/^\d{4}-\d{2}-\d{2}$/) ? tache.echeance : null,
+      client: tache.client || '',
+      clientFinal: tache.clientFinal || '',
+      chiffreAffaire: tache.chiffreAffaire || '',
       numDevis: tache.numDevis || '',
-      assignes: tache.assignes,
-      fichiers: tache.fichiers || [],
-      etapes: tache.etapes || ETAPES_PROJET.map((nom: string) => ({ nom, done: false, doneBy: '', doneAt: '' }))
+      assignes: JSON.stringify(tache.assignes || []),
+      etapes: JSON.stringify(tache.etapes || []),
+      fichiers: JSON.stringify(tache.fichiers || []),
+      utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
     };
-    localStorage.setItem(`tache_extras_${tacheId}`, JSON.stringify(extras));
   }
 
   getAvancement(tache: any): number {
@@ -258,7 +247,7 @@ export class Taches implements OnInit {
       etape.doneBy = '';
       etape.doneAt = '';
     }
-    this.saveExtrasForTache(tache.id, tache);
+    this.http.put<any>(`${API}/${tache.id}`, this.buildBody(tache)).subscribe();
   }
 
   getActiviteRecente(tache: any): any[] {
@@ -274,19 +263,11 @@ export class Taches implements OnInit {
       alert('Veuillez remplir le nom du projet');
       return;
     }
-    const body = {
-      titre: this.nouvelleTache.projet,
-      description: this.nouvelleTache.numCommande,
-      priorite: this.nouvelleTache.priorite,
-      statut: 'A_FAIRE',
-      dateEcheance: this.nouvelleTache.echeance && this.nouvelleTache.echeance.match(/^\d{4}-\d{2}-\d{2}$/)
-        ? this.nouvelleTache.echeance : null,
-      utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
-    };
+    const body = this.buildBody(this.nouvelleTache, 'A_FAIRE');
+    body.etapes = JSON.stringify(ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })));
     this.http.post<any>(API, body).subscribe({
-      next: (tache) => {
-        this.saveExtrasForTache(tache.id, this.nouvelleTache);
-        const t = this.mapFromBackend(tache);
+      next: (created) => {
+        const t = this.mapFromBackend({ ...created, ...body });
         t.notes = [];
         this.taches.push(t);
         this.resetFormAdd();
@@ -307,17 +288,8 @@ export class Taches implements OnInit {
       alert('Veuillez remplir le nom du projet');
       return;
     }
-    const body = {
-      titre: this.tacheEnEdition.projet,
-      statut: this.tacheEnEdition.statut === 'En cours' ? 'EN_COURS' :
-              this.tacheEnEdition.statut === 'Fait' ? 'TERMINEE' : 'A_FAIRE',
-      priorite: this.tacheEnEdition.priorite,
-      dateEcheance: this.tacheEnEdition.echeance || null,
-      description: this.tacheEnEdition.numCommande
-    };
-    this.http.put<any>(`${API}/${this.tacheEnEdition.id}`, body).subscribe({
+    this.http.put<any>(`${API}/${this.tacheEnEdition.id}`, this.buildBody(this.tacheEnEdition)).subscribe({
       next: () => {
-        this.saveExtrasForTache(this.tacheEnEdition.id, this.tacheEnEdition);
         const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
         if (index !== -1) this.taches[index] = { ...this.tacheEnEdition };
         this.resetFormEdit();
@@ -330,10 +302,7 @@ export class Taches implements OnInit {
   supprimerTache(id: number) {
     if (confirm('Supprimer cette tâche ?')) {
       this.http.delete(`${API}/${id}`).subscribe({
-        next: () => {
-          this.taches = this.taches.filter((t: any) => t.id !== id);
-          localStorage.removeItem(`tache_notes_${id}`);
-        },
+        next: () => { this.taches = this.taches.filter((t: any) => t.id !== id); },
         error: () => alert('❌ Erreur suppression')
       });
     }

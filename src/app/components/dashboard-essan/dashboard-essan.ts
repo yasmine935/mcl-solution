@@ -61,7 +61,7 @@ export class DashboardEssan implements OnInit {
   totalConges = 0;
   montantTotalFactures = 0;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -91,65 +91,65 @@ export class DashboardEssan implements OnInit {
   // ==================== CHARGEMENT DES DONNÉES ====================
 
   loadReclamations() {
-    const stored = localStorage.getItem('reclamations');
-    this.reclamations = stored ? JSON.parse(stored) : [];
-    this.totalReclamations = this.reclamations.length;
+    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
+      next: (data) => { this.reclamations = data; this.totalReclamations = data.length; },
+      error: () => { this.reclamations = []; this.totalReclamations = 0; }
+    });
   }
 
   loadSemainiersGlobal() {
-    const stored = localStorage.getItem('SemainiersGlobal');
-    this.SemainiersGlobal = stored ? JSON.parse(stored) : {};
-    // Stocker les clés en tant que strings pour éviter les erreurs de type
-    this.SemainiersGlobalKeys = Object.keys(this.SemainiersGlobal);
+    this.SemainiersGlobal = {};
+    this.SemainiersGlobalKeys = [];
   }
 
   loadPlannings() {
-    const stored = localStorage.getItem('planningNotes');
-    if (stored) {
-      const notes = JSON.parse(stored);
-      // Grouper par utilisateur
-      const planningsMap = new Map();
-      for (const [key, value] of Object.entries(notes)) {
-        const userId = key.split('_')[0];
-        if (!planningsMap.has(userId)) {
-          planningsMap.set(userId, []);
-        }
-        planningsMap.get(userId).push(value);
-      }
-      this.plannings = Array.from(planningsMap.values()).flat();
-    }
+    this.http.get<any[]>('http://localhost:8080/api/planning').subscribe({
+      next: (data) => this.plannings = data,
+      error: () => this.plannings = []
+    });
   }
 
   loadFiches() {
-    const stored = localStorage.getItem('fichesCompletees');
-    this.fiches = stored ? JSON.parse(stored) : [];
-    this.totalFiches = this.fiches.length;
+    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+      next: (data) => {
+        this.fiches = data.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE');
+        this.totalFiches = this.fiches.length;
+      },
+      error: () => { this.fiches = []; this.totalFiches = 0; }
+    });
   }
 
   loadFactures() {
-    const stored = localStorage.getItem('factures');
-    this.factures = stored ? JSON.parse(stored) : [];
-    this.totalFactures = this.factures.length;
-    this.montantTotalFactures = this.factures.reduce((sum: number, f: any) => {
-      return sum + (parseFloat(f.montantHT) * (1 + parseFloat(f.tva) / 100) || 0);
-    }, 0);
+    this.http.get<any[]>('http://localhost:8080/api/factures').subscribe({
+      next: (data) => {
+        this.factures = data;
+        this.totalFactures = data.length;
+        this.montantTotalFactures = data.reduce((sum: number, f: any) =>
+          sum + (Number.parseFloat(f.montantHT) * (1 + Number.parseFloat(f.tva) / 100) || 0), 0);
+      },
+      error: () => { this.factures = []; this.totalFactures = 0; this.montantTotalFactures = 0; }
+    });
   }
 
   loadStock() {
-    const stored = localStorage.getItem('stock');
-    this.stock = stored ? JSON.parse(stored) : [];
+    this.http.get<any[]>('http://localhost:8080/api/stock').subscribe({
+      next: (data) => this.stock = data,
+      error: () => this.stock = []
+    });
   }
 
   loadCommandes() {
-    const stored = localStorage.getItem('commandes');
-    this.commandes = stored ? JSON.parse(stored) : [];
-    this.totalCommandes = this.commandes.length;
+    this.http.get<any[]>('http://localhost:8080/api/commandes').subscribe({
+      next: (data) => { this.commandes = data; this.totalCommandes = data.length; },
+      error: () => { this.commandes = []; this.totalCommandes = 0; }
+    });
   }
 
   loadConges() {
-    const stored = localStorage.getItem('conges');
-    this.conges = stored ? JSON.parse(stored) : [];
-    this.totalConges = this.conges.length;
+    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+      next: (data) => { this.conges = data; this.totalConges = data.length; },
+      error: () => { this.conges = []; this.totalConges = 0; }
+    });
   }
 
   // ==================== CALCUL DES KPI ====================
@@ -161,7 +161,7 @@ export class DashboardEssan implements OnInit {
 
   getTotalStockValue(): number {
     return this.stock.reduce((sum: number, item: any) => {
-      return sum + (parseFloat(item.quantite) * parseFloat(item.prixUnitaire) || 0);
+      return sum + (Number.parseFloat(item.quantite) * Number.parseFloat(item.prixUnitaire) || 0);
     }, 0);
   }
 

@@ -129,12 +129,14 @@ get minutesOk(): number {
 }
 
   loadFiches() {
-    const stored = localStorage.getItem('interventions');
-    const toutesLesFiches = stored ? JSON.parse(stored) : [];
-    
-    this.fichesFiltrees = toutesLesFiches.filter((f: any) => f.statut === 'EN_COURS');
-    this.ficheCompletees = toutesLesFiches.filter((f: any) => f.statut === 'COMPLETEE');
-    this.fiches = toutesLesFiches;
+    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+      next: (data) => {
+        this.fiches = data;
+        this.fichesFiltrees = data.filter((f: any) => f.statut === 'EN_COURS');
+        this.ficheCompletees = data.filter((f: any) => f.statut === 'COMPLETEE');
+      },
+      error: () => { this.fiches = []; this.fichesFiltrees = []; this.ficheCompletees = []; }
+    });
   }
 
   // ============================================================
@@ -171,38 +173,31 @@ calculerJours(dateDebut: string, dateFin: string): string {
   return diff > 0 ? `${diff}j` : '-';
 }
   loadConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges')
-      .subscribe(data => {
-        this.conges = data;
-      }, error => {
-        this.conges = [];
-      });
+    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+      next: (data) => this.conges = data,
+      error: () => this.conges = []
+    });
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
-      .subscribe(data => {
+    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+      next: (data) => {
         this.employes = data;
         this.utilisateurs = data;
-        this.techniciensDisponibles = data.filter((e: any) => 
+        this.techniciensDisponibles = data.filter((e: any) =>
           e.role === 'TECHNICIEN' || e.role === 'TECHNICIEN_SUP'
         );
-      }, error => {
-        this.employes = [];
-        this.utilisateurs = [];
-      });
+      },
+      error: () => { this.employes = []; this.utilisateurs = []; }
+    });
   }
 
-loadReclamations() {
-  this.http.get<any[]>('http://localhost:8080/api/reclamations-sse')
-    .subscribe({
+  loadReclamations() {
+    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
       next: (data) => this.reclamations = data,
-      error: () => {
-        const stored = localStorage.getItem('reclamations');
-        this.reclamations = stored ? JSON.parse(stored) : [];
-      }
+      error: () => this.reclamations = []
     });
-}
+  }
 
   loadDocuments() {
     this.documents = [
@@ -246,9 +241,6 @@ loadReclamations() {
 
     this.fiches.push(nouvelleFiche);
     this.fichesFiltrees.push(nouvelleFiche);
-    
-    localStorage.setItem('interventions', JSON.stringify(this.fiches));
-    
     this.showCreateFiche = false;
     this.nouveauFiche = { numero: '', client: '', description: '', date: '', technicienId: null, technicienNom: '' };
   }
@@ -264,8 +256,10 @@ loadReclamations() {
   }
 
   updateStatut(id: number, statut: string) {
-    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
-      .subscribe(() => this.loadConges(), error => console.error('Erreur', error));
+    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {}).subscribe({
+      next: () => this.loadConges(),
+      error: () => {}
+    });
   }
 
   ouvrirDetailReclamation(reclamation: any) {
@@ -295,28 +289,33 @@ loadReclamations() {
     }
   }
 loadVoitures() {
-  const stored = localStorage.getItem('mcl_voitures');
-  this.voitures = stored ? JSON.parse(stored) : [];
+  this.http.get<any[]>('http://localhost:8080/api/voitures').subscribe({
+    next: (data) => this.voitures = data,
+    error: () => this.voitures = []
+  });
 }
-
-saveVoitures() { localStorage.setItem('mcl_voitures', JSON.stringify(this.voitures)); }
 
 ajouterVoiture() {
   if (!this.nouvelleVoiture.immatriculation || !this.nouvelleVoiture.marque) {
     alert('Champs obligatoires manquants');
     return;
   }
-  const id = Math.max(...this.voitures.map((v: any) => v.id || 0), 0) + 1;
-  this.voitures.push({ id, ...this.nouvelleVoiture });
-  this.saveVoitures();
-  this.nouvelleVoiture = { immatriculation: '', marque: '', modele: '', annee: '', kilometrage: '', statut: 'Disponible', conducteur: '', prochainControle: '' };
-  this.showFormVoiture = false;
+  this.http.post<any>('http://localhost:8080/api/voitures', this.nouvelleVoiture).subscribe({
+    next: () => {
+      this.loadVoitures();
+      this.nouvelleVoiture = { immatriculation: '', marque: '', modele: '', annee: '', kilometrage: '', statut: 'Disponible', conducteur: '', prochainControle: '' };
+      this.showFormVoiture = false;
+    },
+    error: () => alert('Erreur lors de l\'ajout de la voiture')
+  });
 }
 
 supprimerVoiture(id: number) {
   if (confirm('Supprimer ?')) {
-    this.voitures = this.voitures.filter((v: any) => v.id !== id);
-    this.saveVoitures();
+    this.http.delete(`http://localhost:8080/api/voitures/${id}`).subscribe({
+      next: () => this.loadVoitures(),
+      error: () => alert('Erreur suppression')
+    });
   }
 }
 

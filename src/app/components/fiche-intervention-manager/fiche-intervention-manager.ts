@@ -91,14 +91,8 @@ export class FicheInterventionManager implements OnInit {
 
   loadClients() {
     this.http.get<any[]>('http://localhost:8080/api/clients').subscribe({
-      next: (data) => {
-        this.clients = data;
-        localStorage.setItem('mcl_clients', JSON.stringify(data));
-      },
-      error: () => {
-        const stored = localStorage.getItem('mcl_clients');
-        this.clients = stored ? JSON.parse(stored) : [];
-      }
+      next: (data) => this.clients = data,
+      error: () => this.clients = []
     });
   }
 
@@ -159,26 +153,15 @@ export class FicheInterventionManager implements OnInit {
       next: (data) => {
         this.employes = data;
         this.techniciens = data.filter((e: any) => e.role === 'TECHNICIEN' || e.role === 'TECHNICIEN_SUP');
-        localStorage.setItem('employes', JSON.stringify(data));
       },
-      error: () => {
-        const stored = localStorage.getItem('employes');
-        this.employes = stored ? JSON.parse(stored) : [];
-        this.techniciens = this.employes.filter((e: any) => e.role === 'TECHNICIEN' || e.role === 'TECHNICIEN_SUP');
-      }
+      error: () => { this.employes = []; this.techniciens = []; }
     });
   }
 
   loadFiches() {
     this.http.get<any[]>(API).subscribe({
-      next: (data) => {
-        this.fiches = data.map(f => this.mapFromBackend(f));
-        localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
-      },
-      error: () => {
-        const stored = localStorage.getItem('fiches_intervention');
-        this.fiches = stored ? JSON.parse(stored) : [];
-      }
+      next: (data) => this.fiches = data.map(f => this.mapFromBackend(f)),
+      error: () => this.fiches = []
     });
   }
 
@@ -245,7 +228,6 @@ export class FicheInterventionManager implements OnInit {
         ficheData.technicienId = tech?.id || null;
         ficheData.client = this.nouvelleFiche.client;
         this.fiches.push(ficheData);
-        localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
         alert('Fiche creee et envoyee au technicien !');
         this.resetFormAdd();
         this.showFormAdd = false;
@@ -291,7 +273,6 @@ export class FicheInterventionManager implements OnInit {
           ficheData.dateFin = this.ficheEnEdition.dateFin || '';
           this.fiches[index] = ficheData;
         }
-        localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
         this.showFormEdit = false;
         this.ficheEnEdition = null;
       },
@@ -302,10 +283,7 @@ export class FicheInterventionManager implements OnInit {
   supprimerFiche(id: number) {
     if (confirm('Supprimer cette fiche ?')) {
       this.http.delete(`${API}/${id}`).subscribe({
-        next: () => {
-          this.fiches = this.fiches.filter((f: any) => f.id !== id);
-          localStorage.setItem('fiches_intervention', JSON.stringify(this.fiches));
-        },
+        next: () => { this.fiches = this.fiches.filter((f: any) => f.id !== id); },
         error: () => alert('Erreur suppression')
       });
     }
