@@ -303,10 +303,17 @@
               <div class="md-docs-list">
                 @for (doc of selectedFiche.documentsImportes; track $index) {
                   <div class="md-doc-item">
-                    <mat-icon>description</mat-icon>
+                    <mat-icon>{{ doc.nom?.match('\.(png|jpg|jpeg|gif|webp)$') ? 'image' : doc.nom?.match('\.pdf$') ? 'picture_as_pdf' : 'description' }}</mat-icon>
                     <span class="md-doc-nom">{{ doc.nom }}</span>
                     @if (doc.taille) { <span class="md-doc-size">{{ doc.taille }} KB</span> }
                     @if (doc.type) { <span class="md-doc-type">{{ doc.type }}</span> }
+                    @if (doc.data || doc.dataUrl) {
+                      <button type="button" class="md-doc-open-btn" (click)="ouvrirDocument(doc)" title="Ouvrir">
+                        <mat-icon>open_in_new</mat-icon>
+                      </button>
+                    } @else {
+                      <span class="md-doc-unavailable" title="Fichier non disponible">⚠</span>
+                    }
                   </div>
                 }
               </div>

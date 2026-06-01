@@ -76,6 +76,22 @@ export class FichesCompletees implements OnInit {
   ouvrirDetail(fiche: any) { this.selectedFiche = JSON.parse(JSON.stringify(fiche)); this.showDetailModal = true; }
   fermerDetail() { this.showDetailModal = false; this.selectedFiche = null; }
 
+  ouvrirDocument(doc: any) {
+    const dataUrl = doc.data || doc.dataUrl;
+    if (!dataUrl) { alert('Fichier non disponible — réimportez-le depuis la fiche.'); return; }
+    const mimeType = doc.mimeType || (doc.nom?.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? 'image/' : doc.nom?.match(/\.pdf$/i) ? 'application/pdf' : '');
+    if (mimeType?.startsWith('image/') || mimeType === 'application/pdf') {
+      window.open(dataUrl, '_blank');
+    } else {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = doc.nom || 'document';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+
   validerFiche(fiche: any) {
     const nomManager = `${this.currentUser.prenom} ${this.currentUser.nom}`;
     if (confirm('Valider le travail du technicien ?')) {

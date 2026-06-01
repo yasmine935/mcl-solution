@@ -758,6 +758,15 @@
 .md-doc-nom { flex: 1; font-size: 0.85rem; font-weight: 600; color: #263238; }
 .md-doc-size { font-size: 0.72rem; color: #546e7a; }
 .md-doc-type { background: #e3f2fd; color: #1565c0; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.md-doc-open-btn {
+  background: #1565c0; color: #fff; border: none;
+  border-radius: 8px; width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: background 0.15s;
+}
+.md-doc-open-btn:hover { background: #0d47a1; }
+.md-doc-open-btn mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.md-doc-unavailable { font-size: 0.85rem; color: #f57c00; flex-shrink: 0; }
 
 .md-footer { padding: 16px 20px; background: #f8faff; border-top: 1px solid #e3eaf5; display: flex; gap: 10px; justify-content: flex-end; border-radius: 0 0 12px 12px; }
 .md-btn-valider { background: linear-gradient(135deg, #2e7d32, #43a047); color: #fff; border: none; padding: 10px 22px; border-radius: 9px; font-size: 0.88rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; }
