@@ -189,7 +189,8 @@ export class FicheInterventionTechnicien implements OnInit {
       signatureClient: this.form.signatureClient,
       nomClientSigne: this.form.nomClientSigne,
       dateCompletion: new Date().toISOString(),
-      materielsHorsStandard: JSON.stringify(this.materielsHorsStandard)
+      materielsHorsStandard: JSON.stringify(this.materielsHorsStandard),
+      photos: JSON.stringify(this.photos)
     };
 
     this.http.put<any>(`${API}/${this.intervention.id}/completer`, body).subscribe({

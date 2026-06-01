@@ -25,7 +25,7 @@ export class FichesCompletees implements OnInit {
   rechercheFC = '';
   currentUser: any = {};
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -50,7 +50,7 @@ export class FichesCompletees implements OnInit {
             intervenants: f.intervenants || '',
             taches: this.parseJson(f.taches),
             materielsHorsStandard: this.parseJson(f.materielsHorsStandard),
-            photos: f.photos || [],
+            photos: this.parseJson(f.photos),
             documentsImportes: this.parseJson(f.documentsImportes)
           }));
       },
@@ -73,14 +73,21 @@ export class FichesCompletees implements OnInit {
     return liste;
   }
 
-  ouvrirDetail(fiche: any) { this.selectedFiche = JSON.parse(JSON.stringify(fiche)); this.showDetailModal = true; }
+  ouvrirDetail(fiche: any) { this.selectedFiche = structuredClone(fiche); this.showDetailModal = true; }
   fermerDetail() { this.showDetailModal = false; this.selectedFiche = null; }
+
+  private getMimeType(doc: any): string {
+    if (doc.mimeType) return doc.mimeType;
+    if (doc.nom?.match(/\.(png|jpg|jpeg|gif|webp)$/i)) return 'image/';
+    if (doc.nom?.match(/\.pdf$/i)) return 'application/pdf';
+    return '';
+  }
 
   ouvrirDocument(doc: any) {
     const dataUrl = doc.data || doc.dataUrl;
     if (!dataUrl) { alert('Fichier non disponible — réimportez-le depuis la fiche.'); return; }
-    const mimeType = doc.mimeType || (doc.nom?.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? 'image/' : doc.nom?.match(/\.pdf$/i) ? 'application/pdf' : '');
-    if (mimeType?.startsWith('image/') || mimeType === 'application/pdf') {
+    const mimeType = this.getMimeType(doc);
+    if (mimeType.startsWith('image/') || mimeType === 'application/pdf') {
       window.open(dataUrl, '_blank');
     } else {
       const link = document.createElement('a');
@@ -88,7 +95,7 @@ export class FichesCompletees implements OnInit {
       link.download = doc.nom || 'document';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
     }
   }
 

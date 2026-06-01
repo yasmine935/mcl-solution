@@ -161,8 +161,8 @@
 
   <!-- MODAL DÉTAIL -->
   @if (showDetailModal && selectedFiche) {
-    <div class="modal-overlay" (click)="fermerDetail()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-overlay" (click)="fermerDetail()" (keydown.escape)="fermerDetail()" tabindex="-1">
+      <div class="modal-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
 
         <!-- HEADER -->
         <div class="md-header">
@@ -295,6 +295,21 @@
               </div>
             </div>
           </div>
+
+          <!-- PHOTOS -->
+          @if (selectedFiche.photos && selectedFiche.photos.length > 0) {
+            <div class="md-card md-docs">
+              <div class="md-card-title"><mat-icon>photo_library</mat-icon> Photos ({{ selectedFiche.photos.length }})</div>
+              <div class="md-photos-grid">
+                @for (photo of selectedFiche.photos; track $index) {
+                  <button type="button" class="md-photo-thumb" (click)="ouvrirDocument(photo)" title="{{ photo.nom }}">
+                    <img src="{{ photo.data || photo.dataUrl }}" alt="{{ photo.nom }}" class="md-photo-img" aria-hidden="true">
+                    <span class="md-photo-nom">{{ photo.nom }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
 
           <!-- DOCUMENTS -->
           @if (selectedFiche.documentsImportes && selectedFiche.documentsImportes.length > 0) {
