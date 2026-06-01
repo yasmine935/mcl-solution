@@ -1,104 +1,129 @@
-<div class="semenier-wrapper" *ngIf="currentUserId">
+﻿<div class="sem-wrapper" *ngIf="currentUserId">
 
-  <!-- HEADER -->
-  <div class="sem-header">
-    <div class="sem-header-left">
-      <div class="sem-icon">📆</div>
-      <div>
-        <h2>Semenier — {{ getCurrentUserName() }}</h2>
-        <p>Vue hebdomadaire automatique du Planning</p>
+  <!-- HERO HEADER -->
+  <div class="sem-hero">
+    <div class="sem-hero-left">
+      <div class="sem-hero-icon">📆</div>
+      <div class="sem-hero-text">
+        <h2 class="sem-hero-title">Semainier</h2>
+        <p class="sem-hero-sub">{{ getCurrentUserName() }} · Vue hebdomadaire</p>
       </div>
     </div>
-    <div class="sem-badge">✅ Synchronisé avec le Planning</div>
+    <div class="sem-sync-badge">
+      <span class="sem-sync-dot"></span>
+      Synchronisé avec le Planning
+    </div>
   </div>
 
-  <!-- SÉLECTION SEMAINE -->
-  <div class="week-selector-card">
-    <div class="week-selector-top">
-      <span class="week-label">✏️ Sélectionne ta semaine</span>
-    </div>
-    <select [(ngModel)]="mySelectedWeek" (change)="loadWeekFromPlanning()" class="week-select">
+  <!-- LÉGENDE -->
+  <div class="sem-legend">
+    <span class="sem-legend-label">Légende :</span>
+    <span class="sem-legend-item sem-legend-bureau">🏢 Bureau</span>
+    <span class="sem-legend-item sem-legend-teletravail">💻 Télétravail</span>
+    <span class="sem-legend-item sem-legend-deplacement">🚗 Déplacement</span>
+    <span class="sem-legend-item sem-legend-conge">🏖️ Congé / Absent</span>
+    <span class="sem-legend-item sem-legend-formation">📚 Formation</span>
+  </div>
+
+  <!-- WEEK SELECTOR -->
+  <div class="sem-week-selector">
+    <label class="sem-week-label">
+      <span>🗓️</span>
+      Semaine sélectionnée
+    </label>
+    <select [(ngModel)]="mySelectedWeek" (change)="loadWeekFromPlanning()" class="sem-week-select">
       <option *ngFor="let semaine of obtenirSemaines()" [ngValue]="semaine">
         {{ semaine.label }}
       </option>
     </select>
   </div>
 
-  <!-- MA SEMAINE -->
   @if (mySelectedWeek) {
-    <div class="my-week-card">
-      <h3 class="my-week-title">
-        <span>🗓️</span> Ma semaine : <span class="week-range">{{ mySelectedWeek.label }}</span>
-      </h3>
 
-      <div class="days-grid">
+    <!-- MA SEMAINE -->
+    <div class="sem-section">
+      <div class="sem-section-header">
+        <span class="sem-section-icon">👤</span>
+        <span class="sem-section-title">Ma Semaine</span>
+        <span class="sem-section-range">{{ mySelectedWeek.label }}</span>
+      </div>
+
+      <div class="sem-days-row">
         @for (jour of joursDeSemaine; track jour.nom) {
-          <div class="day-card" [class.has-note]="getNotePlanningForJour(jour.date)">
-            <!-- Entête du jour -->
-            <div class="day-header" [style.background]="getDayHeaderColor(jour.date)">
-              <strong>{{ jour.nom }}</strong>
-              <span>{{ jour.dateAffichee }}</span>
+          <div class="sem-day-card" [class.sem-day-filled]="getNotePlanningForJour(jour.date)">
+            <div class="sem-day-top" [style.background]="getDayHeaderColor(jour.date)">
+              <span class="sem-day-name">{{ jour.nom }}</span>
+              <span class="sem-day-date">{{ jour.dateAffichee }}</span>
             </div>
-
-            <!-- Contenu -->
-            <div class="day-body">
+            <div class="sem-day-body">
               @if (getNotePlanningForJour(jour.date)) {
-                <div class="note-badge" [style.background]="getCouleurNote(getNotePlanningForJour(jour.date))">
-                  {{ getNoteEmoji(getNotePlanningForJour(jour.date)) }}
-                  {{ getNotePlanningForJour(jour.date) }}
+                <div class="sem-day-note"
+                  [style.background]="getCouleurNote(getNotePlanningForJour(jour.date)) + '15'"
+                  [style.color]="getCouleurNote(getNotePlanningForJour(jour.date))"
+                  [style.border-color]="getCouleurNote(getNotePlanningForJour(jour.date)) + '45'">
+                  <span class="sem-day-emoji">{{ getNoteEmoji(getNotePlanningForJour(jour.date)) }}</span>
+                  <span class="sem-day-text">{{ getNotePlanningForJour(jour.date) }}</span>
                 </div>
               } @else {
-                <div class="no-note">
-                  <span>📝</span>
-                  <small>Non rempli</small>
-                </div>
+                <div class="sem-day-empty">—</div>
               }
             </div>
           </div>
         }
       </div>
 
-      <!-- INFO TIP -->
-      <div class="tip-box">
-        💡 Modifiez vos notes dans la section <strong>Planning</strong> — elles apparaissent ici automatiquement.
+      <div class="sem-tip">
+        💡 Les notes viennent du <strong>Planning</strong> — modifiez-les là-bas, elles apparaissent ici automatiquement.
       </div>
     </div>
 
     <!-- TOUTE L'ÉQUIPE -->
-    <div class="team-card">
-      <h3 class="team-title">
-        <span>👥</span> Toute l'Équipe — {{ mySelectedWeek.label }}
-      </h3>
+    <div class="sem-section">
+      <div class="sem-section-header">
+        <span class="sem-section-icon">👥</span>
+        <span class="sem-section-title">Toute l'Équipe</span>
+        <span class="sem-section-range">{{ mySelectedWeek.label }}</span>
+      </div>
 
-      <div class="team-table-wrapper">
-        <table class="team-table">
+      <div class="sem-table-wrap">
+        <table class="sem-table">
           <thead>
-            <tr>
-              <th class="th-person">Personne</th>
+            <tr class="sem-thead-row">
+              <th class="sem-th sem-th-name">Collaborateur</th>
               @for (jour of joursDeSemaine; track jour.nom) {
-                <th>
-                  <div>{{ jour.nom }}</div>
-                  <small>{{ jour.dateAffichee }}</small>
+                <th class="sem-th sem-th-day">
+                  <span class="sem-th-day-name">{{ jour.nom }}</span>
+                  <span class="sem-th-day-date">{{ jour.dateAffichee }}</span>
                 </th>
               }
             </tr>
           </thead>
           <tbody>
             @for (user of utilisateurs; track user.id) {
-              <tr>
-                <td class="td-person">
-                  <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-                  <span>{{ user.prenom }} {{ user.nom }}</span>
+              <tr class="sem-tbody-row" [class.sem-row-me]="user.id === currentUserId">
+                <td class="sem-td-name">
+                  <div class="sem-person-row">
+                    <div class="sem-avatar" [class.sem-avatar-me]="user.id === currentUserId">
+                      {{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}
+                    </div>
+                    <span class="sem-person-name">{{ user.prenom }} {{ user.nom }}</span>
+                    @if (user.id === currentUserId) {
+                      <span class="sem-me-tag">moi</span>
+                    }
+                  </div>
                 </td>
                 @for (jour of joursDeSemaine; track jour.nom) {
-                  <td class="td-cell">
+                  <td class="sem-td-cell">
                     @if (getNoteForUser(user.id, jour.date)) {
-                      <div class="team-note-pill" [style.background]="getCouleurNote(getNoteForUser(user.id, jour.date))">
-                        {{ getNoteEmoji(getNoteForUser(user.id, jour.date)) }}
-                        {{ getNoteForUser(user.id, jour.date) }}
+                      <div class="sem-cell-pill"
+                        [style.background]="getCouleurNote(getNoteForUser(user.id, jour.date)) + '18'"
+                        [style.color]="getCouleurNote(getNoteForUser(user.id, jour.date))"
+                        [style.border-color]="getCouleurNote(getNoteForUser(user.id, jour.date)) + '50'">
+                        <span>{{ getNoteEmoji(getNoteForUser(user.id, jour.date)) }}</span>
+                        <span class="sem-pill-text">{{ getNoteForUser(user.id, jour.date) }}</span>
                       </div>
                     } @else {
-                      <span class="empty-dot">·</span>
+                      <span class="sem-td-empty">·</span>
                     }
                   </td>
                 }
@@ -108,10 +133,13 @@
         </table>
       </div>
     </div>
+
   }
 
 </div>
 
-<div *ngIf="!currentUserId" style="padding: 40px; text-align: center; color: #999;">
-  <p>Veuillez vous connecter</p>
+<div *ngIf="!currentUserId" class="sem-login-msg">
+  <span>🔐</span>
+  <p>Veuillez vous connecter pour voir le Semainier</p>
 </div>
+

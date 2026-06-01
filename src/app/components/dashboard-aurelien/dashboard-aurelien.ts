@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,10 +13,11 @@ import { Taches } from '../taches/taches';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Factures } from '../factures/factures';
 import { Documents } from '../documents/documents';
-import { Semenier } from '../semenier/semenier';
+import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
+import { GestionClients } from '../clients/clients';
 
 @Component({
   selector: 'app-dashboard-aurelien',
@@ -26,8 +27,8 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Taches, FichesCompletees,
-    Factures, Documents, Semenier, Planning, TicketingComponent,
-    ApprovisionnementComponent
+    Factures, Documents, Semainier, Planning, TicketingComponent,
+    ApprovisionnementComponent, GestionClients
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
@@ -147,7 +148,7 @@ loadSoldeConges() {
       case 'taches': return 'Taches';
       case 'planning': return 'Planning';
       case 'ged': return 'Documents';
-      case 'semenier': return 'Semenier';
+      case 'Semainier': return 'Semainier';
       case 'tickets': return 'Tickets Clients';
       case 'factures': return 'Factures';
       case 'mes-conges': return 'Mes Conges';
@@ -161,3 +162,5 @@ loadSoldeConges() {
 
   logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }
+
+

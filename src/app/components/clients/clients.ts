@@ -1,0 +1,96 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+
+const API = 'http://localhost:8080/api/clients';
+
+@Component({
+  selector: 'app-gestion-clients',
+  standalone: true,
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  templateUrl: './clients.html',
+  styleUrl: './clients.css'
+})
+export class GestionClients implements OnInit {
+  clients: any[] = [];
+  showForm = false;
+  editingClient: any = null;
+  showEditModal = false;
+  recherche = '';
+
+  form = { nom: '', codeClient: '', email: '', adresse: '', contact: '' };
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() { this.loadClients(); }
+
+  loadClients() {
+    this.http.get<any[]>(API).subscribe({
+      next: data => this.clients = data,
+      error: () => this.clients = []
+    });
+  }
+
+  ajouter() {
+    if (!this.form.nom.trim()) { alert('Le nom du client est obligatoire'); return; }
+    this.http.post<any>(API, { ...this.form }).subscribe({
+      next: () => { this.loadClients(); this.resetForm(); this.showForm = false; },
+      error: () => alert('Erreur lors de l\'ajout du client')
+    });
+  }
+
+  ouvrirEdition(client: any) {
+    this.editingClient = { ...client };
+    this.showEditModal = true;
+  }
+
+  sauvegarderEdition() {
+    if (!this.editingClient?.nom?.trim()) return;
+    this.http.put<any>(`${API}/${this.editingClient.id}`, this.editingClient).subscribe({
+      next: () => { this.loadClients(); this.fermerEditModal(); },
+      error: () => alert('Erreur lors de la modification')
+    });
+  }
+
+  supprimer(id: number) {
+    if (confirm('Supprimer ce client ?')) {
+      this.http.delete(`${API}/${id}`).subscribe({
+        next: () => this.loadClients(),
+        error: () => alert('Erreur lors de la suppression')
+      });
+    }
+  }
+
+  clientsFiltres(): any[] {
+    if (!this.recherche.trim()) return this.clients;
+    const q = this.recherche.toLowerCase().trim();
+    return this.clients.filter(c =>
+      (c.nom || '').toLowerCase().includes(q) ||
+      (c.codeClient || '').toLowerCase().includes(q) ||
+      (c.email || '').toLowerCase().includes(q) ||
+      (c.adresse || '').toLowerCase().includes(q) ||
+      (c.contact || '').toLowerCase().includes(q)
+    );
+  }
+
+  getInitiales(nom: string): string {
+    if (!nom) return '?';
+    const parts = nom.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return nom.substring(0, 2).toUpperCase();
+  }
+
+  getAvatarColor(nom: string): string {
+    const colors = ['#1565c0', '#6a1b9a', '#2e7d32', '#e65100', '#00695c', '#c62828', '#37474f'];
+    return colors[nom ? nom.charCodeAt(0) % colors.length : 0];
+  }
+
+  resetForm() {
+    this.form = { nom: '', codeClient: '', email: '', adresse: '', contact: '' };
+  }
+
+  fermerEditModal() { this.showEditModal = false; this.editingClient = null; }
+}

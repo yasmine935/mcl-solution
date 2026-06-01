@@ -1,0 +1,178 @@
+<div class="clients-container">
+
+  <!-- HEADER -->
+  <div class="clients-header">
+    <div class="clients-header-left">
+      <div class="clients-icon">👥</div>
+      <div>
+        <h2 class="clients-title">Gestion des Clients</h2>
+        <p class="clients-subtitle">{{ clients.length }} client(s) enregistré(s)</p>
+      </div>
+    </div>
+    <button type="button" class="btn-nouveau-client" (click)="showForm = !showForm">
+      <mat-icon>{{ showForm ? 'close' : 'person_add' }}</mat-icon>
+      {{ showForm ? 'Fermer' : '+ Nouveau Client' }}
+    </button>
+  </div>
+
+  <!-- FORMULAIRE AJOUT -->
+  @if (showForm) {
+    <div class="client-form-card">
+      <div class="client-form-title">
+        <mat-icon>person_add</mat-icon>
+        <h3>Nouveau Client</h3>
+      </div>
+      <div class="client-form-grid">
+        <div class="client-field">
+          <label class="client-label" for="c-nom">Nom du client *</label>
+          <input id="c-nom" type="text" class="client-input" [(ngModel)]="form.nom" placeholder="Ex : Total Énergies">
+        </div>
+        <div class="client-field">
+          <label class="client-label" for="c-code">Code Client</label>
+          <input id="c-code" type="text" class="client-input" [(ngModel)]="form.codeClient" placeholder="CLI-001">
+        </div>
+        <div class="client-field">
+          <label class="client-label" for="c-email">Adresse Email</label>
+          <input id="c-email" type="email" class="client-input" [(ngModel)]="form.email" placeholder="contact@entreprise.com">
+        </div>
+        <div class="client-field client-field-wide">
+          <label class="client-label" for="c-adresse">Adresse</label>
+          <input id="c-adresse" type="text" class="client-input" [(ngModel)]="form.adresse" placeholder="123 Rue de Paris, 75001 Paris">
+        </div>
+        <div class="client-field">
+          <label class="client-label" for="c-contact">Contact / Téléphone</label>
+          <input id="c-contact" type="text" class="client-input" [(ngModel)]="form.contact" placeholder="Jean Dupont — 06 00 00 00 00">
+        </div>
+      </div>
+      <div class="client-form-actions">
+        <button type="button" class="btn-save-client" (click)="ajouter()">
+          <mat-icon>check</mat-icon> Ajouter le client
+        </button>
+        <button type="button" class="btn-cancel-client" (click)="showForm = false; resetForm()">
+          Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- BARRE DE RECHERCHE -->
+  <div class="clients-toolbar">
+    <div class="clients-search-wrap">
+      <mat-icon>search</mat-icon>
+      <input type="text" class="clients-search-input" [(ngModel)]="recherche" placeholder="Rechercher par nom, code, email, adresse...">
+      @if (recherche) {
+        <button type="button" class="clients-search-clear" (click)="recherche = ''">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+    <span class="clients-count-badge">{{ clientsFiltres().length }} / {{ clients.length }}</span>
+  </div>
+
+  <!-- LISTE CLIENTS -->
+  @if (clientsFiltres().length === 0) {
+    <div class="clients-empty">
+      <span class="clients-empty-icon">👥</span>
+      <p>Aucun client trouvé</p>
+      <small>Cliquez sur "+ Nouveau Client" pour commencer</small>
+    </div>
+  } @else {
+    <div class="clients-grid">
+      @for (c of clientsFiltres(); track c.id) {
+        <div class="client-card">
+          <div class="client-card-top">
+            <div class="client-avatar" [style.background]="getAvatarColor(c.nom)">
+              {{ getInitiales(c.nom) }}
+            </div>
+            <div class="client-card-info">
+              <strong class="client-nom">{{ c.nom }}</strong>
+              @if (c.codeClient) {
+                <span class="client-code-badge">{{ c.codeClient }}</span>
+              }
+            </div>
+            <div class="client-card-btns">
+              <button mat-icon-button color="primary" (click)="ouvrirEdition(c)" title="Modifier" type="button">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="supprimer(c.id)" title="Supprimer" type="button">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="client-card-body">
+            @if (c.email) {
+              <div class="client-info-row">
+                <mat-icon class="client-info-icon ci-email">email</mat-icon>
+                <a href="mailto:{{ c.email }}" class="client-email-link">{{ c.email }}</a>
+              </div>
+            }
+            @if (c.adresse) {
+              <div class="client-info-row">
+                <mat-icon class="client-info-icon ci-addr">location_on</mat-icon>
+                <span>{{ c.adresse }}</span>
+              </div>
+            }
+            @if (c.contact) {
+              <div class="client-info-row">
+                <mat-icon class="client-info-icon ci-phone">phone</mat-icon>
+                <span>{{ c.contact }}</span>
+              </div>
+            }
+            @if (!c.email && !c.adresse && !c.contact) {
+              <span class="client-no-info">Aucune information supplémentaire</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- MODAL ÉDITION -->
+@if (showEditModal && editingClient) {
+  <div class="modal-overlay" (click)="fermerEditModal()" (keydown.escape)="fermerEditModal()" tabindex="-1">
+    <div class="edit-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <div class="edit-modal-header">
+        <div class="edit-modal-avatar" [style.background]="getAvatarColor(editingClient.nom)">
+          {{ getInitiales(editingClient.nom) }}
+        </div>
+        <div>
+          <h3 class="edit-modal-title">Modifier le client</h3>
+          <span class="edit-modal-sub">{{ editingClient.nom }}</span>
+        </div>
+        <button type="button" class="edit-modal-close" (click)="fermerEditModal()">✕</button>
+      </div>
+      <div class="edit-modal-body">
+        <div class="client-form-grid">
+          <div class="client-field">
+            <label class="client-label" for="e-nom">Nom du client *</label>
+            <input id="e-nom" type="text" class="client-input" [(ngModel)]="editingClient.nom">
+          </div>
+          <div class="client-field">
+            <label class="client-label" for="e-code">Code Client</label>
+            <input id="e-code" type="text" class="client-input" [(ngModel)]="editingClient.codeClient">
+          </div>
+          <div class="client-field">
+            <label class="client-label" for="e-email">Adresse Email</label>
+            <input id="e-email" type="email" class="client-input" [(ngModel)]="editingClient.email">
+          </div>
+          <div class="client-field client-field-wide">
+            <label class="client-label" for="e-adresse">Adresse</label>
+            <input id="e-adresse" type="text" class="client-input" [(ngModel)]="editingClient.adresse">
+          </div>
+          <div class="client-field">
+            <label class="client-label" for="e-contact">Contact / Téléphone</label>
+            <input id="e-contact" type="text" class="client-input" [(ngModel)]="editingClient.contact">
+          </div>
+        </div>
+      </div>
+      <div class="edit-modal-footer">
+        <button type="button" class="btn-save-client" (click)="sauvegarderEdition()">
+          <mat-icon>save</mat-icon> Enregistrer
+        </button>
+        <button type="button" class="btn-cancel-client" (click)="fermerEditModal()">Annuler</button>
+      </div>
+    </div>
+  </div>
+}

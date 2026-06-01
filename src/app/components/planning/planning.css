@@ -33,6 +33,63 @@
 .nav-btn:hover { background: rgba(255,255,255,0.22); }
 .mois-label { font-size: 1rem; font-weight: 800; color: #fff; min-width: 150px; text-align: center; }
 
+/* ══ ONGLETS ══ */
+.plan-tabs {
+  display: flex;
+  gap: 6px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px 10px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1.5px solid #e3f2fd;
+  flex-wrap: wrap;
+}
+
+.plan-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #546e7a;
+  font-size: 0.83rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.plan-tab:hover {
+  background: #f0f6ff;
+  color: #1565c0;
+}
+
+.plan-tab-active {
+  background: linear-gradient(135deg, #0d47a1, #1565c0);
+  color: #fff !important;
+  box-shadow: 0 3px 10px rgba(13,71,161,0.3);
+}
+
+.plan-tab-badge {
+  background: rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.plan-tab:not(.plan-tab-active) .plan-tab-badge {
+  background: #e65100;
+  color: #fff;
+}
+
 /* LEGENDE */
 .legende {
   display: flex; flex-wrap: wrap; gap: 14px; padding: 12px 16px;

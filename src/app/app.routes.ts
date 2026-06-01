@@ -15,6 +15,7 @@ import { DashboardKarine } from './components/dashboard-karine/dashboard-karine'
 import { DashboardAby } from './components/dashboard-aby/dashboard-aby';
 import { DashboardHaideh } from './components/dashboard-haideh/dashboard-haideh';
 import { DashboardNaccera } from './components/dashboard-naccera/dashboard-naccera';
+import { GestionClients } from './components/clients/clients';
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
@@ -32,5 +33,6 @@ export const appRoutes: Routes = [
   { path: 'dashboard-aby', component: DashboardAby },
   { path: 'dashboard-haideh', component: DashboardHaideh },
   { path: 'dashboard-naccera', component: DashboardNaccera },
-  { path: 'fiche-intervention-tech/:id', component: FicheInterventionTechnicien }
+  { path: 'fiche-intervention-tech/:id', component: FicheInterventionTechnicien },
+  { path: 'clients', component: GestionClients }
 ];

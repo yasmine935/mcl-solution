@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -12,7 +12,7 @@ const API = 'http://localhost:8080/api/planning';
   templateUrl: './semenier.html',
   styleUrl: './semenier.css'
 })
-export class Semenier implements OnInit {
+export class Semainier implements OnInit {
 
   utilisateurs: any[] = [];
   allNotes: any = {};
@@ -158,3 +158,5 @@ export class Semenier implements OnInit {
     return semaines;
   }
 }
+
+

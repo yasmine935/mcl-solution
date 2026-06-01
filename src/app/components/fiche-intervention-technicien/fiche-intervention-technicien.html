@@ -69,7 +69,7 @@
             <div class="fit-taches">
               @for (tache of intervention.taches; track $index) {
                 <label class="fit-tache-row" [class.fit-tache-checked]="tache.coche">
-                  <input type="checkbox" [(ngModel)]="tache.coche"/>
+                  <input type="checkbox" [(ngModel)]="tache.coche" (change)="sauvegarderProgres()">
                   <span class="fit-tache-check">{{ tache.coche ? '✓' : '' }}</span>
                   <span class="fit-tache-name">{{ tache.nom }}</span>
                   @if (tache.selection) {
@@ -103,6 +103,31 @@
             </div>
           </div>
         </div>
+
+        <!-- DOCUMENTS / FICHIERS -->
+        @if (intervention.documentsImportes && intervention.documentsImportes.length > 0) {
+          <div class="fit-card">
+            <div class="fit-card-title">📎 Documents / Fichiers</div>
+            <div class="fit-docs-list">
+              @for (doc of intervention.documentsImportes; track $index) {
+                <div class="fit-doc-item">
+                  <span class="fit-doc-icon">
+                    @if (doc.type === 'planning') { 🗓️ }
+                    @else if (doc.type === 'devis') { 📄 }
+                    @else { 📁 }
+                  </span>
+                  <span class="fit-doc-nom">{{ doc.nom }}</span>
+                  @if (doc.taille) {
+                    <span class="fit-doc-taille">{{ doc.taille }} Ko</span>
+                  }
+                  @if (doc.data) {
+                    <a [href]="doc.data" [download]="doc.nom" class="fit-doc-dl">⬇ Télécharger</a>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
 
         <!-- MATÉRIEL HORS STANDARD -->
         <div class="fit-card">

@@ -32,6 +32,28 @@ export class FicheInterventionManager implements OnInit {
   showFormEdit = false;
   ficheEnEdition: any = null;
   currentUser: any = {};
+  recherche = '';
+  filtreStatut = '';
+  filtreClient = '';
+
+  getClientsUniques(): string[] {
+    const noms = this.fiches.map((f: any) => f.client).filter((c: any) => c && c.trim());
+    return [...new Set(noms)].sort();
+  }
+
+  fichesFiltrees(): any[] {
+    let liste = this.fiches;
+    if (this.filtreStatut) liste = liste.filter((f: any) => f.statut === this.filtreStatut);
+    if (this.filtreClient) liste = liste.filter((f: any) => f.client === this.filtreClient);
+    if (!this.recherche.trim()) return liste;
+    const q = this.recherche.toLowerCase().trim();
+    return liste.filter((f: any) =>
+      (f.numProjet || '').toLowerCase().includes(q) ||
+      (f.client || '').toLowerCase().includes(q) ||
+      (f.technicienAssigne || '').toLowerCase().includes(q) ||
+      (f.description || '').toLowerCase().includes(q)
+    );
+  }
 
   // ── GESTION CLIENTS ──
   showClientManager = false;
@@ -82,19 +104,23 @@ export class FicheInterventionManager implements OnInit {
 
   ajouterClientLocal() {
     if (!this.nouveauClient.nom.trim()) { alert('Le nom du client est obligatoire'); return; }
-    const client = { ...this.nouveauClient, id: Date.now() };
-    this.clients.push(client);
-    localStorage.setItem('mcl_clients', JSON.stringify(this.clients));
-    this.http.post('http://localhost:8080/api/clients', client).subscribe();
-    this.nouveauClient = { nom: '', codeClient: '', adresse: '', contact: '' };
+    const client = { ...this.nouveauClient };
+    this.http.post<any>('http://localhost:8080/api/clients', client).subscribe({
+      next: () => {
+        this.loadClients();
+        this.nouveauClient = { nom: '', codeClient: '', adresse: '', contact: '' };
+      },
+      error: () => alert('Erreur lors de l\'ajout du client')
+    });
   }
 
   supprimerClientLocal(index: number) {
     if (confirm('Supprimer ce client ?')) {
       const id = this.clients[index].id;
-      this.clients.splice(index, 1);
-      localStorage.setItem('mcl_clients', JSON.stringify(this.clients));
-      this.http.delete(`http://localhost:8080/api/clients/${id}`).subscribe();
+      this.http.delete(`http://localhost:8080/api/clients/${id}`).subscribe({
+        next: () => this.loadClients(),
+        error: () => alert('Erreur lors de la suppression')
+      });
     }
   }
 
@@ -112,13 +138,18 @@ export class FicheInterventionManager implements OnInit {
     const files = event.target.files;
     if (!files) return;
     if (!form.documentsImportes) form.documentsImportes = [];
-    for (let i = 0; i < files.length; i++) {
-      form.documentsImportes.push({
-        nom: files[i].name.replace(/\.[^/.]+$/, ''),
-        type: categorie,
-        taille: (files[i].size / 1024).toFixed(2),
-        dateAjout: new Date().toLocaleString('fr-FR')
-      });
+    for (const file of Array.from(files) as File[]) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        form.documentsImportes.push({
+          nom: file.name,
+          type: categorie,
+          taille: (file.size / 1024).toFixed(2),
+          dateAjout: new Date().toLocaleString('fr-FR'),
+          data: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
     }
     event.target.value = '';
   }
@@ -169,7 +200,7 @@ export class FicheInterventionManager implements OnInit {
       heureDebut: f.heureDebut,
       heureFin: f.heureFin,
       materielsHorsStandard: f.materielsHorsStandard ? JSON.parse(f.materielsHorsStandard) : [],
-      documentsImportes: [],
+      documentsImportes: f.documentsImportes ? JSON.parse(f.documentsImportes) : [],
       taches: f.taches ? JSON.parse(f.taches) : [],
       nouvelleTacheManuelle: ''
     };
@@ -201,6 +232,7 @@ export class FicheInterventionManager implements OnInit {
       dateIntervention: this.formatDate(this.nouvelleFiche.dateDebut),
       description: this.nouvelleFiche.description,
       taches: JSON.stringify(this.nouvelleFiche.taches || []),
+      documentsImportes: JSON.stringify(this.nouvelleFiche.documentsImportes || []),
       statut: 'EN_COURS',
       technicien: tech ? { id: tech.id } : null,
       manager: { id: this.currentUser.id }
@@ -246,6 +278,7 @@ export class FicheInterventionManager implements OnInit {
       dateIntervention: this.formatDate(this.ficheEnEdition.dateDebut || this.ficheEnEdition.date),
       description: this.ficheEnEdition.description,
       taches: JSON.stringify(this.ficheEnEdition.taches || []),
+      documentsImportes: JSON.stringify(this.ficheEnEdition.documentsImportes || []),
       statut: this.ficheEnEdition.statut,
       technicien: tech ? { id: tech.id } : null
     };
@@ -323,6 +356,15 @@ export class FicheInterventionManager implements OnInit {
   }
 
   supprimerDocument(form: any, index: number) { form.documentsImportes.splice(index, 1); }
+
+  ouvrirDocument(doc: any) {
+    if (!doc.data) { alert('Contenu du fichier non disponible'); return; }
+    const a = document.createElement('a');
+    a.href = doc.data;
+    a.download = doc.nom;
+    a.target = '_blank';
+    a.click();
+  }
 
   ajouterTache(form: any, tache: string) {
     if (!form.taches) form.taches = [];

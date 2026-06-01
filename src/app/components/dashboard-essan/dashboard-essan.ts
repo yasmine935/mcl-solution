@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -36,16 +36,16 @@ export class DashboardEssan implements OnInit {
 
   // Modals
   showReclamationDetailModal = false;
-  showSemeniersDetailModal = false;
+  showSemainiersDetailModal = false;
   showFichesDetailModal = false;
   selectedReclamation: any = null;
-  selectedSemenier: any = null;
+  selectedSemainier: any = null;
   selectedFiche: any = null;
 
   // Data
   reclamations: any[] = [];
-  semeniersGlobal: Record<string, any> = {};
-  semeniersGlobalKeys: string[] = [];
+  SemainiersGlobal: Record<string, any> = {};
+  SemainiersGlobalKeys: string[] = [];
   plannings: any[] = [];
   fiches: any[] = [];
   factures: any[] = [];
@@ -78,7 +78,7 @@ export class DashboardEssan implements OnInit {
 
   loadAllData() {
     this.loadReclamations();
-    this.loadSemeniersGlobal();
+    this.loadSemainiersGlobal();
     this.loadPlannings();
     this.loadFiches();
     this.loadFactures();
@@ -96,11 +96,11 @@ export class DashboardEssan implements OnInit {
     this.totalReclamations = this.reclamations.length;
   }
 
-  loadSemeniersGlobal() {
-    const stored = localStorage.getItem('semeniersGlobal');
-    this.semeniersGlobal = stored ? JSON.parse(stored) : {};
+  loadSemainiersGlobal() {
+    const stored = localStorage.getItem('SemainiersGlobal');
+    this.SemainiersGlobal = stored ? JSON.parse(stored) : {};
     // Stocker les clés en tant que strings pour éviter les erreurs de type
-    this.semeniersGlobalKeys = Object.keys(this.semeniersGlobal);
+    this.SemainiersGlobalKeys = Object.keys(this.SemainiersGlobal);
   }
 
   loadPlannings() {
@@ -181,17 +181,17 @@ export class DashboardEssan implements OnInit {
     this.selectedReclamation = null;
   }
 
-  ouvrirDetailSemenier(userId: string) {
-    const clés = Object.keys(this.semeniersGlobal).filter((k: string) => k.startsWith(userId + '_'));
+  ouvrirDetailSemainier(userId: string) {
+    const clés = Object.keys(this.SemainiersGlobal).filter((k: string) => k.startsWith(userId + '_'));
     if (clés.length > 0) {
-      this.selectedSemenier = this.semeniersGlobal[clés[0]];
-      this.showSemeniersDetailModal = true;
+      this.selectedSemainier = this.SemainiersGlobal[clés[0]];
+      this.showSemainiersDetailModal = true;
     }
   }
 
-  fermerDetailSemenier() {
-    this.showSemeniersDetailModal = false;
-    this.selectedSemenier = null;
+  fermerDetailSemainier() {
+    this.showSemainiersDetailModal = false;
+    this.selectedSemainier = null;
   }
 
   ouvrirDetailFiche(fiche: any) {
@@ -206,7 +206,7 @@ export class DashboardEssan implements OnInit {
 
   fermerAllModals() {
     this.fermerDetailReclamation();
-    this.fermerDetailSemenier();
+    this.fermerDetailSemainier();
     this.fermerDetailFiche();
   }
 
@@ -215,7 +215,7 @@ export class DashboardEssan implements OnInit {
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'dashboard': return '📊 Dashboard ESSAN';
-      case 'semeniersGlobal': return '📅 Semenieres (TOUS)';
+      case 'SemainiersGlobal': return '📅 Semainieres (TOUS)';
       case 'planningsGlobal': return '📆 Plannings (TOUS)';
       case 'fichesGlobal': return '📋 Fiches Complétées (TOUS)';
       case 'factures': return '💰 Factures';
@@ -237,3 +237,4 @@ export class DashboardEssan implements OnInit {
     this.router.navigate(['/login']);
   }
 }
+

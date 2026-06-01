@@ -85,7 +85,8 @@ export class FicheInterventionTechnicien implements OnInit {
       statut: f.statut,
       technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
       technicienId: f.technicien?.id,
-      taches: f.taches ? JSON.parse(f.taches) : []
+      taches: f.taches ? JSON.parse(f.taches) : [],
+      documentsImportes: f.documentsImportes ? JSON.parse(f.documentsImportes) : []
     };
   }
 
@@ -198,6 +199,14 @@ export class FicheInterventionTechnicien implements OnInit {
       },
       error: () => alert('Erreur envoi fiche')
     });
+  }
+
+  sauvegarderProgres() {
+    if (!this.intervention?.id) return;
+    setTimeout(() => {
+      const body = { taches: JSON.stringify(this.intervention.taches) };
+      this.http.put(`${API}/${this.intervention.id}/taches`, body).subscribe();
+    }, 50);
   }
 
   ajouterMateriel() {

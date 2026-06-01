@@ -1,4 +1,4 @@
-<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -28,8 +28,8 @@
       <a class="nav-item" [class.active]="currentPage === 'dashboard'" (click)="currentPage = 'dashboard'">
         <mat-icon>dashboard</mat-icon> Dashboard
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'semeniersGlobal'" (click)="currentPage = 'semeniersGlobal'">
-        <mat-icon>calendar_today</mat-icon> Semenieres
+      <a class="nav-item" [class.active]="currentPage === 'SemainiersGlobal'" (click)="currentPage = 'SemainiersGlobal'">
+        <mat-icon>calendar_today</mat-icon> Semainieres
       </a>
       <a class="nav-item" [class.active]="currentPage === 'planningsGlobal'" (click)="currentPage = 'planningsGlobal'">
         <mat-icon>calendar_month</mat-icon> Plannings
@@ -88,57 +88,80 @@
 
       <!-- ══ DASHBOARD ══ -->
       @if (currentPage === 'dashboard') {
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Vue globale de MCL Solutions — lecture seule</p>
+            </div>
+          </div>
+          <div class="home-welcome-badge"><mat-icon>star</mat-icon> Propriétaire</div>
+        </div>
+        <!-- STAT CARDS -->
         <div class="stats-grid">
-          <div class="stat-card mauve">
-            <div class="stat-icon-wrap"><mat-icon>report_problem</mat-icon></div>
-            <div class="stat-info">
-              <h4>Remontées Terrain</h4>
-              <p class="stat-number">{{ totalReclamations }}</p>
+          <div class="stat-card stat-purple" (click)="currentPage = 'reclamations'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>report_problem</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Remontées Terrain</span>
+              <span class="stat-card-number">{{ totalReclamations }}</span>
+              <span class="stat-card-sub">Voir détail →</span>
             </div>
           </div>
-          <div class="stat-card blue">
-            <div class="stat-icon-wrap"><mat-icon>description</mat-icon></div>
-            <div class="stat-info">
-              <h4>Fiches Complétées</h4>
-              <p class="stat-number">{{ totalFiches }}</p>
+          <div class="stat-card stat-blue" (click)="currentPage = 'fichesGlobal'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>description</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Fiches Complétées</span>
+              <span class="stat-card-number">{{ totalFiches }}</span>
+              <span class="stat-card-sub">Voir fiches →</span>
             </div>
           </div>
-          <div class="stat-card indigo">
-            <div class="stat-icon-wrap"><mat-icon>receipt</mat-icon></div>
-            <div class="stat-info">
-              <h4>Factures</h4>
-              <p class="stat-number">{{ totalFactures }}</p>
+          <div class="stat-card stat-indigo" (click)="currentPage = 'factures'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>receipt</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Factures</span>
+              <span class="stat-card-number">{{ totalFactures }}</span>
+              <span class="stat-card-sub">Voir factures →</span>
             </div>
           </div>
-          <div class="stat-card purple">
-            <div class="stat-icon-wrap"><mat-icon>shopping_cart</mat-icon></div>
-            <div class="stat-info">
-              <h4>Commandes</h4>
-              <p class="stat-number">{{ totalCommandes }}</p>
+          <div class="stat-card stat-orange" (click)="currentPage = 'commandes'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>shopping_cart</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Commandes</span>
+              <span class="stat-card-number">{{ totalCommandes }}</span>
+              <span class="stat-card-sub">Voir commandes →</span>
             </div>
           </div>
         </div>
-
-        <div class="stats-grid-2">
-          <div class="stat-card kpi">
-            <div class="stat-icon-wrap"><mat-icon>euro</mat-icon></div>
-            <div class="stat-info">
-              <h4>Montant Total Factures</h4>
-              <p class="stat-amount">{{ montantTotalFactures | number:'1.2-2' }} €</p>
+        <!-- KPI MONTANTS -->
+        <div class="stats-grid">
+          <div class="stat-card stat-teal">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>euro</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Montant Total Factures</span>
+              <span class="stat-card-number" style="font-size:1.5rem">{{ montantTotalFactures | number:'1.2-2' }} €</span>
             </div>
           </div>
-          <div class="stat-card kpi">
-            <div class="stat-icon-wrap"><mat-icon>inventory</mat-icon></div>
-            <div class="stat-info">
-              <h4>Valeur du Stock</h4>
-              <p class="stat-amount">{{ getTotalStockValue() | number:'1.2-2' }} €</p>
+          <div class="stat-card stat-green" (click)="currentPage = 'stock'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>inventory</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Valeur du Stock</span>
+              <span class="stat-card-number" style="font-size:1.5rem">{{ getTotalStockValue() | number:'1.2-2' }} €</span>
             </div>
           </div>
-          <div class="stat-card kpi">
-            <div class="stat-icon-wrap"><mat-icon>beach_access</mat-icon></div>
-            <div class="stat-info">
-              <h4>Congés en Attente</h4>
-              <p class="stat-number">{{ getCongesEnAttente() }}</p>
+          <div class="stat-card stat-orange" (click)="currentPage = 'conges'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>beach_access</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Congés en Attente</span>
+              <span class="stat-card-number">{{ getCongesEnAttente() }}</span>
             </div>
           </div>
         </div>
@@ -150,7 +173,7 @@
             <p>Vous avez accès en <strong>LECTURE SEULE</strong> à tous les modules de MCL Solutions.</p>
             <p>Vous pouvez consulter :</p>
             <ul>
-              <li>✅ Les semenieres de tous les employés</li>
+              <li>✅ Les Semainieres de tous les employés</li>
               <li>✅ Les plannings de tous les employés</li>
               <li>✅ Les fiches complétées</li>
               <li>✅ Les factures et montants</li>
@@ -164,12 +187,12 @@
         </div>
       }
 
-      <!-- ══ SEMENIERES ══ -->
-      @if (currentPage === 'semeniersGlobal') {
+      <!-- ══ SemainierES ══ -->
+      @if (currentPage === 'SemainiersGlobal') {
         <div class="table-card">
-          <h3>📅 Semenieres Globales ({{ (semeniersGlobal | keyvalue).length }})</h3>
+          <h3>📅 Semainieres Globales ({{ (SemainiersGlobal | keyvalue).length }})</h3>
           <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
-          @if ((semeniersGlobal | keyvalue).length === 0) {
+          @if ((SemainiersGlobal | keyvalue).length === 0) {
             <div class="empty">Aucune semaine enregistrée</div>
           } @else {
             <table class="data-table">
@@ -182,13 +205,13 @@
                 </tr>
               </thead>
               <tbody>
-                @for (item of (semeniersGlobal | keyvalue); track item.key) {
+                @for (item of (SemainiersGlobal | keyvalue); track item.key) {
                   <tr>
                     <td><strong>{{ item.key }}</strong></td>
                     <td>{{ item.value.dateDebut | date:'dd/MM/yyyy' }}</td>
                     <td><span class="badge" style="background:#e8eaf6;color:#5e35b1">VALIDÉE</span></td>
                     <td>
-                      <button mat-icon-button color="primary" (click)="ouvrirDetailSemenier(item.key)">
+                      <button mat-icon-button color="primary" (click)="ouvrirDetailSemainier(item.key)">
                         <mat-icon>visibility</mat-icon>
                       </button>
                     </td>
@@ -457,3 +480,4 @@
     </div>
   </div>
 }
+

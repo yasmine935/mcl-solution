@@ -32,7 +32,33 @@ const ETAPES_PROJET = [
 export class Taches implements OnInit {
   taches: any[] = [];
   employes: any[] = [];
+  rechercheTache = '';
+  filtreStatutTache = '';
+  filtrePrioriteTache = '';
+  filtreClientTache = '';
   showFormAdd = false;
+
+  getClientsUniques(): string[] {
+    const clients = this.taches.map((t: any) => t.client).filter((c: any) => c && c.trim());
+    return [...new Set(clients)].sort();
+  }
+
+  tachesFiltrees(): any[] {
+    let liste = this.taches;
+    if (this.filtreStatutTache) liste = liste.filter((t: any) => t.statut === this.filtreStatutTache);
+    if (this.filtrePrioriteTache) liste = liste.filter((t: any) => t.priorite === this.filtrePrioriteTache);
+    if (this.filtreClientTache) liste = liste.filter((t: any) => t.client === this.filtreClientTache);
+    if (this.rechercheTache.trim()) {
+      const q = this.rechercheTache.toLowerCase().trim();
+      liste = liste.filter((t: any) =>
+        (t.projet || '').toLowerCase().includes(q) ||
+        (t.client || '').toLowerCase().includes(q) ||
+        (t.numCommande || '').toLowerCase().includes(q) ||
+        (t.clientFinal || '').toLowerCase().includes(q)
+      );
+    }
+    return liste;
+  }
   showFormEdit = false;
   showNoteModal = false;
   showDetailModal = false;
@@ -52,7 +78,7 @@ export class Taches implements OnInit {
   nouvelleTache = {
     projet: '', statut: 'En Qualification', date: '',
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
-    echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: ''
+    echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: ''
   };
 
   tacheEnEdition: any = {};
@@ -81,14 +107,35 @@ export class Taches implements OnInit {
     if (!files) return;
     if (!form.fichiers) form.fichiers = [];
     for (let i = 0; i < files.length; i++) {
-      form.fichiers.push({
-        nom: files[i].name,
-        type: categorie,
-        taille: (files[i].size / 1024).toFixed(2),
-        date: new Date().toLocaleString('fr-FR')
-      });
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        form.fichiers.push({
+          nom: file.name,
+          type: categorie,
+          taille: (file.size / 1024).toFixed(2),
+          date: new Date().toLocaleString('fr-FR'),
+          dataUrl: e.target.result,
+          mimeType: file.type
+        });
+      };
+      reader.readAsDataURL(file);
     }
     event.target.value = '';
+  }
+
+  ouvrirFichier(fichier: any) {
+    if (!fichier.dataUrl) return;
+    if (fichier.mimeType?.startsWith('image/') || fichier.mimeType === 'application/pdf') {
+      window.open(fichier.dataUrl, '_blank');
+    } else {
+      const link = document.createElement('a');
+      link.href = fichier.dataUrl;
+      link.download = fichier.nom;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
 
   ouvrirAddClient(target: 'add' | 'edit') {
@@ -100,17 +147,18 @@ export class Taches implements OnInit {
   confirmerNouveauClient() {
     const nom = this.nouveauClientNom.trim();
     if (!nom) return;
-    if (!this.clients.find((c: any) => c.nom === nom)) {
-      const client = { id: Date.now(), nom, codeClient: '', adresse: '', contact: '' };
-      this.clients.push(client);
-      localStorage.setItem('mcl_clients', JSON.stringify(this.clients));
-    }
     if (this.clientModalTarget === 'add') {
       this.nouvelleTache.client = nom;
     } else {
       this.tacheEnEdition.client = nom;
     }
     this.showAddClientModal = false;
+    if (!this.clients.some((c: any) => c.nom === nom)) {
+      this.http.post<any>('http://localhost:8080/api/clients', { nom, codeClient: '', adresse: '', contact: '', email: '' }).subscribe({
+        next: () => this.loadClients(),
+        error: () => {}
+      });
+    }
   }
 
   loadEmployes() {
@@ -164,6 +212,7 @@ export class Taches implements OnInit {
       clientFinal: extras.clientFinal || '',
       chiffreAffaire: extras.chiffreAffaire || '',
       numCommande: t.description || extras.numCommande || '',
+      numDevis: extras.numDevis || '',
       fichiers: extras.fichiers || [],
       assignes: extras.assignes || [],
       notes: [],
@@ -184,6 +233,7 @@ export class Taches implements OnInit {
       clientFinal: tache.clientFinal,
       chiffreAffaire: tache.chiffreAffaire,
       numCommande: tache.numCommande,
+      numDevis: tache.numDevis || '',
       assignes: tache.assignes,
       fichiers: tache.fichiers || [],
       etapes: tache.etapes || ETAPES_PROJET.map((nom: string) => ({ nom, done: false, doneBy: '', doneAt: '' }))
@@ -370,7 +420,7 @@ export class Taches implements OnInit {
     this.nouvelleTache = {
       projet: '', statut: 'En Qualification', date: '',
       priorite: 'Moyenne', fichiers: [], assignes: [],
-      echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: ''
+      echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: ''
     };
   }
 

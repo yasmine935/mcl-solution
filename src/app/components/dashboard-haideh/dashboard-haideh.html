@@ -57,33 +57,53 @@
 
       <!-- HOME -->
       @if (currentPage === 'home') {
-        <div class="kpi-grid">
-          <div class="kpi-card kpi-bleu" (click)="currentPage = 'comptabilite'">
-            <div class="kpi-icon">🧾</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ totalFactures }}</span>
-              <span class="kpi-label">Total Factures</span>
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Voici un aperçu de votre activité financière</p>
             </div>
           </div>
-          <div class="kpi-card kpi-orange" (click)="currentPage = 'comptabilite'">
-            <div class="kpi-icon">⏳</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ facturesEnAttente }}</span>
-              <span class="kpi-label">Factures en attente</span>
+          <div class="home-welcome-badge"><mat-icon>account_balance</mat-icon> DAF MCL</div>
+        </div>
+        <!-- STAT CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card stat-blue" (click)="currentPage = 'comptabilite'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>receipt_long</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Total Factures</span>
+              <span class="stat-card-number">{{ totalFactures }}</span>
+              <span class="stat-card-sub">Comptabilité →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-vert" (click)="currentPage = 'budget'">
-            <div class="kpi-icon">💰</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ totalBudgetAlloue | number }}€</span>
-              <span class="kpi-label">Budget total alloue</span>
+          <div class="stat-card stat-orange" (click)="currentPage = 'comptabilite'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>hourglass_empty</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Factures en attente</span>
+              <span class="stat-card-number">{{ facturesEnAttente }}</span>
+              <span class="stat-card-sub">À traiter →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-violet" (click)="currentPage = 'budget'">
-            <div class="kpi-icon">📊</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ totalBudgetDepense | number }}€</span>
-              <span class="kpi-label">Budget depense</span>
+          <div class="stat-card stat-green" (click)="currentPage = 'budget'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>savings</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Budget alloué</span>
+              <span class="stat-card-number">{{ totalBudgetAlloue | number }}€</span>
+              <span class="stat-card-sub">Voir budget →</span>
+            </div>
+          </div>
+          <div class="stat-card stat-purple" (click)="currentPage = 'budget'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>analytics</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Budget dépensé</span>
+              <span class="stat-card-number">{{ totalBudgetDepense | number }}€</span>
+              <span class="stat-card-sub">Suivi budget →</span>
             </div>
           </div>
         </div>

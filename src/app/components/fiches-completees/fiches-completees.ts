@@ -22,6 +22,7 @@ export class FichesCompletees implements OnInit {
   selectedFiche: any = null;
   showDetailModal = false;
   filterStatut = 'PENDING';
+  rechercheFC = '';
   currentUser: any = {};
 
   constructor(private http: HttpClient) {}
@@ -47,9 +48,10 @@ export class FichesCompletees implements OnInit {
             heureDebut: f.heureDebut || '',
             heureFin: f.heureFin || '',
             intervenants: f.intervenants || '',
-            taches: f.taches || [],
+            taches: this.parseJson(f.taches),
+            materielsHorsStandard: this.parseJson(f.materielsHorsStandard),
             photos: f.photos || [],
-            documentsImportes: f.documentsImportes || []
+            documentsImportes: this.parseJson(f.documentsImportes)
           }));
       },
       error: () => this.fichesCompletees = []
@@ -57,9 +59,18 @@ export class FichesCompletees implements OnInit {
   }
 
   getFichesAffichees(): any[] {
-    if (this.filterStatut === 'PENDING') return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE');
-    if (this.filterStatut === 'VALIDEE') return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE');
-    return this.fichesCompletees;
+    let liste = this.fichesCompletees;
+    if (this.filterStatut === 'PENDING') liste = liste.filter((f: any) => f.statut === 'COMPLETEE');
+    else if (this.filterStatut === 'VALIDEE') liste = liste.filter((f: any) => f.statut === 'VALIDEE');
+    if (this.rechercheFC.trim()) {
+      const q = this.rechercheFC.toLowerCase().trim();
+      liste = liste.filter((f: any) =>
+        (f.numProjet || '').toLowerCase().includes(q) ||
+        (f.client || '').toLowerCase().includes(q) ||
+        (f.technicienAssigne || '').toLowerCase().includes(q)
+      );
+    }
+    return liste;
   }
 
   ouvrirDetail(fiche: any) { this.selectedFiche = JSON.parse(JSON.stringify(fiche)); this.showDetailModal = true; }
@@ -102,6 +113,12 @@ export class FichesCompletees implements OnInit {
       case 'EN_COURS': return 'badge-en-cours';
       default: return 'badge-pending';
     }
+  }
+
+  parseJson(val: any): any[] {
+    if (!val) return [];
+    if (typeof val === 'string') return JSON.parse(val);
+    return val;
   }
 
   afficherSignature(signature: string): boolean {

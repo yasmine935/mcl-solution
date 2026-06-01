@@ -149,7 +149,7 @@ mat-form-field { width: 100%; }
 .note-btn mat-icon:hover { color: #01579b; }
 .note-btn mat-icon.has-note { color: #f57f17; }
 .note-count {
-  position: absolute; top: -6px; right: -6px; background: #f44336; color: #fff;
+  position: absolute; top: -6px; right: -6px; background: #b71c1c; color: #fff;
   border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center;
   justify-content: center; font-size: 0.62rem; font-weight: 800;
 }
@@ -337,9 +337,76 @@ mat-form-field { width: 100%; }
 .btn-upload { color: #01579b !important; border-color: #01579b !important; font-size: 0.78rem !important; }
 .fichiers-count { font-size: 0.75rem; color: #0288d1; font-weight: 700; }
 
+/* ══ SECTIONS FORMULAIRE PROJET ══ */
+.proj-section {
+  margin: 0 16px 12px;
+  padding: 14px 18px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #eef2f7;
+  border-left: 4px solid #01579b;
+}
+.proj-section-blue   { border-left-color: #1565c0; }
+.proj-section-purple { border-left-color: #6a1b9a; }
+.proj-section-green  { border-left-color: #2e7d32; }
+.proj-section-orange { border-left-color: #e65100; }
+.proj-section-teal   { border-left-color: #00695c; }
+.proj-section-grey   { border-left-color: #546e7a; }
+.proj-section-amber  { border-left-color: #f57f17; }
+
+.proj-section-title {
+  display: flex; align-items: center; gap: 7px; margin-bottom: 12px;
+}
+.proj-section-icon { font-size: 1rem; }
+.proj-section-title h4 {
+  margin: 0; font-size: 0.75rem; font-weight: 800;
+  color: #0d1b2a; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.proj-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.proj-row-align-bottom { align-items: flex-end; }
+.proj-field-sm     { flex: 0 0 140px; }
+.proj-field-md     { flex: 0 0 180px; }
+.proj-field-lg     { flex: 1; min-width: 180px; }
+.proj-field-xl     { flex: 2; min-width: 220px; }
+.proj-field-full   { flex: 1 1 100%; }
+.proj-field-import {
+  display: flex; align-items: center; gap: 8px;
+  background: #f8faff; border: 1.5px solid #e0e0e0;
+  border-radius: 10px; padding: 7px 12px;
+  flex: 1; min-width: 200px;
+}
+.proj-import-label {
+  flex: 1; font-size: 0.78rem; font-weight: 700;
+  color: #37474f; white-space: nowrap;
+}
+.proj-fichiers-inline {
+  display: flex; flex-direction: column; gap: 6px; margin-top: 10px;
+}
+
+.select-multi { height: 70px !important; }
+
+@media (max-width: 768px) {
+  .proj-row { flex-direction: column; }
+  .proj-field-sm, .proj-field-md, .proj-field-lg, .proj-field-xl { flex: 1 1 100%; }
+}
+
 /* Table header */
-.table-header { padding: 0 0 14px; border-bottom: 1px solid #f0f4f8; margin-bottom: 14px; }
+.table-header { padding: 0 0 14px; border-bottom: 1px solid #f0f4f8; margin-bottom: 14px; display: flex; flex-direction: column; gap: 12px; }
 .table-header h3 { margin: 0; font-size: 0.95rem; font-weight: 800; color: #0d1b2a; }
+
+/* Toolbar filtres */
+.taches-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.taches-search-wrap { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 8px; background: #f8faff; border: 1.5px solid #cfd8dc; border-radius: 10px; padding: 0 12px; transition: border-color 0.2s; }
+.taches-search-wrap:focus-within { border-color: #1565c0; }
+.taches-search-wrap mat-icon { font-size: 18px; width: 18px; height: 18px; color: #546e7a; flex-shrink: 0; }
+.taches-search { flex: 1; border: none; outline: none; font-size: 0.85rem; padding: 9px 0; font-family: inherit; color: #263238; background: transparent; }
+.taches-search-clear { background: none; border: none; cursor: pointer; display: flex; align-items: center; color: #546e7a; padding: 0; }
+.taches-filter-select { border: 1.5px solid #cfd8dc; border-radius: 10px; padding: 8px 12px; font-size: 0.82rem; font-family: inherit; color: #263238; background: #f8faff; outline: none; cursor: pointer; }
+.taches-filter-select:focus { border-color: #1565c0; }
+.taches-reset-btn { display: flex; align-items: center; gap: 5px; background: #f5f5f5; color: #37474f; border: 1px solid #cfd8dc; border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.taches-reset-btn:hover { background: #eceff1; }
+.taches-reset-btn mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
 /* Empty state */
 .empty-state { text-align: center; padding: 48px; color: #b0bec5; }
@@ -368,8 +435,7 @@ mat-form-field { width: 100%; }
 
 .badge-client {
   display: inline-block;
-  font-size: 0.85rem; font-weight: 500; color: #37474f;
-  font-size: 0.75rem; font-weight: 600;
+  font-size: 0.75rem; font-weight: 600; color: #37474f;
 }
 
 /* ══ MODAL NOUVEAU CLIENT ══ */
@@ -483,4 +549,30 @@ mat-form-field { width: 100%; }
 .activite-dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: #1565c0; flex-shrink: 0; margin-top: 4px;
+}
+
+/* DOCUMENTS dans modal détail */
+.detail-docs-section {
+  margin-top: 16px;
+  background: #f8fafc;
+  border: 1.5px solid #e1f0ff;
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+.detail-docs-title {
+  font-size: 0.82rem; font-weight: 800;
+  color: #0d1b2a; text-transform: uppercase;
+  letter-spacing: 0.4px; margin-bottom: 12px;
+}
+.fichiers-liste { display: flex; flex-direction: column; gap: 8px; }
+.detail-docs-section .fichier-item {
+  background: #fff; border: 1.5px solid #e8ecf0;
+  border-radius: 10px; padding: 9px 12px; border-left: 1.5px solid #e8ecf0;
+}
+.detail-docs-section .fichier-nom {
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.detail-docs-section .fichier-taille { font-size: 0.7rem; color: #78909c; white-space: nowrap; }
+.fichier-no-preview {
+  font-size: 0.7rem; color: #f57c00; font-style: italic; white-space: nowrap;
 }

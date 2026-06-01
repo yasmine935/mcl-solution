@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,12 +14,13 @@ import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Factures } from '../factures/factures';
-import { Semenier } from '../semenier/semenier';
+import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { Voitures } from '../voitures/voitures';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
+import { GestionClients } from '../clients/clients';
 
 
 @Component({
@@ -29,7 +30,7 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager,Employes ,Taches, Documents, FichesCompletees, Factures, Semenier, Planning , TicketingComponent , Voitures, RemonteesTerrainComponent, ApprovisionnementComponent
+    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'
@@ -369,3 +370,5 @@ getStatutVoitureColor(statut: string): string {
     this.router.navigate(['/login']);
   }
 }
+
+

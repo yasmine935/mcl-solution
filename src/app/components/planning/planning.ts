@@ -40,10 +40,14 @@ export class Planning implements OnInit {
   currentWeekStart: Date = new Date();
   weekDays: any[] = [];
 
+  // ✅ Onglets
+  activeView = 'calendrier';
+
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.detectCurrentUser();
+    this.activeView = this.isManager ? 'grille' : 'semaine';
     this.currentWeekStart = this.getMondayOf(new Date());
     this.generateSemaine();
     this.loadUtilisateurs();

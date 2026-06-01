@@ -72,67 +72,88 @@
 
       <!-- ══ HOME ══ -->
       @if (currentPage === 'home') {
-        <div class="kpi-grid">
-          <div class="kpi-card kpi-rose" (click)="currentPage = 'conges'">
-            <div class="kpi-icon">🏖️</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ congesEnAttente.length }}</span>
-              <span class="kpi-label">Congés en attente</span>
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Voici un aperçu de votre activité RH du jour</p>
             </div>
           </div>
-          <div class="kpi-card kpi-vert" (click)="currentPage = 'conges'">
-            <div class="kpi-icon">✅</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ congesApprouves.length }}</span>
-              <span class="kpi-label">Congés approuvés</span>
+          <div class="home-welcome-badge"><mat-icon>manage_accounts</mat-icon> DRH MCL</div>
+        </div>
+        <!-- STAT CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card stat-orange" (click)="currentPage = 'conges'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>beach_access</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Congés en attente</span>
+              <span class="stat-card-number">{{ congesEnAttente.length }}</span>
+              <span class="stat-card-sub">À valider →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-bleu" (click)="currentPage = 'employes'">
-            <div class="kpi-icon">👥</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ employes.length }}</span>
-              <span class="kpi-label">Employés actifs</span>
+          <div class="stat-card stat-green" (click)="currentPage = 'conges'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Congés approuvés</span>
+              <span class="stat-card-number">{{ congesApprouves.length }}</span>
+              <span class="stat-card-sub">Ce mois-ci →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-orange" (click)="currentPage = 'sse'">
-            <div class="kpi-icon">⚠️</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ sseEnAttente.length }}</span>
-              <span class="kpi-label">SSE en attente</span>
+          <div class="stat-card stat-blue" (click)="currentPage = 'employes'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>people</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Employés actifs</span>
+              <span class="stat-card-number">{{ employes.length }}</span>
+              <span class="stat-card-sub">Dossiers personnel →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-violet" (click)="currentPage = 'voitures'">
-            <div class="kpi-icon">🚗</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ voituresDisponibles.length }}</span>
-              <span class="kpi-label">Véhicules disponibles</span>
+          <div class="stat-card stat-teal" (click)="currentPage = 'sse'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>health_and_safety</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">SSE en attente</span>
+              <span class="stat-card-number">{{ sseEnAttente.length }}</span>
+              <span class="stat-card-sub">Remontées SSE →</span>
+            </div>
+          </div>
+          <div class="stat-card stat-purple" (click)="currentPage = 'voitures'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>directions_car</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Véhicules dispo.</span>
+              <span class="stat-card-number">{{ voituresDisponibles.length }}</span>
+              <span class="stat-card-sub">Parc automobile →</span>
             </div>
           </div>
         </div>
-
-        <!-- Actions rapides -->
-        <div class="quick-actions-card">
-          <h3>⚡ Actions Rapides</h3>
-          <div class="quick-grid">
-            <div class="quick-btn" (click)="currentPage = 'conges'">
-              <span>🏖️</span>
-              <strong>Gérer les Congés</strong>
-              <small>{{ congesEnAttente.length }} en attente</small>
+        <!-- ACTIONS RAPIDES -->
+        <div class="home-actions-card">
+          <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
+          <div class="home-actions-grid">
+            <div class="home-action-btn" (click)="currentPage = 'conges'">
+              <div class="home-action-icon home-action-orange"><mat-icon>beach_access</mat-icon></div>
+              <div class="home-action-text"><strong>Gérer les Congés</strong><span>{{ congesEnAttente.length }} en attente</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
-            <div class="quick-btn" (click)="currentPage = 'sse'">
-              <span>⚠️</span>
-              <strong>Remontées SSE</strong>
-              <small>{{ reclamationsSSE.length }} total</small>
+            <div class="home-action-btn" (click)="currentPage = 'sse'">
+              <div class="home-action-icon home-action-teal"><mat-icon>health_and_safety</mat-icon></div>
+              <div class="home-action-text"><strong>Remontées SSE</strong><span>{{ reclamationsSSE.length }} total</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
-            <div class="quick-btn" (click)="currentPage = 'voitures'">
-              <span>🚗</span>
-              <strong>Parc Auto</strong>
-              <small>{{ voitures.length }} véhicules</small>
+            <div class="home-action-btn" (click)="currentPage = 'voitures'">
+              <div class="home-action-icon home-action-purple"><mat-icon>directions_car</mat-icon></div>
+              <div class="home-action-text"><strong>Parc Auto</strong><span>{{ voitures.length }} véhicules</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
-            <div class="quick-btn" (click)="currentPage = 'employes'">
-              <span>👥</span>
-              <strong>Personnel</strong>
-              <small>{{ employes.length }} employés</small>
+            <div class="home-action-btn" (click)="currentPage = 'employes'">
+              <div class="home-action-icon home-action-blue"><mat-icon>people</mat-icon></div>
+              <div class="home-action-text"><strong>Personnel</strong><span>{{ employes.length }} employés</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
           </div>
         </div>

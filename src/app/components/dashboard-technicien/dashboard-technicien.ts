@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Semenier } from '../semenier/semenier';
+import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 
@@ -19,7 +19,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    Semenier, Planning, RemonteesTerrainComponent
+    Semainier, Planning, RemonteesTerrainComponent
   ],
   templateUrl: './dashboard-technicien.html',
   styleUrl: './dashboard-technicien.css'
@@ -46,8 +46,12 @@ export class DashboardTechnicien implements OnInit {
   conges: any[] = [];
   soldeConges: any = null;
   ficheDetail: any = null;
+  selectedConge: any = null;
+  showCongeDetail = false;
 
   voirDetailFiche(fiche: any) { this.ficheDetail = fiche; }
+  ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
+  fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
   nombreJours = 0;
@@ -86,23 +90,15 @@ export class DashboardTechnicien implements OnInit {
   }
 
   loadInterventions() {
-    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    this.http.get<any[]>(`http://localhost:8080/api/fiches-intervention/technicien/${this.user.id}`).subscribe({
       next: (data) => {
         localStorage.setItem('fiches_intervention', JSON.stringify(data));
-        const userFullName = `${this.user.prenom} ${this.user.nom}`;
-        const stored = localStorage.getItem('fiches_intervention');
-        const local: any[] = stored ? JSON.parse(stored) : [];
-        const mesFiches = data
-          .filter((f: any) => f.technicien && `${f.technicien.prenom} ${f.technicien.nom}` === userFullName)
-          .map((f: any) => {
-            const loc = local.find((l: any) => l.id === f.id);
-            return {
-              ...f,
-              numProjet: f.numProjet || f.numeroProjet,
-              dateDebut: loc?.dateDebut || (f.dateIntervention ? f.dateIntervention.split('T')[0] : ''),
-              dateFin: loc?.dateFin || ''
-            };
-          });
+        const mesFiches = data.map((f: any) => ({
+          ...f,
+          numProjet: f.numProjet || f.numeroProjet,
+          dateDebut: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
+          dateFin: ''
+        }));
         this.interventions = mesFiches.filter((f: any) => f.statut !== 'COMPLETEE' && f.statut !== 'VALIDEE');
         this.interventionsCompletees = mesFiches.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE');
       },
@@ -277,7 +273,7 @@ export class DashboardTechnicien implements OnInit {
       case 'completees':    return 'Interventions Completees';
       case 'conges':        return 'Mes Conges';
       case 'reclamations':  return 'Remontees SSE Terrain';
-      case 'semenier':      return 'Semenier';
+      case 'Semainier':      return 'Semainier';
       case 'planning':      return 'Planning';
       default: return 'Dashboard Technicien';
     }
@@ -291,3 +287,5 @@ export class DashboardTechnicien implements OnInit {
     this.router.navigate(['/login']);
   }
 }
+
+

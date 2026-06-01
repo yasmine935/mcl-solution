@@ -1,4 +1,4 @@
-<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -37,13 +37,16 @@
       <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
         <mat-icon>calendar_month</mat-icon> Planning
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
-        <mat-icon>calendar_today</mat-icon> Semenier
+      <a class="nav-item" [class.active]="currentPage === 'Semainier'" (click)="currentPage = 'Semainier'">
+        <mat-icon>calendar_today</mat-icon> Semainier
       </a>
 
       <div class="nav-divider"></div>
       <div class="nav-section-label">Gestion</div>
 
+      <a class="nav-item" [class.active]="currentPage === 'clients'" (click)="currentPage = 'clients'">
+        <mat-icon>people</mat-icon> Gestion des Clients
+      </a>
       <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
         <mat-icon>folder_open</mat-icon> Documents
       </a>
@@ -97,29 +100,70 @@
 
       <!-- ══ HOME ══ -->
       @if (currentPage === 'home') {
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Voici un aperçu de votre activité du jour</p>
+            </div>
+          </div>
+          <div class="home-welcome-badge"><mat-icon>manage_accounts</mat-icon> Manager MCL</div>
+        </div>
+        <!-- STAT CARDS -->
         <div class="stats-grid">
-          <div class="stat-card steel">
-            <div class="stat-icon-wrap"><mat-icon>receipt</mat-icon></div>
-            <div class="stat-info">
-              <h4>Factures</h4>
-              <p class="stat-number">{{ factures.length }}</p>
-              <p class="stat-sub">Ce mois-ci</p>
+          <div class="stat-card stat-blue" (click)="currentPage = 'factures'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>receipt</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Factures</span>
+              <span class="stat-card-number">{{ factures.length }}</span>
+              <span class="stat-card-sub">Ce mois-ci →</span>
             </div>
           </div>
-          <div class="stat-card navy">
-            <div class="stat-icon-wrap"><mat-icon>description</mat-icon></div>
-            <div class="stat-info">
-              <h4>Fiches</h4>
-              <p class="stat-number">{{ fiches.length }}</p>
-              <p class="stat-sub">Total fiches</p>
+          <div class="stat-card stat-green" (click)="currentPage = 'fiches'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>description</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Fiches</span>
+              <span class="stat-card-number">{{ fiches.length }}</span>
+              <span class="stat-card-sub">Total fiches →</span>
             </div>
           </div>
-          <div class="stat-card light">
-            <div class="stat-icon-wrap"><mat-icon>support_agent</mat-icon></div>
-            <div class="stat-info">
-              <h4>Tickets</h4>
-              <p class="stat-number">{{ tickets.length }}</p>
-              <p class="stat-sub">En attente</p>
+          <div class="stat-card stat-orange" (click)="currentPage = 'tickets'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>support_agent</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Tickets</span>
+              <span class="stat-card-number">{{ tickets.length }}</span>
+              <span class="stat-card-sub">En attente →</span>
+            </div>
+          </div>
+        </div>
+        <!-- ACTIONS RAPIDES -->
+        <div class="home-actions-card">
+          <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
+          <div class="home-actions-grid">
+            <div class="home-action-btn" (click)="currentPage = 'factures'">
+              <div class="home-action-icon home-action-blue"><mat-icon>receipt</mat-icon></div>
+              <div class="home-action-text"><strong>Factures</strong><span>{{ factures.length }} ce mois</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'fiches'">
+              <div class="home-action-icon home-action-green"><mat-icon>description</mat-icon></div>
+              <div class="home-action-text"><strong>Fiches</strong><span>{{ fiches.length }} total</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'tickets'">
+              <div class="home-action-icon home-action-orange"><mat-icon>support_agent</mat-icon></div>
+              <div class="home-action-text"><strong>Tickets</strong><span>{{ tickets.length }} en attente</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'ged'">
+              <div class="home-action-icon home-action-purple"><mat-icon>folder_open</mat-icon></div>
+              <div class="home-action-text"><strong>Documents</strong><span>GED</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
           </div>
         </div>
@@ -135,11 +179,14 @@
       @if (currentPage === 'planning') {
         <app-planning></app-planning>
       }
-      @if (currentPage === 'semenier') {
+      @if (currentPage === 'Semainier') {
         <app-semenier></app-semenier>
       }
       @if (currentPage === 'ged') {
         <app-documents></app-documents>
+      }
+      @if (currentPage === 'clients') {
+        <app-gestion-clients></app-gestion-clients>
       }
       @if (currentPage === 'factures') {
         <app-factures></app-factures>
@@ -412,3 +459,5 @@
     </div>
   </div>
 }
+
+

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,11 +11,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Planning } from '../planning/planning';
-import { Semenier } from '../semenier/semenier';
+import { Semainier } from '../semenier/semenier';
 import { Documents } from '../documents/documents';
 import { MiseAuTravail } from '../mise-au-travail/mise-au-travail';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
+import { GestionClients } from '../clients/clients';
 
 @Component({
   selector: 'app-dashboard-kia',
@@ -25,8 +26,8 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees,
-    Planning, Semenier, Documents,
-    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent
+    Planning, Semainier, Documents,
+    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'
@@ -198,7 +199,7 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
       case 'fiches': return 'Fiches Intervention';
       case 'fiches-completees': return 'Fiches Completees';
       case 'planning': return 'Planning';
-      case 'semenier': return 'Semenier';
+      case 'Semainier': return 'Semainier';
       case 'ged': return 'Documents';
       case 'conges-tech': return 'Conges a Valider';
       case 'mes-conges': return 'Mes Conges';
@@ -213,3 +214,5 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
 
   logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }
+
+

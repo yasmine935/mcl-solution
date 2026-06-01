@@ -17,26 +17,48 @@
         <h3>Nouveau Projet</h3>
       </div>
 
-      <div class="form-body">
-        <!-- LIGNE 1 -->
-        <div class="form-row">
-          <div class="field-xl">
+      <!-- SECTION 1 : INFORMATIONS PRINCIPALES -->
+      <div class="proj-section proj-section-blue">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">⭐</span>
+          <h4>Informations Principales</h4>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-xl">
             <label class="field-label">Nom du Projet *</label>
             <input class="compact-input" [(ngModel)]="nouvelleTache.projet" placeholder="Ex: Projet MCL..."/>
           </div>
-          <div class="field-md">
+          <div class="proj-field-md">
             <label class="field-label">Statut</label>
             <select class="compact-input" [(ngModel)]="nouvelleTache.statut">
               @for (s of statuts; track s) { <option [value]="s">{{ s }}</option> }
             </select>
           </div>
-          <div class="field-md">
+          <div class="proj-field-md">
             <label class="field-label">Priorité</label>
             <select class="compact-input" [(ngModel)]="nouvelleTache.priorite">
               @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
             </select>
           </div>
-          <div class="field-md">
+          <div class="proj-field-sm">
+            <label class="field-label">Date</label>
+            <input class="compact-input" [(ngModel)]="nouvelleTache.date" type="date"/>
+          </div>
+          <div class="proj-field-sm">
+            <label class="field-label">Échéance</label>
+            <input class="compact-input" [(ngModel)]="nouvelleTache.echeance" type="date"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2 : CLIENT -->
+      <div class="proj-section proj-section-purple">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">👥</span>
+          <h4>Client</h4>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-lg">
             <label class="field-label">Client</label>
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="nouvelleTache.client">
@@ -46,7 +68,7 @@
               <button type="button" class="btn-add-client" (click)="ouvrirAddClient('add')" title="Nouveau client">+</button>
             </div>
           </div>
-          <div class="field-md">
+          <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="nouvelleTache.clientFinal">
@@ -57,47 +79,107 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- LIGNE 2 -->
-        <div class="form-row">
-          <div class="field-xl">
+      <!-- SECTION 3 : DEVIS -->
+      <div class="proj-section proj-section-amber">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">📄</span>
+          <h4>Devis</h4>
+        </div>
+        <div class="proj-row proj-row-align-bottom">
+          <div class="proj-field-md">
+            <label class="field-label" for="num-devis-add">N° Devis</label>
+            <input id="num-devis-add" type="text" class="compact-input" [(ngModel)]="nouvelleTache.numDevis" placeholder="DEV-001">
+          </div>
+          <div class="proj-field-import">
+            <span class="proj-import-label">📄 Devis / Bon de commande</span>
+            <input type="file" #fileDevisAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Devis')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileDevisAdd.click()" type="button">Importer</button>
+          </div>
+        </div>
+        @if (nouvelleTache.fichiers.length) {
+          <div class="proj-fichiers-inline">
+            @for (f of nouvelleTache.fichiers; track $index) {
+              @if (f.type === 'Devis') {
+                <div class="fichier-item">
+                  <span class="doc-type-badge">{{ f.type }}</span>
+                  <span class="fichier-nom">{{ f.nom }}</span>
+                  <span class="fichier-taille">{{ f.taille }} KB</span>
+                  <button mat-icon-button color="warn" (click)="supprimerFichier($index)" type="button"><mat-icon>delete</mat-icon></button>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <!-- SECTION 4 : COMMANDE -->
+      <div class="proj-section proj-section-green">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">🛒</span>
+          <h4>Commande</h4>
+        </div>
+        <div class="proj-row proj-row-align-bottom">
+          <div class="proj-field-sm">
+            <label class="field-label" for="ca-add">CA (€)</label>
+            <input id="ca-add" class="compact-input" type="number" [(ngModel)]="nouvelleTache.chiffreAffaire" placeholder="0">
+          </div>
+          <div class="proj-field-md">
+            <label class="field-label" for="num-cmd-add">N° Commande</label>
+            <input id="num-cmd-add" type="text" class="compact-input" [(ngModel)]="nouvelleTache.numCommande" placeholder="CMD-001">
+          </div>
+          <div class="proj-field-import">
+            <span class="proj-import-label">📋 Bon de commande</span>
+            <input type="file" #fileCmdAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Commande')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileCmdAdd.click()" type="button">Importer</button>
+          </div>
+        </div>
+        @if (nouvelleTache.fichiers?.length) {
+          <div class="proj-fichiers-inline">
+            @for (f of nouvelleTache.fichiers; track $index) {
+              @if (f.type === 'Commande') {
+                <div class="fichier-item">
+                  <span class="doc-type-badge">{{ f.type }}</span>
+                  <span class="fichier-nom">{{ f.nom }}</span>
+                  <span class="fichier-taille">{{ f.taille }} KB</span>
+                  <button mat-icon-button color="warn" (click)="supprimerFichier($index)" type="button"><mat-icon>delete</mat-icon></button>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <!-- SECTION 5 : ÉQUIPE -->
+      <div class="proj-section proj-section-orange">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">👷</span>
+          <h4>Équipe</h4>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-full">
             <label class="field-label">Personnes assignées</label>
-            <select class="compact-input" [(ngModel)]="nouvelleTache.assignes" multiple style="height:60px">
+            <select class="compact-input select-multi" [(ngModel)]="nouvelleTache.assignes" multiple>
               @for (emp of employes; track emp.id) {
                 <option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</option>
               }
             </select>
           </div>
-          <div class="field-sm">
-            <label class="field-label">Date</label>
-            <input class="compact-input" [(ngModel)]="nouvelleTache.date" placeholder="2026-01-15" type="date"/>
-          </div>
-          <div class="field-sm">
-            <label class="field-label">Échéance</label>
-            <input class="compact-input" [(ngModel)]="nouvelleTache.echeance" placeholder="2026-03-01" type="date"/>
-          </div>
-          <div class="field-sm">
-            <label class="field-label">CA (€)</label>
-            <input class="compact-input" type="number" [(ngModel)]="nouvelleTache.chiffreAffaire" placeholder="0"/>
-          </div>
-          <div class="field-sm">
-            <label class="field-label">N° Commande</label>
-            <input class="compact-input" [(ngModel)]="nouvelleTache.numCommande" placeholder="CMD-001"/>
-          </div>
         </div>
+      </div>
 
-        <!-- FICHIERS -->
-        <div class="doc-section-label">📎 Documents / Fichiers</div>
+      <!-- SECTION 6 : DOCUMENTS (Planning + Autres) -->
+      <div class="proj-section proj-section-grey">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">📎</span>
+          <h4>Documents / Fichiers</h4>
+        </div>
         <div class="doc-categories">
           <div class="doc-cat-item">
             <span class="doc-cat-label">📅 Planning</span>
             <input type="file" #filePlanningAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Planning')" multiple class="file-input" accept="*/*">
             <button class="btn-doc-cat" (click)="filePlanningAdd.click()" type="button">Importer</button>
-          </div>
-          <div class="doc-cat-item">
-            <span class="doc-cat-label">📄 Devis / Bon de commande</span>
-            <input type="file" #fileDevisAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Devis')" multiple class="file-input" accept="*/*">
-            <button class="btn-doc-cat" (click)="fileDevisAdd.click()" type="button">Importer</button>
           </div>
           <div class="doc-cat-item">
             <span class="doc-cat-label">📁 Autres documents</span>
@@ -108,12 +190,14 @@
         @if (nouvelleTache.fichiers?.length) {
           <div class="fichiers-liste">
             @for (f of nouvelleTache.fichiers; track $index) {
-              <div class="fichier-item">
-                <span class="doc-type-badge">{{ f.type }}</span>
-                <span class="fichier-nom">{{ f.nom }}</span>
-                <span class="fichier-taille">{{ f.taille }} KB</span>
-                <button mat-icon-button color="warn" (click)="supprimerFichier($index)" type="button"><mat-icon>delete</mat-icon></button>
-              </div>
+              @if (f.type === 'Planning' || f.type === 'Autre') {
+                <div class="fichier-item">
+                  <span class="doc-type-badge">{{ f.type }}</span>
+                  <span class="fichier-nom">{{ f.nom }}</span>
+                  <span class="fichier-taille">{{ f.taille }} KB</span>
+                  <button mat-icon-button color="warn" (click)="supprimerFichier($index)" type="button"><mat-icon>delete</mat-icon></button>
+                </div>
+              }
             }
           </div>
         }
@@ -138,25 +222,48 @@
         <h3>Modifier — {{ selectedTache.projet }}</h3>
       </div>
 
-      <div class="form-body">
-        <div class="form-row">
-          <div class="field-xl">
+      <!-- SECTION 1 : INFORMATIONS PRINCIPALES -->
+      <div class="proj-section proj-section-orange">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">⭐</span>
+          <h4>Informations Principales</h4>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-xl">
             <label class="field-label">Nom du Projet *</label>
             <input class="compact-input" [(ngModel)]="tacheEnEdition.projet"/>
           </div>
-          <div class="field-md">
+          <div class="proj-field-md">
             <label class="field-label">Statut</label>
             <select class="compact-input" [(ngModel)]="tacheEnEdition.statut">
               @for (s of statuts; track s) { <option [value]="s">{{ s }}</option> }
             </select>
           </div>
-          <div class="field-md">
+          <div class="proj-field-md">
             <label class="field-label">Priorité</label>
             <select class="compact-input" [(ngModel)]="tacheEnEdition.priorite">
               @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
             </select>
           </div>
-          <div class="field-md">
+          <div class="proj-field-sm">
+            <label class="field-label">Date</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.date" type="date"/>
+          </div>
+          <div class="proj-field-sm">
+            <label class="field-label">Échéance</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.echeance" type="date"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2 : CLIENT -->
+      <div class="proj-section proj-section-purple">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">👥</span>
+          <h4>Client</h4>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-lg">
             <label class="field-label">Client</label>
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="tacheEnEdition.client">
@@ -166,7 +273,7 @@
               <button type="button" class="btn-add-client" (click)="ouvrirAddClient('edit')" title="Nouveau client">+</button>
             </div>
           </div>
-          <div class="field-md">
+          <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
             <div class="client-select-wrap">
               <select class="compact-input" [(ngModel)]="tacheEnEdition.clientFinal">
@@ -177,43 +284,107 @@
             </div>
           </div>
         </div>
-        <div class="form-row">
-          <div class="field-xl">
-            <label class="field-label">Personnes assignées</label>
-            <select class="compact-input" [(ngModel)]="tacheEnEdition.assignes" multiple style="height:60px">
+      </div>
+
+      <!-- SECTION 3 : COMMANDE -->
+      <div class="proj-section proj-section-green">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">🛒</span>
+          <h4>Commande</h4>
+        </div>
+        <div class="proj-row proj-row-align-bottom">
+          <div class="proj-field-sm">
+            <label class="field-label">CA (€)</label>
+            <input class="compact-input" type="number" [(ngModel)]="tacheEnEdition.chiffreAffaire"/>
+          </div>
+          <div class="proj-field-md">
+            <label class="field-label">N° Commande</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.numCommande"/>
+          </div>
+          <div class="proj-field-import">
+            <span class="proj-import-label">📋 Bon de commande</span>
+            <input type="file" #fileCmdEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Commande')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileCmdEdit.click()" type="button">Importer</button>
+          </div>
+        </div>
+        @if (tacheEnEdition.fichiers?.length) {
+          <div class="proj-fichiers-inline">
+            @for (f of tacheEnEdition.fichiers; track $index) {
+              @if (f.type === 'Commande') {
+                <div class="fichier-item">
+                  <span class="doc-type-badge">{{ f.type }}</span>
+                  <span class="fichier-nom">{{ f.nom }}</span>
+                  <span class="fichier-taille">{{ f.taille }} KB</span>
+                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <!-- SECTION 4 : DEVIS -->
+      <div class="proj-section proj-section-amber">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">📄</span>
+          <h4>Devis</h4>
+        </div>
+        <div class="proj-row proj-row-align-bottom">
+          <div class="proj-field-md">
+            <label class="field-label">N° Devis</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.numDevis">
+          </div>
+          <div class="proj-field-import">
+            <span class="proj-import-label">📄 Devis / Bon de commande</span>
+            <input type="file" #fileDevisEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Devis')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileDevisEdit.click()" type="button">Importer</button>
+          </div>
+        </div>
+        @if (tacheEnEdition.fichiers?.length) {
+          <div class="proj-fichiers-inline">
+            @for (f of tacheEnEdition.fichiers; track $index) {
+              @if (f.type === 'Devis') {
+                <div class="fichier-item">
+                  <span class="doc-type-badge">{{ f.type }}</span>
+                  <span class="fichier-nom">{{ f.nom }}</span>
+                  <span class="fichier-taille">{{ f.taille }} KB</span>
+                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <!-- SECTION 5 : ÉQUIPE -->
+      <div class="proj-section proj-section-teal">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">👷</span>
+          <h4>Équipe</h4>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-full">
+            <label class="field-label" for="assignes-edit">Personnes assignées</label>
+            <select id="assignes-edit" class="compact-input select-multi" [(ngModel)]="tacheEnEdition.assignes" multiple>
               @for (emp of employes; track emp.id) {
                 <option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</option>
               }
             </select>
           </div>
-          <div class="field-sm">
-            <label class="field-label">Date</label>
-            <input class="compact-input" [(ngModel)]="tacheEnEdition.date" type="date"/>
-          </div>
-          <div class="field-sm">
-            <label class="field-label">Échéance</label>
-            <input class="compact-input" [(ngModel)]="tacheEnEdition.echeance" type="date"/>
-          </div>
-          <div class="field-sm">
-            <label class="field-label">CA (€)</label>
-            <input class="compact-input" type="number" [(ngModel)]="tacheEnEdition.chiffreAffaire"/>
-          </div>
-          <div class="field-sm">
-            <label class="field-label">N° Commande</label>
-            <input class="compact-input" [(ngModel)]="tacheEnEdition.numCommande"/>
-          </div>
         </div>
-        <div class="doc-section-label">📎 Documents / Fichiers</div>
+      </div>
+
+      <!-- SECTION 6 : DOCUMENTS (Planning + Autres) -->
+      <div class="proj-section proj-section-grey">
+        <div class="proj-section-title">
+          <span class="proj-section-icon">📎</span>
+          <h4>Documents / Fichiers</h4>
+        </div>
         <div class="doc-categories">
           <div class="doc-cat-item">
             <span class="doc-cat-label">📅 Planning</span>
             <input type="file" #filePlanningEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Planning')" multiple class="file-input" accept="*/*">
             <button class="btn-doc-cat" (click)="filePlanningEdit.click()" type="button">Importer</button>
-          </div>
-          <div class="doc-cat-item">
-            <span class="doc-cat-label">📄 Devis / Bon de commande</span>
-            <input type="file" #fileDevisEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Devis')" multiple class="file-input" accept="*/*">
-            <button class="btn-doc-cat" (click)="fileDevisEdit.click()" type="button">Importer</button>
           </div>
           <div class="doc-cat-item">
             <span class="doc-cat-label">📁 Autres documents</span>
@@ -224,12 +395,14 @@
         @if (tacheEnEdition.fichiers?.length) {
           <div class="fichiers-liste">
             @for (f of tacheEnEdition.fichiers; track $index) {
-              <div class="fichier-item">
-                <span class="doc-type-badge">{{ f.type }}</span>
-                <span class="fichier-nom">{{ f.nom }}</span>
-                <span class="fichier-taille">{{ f.taille }} KB</span>
-                <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
-              </div>
+              @if (f.type === 'Planning' || f.type === 'Autre') {
+                <div class="fichier-item">
+                  <span class="doc-type-badge">{{ f.type }}</span>
+                  <span class="fichier-nom">{{ f.nom }}</span>
+                  <span class="fichier-taille">{{ f.taille }} KB</span>
+                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
+                </div>
+              }
             }
           </div>
         }
@@ -249,9 +422,35 @@
   <!-- TABLEAU -->
   <div class="table-container">
     <div class="table-header">
-      <h3>📊 Liste des Projets ({{ taches.length }})</h3>
+      <h3>📊 Liste des Projets ({{ tachesFiltrees().length }}/{{ taches.length }})</h3>
+      <div class="taches-toolbar">
+        <div class="taches-search-wrap">
+          <mat-icon>search</mat-icon>
+          <input type="text" class="taches-search" [(ngModel)]="rechercheTache" placeholder="Projet, client, N° CMD...">
+          @if (rechercheTache) {
+            <button type="button" class="taches-search-clear" (click)="rechercheTache = ''"><mat-icon>close</mat-icon></button>
+          }
+        </div>
+        <select class="taches-filter-select" [(ngModel)]="filtreStatutTache">
+          <option value="">Tous les statuts</option>
+          @for (s of statuts; track s) { <option [value]="s">{{ s }}</option> }
+        </select>
+        <select class="taches-filter-select" [(ngModel)]="filtrePrioriteTache">
+          <option value="">Toutes priorités</option>
+          @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
+        </select>
+        <select class="taches-filter-select" [(ngModel)]="filtreClientTache">
+          <option value="">Tous les clients</option>
+          @for (c of getClientsUniques(); track c) { <option [value]="c">{{ c }}</option> }
+        </select>
+        @if (rechercheTache || filtreStatutTache || filtrePrioriteTache || filtreClientTache) {
+          <button type="button" class="taches-reset-btn" (click)="rechercheTache=''; filtreStatutTache=''; filtrePrioriteTache=''; filtreClientTache=''">
+            <mat-icon>filter_alt_off</mat-icon> Réinitialiser
+          </button>
+        }
+      </div>
     </div>
-    @if (taches.length === 0) {
+    @if (tachesFiltrees().length === 0) {
       <div class="empty-state">
         <mat-icon>folder_open</mat-icon>
         <p>Aucun projet</p>
@@ -275,7 +474,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (tache of taches; track tache.id) {
+            @for (tache of tachesFiltrees(); track tache.id) {
               <tr>
                 <td>
                   <div class="projet-with-note">
@@ -498,6 +697,29 @@
             </div>
           }
         </div>
+
+        <!-- DOCUMENTS -->
+        @if (selectedTache.fichiers?.length > 0) {
+          <div class="detail-docs-section">
+            <div class="detail-docs-title">📎 Documents attachés ({{ selectedTache.fichiers.length }})</div>
+            <div class="fichiers-liste">
+              @for (f of selectedTache.fichiers; track $index) {
+                <div class="fichier-item">
+                  <span class="doc-type-badge">{{ f.type || 'Doc' }}</span>
+                  <span class="fichier-nom">{{ f.nom }}</span>
+                  <span class="fichier-taille">{{ f.taille }} KB</span>
+                  @if (f.dataUrl) {
+                    <button mat-icon-button color="primary" (click)="ouvrirFichier(f)" title="Ouvrir / Télécharger" type="button">
+                      <mat-icon>open_in_new</mat-icon>
+                    </button>
+                  } @else {
+                    <span class="fichier-no-preview" title="Fichier importé avant la mise à jour — veuillez le ré-importer">⚠ Réimporter</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
 
       </div>
       <div class="modal-footer">

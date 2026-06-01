@@ -52,33 +52,53 @@
 
       <!-- HOME -->
       @if (currentPage === 'home') {
-        <div class="kpi-grid">
-          <div class="kpi-card kpi-bleu" (click)="currentPage = 'factures'">
-            <div class="kpi-icon">🧾</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ factures.length }}</span>
-              <span class="kpi-label">Total Factures</span>
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Voici un aperçu de votre activité comptable</p>
             </div>
           </div>
-          <div class="kpi-card kpi-vert" (click)="currentPage = 'factures'">
-            <div class="kpi-icon">✅</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ facturesPayees }}</span>
-              <span class="kpi-label">Factures payees</span>
+          <div class="home-welcome-badge"><mat-icon>receipt_long</mat-icon> Comptable MCL</div>
+        </div>
+        <!-- STAT CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card stat-blue" (click)="currentPage = 'factures'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>receipt</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Total Factures</span>
+              <span class="stat-card-number">{{ factures.length }}</span>
+              <span class="stat-card-sub">Voir factures →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-orange" (click)="currentPage = 'factures'">
-            <div class="kpi-icon">⏳</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ facturesEnAttente }}</span>
-              <span class="kpi-label">En attente</span>
+          <div class="stat-card stat-green" (click)="currentPage = 'factures'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Factures payées</span>
+              <span class="stat-card-number">{{ facturesPayees }}</span>
+              <span class="stat-card-sub">Réglées →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-violet" (click)="currentPage = 'ecritures'">
-            <div class="kpi-icon">📒</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ ecritures.length }}</span>
-              <span class="kpi-label">Ecritures comptables</span>
+          <div class="stat-card stat-orange" (click)="currentPage = 'factures'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>hourglass_empty</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">En attente</span>
+              <span class="stat-card-number">{{ facturesEnAttente }}</span>
+              <span class="stat-card-sub">À traiter →</span>
+            </div>
+          </div>
+          <div class="stat-card stat-purple" (click)="currentPage = 'ecritures'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>book</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Écritures comptables</span>
+              <span class="stat-card-number">{{ ecritures.length }}</span>
+              <span class="stat-card-sub">Journal →</span>
             </div>
           </div>
         </div>

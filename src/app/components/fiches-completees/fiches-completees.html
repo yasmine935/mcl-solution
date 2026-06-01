@@ -1,167 +1,161 @@
-<div class="fiches-completees-container">
-  <div class="fiches-header">
-    <h2>📋 Fiches Complétées par les Techniciens</h2>
-    <div class="stats">
-      <div class="stat-card">
-        <span class="stat-number">{{ getCountPending() }}</span>
-        <span class="stat-label">En attente de validation</span>
+<div class="fc-container">
+
+  <!-- HEADER GRADIENT -->
+  <div class="fc-header">
+    <div class="fc-header-left">
+      <div class="fc-header-icon"><mat-icon>task_alt</mat-icon></div>
+      <div>
+        <h2>Fiches Complétées</h2>
+        <p>Validation des travaux réalisés par les techniciens</p>
       </div>
-      <div class="stat-card validated">
-        <span class="stat-number">{{ getCountValidees() }}</span>
-        <span class="stat-label">Validées</span>
+    </div>
+    <div class="fc-header-stats">
+      <div class="fc-stat fc-stat-orange">
+        <mat-icon>hourglass_empty</mat-icon>
+        <div>
+          <span class="fc-stat-num">{{ getCountPending() }}</span>
+          <span class="fc-stat-lbl">En attente</span>
+        </div>
+      </div>
+      <div class="fc-stat fc-stat-green">
+        <mat-icon>check_circle</mat-icon>
+        <div>
+          <span class="fc-stat-num">{{ getCountValidees() }}</span>
+          <span class="fc-stat-lbl">Validées</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- FILTRES -->
-  <div class="filters-section">
-    <button 
-      [class.active]="filterStatut === 'PENDING'"
-      (click)="filterStatut = 'PENDING'" 
-      class="filter-btn pending">
-      ⏳ En attente ({{ getCountPending() }})
-    </button>
-    <button 
-      [class.active]="filterStatut === 'VALIDEE'"
-      (click)="filterStatut = 'VALIDEE'" 
-      class="filter-btn validee">
-      ✅ Validées ({{ getCountValidees() }})
-    </button>
+  <!-- FILTRES + RECHERCHE -->
+  <div class="fc-toolbar">
+    <div class="fc-tabs">
+      <button type="button" class="fc-tab" [class.fc-tab-active]="filterStatut === 'PENDING'" (click)="filterStatut = 'PENDING'">
+        <mat-icon>hourglass_empty</mat-icon> En attente ({{ getCountPending() }})
+      </button>
+      <button type="button" class="fc-tab" [class.fc-tab-active]="filterStatut === 'VALIDEE'" (click)="filterStatut = 'VALIDEE'">
+        <mat-icon>check_circle</mat-icon> Validées ({{ getCountValidees() }})
+      </button>
+    </div>
+    <div class="fc-search-wrap">
+      <mat-icon>search</mat-icon>
+      <input type="text" class="fc-search" [(ngModel)]="rechercheFC" placeholder="Projet, client, technicien...">
+      @if (rechercheFC) {
+        <button type="button" class="fc-search-clear" (click)="rechercheFC = ''"><mat-icon>close</mat-icon></button>
+      }
+    </div>
   </div>
 
-  <!-- LISTE DES FICHES -->
+  <!-- LISTE -->
   @if (getFichesAffichees().length > 0) {
-    <div class="fiches-list">
+    <div class="fc-grid">
       @for (fiche of getFichesAffichees(); track fiche.id) {
-        <div class="fiche-card" [class.validee]="fiche.approuvePar">
-          <div class="fiche-card-header">
-            <div class="fiche-info">
-              <h3>{{ fiche.numProjet }} - {{ fiche.client }}</h3>
-              <p class="tech-name">👤 {{ fiche.technicienAssigne }}</p>
+        <div class="fc-card" [class.fc-card-validee]="fiche.approuvePar">
+
+          <!-- CARD HEADER -->
+          <div class="fc-card-head" [class.fc-head-validee]="fiche.approuvePar">
+            <div class="fc-card-head-left">
+              <span class="fc-proj">{{ fiche.numProjet }}</span>
+              <span class="fc-client">{{ fiche.client }}</span>
             </div>
-            <div class="fiche-status">
-              @if (fiche.approuvePar) {
-                <span class="badge badge-validee">✅ VALIDÉE</span>
-                <p class="validated-by">Validé par: {{ fiche.approuvePar }}</p>
-              } @else {
-                <span class="badge badge-pending">⏳ EN ATTENTE</span>
-              }
-            </div>
+            @if (fiche.approuvePar) {
+              <span class="fc-badge fc-badge-ok">✅ VALIDÉE</span>
+            } @else {
+              <span class="fc-badge fc-badge-wait">⏳ EN ATTENTE</span>
+            }
           </div>
 
-          <div class="fiche-card-body">
-            <div class="fiche-dates">
-              <div class="date-item">
-                <strong>Date intervention:</strong> {{ fiche.dateIntervention || fiche.date }}
+          <!-- CARD BODY -->
+          <div class="fc-card-body">
+            <div class="fc-row-info">
+              <div class="fc-info-item">
+                <mat-icon>engineering</mat-icon>
+                <span>{{ fiche.technicienAssigne || 'Non assigné' }}</span>
               </div>
-              <div class="date-item">
-                <strong>Date complétée:</strong> {{ fiche.dateCompletion | date:'dd/MM/yyyy HH:mm' }}
-              </div>
-              @if (fiche.approuvePar) {
-                <div class="date-item validated">
-                  <strong>Date validation:</strong> {{ fiche.dateApprobation | date:'dd/MM/yyyy HH:mm' }}
+              @if (fiche.dateIntervention || fiche.date) {
+                <div class="fc-info-item">
+                  <mat-icon>calendar_today</mat-icon>
+                  <span>{{ fiche.dateIntervention || fiche.date | date:'dd/MM/yyyy' }}</span>
+                </div>
+              }
+              @if (fiche.dateCompletion) {
+                <div class="fc-info-item fc-completed-date">
+                  <mat-icon>done_all</mat-icon>
+                  <span>{{ fiche.dateCompletion | date:'dd/MM HH:mm' }}</span>
                 </div>
               }
             </div>
 
-            <div class="fiche-details-preview">
-              <div class="detail-item">
-                <strong>📍 Adresse:</strong> {{ fiche.adresse }}
+            @if (fiche.adresse || fiche.contact) {
+              <div class="fc-row-info fc-row-secondary">
+                @if (fiche.adresse) {
+                  <div class="fc-info-item">
+                    <mat-icon>location_on</mat-icon>
+                    <span>{{ fiche.adresse }}</span>
+                  </div>
+                }
+                @if (fiche.contact) {
+                  <div class="fc-info-item">
+                    <mat-icon>phone</mat-icon>
+                    <span>{{ fiche.contact }}</span>
+                  </div>
+                }
               </div>
-              <div class="detail-item">
-                <strong>📞 Contact:</strong> {{ fiche.contact }}
-              </div>
-              <div class="detail-item">
-                <strong>🕐 Heure début:</strong> {{ fiche.heureDebut }} - 
-                <strong>Heure fin:</strong> {{ fiche.heureFin }}
-              </div>
-              @if (fiche.intervenants) {
-                <div class="detail-item">
-                  <strong>👥 Intervenants:</strong> {{ fiche.intervenants }}
+            }
+
+            @if (fiche.heureDebut || fiche.heureFin) {
+              <div class="fc-row-info">
+                <div class="fc-info-item">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ fiche.heureDebut || '-' }} → {{ fiche.heureFin || '-' }}</span>
                 </div>
-              }
-            </div>
+              </div>
+            }
 
             <!-- SIGNATURES PREVIEW -->
-            <div class="signatures-preview">
-              <div class="signature-box">
-                <strong>✍️ Signature Technicien</strong>
-                @if (afficherSignature(fiche.signatureTechnicien)) {
-                  <img [src]="fiche.signatureTechnicien" alt="Signature Technicien" class="sig-preview"/>
-                } @else {
-                  <p class="no-sig">Pas de signature</p>
-                }
+            <div class="fc-sigs">
+              <div class="fc-sig-mini" [class.fc-sig-ok]="afficherSignature(fiche.signatureTechnicien)">
+                <mat-icon>{{ afficherSignature(fiche.signatureTechnicien) ? 'check' : 'close' }}</mat-icon>
+                <span>Technicien</span>
               </div>
-
-              <div class="signature-box">
-                <strong>✍️ Signature Client</strong>
-                @if (fiche.nomClientSigne) {
-                  <p class="client-name">{{ fiche.nomClientSigne }}</p>
-                }
-                @if (afficherSignature(fiche.signatureClient)) {
-                  <img [src]="fiche.signatureClient" alt="Signature Client" class="sig-preview"/>
-                } @else {
-                  <p class="no-sig">Pas de signature</p>
-                }
+              <div class="fc-sig-mini" [class.fc-sig-ok]="afficherSignature(fiche.signatureClient)">
+                <mat-icon>{{ afficherSignature(fiche.signatureClient) ? 'check' : 'close' }}</mat-icon>
+                <span>Client{{ fiche.nomClientSigne ? ' (' + fiche.nomClientSigne + ')' : '' }}</span>
               </div>
+              @if (fiche.taches && fiche.taches.length > 0) {
+                <div class="fc-taches-count">
+                  <mat-icon>checklist</mat-icon>
+                  <span>{{ fiche.taches.length }} tâche(s)</span>
+                </div>
+              }
             </div>
 
-            <!-- TÂCHES COMPLÉTÉES -->
-            @if (fiche.taches && fiche.taches.length > 0) {
-              <div class="taches-resume">
-                <strong>✅ Tâches effectuées:</strong>
-                <ul>
-                  @for (tache of fiche.taches; track $index) {
-                    <li [class.checked]="tache.coche">
-                      <input type="checkbox" [checked]="tache.coche" disabled/>
-                      {{ tache.nom }}
-                      @if (tache.selection) {
-                        <span class="tache-selection">{{ tache.selection }}</span>
-                      }
-                    </li>
-                  }
-                </ul>
-              </div>
-            }
-
-            <!-- PHOTOS -->
-            @if (fiche.photos && fiche.photos.length > 0) {
-              <div class="photos-count">
-                <mat-icon>photo</mat-icon> {{ fiche.photos.length }} photo(s)
-              </div>
-            }
-
-            @if (fiche.documentsImportes && fiche.documentsImportes.length > 0) {
-              <div class="documents-count">
-                <mat-icon>description</mat-icon> {{ fiche.documentsImportes.length }} document(s)
+            @if (fiche.approuvePar) {
+              <div class="fc-validated-by">
+                <mat-icon>verified</mat-icon> Validé par {{ fiche.approuvePar }}
+                @if (fiche.dateApprobation) { · {{ fiche.dateApprobation | date:'dd/MM/yyyy' }} }
               </div>
             }
           </div>
 
-          <!-- ACTIONS -->
-          @if (!fiche.approuvePar) {
-            <div class="fiche-card-actions">
-              <button mat-raised-button color="primary" (click)="ouvrirDetail(fiche)" class="btn-detail">
-                <mat-icon>visibility</mat-icon> Voir détails
+          <!-- CARD FOOTER -->
+          <div class="fc-card-foot">
+            <button type="button" class="fc-btn-detail" (click)="ouvrirDetail(fiche)">
+              <mat-icon>visibility</mat-icon> Voir détails
+            </button>
+            @if (!fiche.approuvePar) {
+              <button type="button" class="fc-btn-valider" (click)="validerFiche(fiche)">
+                <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
               </button>
-              <button mat-raised-button color="accent" (click)="validerFiche(fiche)" class="btn-valider">
-                <mat-icon>check_circle</mat-icon> Valider & Facturer
-              </button>
-            </div>
-          } @else {
-            <div class="fiche-card-actions">
-              <button mat-raised-button color="primary" (click)="ouvrirDetail(fiche)" class="btn-detail">
-                <mat-icon>visibility</mat-icon> Voir détails
-              </button>
-            </div>
-          }
+            }
+          </div>
         </div>
       }
     </div>
   } @else {
-    <div class="empty-state">
+    <div class="fc-empty">
       <mat-icon>inbox</mat-icon>
-      <p>Aucune fiche {{ filterStatut === 'PENDING' ? 'en attente' : 'validée' }}</p>
+      <p>Aucune fiche {{ filterStatut === 'PENDING' ? 'en attente de validation' : 'validée' }}</p>
     </div>
   }
 
@@ -169,147 +163,172 @@
   @if (showDetailModal && selectedFiche) {
     <div class="modal-overlay" (click)="fermerDetail()">
       <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>{{ selectedFiche.numProjet }} - {{ selectedFiche.client }}</h2>
-          <button class="close-btn" (click)="fermerDetail()">
-            <mat-icon>close</mat-icon>
-          </button>
+
+        <!-- HEADER -->
+        <div class="md-header">
+          <div class="md-header-left">
+            <span class="md-proj-chip">{{ selectedFiche.numProjet }}</span>
+            <div>
+              <h2>{{ selectedFiche.client }}</h2>
+              <p>{{ selectedFiche.technicienAssigne }} · {{ selectedFiche.date | date:'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
+          <div class="md-header-right">
+            @if (selectedFiche.approuvePar) {
+              <span class="md-badge-ok">✅ VALIDÉE</span>
+            } @else {
+              <span class="md-badge-wait">⏳ EN ATTENTE</span>
+            }
+            <button type="button" class="md-close" (click)="fermerDetail()"><mat-icon>close</mat-icon></button>
+          </div>
         </div>
 
-        <div class="modal-body">
-          <!-- INFOS PRINCIPALES -->
-          <div class="modal-section">
-            <h3>⭐ Informations Principales</h3>
-            <div class="modal-grid">
-              <div class="modal-item">
-                <strong>N° Projet:</strong> {{ selectedFiche.numProjet }}
-              </div>
-              <div class="modal-item">
-                <strong>Client:</strong> {{ selectedFiche.client }}
-              </div>
-              <div class="modal-item">
-                <strong>Technicien:</strong> {{ selectedFiche.technicienAssigne }}
-              </div>
-              <div class="modal-item">
-                <strong>Date:</strong> {{ selectedFiche.date }}
+        <div class="md-body">
+
+          <!-- LIGNE 1 : Infos + Client -->
+          <div class="md-row2">
+
+            <div class="md-card md-blue">
+              <div class="md-card-title"><mat-icon>info</mat-icon> Informations</div>
+              <div class="md-fields">
+                <div class="md-field"><span class="md-lbl">N° Projet</span><span class="md-val">{{ selectedFiche.numProjet }}</span></div>
+                <div class="md-field"><span class="md-lbl">Technicien</span><span class="md-val">{{ selectedFiche.technicienAssigne || '-' }}</span></div>
+                <div class="md-field"><span class="md-lbl">Statut</span><span class="md-val">{{ selectedFiche.statut }}</span></div>
+                @if (selectedFiche.description) {
+                  <div class="md-field md-full"><span class="md-lbl">Description</span><span class="md-val">{{ selectedFiche.description }}</span></div>
+                }
               </div>
             </div>
-            <div class="modal-description">
-              <strong>Description:</strong>
-              <p>{{ selectedFiche.description }}</p>
+
+            <div class="md-card md-purple">
+              <div class="md-card-title"><mat-icon>person</mat-icon> Client</div>
+              <div class="md-fields">
+                <div class="md-field"><span class="md-lbl">Client</span><span class="md-val">{{ selectedFiche.client || '-' }}</span></div>
+                <div class="md-field"><span class="md-lbl">Code Client</span><span class="md-val">{{ selectedFiche.codeClient || '-' }}</span></div>
+                <div class="md-field"><span class="md-lbl">N° Commande</span><span class="md-val">{{ selectedFiche.numCommande || '-' }}</span></div>
+                <div class="md-field"><span class="md-lbl">Adresse</span><span class="md-val">{{ selectedFiche.adresse || '-' }}</span></div>
+                <div class="md-field"><span class="md-lbl">Contact</span><span class="md-val">{{ selectedFiche.contact || '-' }}</span></div>
+                @if (selectedFiche.chiffreAffaire) {
+                  <div class="md-field"><span class="md-lbl">Chiffre d'affaire</span><span class="md-val md-ca">{{ selectedFiche.chiffreAffaire | number }} €</span></div>
+                }
+              </div>
             </div>
+
           </div>
 
-          <!-- INFOS CLIENT -->
-          <div class="modal-section">
-            <h3>👥 Informations Client</h3>
-            <div class="modal-grid">
-              <div class="modal-item">
-                <strong>N° Commande:</strong> {{ selectedFiche.numCommande }}
-              </div>
-              <div class="modal-item">
-                <strong>Adresse:</strong> {{ selectedFiche.adresse }}
-              </div>
-              <div class="modal-item">
-                <strong>Contact:</strong> {{ selectedFiche.contact }}
-              </div>
-            </div>
-          </div>
-
-          <!-- DONNÉES D'EXÉCUTION -->
-          <div class="modal-section">
-            <h3>⏱️ Données d'Exécution</h3>
-            <div class="modal-grid">
-              <div class="modal-item">
-                <strong>Date début:</strong> {{ selectedFiche.dateDebut }}
-              </div>
-              <div class="modal-item">
-                <strong>Heure début:</strong> {{ selectedFiche.heureDebut }}
-              </div>
-              <div class="modal-item">
-                <strong>Heure fin:</strong> {{ selectedFiche.heureFin }}
-              </div>
-              <div class="modal-item">
-                <strong>Intervenants:</strong> {{ selectedFiche.intervenants }}
-              </div>
+          <!-- EXÉCUTION -->
+          <div class="md-card md-teal">
+            <div class="md-card-title"><mat-icon>schedule</mat-icon> Données d'Exécution</div>
+            <div class="md-fields md-row">
+              <div class="md-field"><span class="md-lbl">Date intervention</span><span class="md-val">{{ selectedFiche.date | date:'dd/MM/yyyy' }}</span></div>
+              <div class="md-field"><span class="md-lbl">Heure début</span><span class="md-val">{{ selectedFiche.heureDebut || '-' }}</span></div>
+              <div class="md-field"><span class="md-lbl">Heure fin</span><span class="md-val">{{ selectedFiche.heureFin || '-' }}</span></div>
+              <div class="md-field"><span class="md-lbl">Intervenants</span><span class="md-val">{{ selectedFiche.intervenants || '-' }}</span></div>
+              @if (selectedFiche.dateCompletion) {
+                <div class="md-field"><span class="md-lbl">Complétée le</span><span class="md-val">{{ selectedFiche.dateCompletion | date:'dd/MM/yyyy HH:mm' }}</span></div>
+              }
+              @if (selectedFiche.approuvePar) {
+                <div class="md-field"><span class="md-lbl">Validé par</span><span class="md-val">{{ selectedFiche.approuvePar }}</span></div>
+                <div class="md-field"><span class="md-lbl">Date validation</span><span class="md-val">{{ selectedFiche.dateApprobation | date:'dd/MM/yyyy HH:mm' }}</span></div>
+              }
             </div>
           </div>
 
           <!-- TÂCHES -->
           @if (selectedFiche.taches && selectedFiche.taches.length > 0) {
-            <div class="modal-section">
-              <h3>✅ Tâches</h3>
-              <ul class="taches-complete-list">
+            <div class="md-card md-green">
+              <div class="md-card-title"><mat-icon>checklist</mat-icon> Tâches ({{ selectedFiche.taches.length }})</div>
+              <div class="md-taches">
                 @for (tache of selectedFiche.taches; track $index) {
-                  <li [class.checked]="tache.coche">
-                    <input type="checkbox" [checked]="tache.coche" disabled/>
-                    <span>{{ tache.nom }}</span>
-                    @if (tache.selection) {
-                      <span class="tache-selection">{{ tache.selection }}</span>
-                    }
-                  </li>
+                  <div class="md-tache" [class.md-tache-done]="tache.coche">
+                    <span class="md-tache-icon">{{ tache.coche ? '✅' : '⬜' }}</span>
+                    <div class="md-tache-body">
+                      <span class="md-tache-nom">{{ tache.nom }}</span>
+                      @if (tache.selections && tache.selections.length > 0) {
+                        <div class="md-chips">
+                          @for (sel of tache.selections; track $index) {
+                            <span class="md-chip">{{ sel }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
                 }
-              </ul>
+              </div>
             </div>
           }
 
-          <!-- SIGNATURES COMPLÈTES -->
-          <div class="modal-section signatures-full">
-            <h3>✍️ Signatures</h3>
-            <div class="signatures-grid">
-              <div class="signature-full">
-                <strong>Signature Technicien</strong>
-                @if (afficherSignature(selectedFiche.signatureTechnicien)) {
-                  <img [src]="selectedFiche.signatureTechnicien" alt="Signature Technicien"/>
-                } @else {
-                  <p>Pas de signature</p>
+          <!-- MATÉRIELS -->
+          @if (selectedFiche.materielsHorsStandard && selectedFiche.materielsHorsStandard.length > 0) {
+            <div class="md-card md-orange">
+              <div class="md-card-title"><mat-icon>build</mat-icon> Matériels Hors Standard ({{ selectedFiche.materielsHorsStandard.length }})</div>
+              <div class="md-chips md-chips-big">
+                @for (mat of selectedFiche.materielsHorsStandard; track $index) {
+                  <span class="md-chip-mat">{{ mat }}</span>
                 }
               </div>
+            </div>
+          }
 
-              <div class="signature-full">
-                <strong>Signature Client: {{ selectedFiche.nomClientSigne }}</strong>
-                @if (afficherSignature(selectedFiche.signatureClient)) {
-                  <img [src]="selectedFiche.signatureClient" alt="Signature Client"/>
+          <!-- SIGNATURES -->
+          <div class="md-card md-sig">
+            <div class="md-card-title"><mat-icon>draw</mat-icon> Signatures</div>
+            <div class="md-sig-grid">
+              <div class="md-sig-box">
+                <div class="md-sig-lbl">Technicien</div>
+                @if (afficherSignature(selectedFiche.signatureTechnicien)) {
+                  <img src="{{ selectedFiche.signatureTechnicien }}" alt="Signature Technicien">
                 } @else {
-                  <p>Pas de signature</p>
+                  <div class="md-no-sig">Aucune signature</div>
+                }
+              </div>
+              <div class="md-sig-box">
+                <div class="md-sig-lbl">Signature Client</div>
+                @if (selectedFiche.nomClientSigne) {
+                  <div class="md-sig-name">{{ selectedFiche.nomClientSigne }}</div>
+                }
+                @if (afficherSignature(selectedFiche.signatureClient)) {
+                  <img src="{{ selectedFiche.signatureClient }}" alt="Signature Client">
+                } @else {
+                  <div class="md-no-sig">Aucune signature</div>
                 }
               </div>
             </div>
           </div>
 
-          <!-- PHOTOS -->
-          @if (selectedFiche.photos && selectedFiche.photos.length > 0) {
-            <div class="modal-section">
-              <h3>📸 Photos ({{ selectedFiche.photos.length }})</h3>
-              <p>{{ getPhotosNames() }}</p>
-            </div>
-          }
-
           <!-- DOCUMENTS -->
           @if (selectedFiche.documentsImportes && selectedFiche.documentsImportes.length > 0) {
-            <div class="modal-section">
-              <h3>📄 Documents ({{ selectedFiche.documentsImportes.length }})</h3>
-              <ul>
+            <div class="md-card md-docs">
+              <div class="md-card-title"><mat-icon>folder</mat-icon> Documents ({{ selectedFiche.documentsImportes.length }})</div>
+              <div class="md-docs-list">
                 @for (doc of selectedFiche.documentsImportes; track $index) {
-                  <li>{{ doc.nom }} ({{ doc.taille }} KB)</li>
+                  <div class="md-doc-item">
+                    <mat-icon>description</mat-icon>
+                    <span class="md-doc-nom">{{ doc.nom }}</span>
+                    @if (doc.taille) { <span class="md-doc-size">{{ doc.taille }} KB</span> }
+                    @if (doc.type) { <span class="md-doc-type">{{ doc.type }}</span> }
+                  </div>
                 }
-              </ul>
+              </div>
             </div>
           }
+
         </div>
 
-        <!-- MODAL ACTIONS -->
-        <div class="modal-footer">
+        <!-- FOOTER -->
+        <div class="md-footer">
           @if (!selectedFiche.approuvePar) {
-            <button mat-raised-button color="accent" (click)="validerFiche(selectedFiche)">
-              <mat-icon>check_circle</mat-icon> Valider & Facturer
+            <button type="button" class="md-btn-valider" (click)="validerFiche(selectedFiche)">
+              <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
             </button>
           }
-          <button mat-stroked-button (click)="fermerDetail()">
+          <button type="button" class="md-btn-fermer" (click)="fermerDetail()">
             <mat-icon>close</mat-icon> Fermer
           </button>
         </div>
+
       </div>
     </div>
   }
+
 </div>

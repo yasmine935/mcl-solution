@@ -1,4 +1,4 @@
-<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -44,14 +44,17 @@
       <div class="nav-divider"></div>
       <div class="nav-section-label">Gestion</div>
 
+      <a class="nav-item" [class.active]="currentPage === 'clients'" (click)="currentPage = 'clients'">
+        <mat-icon>people</mat-icon> Gestion des Clients
+      </a>
       <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
         <mat-icon>fact_check</mat-icon> Tous les Congés
       </a>
       <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
         <mat-icon>people_alt</mat-icon> Employés
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
-        <mat-icon>calendar_today</mat-icon> Semenier
+      <a class="nav-item" [class.active]="currentPage === 'Semainier'" (click)="currentPage = 'Semainier'">
+        <mat-icon>calendar_today</mat-icon> Semainier
       </a>
       <a class="nav-item" [class.active]="currentPage === 'documents'" (click)="currentPage = 'documents'">
         <mat-icon>folder_open</mat-icon> Documents
@@ -111,37 +114,79 @@
 
       <!-- ══ HOME ══ -->
       @if (currentPage === 'home') {
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Voici un aperçu de votre activité du jour</p>
+            </div>
+          </div>
+          <div class="home-welcome-badge"><mat-icon>admin_panel_settings</mat-icon> Admin MCL</div>
+        </div>
+        <!-- STAT CARDS -->
         <div class="stats-grid">
-          <div class="stat-card blue">
-            <div class="stat-icon-wrap"><mat-icon>people_alt</mat-icon></div>
-            <div class="stat-info">
-              <h4>Employés</h4>
-              <p class="stat-number">{{ employes.length }}</p>
-              <p class="stat-sub">Actifs dans le système</p>
+          <div class="stat-card stat-blue" (click)="currentPage = 'employes'" style="cursor:pointer">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>people_alt</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Employés</span>
+              <span class="stat-card-number">{{ employes.length }}</span>
+              <span class="stat-card-sub">Actifs dans le système →</span>
             </div>
           </div>
-          <div class="stat-card orange">
-            <div class="stat-icon-wrap"><mat-icon>fact_check</mat-icon></div>
-            <div class="stat-info">
-              <h4>Demandes Congés</h4>
-              <p class="stat-number">{{ conges.length }}</p>
-              <p class="stat-sub">À traiter</p>
+          <div class="stat-card stat-orange" (click)="currentPage = 'conges'" style="cursor:pointer">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>fact_check</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Demandes Congés</span>
+              <span class="stat-card-number">{{ conges.length }}</span>
+              <span class="stat-card-sub">À traiter →</span>
             </div>
           </div>
-          <div class="stat-card green">
-            <div class="stat-icon-wrap"><mat-icon>receipt</mat-icon></div>
-            <div class="stat-info">
-              <h4>Factures</h4>
-              <p class="stat-number">{{ factures.length }}</p>
-              <p class="stat-sub">Ce mois-ci</p>
+          <div class="stat-card stat-green" (click)="currentPage = 'factures'" style="cursor:pointer">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>receipt</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Factures</span>
+              <span class="stat-card-number">{{ factures.length }}</span>
+              <span class="stat-card-sub">Ce mois-ci →</span>
             </div>
           </div>
-          <div class="stat-card purple">
-            <div class="stat-icon-wrap"><mat-icon>support_agent</mat-icon></div>
-            <div class="stat-info">
-              <h4>Tickets Clients</h4>
-              <p class="stat-number">{{ reclamations.length }}</p>
-              <p class="stat-sub">Remontées terrain</p>
+          <div class="stat-card stat-purple" (click)="currentPage = 'tickets'" style="cursor:pointer">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>support_agent</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Tickets Clients</span>
+              <span class="stat-card-number">{{ reclamations.length }}</span>
+              <span class="stat-card-sub">Remontées terrain →</span>
+            </div>
+          </div>
+        </div>
+        <!-- ACTIONS RAPIDES -->
+        <div class="home-actions-card">
+          <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
+          <div class="home-actions-grid">
+            <div class="home-action-btn" (click)="currentPage = 'employes'">
+              <div class="home-action-icon home-action-blue"><mat-icon>people_alt</mat-icon></div>
+              <div class="home-action-text"><strong>Employés</strong><span>{{ employes.length }} actifs</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'conges'">
+              <div class="home-action-icon home-action-orange"><mat-icon>fact_check</mat-icon></div>
+              <div class="home-action-text"><strong>Congés</strong><span>{{ conges.length }} demandes</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'interventions'">
+              <div class="home-action-icon home-action-teal"><mat-icon>engineering</mat-icon></div>
+              <div class="home-action-text"><strong>Interventions</strong><span>Fiches terrain</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'tickets'">
+              <div class="home-action-icon home-action-purple"><mat-icon>support_agent</mat-icon></div>
+              <div class="home-action-text"><strong>Tickets</strong><span>{{ reclamations.length }} remontées</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
           </div>
         </div>
@@ -216,13 +261,16 @@
       @if (currentPage === 'taches') {
         <app-taches></app-taches>
       }
+      @if (currentPage === 'clients') {
+        <app-gestion-clients></app-gestion-clients>
+      }
       @if (currentPage === 'planning') {
         <app-planning></app-planning>
       }
       @if (currentPage === 'employes') {
         <app-employes></app-employes>
       }
-      @if (currentPage === 'semenier') {
+      @if (currentPage === 'Semainier') {
         <app-semenier></app-semenier>
       }
       @if (currentPage === 'documents') {
@@ -608,3 +656,5 @@
     </div>
   </div>
 }
+
+

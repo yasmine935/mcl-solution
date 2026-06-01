@@ -1,4 +1,4 @@
-<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -37,13 +37,16 @@
       <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
         <mat-icon>calendar_month</mat-icon> Planning
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'semenier'" (click)="currentPage = 'semenier'">
-        <mat-icon>calendar_today</mat-icon> Semenier
+      <a class="nav-item" [class.active]="currentPage === 'Semainier'" (click)="currentPage = 'Semainier'">
+        <mat-icon>calendar_today</mat-icon> Semainier
       </a>
 
       <div class="nav-divider"></div>
       <div class="nav-section-label">Gestion</div>
 
+      <a class="nav-item" [class.active]="currentPage === 'clients'" (click)="currentPage = 'clients'">
+        <mat-icon>people</mat-icon> Gestion des Clients
+      </a>
       <!-- ✅ NOUVEAU : Mise au Travail -->
       <a class="nav-item" [class.active]="currentPage === 'mise-au-travail'" (click)="currentPage = 'mise-au-travail'">
         <mat-icon>engineering</mat-icon> Mise au Travail
@@ -99,29 +102,70 @@
 
       <!-- ══ HOME ══ -->
       @if (currentPage === 'home') {
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Voici un aperçu de votre activité du jour</p>
+            </div>
+          </div>
+          <div class="home-welcome-badge"><mat-icon>engineering</mat-icon> Tech Sup MCL</div>
+        </div>
+        <!-- STAT CARDS -->
         <div class="stats-grid">
-          <div class="stat-card violet">
-            <div class="stat-icon-wrap"><mat-icon>engineering</mat-icon></div>
-            <div class="stat-info">
-              <h4>Interventions</h4>
-              <p class="stat-number">{{ interventions.length }}</p>
-              <p class="stat-sub">En cours</p>
+          <div class="stat-card stat-blue" (click)="currentPage = 'fiches'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>engineering</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Interventions</span>
+              <span class="stat-card-number">{{ interventions.length }}</span>
+              <span class="stat-card-sub">En cours →</span>
             </div>
           </div>
-          <div class="stat-card blue">
-            <div class="stat-icon-wrap"><mat-icon>fact_check</mat-icon></div>
-            <div class="stat-info">
-              <h4>Congés à valider</h4>
-              <p class="stat-number">{{ congesTechniciens.length }}</p>
-              <p class="stat-sub">En attente</p>
+          <div class="stat-card stat-orange" (click)="currentPage = 'conges-tech'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>fact_check</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Congés à valider</span>
+              <span class="stat-card-number">{{ congesTechniciens.length }}</span>
+              <span class="stat-card-sub">En attente →</span>
             </div>
           </div>
-          <div class="stat-card deep">
-            <div class="stat-icon-wrap"><mat-icon>beach_access</mat-icon></div>
-            <div class="stat-info">
-              <h4>Mes Congés</h4>
-              <p class="stat-number">{{ mesConges.length }}</p>
-              <p class="stat-sub">Total demandes</p>
+          <div class="stat-card stat-green" (click)="currentPage = 'mes-conges'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>beach_access</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Mes Congés</span>
+              <span class="stat-card-number">{{ mesConges.length }}</span>
+              <span class="stat-card-sub">Total demandes →</span>
+            </div>
+          </div>
+        </div>
+        <!-- ACTIONS RAPIDES -->
+        <div class="home-actions-card">
+          <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
+          <div class="home-actions-grid">
+            <div class="home-action-btn" (click)="currentPage = 'fiches'">
+              <div class="home-action-icon home-action-blue"><mat-icon>engineering</mat-icon></div>
+              <div class="home-action-text"><strong>Interventions</strong><span>{{ interventions.length }} en cours</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'conges-tech'">
+              <div class="home-action-icon home-action-orange"><mat-icon>fact_check</mat-icon></div>
+              <div class="home-action-text"><strong>Congés à valider</strong><span>{{ congesTechniciens.length }} en attente</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'planning'">
+              <div class="home-action-icon home-action-teal"><mat-icon>calendar_month</mat-icon></div>
+              <div class="home-action-text"><strong>Planning</strong><span>Vue hebdomadaire</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </div>
+            <div class="home-action-btn" (click)="currentPage = 'remonteesTerrain'">
+              <div class="home-action-icon home-action-purple"><mat-icon>report_problem</mat-icon></div>
+              <div class="home-action-text"><strong>Remontées</strong><span>Terrain</span></div>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
           </div>
         </div>
@@ -137,11 +181,14 @@
       @if (currentPage === 'planning') {
         <app-planning></app-planning>
       }
-      @if (currentPage === 'semenier') {
+      @if (currentPage === 'Semainier') {
         <app-semenier></app-semenier>
       }
       @if (currentPage === 'ged') {
         <app-documents></app-documents>
+      }
+      @if (currentPage === 'clients') {
+        <app-gestion-clients></app-gestion-clients>
       }
 
       <!-- ✅ NOUVEAU : Mise au Travail -->
@@ -567,3 +614,5 @@
     </div>
   </div>
 }
+
+

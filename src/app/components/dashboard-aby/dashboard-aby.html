@@ -77,33 +77,53 @@
 
       <!-- ══ HOME ══ -->
       @if (currentPage === 'home') {
-        <div class="kpi-grid">
-          <div class="kpi-card kpi-orange" (click)="currentPage = 'demandes'">
-            <div class="kpi-icon">📥</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ demandesEnAttente.length }}</span>
-              <span class="kpi-label">Demandes en attente</span>
+        <!-- BANNIÈRE DE BIENVENUE -->
+        <div class="home-welcome">
+          <div class="home-welcome-left">
+            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+            <div class="home-welcome-text">
+              <h2>Bonjour, {{ user.prenom }} 👋</h2>
+              <p>Voici un aperçu de votre activité Supply Chain</p>
             </div>
           </div>
-          <div class="kpi-card kpi-bleu" (click)="currentPage = 'commandes'">
-            <div class="kpi-icon">🛒</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ commandesEnCours.length }}</span>
-              <span class="kpi-label">Commandes en cours</span>
+          <div class="home-welcome-badge"><mat-icon>inventory</mat-icon> Supply Chain MCL</div>
+        </div>
+        <!-- STAT CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card stat-orange" (click)="currentPage = 'demandes'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>inbox</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Demandes en attente</span>
+              <span class="stat-card-number">{{ demandesEnAttente.length }}</span>
+              <span class="stat-card-sub">À traiter →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-vert" (click)="currentPage = 'commandes'">
-            <div class="kpi-icon">✅</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ commandes.length }}</span>
-              <span class="kpi-label">Total commandes</span>
+          <div class="stat-card stat-blue" (click)="currentPage = 'commandes'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>shopping_cart</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Commandes en cours</span>
+              <span class="stat-card-number">{{ commandesEnCours.length }}</span>
+              <span class="stat-card-sub">Voir commandes →</span>
             </div>
           </div>
-          <div class="kpi-card kpi-violet" (click)="currentPage = 'logistique'">
-            <div class="kpi-icon">📦</div>
-            <div class="kpi-info">
-              <span class="kpi-num">{{ stocks.length }}</span>
-              <span class="kpi-label">Articles en stock</span>
+          <div class="stat-card stat-green" (click)="currentPage = 'commandes'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Total commandes</span>
+              <span class="stat-card-number">{{ commandes.length }}</span>
+              <span class="stat-card-sub">Historique →</span>
+            </div>
+          </div>
+          <div class="stat-card stat-purple" (click)="currentPage = 'logistique'">
+            <div class="stat-card-bg"></div>
+            <div class="stat-card-icon"><mat-icon>inventory_2</mat-icon></div>
+            <div class="stat-card-body">
+              <span class="stat-card-label">Articles en stock</span>
+              <span class="stat-card-number">{{ stocks.length }}</span>
+              <span class="stat-card-sub">Logistique →</span>
             </div>
           </div>
         </div>

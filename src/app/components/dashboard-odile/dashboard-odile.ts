@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,11 +12,12 @@ import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-in
 import { Factures } from '../factures/factures';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Documents } from '../documents/documents';
-import { Semenier } from '../semenier/semenier';
+import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
+import { GestionClients } from '../clients/clients';
 
 @Component({
   selector: 'app-dashboard-odile',
@@ -25,8 +26,8 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, FichesCompletees, Factures, Documents, Semenier, Planning,
-    TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent
+    FicheInterventionManager, FichesCompletees, Factures, Documents, Semainier, Planning,
+    TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
@@ -147,7 +148,7 @@ export class DashboardOdile implements OnInit {
       case 'tickets': return 'Tickets Clients';
       case 'factures': return 'Factures';
       case 'planning': return 'Planning';
-      case 'semenier': return 'Semenier';
+      case 'Semainier': return 'Semainier';
       case 'mes-conges': return 'Mes Conges';
       case 'remonteesTerrain': return 'Remontees Terrain';
       case 'approvisionnement': return 'Demandes d\'Approvisionnement';
@@ -159,3 +160,5 @@ export class DashboardOdile implements OnInit {
 
   logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
 }
+
+
