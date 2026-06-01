@@ -93,7 +93,7 @@
             <input id="num-devis-add" type="text" class="compact-input" [(ngModel)]="nouvelleTache.numDevis" placeholder="DEV-001">
           </div>
           <div class="proj-field-import">
-            <span class="proj-import-label">📄 Devis / Bon de commande</span>
+            <span class="proj-import-label">📄 Devis</span>
             <input type="file" #fileDevisAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Devis')" multiple class="file-input" accept="*/*">
             <button class="btn-doc-cat" (click)="fileDevisAdd.click()" type="button">Importer</button>
           </div>
@@ -335,7 +335,7 @@
             <input class="compact-input" [(ngModel)]="tacheEnEdition.numDevis">
           </div>
           <div class="proj-field-import">
-            <span class="proj-import-label">📄 Devis / Bon de commande</span>
+            <span class="proj-import-label">📄 Devis</span>
             <input type="file" #fileDevisEdit (change)="onFileSelectCategorie($event, tacheEnEdition, 'Devis')" multiple class="file-input" accept="*/*">
             <button class="btn-doc-cat" (click)="fileDevisEdit.click()" type="button">Importer</button>
           </div>
