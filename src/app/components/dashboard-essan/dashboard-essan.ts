@@ -52,6 +52,9 @@ export class DashboardEssan implements OnInit {
   stock: any[] = [];
   commandes: any[] = [];
   conges: any[] = [];
+  taches: any[] = [];
+  clients: any[] = [];
+  employes: any[] = [];
 
   // KPI Stats
   totalReclamations = 0;
@@ -85,6 +88,9 @@ export class DashboardEssan implements OnInit {
     this.loadStock();
     this.loadCommandes();
     this.loadConges();
+    this.loadTaches();
+    this.loadClients();
+    this.loadEmployes();
     this.calculateKPI();
   }
 
@@ -111,10 +117,7 @@ export class DashboardEssan implements OnInit {
 
   loadFiches() {
     this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
-      next: (data) => {
-        this.fiches = data.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE');
-        this.totalFiches = this.fiches.length;
-      },
+      next: (data) => { this.fiches = data; this.totalFiches = data.length; },
       error: () => { this.fiches = []; this.totalFiches = 0; }
     });
   }
@@ -149,6 +152,27 @@ export class DashboardEssan implements OnInit {
     this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
       next: (data) => { this.conges = data; this.totalConges = data.length; },
       error: () => { this.conges = []; this.totalConges = 0; }
+    });
+  }
+
+  loadTaches() {
+    this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+      next: (data) => this.taches = data,
+      error: () => this.taches = []
+    });
+  }
+
+  loadClients() {
+    this.http.get<any[]>('http://localhost:8080/api/clients').subscribe({
+      next: (data) => this.clients = data,
+      error: () => this.clients = []
+    });
+  }
+
+  loadEmployes() {
+    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+      next: (data) => this.employes = data,
+      error: () => this.employes = []
     });
   }
 
@@ -223,6 +247,9 @@ export class DashboardEssan implements OnInit {
       case 'commandes': return '🛒 Commandes';
       case 'conges': return '🏖️ Congés';
       case 'reclamations': return '⚠️ Remontées Terrain';
+      case 'projets': return '📊 Projets';
+      case 'clients': return '👥 Clients';
+      case 'employes': return '👷 Employés';
       default: return 'ESSAN Dashboard';
     }
   }

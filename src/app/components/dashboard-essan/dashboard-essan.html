@@ -38,6 +38,16 @@
         <mat-icon>description</mat-icon> Fiches
       </a>
 
+      <a class="nav-item" [class.active]="currentPage === 'projets'" (click)="currentPage = 'projets'">
+        <mat-icon>task_alt</mat-icon> Projets
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'clients'" (click)="currentPage = 'clients'">
+        <mat-icon>people</mat-icon> Clients
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
+        <mat-icon>badge</mat-icon> Employés
+      </a>
+
       <div class="nav-divider"></div>
       <div class="nav-section-label">Finances</div>
 
@@ -145,7 +155,7 @@
             <div class="stat-card-icon"><mat-icon>euro</mat-icon></div>
             <div class="stat-card-body">
               <span class="stat-card-label">Montant Total Factures</span>
-              <span class="stat-card-number" style="font-size:1.5rem">{{ montantTotalFactures | number:'1.2-2' }} €</span>
+              <span class="stat-card-number stat-number-lg">{{ montantTotalFactures | number:'1.2-2' }} €</span>
             </div>
           </div>
           <div class="stat-card stat-green" (click)="currentPage = 'stock'">
@@ -153,7 +163,7 @@
             <div class="stat-card-icon"><mat-icon>inventory</mat-icon></div>
             <div class="stat-card-body">
               <span class="stat-card-label">Valeur du Stock</span>
-              <span class="stat-card-number" style="font-size:1.5rem">{{ getTotalStockValue() | number:'1.2-2' }} €</span>
+              <span class="stat-card-number stat-number-lg">{{ getTotalStockValue() | number:'1.2-2' }} €</span>
             </div>
           </div>
           <div class="stat-card stat-orange" (click)="currentPage = 'conges'">
@@ -182,7 +192,7 @@
               <li>✅ Les congés demandés</li>
               <li>✅ Les remontées terrain</li>
             </ul>
-            <p style="color:#5e35b1;font-weight:700;margin-top:12px">⚠️ Mode consultation uniquement — aucune modification possible.</p>
+            <p class="info-warning">⚠️ Mode consultation uniquement — aucune modification possible.</p>
           </div>
         </div>
       }
@@ -209,9 +219,9 @@
                   <tr>
                     <td><strong>{{ item.key }}</strong></td>
                     <td>{{ item.value.dateDebut | date:'dd/MM/yyyy' }}</td>
-                    <td><span class="badge" style="background:#e8eaf6;color:#5e35b1">VALIDÉE</span></td>
+                    <td><span class="badge-essan">VALIDÉE</span></td>
                     <td>
-                      <button mat-icon-button color="primary" (click)="ouvrirDetailSemainier(item.key)">
+                      <button type="button" mat-icon-button color="primary" (click)="ouvrirDetailSemainier(item.key)">
                         <mat-icon>visibility</mat-icon>
                       </button>
                     </td>
@@ -233,14 +243,14 @@
           } @else {
             <table class="data-table">
               <thead>
-                <tr><th>Date</th><th>Note</th><th>Voir</th></tr>
+                <tr><th>Date</th><th>Utilisateur</th><th>Note</th></tr>
               </thead>
               <tbody>
                 @for (planning of plannings; track planning.id) {
                   <tr>
-                    <td>{{ planning.jour }}/{{ planning.mois }} - {{ planning.annee }}</td>
+                    <td>{{ planning.date | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ planning.utilisateur?.prenom }} {{ planning.utilisateur?.nom }}</td>
                     <td>{{ planning.note }}</td>
-                    <td><button mat-icon-button color="primary"><mat-icon>visibility</mat-icon></button></td>
                   </tr>
                 }
               </tbody>
@@ -303,7 +313,7 @@
                     <td>{{ facture.montantHT }} €</td>
                     <td>{{ facture.tva }}%</td>
                     <td><strong>{{ facture.montantHT * (1 + facture.tva / 100) | number:'1.2-2' }} €</strong></td>
-                    <td><span class="badge" style="background:#e8eaf6;color:#5e35b1">{{ facture.statut }}</span></td>
+                    <td><span class="badge-essan">{{ facture.statut }}</span></td>
                   </tr>
                 }
               </tbody>
@@ -358,7 +368,7 @@
                     <td><strong>{{ cmd.numero }}</strong></td>
                     <td>{{ cmd.fournisseur }}</td>
                     <td>{{ cmd.montant }} €</td>
-                    <td><span class="badge" style="background:#e8eaf6;color:#5e35b1">{{ cmd.statut }}</span></td>
+                    <td><span class="badge-essan">{{ cmd.statut }}</span></td>
                     <td>{{ cmd.dateCreation | date:'dd/MM/yyyy' }}</td>
                   </tr>
                 }
@@ -424,17 +434,101 @@
                     <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td>
                       @if (rec.photos && rec.photos.length > 0) {
-                        <span class="badge" style="background:#ede7f6;color:#5e35b1">{{ rec.photos.length }} 📸</span>
+                        <span class="badge-essan">{{ rec.photos.length }} 📸</span>
                       } @else {
-                        <span style="color:#ccc">-</span>
+                        <span class="text-muted">-</span>
                       }
                     </td>
-                    <td><span class="badge" style="background:#fff3e0;color:#e65100">{{ rec.statut }}</span></td>
+                    <td><span class="badge-essan badge-attente">{{ rec.statut }}</span></td>
                     <td>
-                      <button mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec)">
+                      <button type="button" mat-icon-button color="primary" (click)="ouvrirDetailReclamation(rec)">
                         <mat-icon>visibility</mat-icon>
                       </button>
                     </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ PROJETS ══ -->
+      @if (currentPage === 'projets') {
+        <div class="table-card">
+          <h3>📊 Projets ({{ taches.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (taches.length === 0) {
+            <div class="empty">Aucun projet</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Titre</th><th>Statut</th><th>Priorité</th><th>Client</th><th>CA</th><th>Échéance</th></tr>
+              </thead>
+              <tbody>
+                @for (t of taches; track t.id) {
+                  <tr>
+                    <td><strong>{{ t.titre }}</strong></td>
+                    <td><span class="badge-essan">{{ t.statut }}</span></td>
+                    <td>{{ t.priorite }}</td>
+                    <td>{{ t.client || '—' }}</td>
+                    <td>{{ t.chiffreAffaire ? (t.chiffreAffaire + ' €') : '—' }}</td>
+                    <td>{{ t.dateEcheance | date:'dd/MM/yyyy' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ CLIENTS ══ -->
+      @if (currentPage === 'clients') {
+        <div class="table-card">
+          <h3>👥 Clients ({{ clients.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (clients.length === 0) {
+            <div class="empty">Aucun client</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Nom</th><th>Code</th><th>Email</th><th>Adresse</th><th>Contact</th></tr>
+              </thead>
+              <tbody>
+                @for (c of clients; track c.id) {
+                  <tr>
+                    <td><strong>{{ c.nom }}</strong></td>
+                    <td>{{ c.codeClient || '—' }}</td>
+                    <td>{{ c.email || '—' }}</td>
+                    <td>{{ c.adresse || '—' }}</td>
+                    <td>{{ c.contact || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+
+      <!-- ══ EMPLOYÉS ══ -->
+      @if (currentPage === 'employes') {
+        <div class="table-card">
+          <h3>👷 Employés ({{ employes.length }})</h3>
+          <div class="readonly-notice">👁️ Mode consultation — Lecture seule</div>
+          @if (employes.length === 0) {
+            <div class="empty">Aucun employé</div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr><th>Prénom</th><th>Nom</th><th>Rôle</th><th>Email</th></tr>
+              </thead>
+              <tbody>
+                @for (e of employes; track e.id) {
+                  <tr>
+                    <td><strong>{{ e.prenom }}</strong></td>
+                    <td>{{ e.nom }}</td>
+                    <td><span class="badge-essan">{{ e.role }}</span></td>
+                    <td>{{ e.email || '—' }}</td>
                   </tr>
                 }
               </tbody>
@@ -450,11 +544,11 @@
 
 <!-- ══ MODAL RÉCLAMATION ══ -->
 @if (showReclamationDetailModal && selectedReclamation) {
-  <div class="modal-overlay" (click)="fermerDetailReclamation()">
-    <div class="modal-detail-content" (click)="$event.stopPropagation()">
+  <div class="modal-overlay" (click)="fermerDetailReclamation()" (keydown.escape)="fermerDetailReclamation()" tabindex="-1">
+    <div class="modal-detail-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>⚠️ Remontée Terrain — Consultation</h2>
-        <button mat-icon-button (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon></button>
+        <button type="button" mat-icon-button (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon></button>
       </div>
       <div class="modal-body">
         <div class="detail-row"><span class="label">Technicien</span><span class="value">{{ selectedReclamation.technicien?.prenom }} {{ selectedReclamation.technicien?.nom }}</span></div>
@@ -464,23 +558,23 @@
         <div class="detail-row"><span class="label">Gravité</span><span class="value">{{ selectedReclamation.gravite }}</span></div>
         <div class="detail-row"><span class="label">Action corrective</span><span class="value">{{ selectedReclamation.actionCorrective }}</span></div>
         <div class="detail-row"><span class="label">Date</span><span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span></div>
-        <div class="detail-row"><span class="label">Statut</span><span class="badge" style="background:#fff3e0;color:#e65100">{{ selectedReclamation.statut }}</span></div>
-        <h3 style="color:#5e35b1;margin:20px 0 12px;font-size:0.95rem">📸 Photos</h3>
-        @if (selectedReclamation.photos && selectedReclamation.photos.length > 0) {
+        <div class="detail-row"><span class="label">Statut</span><span class="badge-essan badge-attente">{{ selectedReclamation.statut }}</span></div>
+        <h3 class="modal-photos-title">📸 Photos</h3>
+        @if (selectedReclamation.photos?.length > 0) {
           <div class="photos-gallery-detail">
             @for (photo of selectedReclamation.photos; track $index) {
               <div class="photo-detail-item">
-                <img [src]="photo.data" alt="{{ photo.nom }}">
-                <p style="padding:8px;font-size:12px;color:#555">{{ photo.nom }}</p>
+                <img src="{{ photo.data }}" alt="{{ photo.nom }}" aria-hidden="true">
+                <p class="photo-nom">{{ photo.nom }}</p>
               </div>
             }
           </div>
         } @else {
-          <p style="color:#999">Aucune photo</p>
+          <p class="text-muted">Aucune photo</p>
         }
       </div>
       <div class="modal-footer">
-        <button mat-raised-button color="primary" (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon> Fermer</button>
+        <button type="button" mat-raised-button color="primary" (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon> Fermer</button>
       </div>
     </div>
   </div>
