@@ -7,47 +7,12 @@
       <span class="fiches-count">{{ fiches.length }} fiche(s)</span>
     </div>
     <div class="header-actions">
-      <button class="btn-clients" (click)="showClientManager = !showClientManager; showFormAdd = false; showFormEdit = false">
-        <mat-icon>people</mat-icon> Clients ({{ clients.length }})
-      </button>
-      <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd; showFormEdit = false; showClientManager = false" class="btn-add">
+      <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd; showFormEdit = false" class="btn-add">
         <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
         {{ showFormAdd ? 'Fermer' : 'Nouvelle Fiche' }}
       </button>
     </div>
   </div>
-
-  <!-- ══ GESTIONNAIRE CLIENTS ══ -->
-  @if (showClientManager) {
-    <div class="client-manager">
-      <div class="client-manager-header">
-        <h4><mat-icon>people</mat-icon> Gestion des Clients</h4>
-        <button mat-icon-button (click)="showClientManager = false"><mat-icon>close</mat-icon></button>
-      </div>
-      <div class="client-add-row">
-        <input class="compact-input" [(ngModel)]="nouveauClient.nom" placeholder="Nom du client *"/>
-        <input class="compact-input" [(ngModel)]="nouveauClient.codeClient" placeholder="Code client (ex: CLI-001)"/>
-        <input class="compact-input" [(ngModel)]="nouveauClient.adresse" placeholder="Adresse"/>
-        <input class="compact-input" [(ngModel)]="nouveauClient.contact" placeholder="Contact — Téléphone"/>
-        <button class="btn-inline-add" (click)="ajouterClientLocal()">+ Ajouter</button>
-      </div>
-      @if (clients.length === 0) {
-        <p class="client-empty">Aucun client. Ajoutez-en un ci-dessus.</p>
-      } @else {
-        <div class="clients-list">
-          @for (c of clients; track c.id; let i = $index) {
-            <div class="client-row">
-              <span class="client-nom">{{ c.nom }}</span>
-              @if (c.codeClient) { <span class="client-code">{{ c.codeClient }}</span> }
-              @if (c.adresse) { <span class="client-detail">{{ c.adresse }}</span> }
-              @if (c.contact) { <span class="client-detail">{{ c.contact }}</span> }
-              <button mat-icon-button color="warn" (click)="supprimerClientLocal(i)"><mat-icon>delete</mat-icon></button>
-            </div>
-          }
-        </div>
-      }
-    </div>
-  }
 
   @if (showFormAdd) {
     <div class="form-container">
