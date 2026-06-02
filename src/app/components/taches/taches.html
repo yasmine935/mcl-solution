@@ -60,23 +60,17 @@
         <div class="proj-row">
           <div class="proj-field-lg">
             <label class="field-label">Client</label>
-            <div class="client-select-wrap">
-              <select class="compact-input" [(ngModel)]="nouvelleTache.client">
-                <option value="">— Sélectionner —</option>
-                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
-              </select>
-              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('add')" title="Nouveau client">+</button>
-            </div>
+            <select class="compact-input" [(ngModel)]="nouvelleTache.client">
+              <option value="">— Sélectionner —</option>
+              @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
+            </select>
           </div>
           <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
-            <div class="client-select-wrap">
-              <select class="compact-input" [(ngModel)]="nouvelleTache.clientFinal">
-                <option value="">— Sélectionner —</option>
-                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
-              </select>
-              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('add')" title="Nouveau client">+</button>
-            </div>
+            <select class="compact-input" [(ngModel)]="nouvelleTache.clientFinal">
+              <option value="">— Sélectionner —</option>
+              @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
+            </select>
           </div>
         </div>
       </div>
@@ -265,23 +259,17 @@
         <div class="proj-row">
           <div class="proj-field-lg">
             <label class="field-label">Client</label>
-            <div class="client-select-wrap">
-              <select class="compact-input" [(ngModel)]="tacheEnEdition.client">
-                <option value="">— Sélectionner —</option>
-                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
-              </select>
-              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('edit')" title="Nouveau client">+</button>
-            </div>
+            <select class="compact-input" [(ngModel)]="tacheEnEdition.client">
+              <option value="">— Sélectionner —</option>
+              @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
+            </select>
           </div>
           <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
-            <div class="client-select-wrap">
-              <select class="compact-input" [(ngModel)]="tacheEnEdition.clientFinal">
-                <option value="">— Sélectionner —</option>
-                @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
-              </select>
-              <button type="button" class="btn-add-client" (click)="ouvrirAddClient('edit')" title="Nouveau client">+</button>
-            </div>
+            <select class="compact-input" [(ngModel)]="tacheEnEdition.clientFinal">
+              <option value="">— Sélectionner —</option>
+              @for (c of clients; track c.id) { <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option> }
+            </select>
           </div>
         </div>
       </div>
@@ -543,28 +531,6 @@
   </div>
 </div>
 
-<!-- MODAL NOUVEAU CLIENT -->
-@if (showAddClientModal) {
-  <div class="modal-overlay" (click)="showAddClientModal = false">
-    <div class="modal-client" (click)="$event.stopPropagation()">
-      <div class="modal-client-header">
-        <span>🏢 Ajouter un Client</span>
-        <button type="button" class="chat-close" (click)="showAddClientModal = false">✕</button>
-      </div>
-      <div class="modal-client-body">
-        <label class="field-label">Nom du client</label>
-        <input class="compact-input" [(ngModel)]="nouveauClientNom"
-          placeholder="Ex: Total Energies" (keyup.enter)="confirmerNouveauClient()">
-      </div>
-      <div class="modal-client-footer">
-        <button type="button" class="btn-save-client" (click)="confirmerNouveauClient()" [disabled]="!nouveauClientNom.trim()">
-          ✅ Ajouter
-        </button>
-        <button type="button" class="btn-cancel-client" (click)="showAddClientModal = false">Annuler</button>
-      </div>
-    </div>
-  </div>
-}
 
 <!-- MODAL CHAT -->
 @if (showNoteModal && selectedTache) {
