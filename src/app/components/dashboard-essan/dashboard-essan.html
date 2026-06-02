@@ -259,18 +259,19 @@
           } @else {
             <table class="data-table">
               <thead>
-                <tr><th>Numéro</th><th>Utilisateur</th><th>Client</th><th>Montant</th><th>Date</th><th>Voir</th></tr>
+                <tr><th>N° Projet</th><th>Technicien</th><th>Client</th><th>CA</th><th>Date</th><th>Statut</th><th>Voir</th></tr>
               </thead>
               <tbody>
                 @for (fiche of fiches; track fiche.id) {
                   <tr>
-                    <td><strong>{{ fiche.numero }}</strong></td>
-                    <td>{{ fiche.userId }}</td>
+                    <td><strong>{{ fiche.numProjet }}</strong></td>
+                    <td>{{ fiche.technicien?.prenom }} {{ fiche.technicien?.nom }}</td>
                     <td>{{ fiche.client }}</td>
-                    <td>{{ fiche.montant }} €</td>
-                    <td>{{ fiche.dateCreation | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ fiche.chiffreAffaire ? (fiche.chiffreAffaire + ' €') : '—' }}</td>
+                    <td>{{ fiche.dateIntervention | date:'dd/MM/yyyy' }}</td>
+                    <td><span class="badge-essan" [class.badge-validee]="fiche.statut === 'VALIDEE'">{{ fiche.statut }}</span></td>
                     <td>
-                      <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)">
+                      <button mat-icon-button color="primary" (click)="ouvrirDetailFiche(fiche)" type="button">
                         <mat-icon>visibility</mat-icon>
                       </button>
                     </td>
@@ -382,15 +383,16 @@
               <tbody>
                 @for (cg of conges; track cg.id) {
                   <tr>
-                    <td><strong>{{ cg.userId }}</strong></td>
+                    <td><strong>{{ cg.utilisateur?.prenom }} {{ cg.utilisateur?.nom }}</strong></td>
                     <td>{{ cg.type }}</td>
                     <td>{{ cg.dateDebut | date:'dd/MM/yyyy' }}</td>
                     <td>{{ cg.dateFin | date:'dd/MM/yyyy' }}</td>
                     <td>
-                      <span class="badge"
-                        [style.background]="cg.statut === 'APPROUVÉ' ? '#e8eaf6' : cg.statut === 'EN ATTENTE' ? '#fff3e0' : '#ffebee'"
-                        [style.color]="cg.statut === 'APPROUVÉ' ? '#5e35b1' : cg.statut === 'EN ATTENTE' ? '#e65100' : '#c62828'">
-                        {{ cg.statut }}
+                      <span class="badge-essan"
+                        [class.badge-approuve]="cg.statut === 'APPROUVE'"
+                        [class.badge-attente]="cg.statut === 'EN_ATTENTE'"
+                        [class.badge-refuse]="cg.statut === 'REFUSE'">
+                        {{ cg.statut === 'EN_ATTENTE' ? 'En attente' : cg.statut === 'APPROUVE' ? 'Approuvé' : 'Refusé' }}
                       </span>
                     </td>
                   </tr>
@@ -411,14 +413,14 @@
           } @else {
             <table class="data-table">
               <thead>
-                <tr><th>Technicien</th><th>Sujet</th><th>Description</th><th>Date</th><th>Photos</th><th>Statut</th><th>Voir</th></tr>
+                <tr><th>Technicien</th><th>Lieu / Entreprise</th><th>Description</th><th>Date</th><th>Photos</th><th>Statut</th><th>Voir</th></tr>
               </thead>
               <tbody>
                 @for (rec of reclamations; track rec.id) {
                   <tr>
-                    <td><strong>{{ rec.technicienNom }}</strong></td>
-                    <td><strong>{{ rec.sujet }}</strong></td>
-                    <td>{{ rec.description | slice:0:50 }}...</td>
+                    <td><strong>{{ rec.technicien?.prenom }} {{ rec.technicien?.nom }}</strong></td>
+                    <td><strong>{{ rec.entrepriseConcernee || rec.lieu }}</strong></td>
+                    <td>{{ rec.descriptionFaits | slice:0:50 }}...</td>
                     <td>{{ rec.dateCreation | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td>
                       @if (rec.photos && rec.photos.length > 0) {
@@ -455,9 +457,12 @@
         <button mat-icon-button (click)="fermerDetailReclamation()"><mat-icon>close</mat-icon></button>
       </div>
       <div class="modal-body">
-        <div class="detail-row"><span class="label">Technicien</span><span class="value">{{ selectedReclamation.technicienNom }}</span></div>
-        <div class="detail-row"><span class="label">Sujet</span><span class="value"><strong>{{ selectedReclamation.sujet }}</strong></span></div>
-        <div class="detail-row"><span class="label">Description</span><span class="value">{{ selectedReclamation.description }}</span></div>
+        <div class="detail-row"><span class="label">Technicien</span><span class="value">{{ selectedReclamation.technicien?.prenom }} {{ selectedReclamation.technicien?.nom }}</span></div>
+        <div class="detail-row"><span class="label">Lieu</span><span class="value">{{ selectedReclamation.lieu }}</span></div>
+        <div class="detail-row"><span class="label">Entreprise</span><span class="value"><strong>{{ selectedReclamation.entrepriseConcernee }}</strong></span></div>
+        <div class="detail-row"><span class="label">Description</span><span class="value">{{ selectedReclamation.descriptionFaits }}</span></div>
+        <div class="detail-row"><span class="label">Gravité</span><span class="value">{{ selectedReclamation.gravite }}</span></div>
+        <div class="detail-row"><span class="label">Action corrective</span><span class="value">{{ selectedReclamation.actionCorrective }}</span></div>
         <div class="detail-row"><span class="label">Date</span><span class="value">{{ selectedReclamation.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span></div>
         <div class="detail-row"><span class="label">Statut</span><span class="badge" style="background:#fff3e0;color:#e65100">{{ selectedReclamation.statut }}</span></div>
         <h3 style="color:#5e35b1;margin:20px 0 12px;font-size:0.95rem">📸 Photos</h3>

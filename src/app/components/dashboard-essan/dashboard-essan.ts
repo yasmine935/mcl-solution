@@ -166,7 +166,7 @@ export class DashboardEssan implements OnInit {
   }
 
   getCongesEnAttente(): number {
-    return this.conges.filter((c: any) => c.statut === 'EN ATTENTE').length;
+    return this.conges.filter((c: any) => c.statut === 'EN_ATTENTE').length;
   }
 
   // ==================== MODALS ====================
