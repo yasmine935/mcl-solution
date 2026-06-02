@@ -270,28 +270,42 @@
         </div>
       }
 
-      <!-- Employés — pas de composant standalone -->
+      <!-- Employés -->
       @if (currentPage === 'employes') {
-        <div class="table-card">
-          <h3>👷 Employés ({{ employes.length }})</h3>
+        <div class="emp-container">
+          <div class="emp-header">
+            <div class="emp-header-left">
+              <div class="emp-icon">👷</div>
+              <div>
+                <h2 class="emp-title">Employés</h2>
+                <p class="emp-subtitle">{{ employes.length }} membre(s) de l'équipe</p>
+              </div>
+            </div>
+          </div>
           @if (employes.length === 0) {
-            <div class="empty">Aucun employé</div>
+            <div class="emp-empty">Aucun employé</div>
           } @else {
-            <table class="data-table">
-              <thead>
-                <tr><th>Prénom</th><th>Nom</th><th>Rôle</th><th>Email</th></tr>
-              </thead>
-              <tbody>
-                @for (e of employes; track e.id) {
-                  <tr>
-                    <td><strong>{{ e.prenom }}</strong></td>
-                    <td>{{ e.nom }}</td>
-                    <td><span class="badge-essan">{{ e.role }}</span></td>
-                    <td>{{ e.email || '—' }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+            <div class="emp-grid">
+              @for (e of employes; track e.id) {
+                <div class="emp-card">
+                  <div class="emp-card-top">
+                    <div class="emp-avatar" [style.background]="getRoleColor(e.role)">
+                      {{ e.prenom?.charAt(0) }}{{ e.nom?.charAt(0) }}
+                    </div>
+                    <div class="emp-info">
+                      <strong class="emp-nom">{{ e.prenom }} {{ e.nom }}</strong>
+                      <span class="emp-role-badge" [style.background]="getRoleColorLight(e.role)" [style.color]="getRoleColor(e.role)">{{ e.role }}</span>
+                    </div>
+                  </div>
+                  @if (e.email) {
+                    <div class="emp-detail">
+                      <mat-icon class="emp-icon-sm">email</mat-icon>
+                      <span>{{ e.email }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           }
         </div>
       }

@@ -112,6 +112,26 @@ export class DashboardEssan implements OnInit {
     return titles[this.currentPage] || 'ESSAN';
   }
 
+  getRoleColor(role: string): string {
+    const colors: Record<string, string> = {
+      'TECHNICIEN': '#01579b', 'TECHNICIEN_SUP': '#4527a0',
+      'AURELIEN': '#1b5e20', 'ODILE': '#0d47a1', 'KIA': '#bf360c',
+      'FERID': '#37474f', 'ESSAN': '#5e35b1', 'KARINE': '#880e4f',
+      'AYDEH': '#e65100', 'NACCERA': '#2e7d32', 'ABY': '#00695c'
+    };
+    return colors[role] || '#546e7a';
+  }
+
+  getRoleColorLight(role: string): string {
+    const colors: Record<string, string> = {
+      'TECHNICIEN': '#e3f2fd', 'TECHNICIEN_SUP': '#ede7f6',
+      'AURELIEN': '#e8f5e9', 'ODILE': '#e3f2fd', 'KIA': '#fbe9e7',
+      'FERID': '#eceff1', 'ESSAN': '#ede7f6', 'KARINE': '#fce4ec',
+      'AYDEH': '#fff3e0', 'NACCERA': '#e8f5e9', 'ABY': '#e0f2f1'
+    };
+    return colors[role] || '#f5f5f5';
+  }
+
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }
   logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
