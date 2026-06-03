@@ -47,8 +47,11 @@
       <a class="nav-item" [class.active]="currentPage === 'clients'" (click)="currentPage = 'clients'">
         <mat-icon>people</mat-icon> Gestion des Clients
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
+        <mat-icon>beach_access</mat-icon> Mes Congés
+      </a>
       <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
-        <mat-icon>fact_check</mat-icon> Tous les Congés
+        <mat-icon>fact_check</mat-icon> Congés Équipe
       </a>
       <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
         <mat-icon>people_alt</mat-icon> Employés
@@ -440,9 +443,122 @@
 
   </div>
 }
-      <!-- ══ CONGÉS ══ -->
-   <!-- ══ CONGÉS — Remplace @if (currentPage === 'conges') ══ -->
+      <!-- ══ MES CONGÉS (Ferid → ESSAN) ══ -->
+@if (currentPage === 'mes-conges') {
+  <div class="conge-page-wrap">
 
+    <!-- HEADER -->
+    <div class="conge-page-header">
+      <div class="conge-page-header-left">
+        <span class="conge-header-icon">🏖️</span>
+        <div>
+          <h2>Mes Congés</h2>
+          <p>{{ mesConges.length }} demande(s) — envoyées à ESSAN</p>
+        </div>
+      </div>
+      @if (!showCongeFormPerso) {
+        <button type="button" class="btn-nouvelle-demande" (click)="showCongeFormPerso = true">
+          + Nouvelle demande
+        </button>
+      }
+    </div>
+
+    <!-- SOLDE -->
+    @if (soldeCongesPerso) {
+      <div class="solde-card">
+        <h4 class="solde-title">📊 Mon Solde de Congés {{ soldeCongesPerso.annee }}</h4>
+        <div class="solde-grid">
+          <div class="solde-item">
+            <span class="solde-icon">🌴</span>
+            <div>
+              <div class="solde-type">Congés Annuels</div>
+              <div class="solde-detail">{{ soldeCongesPerso.congesAnnuelsPris }}j pris</div>
+            </div>
+            <div class="solde-restant">{{ soldeCongesPerso.congesAnnuelsRestants }}j restants</div>
+          </div>
+          <div class="solde-item">
+            <span class="solde-icon">😴</span>
+            <div>
+              <div class="solde-type">RTT</div>
+              <div class="solde-detail">{{ soldeCongesPerso.rttPris }}j pris</div>
+            </div>
+            <div class="solde-restant">{{ soldeCongesPerso.rttRestants }}j restants</div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- FORMULAIRE -->
+    @if (showCongeFormPerso) {
+      <div class="conge-form-card">
+        <h3>📝 Nouvelle demande de congé</h3>
+        <div class="conge-form-grid">
+          <div class="conge-form-field">
+            <label for="cp-type">Type *</label>
+            <select id="cp-type" [(ngModel)]="congePerso.type" class="conge-select">
+              @for (t of typesConge; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
+          </div>
+          <div class="conge-form-field">
+            <label for="cp-debut">Date début *</label>
+            <input id="cp-debut" type="date" [(ngModel)]="congePerso.dateDebut" (change)="calculerJoursPerso()" class="conge-input">
+          </div>
+          <div class="conge-form-field">
+            <label for="cp-fin">Date fin *</label>
+            <input id="cp-fin" type="date" [(ngModel)]="congePerso.dateFin" (change)="calculerJoursPerso()" class="conge-input">
+          </div>
+          @if (nombreJoursPerso > 0) {
+            <div class="conge-duree-badge">⏱ {{ nombreJoursPerso }} jour(s)</div>
+          }
+          <div class="conge-form-field conge-form-full">
+            <label for="cp-motif">Motif</label>
+            <input id="cp-motif" type="text" [(ngModel)]="congePerso.motif" placeholder="Motif (optionnel)" class="conge-input">
+          </div>
+        </div>
+        <div class="conge-form-actions">
+          <button type="button" class="btn-envoyer-conge" (click)="deposerCongePerso()">
+            ✅ Envoyer à ESSAN
+          </button>
+          <button type="button" class="btn-annuler-conge" (click)="showCongeFormPerso = false; resetCongeFormPerso()">
+            Annuler
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- LISTE MES DEMANDES -->
+    @if (mesConges.length === 0) {
+      <div class="conge-empty">
+        <span>🏖️</span>
+        <p>Aucune demande de congé</p>
+        <small>Cliquez sur "+ Nouvelle demande" pour commencer</small>
+      </div>
+    } @else {
+      <div class="conge-list">
+        @for (c of mesConges; track c.id) {
+          <div class="conge-item" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
+            <span class="conge-type-icon">
+              {{ c.type === 'ANNUEL' ? '🌴' : c.type === 'RTT' ? '😴' : c.type === 'MALADIE' ? '🏥' : c.type === 'FORMATION' ? '📚' : '📋' }}
+            </span>
+            <span class="conge-item-text">
+              <strong>{{ c.type }}</strong>
+              <span class="conge-dates-text">{{ c.dateDebut }} → {{ c.dateFin }}</span>
+            </span>
+            <span class="conge-statut-badge"
+              [class.badge-approuve]="c.statut === 'APPROUVE'"
+              [class.badge-refuse]="c.statut === 'REFUSE'"
+              [class.badge-attente]="c.statut === 'EN_ATTENTE'">
+              {{ c.statut === 'APPROUVE' ? '✅ Approuvé' : c.statut === 'REFUSE' ? '❌ Refusé' : '⏳ En attente' }}
+            </span>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}
+
+      <!-- ══ CONGÉS ÉQUIPE ══ -->
 @if (currentPage === 'conges') {
   <div class="conges-manager-wrapper">
 

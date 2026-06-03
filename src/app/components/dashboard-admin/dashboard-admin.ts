@@ -78,6 +78,14 @@ export class DashboardAdmin implements OnInit {
   };
 voitures: any[] = [];
 showFormVoiture = false;
+
+// ── MES CONGÉS (Ferid → ESSAN) ──
+mesConges: any[] = [];
+soldeCongesPerso: any = null;
+showCongeFormPerso = false;
+congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '' };
+nombreJoursPerso = 0;
+typesConge = ['ANNUEL', 'RTT', 'MALADIE', 'SANS_SOLDE', 'FORMATION'];
 nouvelleVoiture = {
   immatriculation: '', marque: '', modele: '',
   annee: '', kilometrage: '', statut: 'Disponible',
@@ -126,6 +134,60 @@ get minutesOk(): number {
   this.loadVoitures();
   this.loadMinutesSecurite();
   this.loadResetRequests();
+  this.loadMesConges();
+  this.loadSoldeCongesPerso();
+}
+
+loadMesConges() {
+  this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`).subscribe({
+    next: (data) => this.mesConges = data,
+    error: () => this.mesConges = []
+  });
+}
+
+loadSoldeCongesPerso() {
+  if (!this.user.id) return;
+  this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+    next: (data) => this.soldeCongesPerso = data,
+    error: () => this.soldeCongesPerso = null
+  });
+}
+
+getEssanId(): number | null {
+  const essan = this.employes.find((e: any) => e.role === 'ESSAN');
+  return essan ? essan.id : null;
+}
+
+deposerCongePerso() {
+  if (!this.congePerso.dateDebut || !this.congePerso.dateFin || !this.congePerso.type) {
+    alert('Veuillez remplir les champs obligatoires'); return;
+  }
+  const essanId = this.getEssanId();
+  if (!essanId) { alert('Responsable ESSAN introuvable'); return; }
+  const demande = { ...this.congePerso, utilisateur: { id: this.user.id }, manager: { id: essanId } };
+  this.http.post('http://localhost:8080/api/conges', demande).subscribe({
+    next: () => {
+      this.loadMesConges();
+      this.loadSoldeCongesPerso();
+      this.showCongeFormPerso = false;
+      this.resetCongeFormPerso();
+      alert('Demande envoyée à ESSAN !');
+    },
+    error: () => alert('Erreur lors du dépôt')
+  });
+}
+
+calculerJoursPerso() {
+  if (this.congePerso.dateDebut && this.congePerso.dateFin) {
+    const d = new Date(this.congePerso.dateDebut);
+    const f = new Date(this.congePerso.dateFin);
+    this.nombreJoursPerso = Math.max(0, Math.ceil((f.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+  }
+}
+
+resetCongeFormPerso() {
+  this.congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '' };
+  this.nombreJoursPerso = 0;
 }
 
   loadFiches() {

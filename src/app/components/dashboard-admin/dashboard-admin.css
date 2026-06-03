@@ -920,3 +920,40 @@ nav {
 .no-photos { color: #999; }
 .modal-reset-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 14px 22px; border-top: 1px solid #f0f4f8; }
 .reset-success { text-align: center; font-size: 0.88rem; color: #2e7d32; font-weight: 700; padding: 10px 0; }
+
+/* ══ MES CONGÉS FERID ══ */
+.conge-page-wrap { display: flex; flex-direction: column; gap: 18px; padding: 20px; }
+.conge-page-header { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #0d1b2a, #1565c0); border-radius: 16px; padding: 20px 24px; color: #fff; }
+.conge-page-header-left { display: flex; align-items: center; gap: 14px; }
+.conge-header-icon { font-size: 2rem; background: rgba(255,255,255,0.15); border-radius: 12px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; }
+.conge-page-header h2 { margin: 0; font-size: 1.2rem; font-weight: 800; }
+.conge-page-header p { margin: 3px 0 0; font-size: 0.78rem; opacity: 0.8; }
+.btn-nouvelle-demande { background: #fff; color: #1565c0; border: none; border-radius: 10px; padding: 10px 18px; font-size: 0.85rem; font-weight: 800; cursor: pointer; font-family: inherit; }
+.btn-nouvelle-demande:hover { background: #e3f2fd; }
+
+.conge-form-card { background: #fff; border-radius: 14px; border: 1.5px solid #e0e0e0; padding: 20px; border-left: 4px solid #1565c0; }
+.conge-form-card h3 { margin: 0 0 16px; font-size: 0.9rem; font-weight: 800; color: #0d1b2a; }
+.conge-form-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+.conge-form-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 150px; }
+.conge-form-field label { font-size: 0.72rem; font-weight: 700; color: #546e7a; text-transform: uppercase; }
+.conge-form-full { flex: 1 1 100%; }
+.conge-select, .conge-input { border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 9px 12px; font-size: 0.85rem; font-family: inherit; outline: none; width: 100%; }
+.conge-select:focus, .conge-input:focus { border-color: #1565c0; }
+.conge-duree-badge { background: #e3f2fd; color: #1565c0; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
+.conge-form-actions { display: flex; gap: 10px; }
+.btn-envoyer-conge { background: #1565c0; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-envoyer-conge:hover { background: #0d47a1; }
+.btn-annuler-conge { background: #f0f4f8; color: #546e7a; border: none; border-radius: 10px; padding: 10px 16px; font-size: 0.88rem; cursor: pointer; font-family: inherit; }
+
+.conge-empty { text-align: center; padding: 50px; background: #fff; border-radius: 14px; border: 2px dashed #e0e0e0; color: #b0bec5; }
+.conge-empty span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+.conge-empty p { font-weight: 700; margin: 0 0 5px; color: #78909c; }
+.conge-list { display: flex; flex-direction: column; gap: 10px; }
+.conge-item { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 12px; border: 1.5px solid #e0e0e0; padding: 14px 18px; }
+.conge-item.conge-approuve { border-color: #a5d6a7; background: #f9fff9; }
+.conge-item.conge-refuse { border-color: #ef9a9a; background: #fff9f9; }
+.conge-type-icon { font-size: 1.5rem; }
+.conge-item-text { display: flex; flex-direction: column; flex: 1; gap: 2px; }
+.conge-item-text strong { font-size: 0.9rem; color: #0d1b2a; }
+.conge-dates-text { font-size: 0.75rem; color: #90a4ae; }
+.conge-statut-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
