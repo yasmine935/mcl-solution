@@ -199,8 +199,9 @@ export class FicheInterventionManager implements OnInit {
     };
   }
 
-  buildTechBody(selectedTechIds: number[]) {
-    const techs = this.techniciens.filter((t: any) => selectedTechIds.includes(t.id));
+  buildTechBody(selectedTechIds: any[]) {
+    const ids = selectedTechIds.map(Number).filter(Boolean);
+    const techs = this.techniciens.filter((t: any) => ids.includes(Number(t.id)));
     return {
       technicien: techs[0] ? { id: techs[0].id } : null,
       technicienIds: techs.map((t: any) => t.id).join(','),
