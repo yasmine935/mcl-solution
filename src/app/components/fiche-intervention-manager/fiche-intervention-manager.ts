@@ -199,6 +199,27 @@ export class FicheInterventionManager implements OnInit {
     };
   }
 
+  isTechSelected(selectedIds: any[], techId: number): boolean {
+    return (selectedIds || []).map(Number).includes(Number(techId));
+  }
+
+  toggleTech(selectedIds: any[], techId: number, event: any) {
+    const ids = (selectedIds || []).map(Number);
+    if (event.target.checked) {
+      if (!ids.includes(Number(techId))) ids.push(Number(techId));
+    } else {
+      const i = ids.indexOf(Number(techId));
+      if (i !== -1) ids.splice(i, 1);
+    }
+    selectedIds.length = 0;
+    ids.forEach(id => selectedIds.push(id));
+  }
+
+  getTechColor(techId: number): string {
+    const colors = ['#1565c0', '#6a1b9a', '#2e7d32', '#e65100', '#00695c', '#c62828'];
+    return colors[Number(techId) % colors.length];
+  }
+
   buildTechBody(selectedTechIds: any[]) {
     const ids = selectedTechIds.map(Number).filter(Boolean);
     const techs = this.techniciens.filter((t: any) => ids.includes(Number(t.id)));

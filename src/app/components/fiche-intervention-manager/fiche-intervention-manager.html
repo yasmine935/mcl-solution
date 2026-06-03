@@ -51,14 +51,18 @@
               <span>⏱ {{ getDuree(nouvelleFiche.dateDebut, nouvelleFiche.dateFin) }} jour(s)</span>
             </div>
           }
-          <div class="field-md">
+          <div class="field-lg">
             <label class="field-label">Technicien(s) Assigné(s)</label>
-            <select class="compact-input select-multi-tech" [(ngModel)]="nouvelleFiche.selectedTechIds" multiple>
+            <div class="tech-checkboxes">
               @for (tech of techniciens; track tech.id) {
-                <option [value]="tech.id">{{ tech.prenom }} {{ tech.nom }}</option>
+                <label class="tech-checkbox-item" [class.tech-selected]="isTechSelected(nouvelleFiche.selectedTechIds, tech.id)">
+                  <input type="checkbox" [checked]="isTechSelected(nouvelleFiche.selectedTechIds, tech.id)"
+                    (change)="toggleTech(nouvelleFiche.selectedTechIds, tech.id, $event)">
+                  <span class="tech-avatar-sm" [style.background]="getTechColor(tech.id)">{{ tech.prenom?.charAt(0) }}{{ tech.nom?.charAt(0) }}</span>
+                  <span>{{ tech.prenom }} {{ tech.nom }}</span>
+                </label>
               }
-            </select>
-            <small class="field-hint">Ctrl+clic pour sélectionner plusieurs</small>
+            </div>
           </div>
         </div>
         <div class="field-full">
@@ -245,14 +249,18 @@
               <span>⏱ {{ getDuree(ficheEnEdition.dateDebut, ficheEnEdition.dateFin) }} jour(s)</span>
             </div>
           }
-          <div class="field-md">
+          <div class="field-lg">
             <label class="field-label">Technicien(s) Assigné(s)</label>
-            <select class="compact-input select-multi-tech" [(ngModel)]="ficheEnEdition.selectedTechIds" multiple>
+            <div class="tech-checkboxes">
               @for (tech of techniciens; track tech.id) {
-                <option [value]="tech.id">{{ tech.prenom }} {{ tech.nom }}</option>
+                <label class="tech-checkbox-item" [class.tech-selected]="isTechSelected(ficheEnEdition.selectedTechIds, tech.id)">
+                  <input type="checkbox" [checked]="isTechSelected(ficheEnEdition.selectedTechIds, tech.id)"
+                    (change)="toggleTech(ficheEnEdition.selectedTechIds, tech.id, $event)">
+                  <span class="tech-avatar-sm" [style.background]="getTechColor(tech.id)">{{ tech.prenom?.charAt(0) }}{{ tech.nom?.charAt(0) }}</span>
+                  <span>{{ tech.prenom }} {{ tech.nom }}</span>
+                </label>
               }
-            </select>
-            <small class="field-hint">Ctrl+clic pour sélectionner plusieurs</small>
+            </div>
           </div>
         </div>
         <div class="field-full">
