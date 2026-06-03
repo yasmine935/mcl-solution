@@ -68,6 +68,8 @@
   background: #fff; color: #0d1b2a; box-sizing: border-box; transition: border-color 0.15s;
 }
 .compact-input:focus { border-color: #01579b; box-shadow: 0 0 0 3px rgba(1,87,155,0.08); }
+.select-multi-tech { height: 80px !important; }
+.field-hint { font-size: 0.65rem; color: #90a4ae; margin-top: 3px; display: block; }
 
 .compact-date { width: 100% !important; }
 .compact-date .mat-mdc-form-field-infix { padding: 4px 0 !important; }

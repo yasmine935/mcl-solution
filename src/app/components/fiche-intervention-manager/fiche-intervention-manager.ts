@@ -73,7 +73,8 @@ export class FicheInterventionManager implements OnInit {
   ];
 
   nouvelleFiche: any = {
-    numProjet: '', client: '', dateDebut: '', dateFin: '', technicienAssigne: '',
+    numProjet: '', client: '', dateDebut: '', dateFin: '',
+    technicienAssigne: '', selectedTechIds: [] as number[],
     description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
     adresse: '', contact: '', materielsHorsStandard: [],
     nouveauMateriel: '', documentsImportes: [], taches: [],
@@ -166,6 +167,14 @@ export class FicheInterventionManager implements OnInit {
   }
 
   mapFromBackend(f: any): any {
+    let techNoms: string[] = [];
+    try { techNoms = f.technicienNoms ? JSON.parse(f.technicienNoms) : []; } catch { techNoms = []; }
+    if (techNoms.length === 0 && f.technicien) {
+      techNoms = [`${f.technicien.prenom} ${f.technicien.nom}`];
+    }
+    const techIds: number[] = f.technicienIds
+      ? f.technicienIds.split(',').map(Number).filter(Boolean)
+      : (f.technicien ? [f.technicien.id] : []);
     return {
       id: f.id,
       numProjet: f.numProjet,
@@ -174,7 +183,8 @@ export class FicheInterventionManager implements OnInit {
       date: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
       dateDebut: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
       dateFin: '',
-      technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
+      technicienAssigne: techNoms.join(', '),
+      selectedTechIds: techIds,
       technicienId: f.technicien?.id || null,
       description: f.description,
       adresse: f.adresse,
@@ -186,6 +196,15 @@ export class FicheInterventionManager implements OnInit {
       documentsImportes: f.documentsImportes ? JSON.parse(f.documentsImportes) : [],
       taches: f.taches ? JSON.parse(f.taches) : [],
       nouvelleTacheManuelle: ''
+    };
+  }
+
+  buildTechBody(selectedTechIds: number[]) {
+    const techs = this.techniciens.filter((t: any) => selectedTechIds.includes(t.id));
+    return {
+      technicien: techs[0] ? { id: techs[0].id } : null,
+      technicienIds: techs.map((t: any) => t.id).join(','),
+      technicienNoms: JSON.stringify(techs.map((t: any) => `${t.prenom} ${t.nom}`))
     };
   }
 
@@ -206,7 +225,7 @@ export class FicheInterventionManager implements OnInit {
       alert('Veuillez remplir les champs obligatoires');
       return;
     }
-    const tech = this.techniciens.find((t: any) => `${t.prenom} ${t.nom}` === this.nouvelleFiche.technicienAssigne);
+    const techBody = this.buildTechBody(this.nouvelleFiche.selectedTechIds || []);
     const body = {
       numProjet: this.nouvelleFiche.numProjet,
       client: this.nouvelleFiche.client,
@@ -217,15 +236,15 @@ export class FicheInterventionManager implements OnInit {
       taches: JSON.stringify(this.nouvelleFiche.taches || []),
       documentsImportes: JSON.stringify(this.nouvelleFiche.documentsImportes || []),
       statut: 'EN_COURS',
-      technicien: tech ? { id: tech.id } : null,
-      manager: { id: this.currentUser.id }
+      manager: { id: this.currentUser.id },
+      ...techBody
     };
     this.http.post<any>(API, body).subscribe({
       next: (fiche) => {
         const ficheData = this.mapFromBackend(fiche);
         ficheData.dateDebut = this.nouvelleFiche.dateDebut;
         ficheData.dateFin = this.nouvelleFiche.dateFin;
-        ficheData.technicienId = tech?.id || null;
+        ficheData.selectedTechIds = this.nouvelleFiche.selectedTechIds || [];
         ficheData.client = this.nouvelleFiche.client;
         this.fiches.push(ficheData);
         alert('Fiche creee et envoyee au technicien !');
@@ -251,7 +270,7 @@ export class FicheInterventionManager implements OnInit {
       alert('Veuillez remplir les champs obligatoires');
       return;
     }
-    const tech = this.techniciens.find((t: any) => `${t.prenom} ${t.nom}` === this.ficheEnEdition.technicienAssigne);
+    const techBody = this.buildTechBody(this.ficheEnEdition.selectedTechIds || []);
     const body = {
       numProjet: this.ficheEnEdition.numProjet,
       client: this.ficheEnEdition.client,
@@ -262,7 +281,7 @@ export class FicheInterventionManager implements OnInit {
       taches: JSON.stringify(this.ficheEnEdition.taches || []),
       documentsImportes: JSON.stringify(this.ficheEnEdition.documentsImportes || []),
       statut: this.ficheEnEdition.statut,
-      technicien: tech ? { id: tech.id } : null
+      ...techBody
     };
     this.http.put<any>(`${API}/${this.ficheEnEdition.id}`, body).subscribe({
       next: (fiche) => {
@@ -291,7 +310,8 @@ export class FicheInterventionManager implements OnInit {
 
   resetFormAdd() {
     this.nouvelleFiche = {
-      numProjet: '', client: '', dateDebut: '', dateFin: '', technicienAssigne: '',
+      numProjet: '', client: '', dateDebut: '', dateFin: '',
+      technicienAssigne: '', selectedTechIds: [] as number[],
       description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
       adresse: '', contact: '', materielsHorsStandard: [],
       nouveauMateriel: '', documentsImportes: [], taches: [],

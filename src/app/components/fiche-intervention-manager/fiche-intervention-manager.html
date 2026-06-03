@@ -52,13 +52,13 @@
             </div>
           }
           <div class="field-md">
-            <label class="field-label">Technicien Assigné</label>
-            <select class="compact-input" [(ngModel)]="nouvelleFiche.technicienAssigne">
-              <option value="">-- Sélectionner --</option>
+            <label class="field-label">Technicien(s) Assigné(s)</label>
+            <select class="compact-input select-multi-tech" [(ngModel)]="nouvelleFiche.selectedTechIds" multiple>
               @for (tech of techniciens; track tech.id) {
-                <option [value]="tech.prenom + ' ' + tech.nom">{{ tech.prenom }} {{ tech.nom }}</option>
+                <option [value]="tech.id">{{ tech.prenom }} {{ tech.nom }}</option>
               }
             </select>
+            <small class="field-hint">Ctrl+clic pour sélectionner plusieurs</small>
           </div>
         </div>
         <div class="field-full">
@@ -246,13 +246,13 @@
             </div>
           }
           <div class="field-md">
-            <label class="field-label">Technicien Assigné</label>
-            <select class="compact-input" [(ngModel)]="ficheEnEdition.technicienAssigne">
-              <option value="">-- Sélectionner --</option>
+            <label class="field-label">Technicien(s) Assigné(s)</label>
+            <select class="compact-input select-multi-tech" [(ngModel)]="ficheEnEdition.selectedTechIds" multiple>
               @for (tech of techniciens; track tech.id) {
-                <option [value]="tech.prenom + ' ' + tech.nom">{{ tech.prenom }} {{ tech.nom }}</option>
+                <option [value]="tech.id">{{ tech.prenom }} {{ tech.nom }}</option>
               }
             </select>
+            <small class="field-hint">Ctrl+clic pour sélectionner plusieurs</small>
           </div>
         </div>
         <div class="field-full">
