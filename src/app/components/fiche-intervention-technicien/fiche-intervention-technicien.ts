@@ -47,17 +47,15 @@ export class FicheInterventionTechnicien implements OnInit {
       if (params['id']) { this.loadIntervention(parseInt(params['id'])); }
       else { this.loadPremiereFiche(); }
     });
-    setTimeout(() => this.initSignatureCanvases(), 100);
   }
 
   loadIntervention(id: number) {
     this.http.get<any>(`${API}/${id}`).subscribe({
-      next: (fiche) => { this.intervention = this.mapFromBackend(fiche); },
-      error: () => {
-        const stored = localStorage.getItem('fiches_intervention');
-        const fiches = stored ? JSON.parse(stored) : [];
-        this.intervention = fiches.find((f: any) => f.id === id) || {};
-      }
+      next: (fiche) => {
+        this.intervention = this.mapFromBackend(fiche);
+        setTimeout(() => this.initSignatureCanvases(), 150);
+      },
+      error: () => this.intervention = {}
     });
   }
 
@@ -66,14 +64,12 @@ export class FicheInterventionTechnicien implements OnInit {
     this.http.get<any[]>(`${API}/technicien/${user.id}`).subscribe({
       next: (fiches) => {
         const fiche = fiches.find((f: any) => f.statut !== 'COMPLETEE');
-        if (fiche) this.intervention = this.mapFromBackend(fiche);
+        if (fiche) {
+          this.intervention = this.mapFromBackend(fiche);
+          setTimeout(() => this.initSignatureCanvases(), 150);
+        }
       },
-      error: () => {
-        const stored = localStorage.getItem('fiches_intervention');
-        const fiches = stored ? JSON.parse(stored) : [];
-        const userFullName = `${user.prenom} ${user.nom}`;
-        this.intervention = fiches.find((f: any) => f.technicienAssigne === userFullName) || {};
-      }
+      error: () => this.intervention = {}
     });
   }
 
@@ -112,8 +108,31 @@ export class FicheInterventionTechnicien implements OnInit {
     canvas.addEventListener('touchend', (e) => this.stopDrawing(e, type));
   }
 
-  startDrawing(event: MouseEvent, type: string) { type === 'tech' ? this.isDrawingTech = true : this.isDrawingClient = true; }
-  startDrawingTouch(event: TouchEvent, type: string) { event.preventDefault(); type === 'tech' ? this.isDrawingTech = true : this.isDrawingClient = true; }
+  startDrawing(event: MouseEvent, type: string) {
+    type === 'tech' ? this.isDrawingTech = true : this.isDrawingClient = true;
+    const canvasRef = type === 'tech' ? this.signatureTechnicienCanvas : this.signatureClientCanvas;
+    const ctx = canvasRef?.nativeElement?.getContext('2d');
+    if (!ctx) return;
+    const rect = canvasRef.nativeElement.getBoundingClientRect();
+    const scaleX = canvasRef.nativeElement.width / rect.width;
+    const scaleY = canvasRef.nativeElement.height / rect.height;
+    ctx.beginPath();
+    ctx.moveTo((event.clientX - rect.left) * scaleX, (event.clientY - rect.top) * scaleY);
+  }
+
+  startDrawingTouch(event: TouchEvent, type: string) {
+    event.preventDefault();
+    type === 'tech' ? this.isDrawingTech = true : this.isDrawingClient = true;
+    const canvasRef = type === 'tech' ? this.signatureTechnicienCanvas : this.signatureClientCanvas;
+    const ctx = canvasRef?.nativeElement?.getContext('2d');
+    if (!ctx) return;
+    const touch = event.touches[0];
+    const rect = canvasRef.nativeElement.getBoundingClientRect();
+    const scaleX = canvasRef.nativeElement.width / rect.width;
+    const scaleY = canvasRef.nativeElement.height / rect.height;
+    ctx.beginPath();
+    ctx.moveTo((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+  }
 
   draw(event: MouseEvent, type: string) {
     const isDrawing = type === 'tech' ? this.isDrawingTech : this.isDrawingClient;
@@ -122,8 +141,11 @@ export class FicheInterventionTechnicien implements OnInit {
     const ctx = canvasRef.nativeElement.getContext('2d');
     if (!ctx) return;
     const rect = canvasRef.nativeElement.getBoundingClientRect();
+    const scaleX = canvasRef.nativeElement.width / rect.width;
+    const scaleY = canvasRef.nativeElement.height / rect.height;
     ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top); ctx.stroke();
+    ctx.lineTo((event.clientX - rect.left) * scaleX, (event.clientY - rect.top) * scaleY);
+    ctx.stroke();
   }
 
   drawTouch(event: TouchEvent, type: string) {
@@ -135,8 +157,11 @@ export class FicheInterventionTechnicien implements OnInit {
     if (!ctx) return;
     const touch = event.touches[0];
     const rect = canvasRef.nativeElement.getBoundingClientRect();
+    const scaleX = canvasRef.nativeElement.width / rect.width;
+    const scaleY = canvasRef.nativeElement.height / rect.height;
     ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top); ctx.stroke();
+    ctx.lineTo((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+    ctx.stroke();
   }
 
   stopDrawing(event: Event, type: string) {
