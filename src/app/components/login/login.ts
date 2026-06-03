@@ -44,7 +44,7 @@ export class Login {
   changePasswordLoading = false;
   changePasswordSuccess = false;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
   ouvrirForgot() { this.showForgotModal = true; this.forgotUsername = ''; this.forgotMessage = ''; this.forgotError = ''; }
   fermerForgot() { this.showForgotModal = false; }
@@ -83,8 +83,10 @@ export class Login {
     }).subscribe({
       next: (user) => {
         localStorage.setItem('user', JSON.stringify(user));
-        if (user.premierConnexion) {
-          // Première connexion → forcer changement de mot de passe
+        const pwdChangedKey = `pwd_changed_${user.username}`;
+        const alreadyChanged = localStorage.getItem(pwdChangedKey) === 'true';
+        if (user.premierConnexion && !alreadyChanged) {
+          // Première connexion sur cet appareil → forcer changement de mot de passe
           this.pendingUser = user;
           this.newPassword = '';
           this.confirmPassword = '';
@@ -119,9 +121,9 @@ export class Login {
       next: () => {
         this.changePasswordLoading = false;
         this.changePasswordSuccess = true;
-        // Mettre à jour le user en localStorage
         this.pendingUser.premierConnexion = false;
         localStorage.setItem('user', JSON.stringify(this.pendingUser));
+        localStorage.setItem(`pwd_changed_${this.pendingUser.username}`, 'true');
         setTimeout(() => {
           this.showChangePasswordModal = false;
           this.naviguerVersPage(this.pendingUser);
