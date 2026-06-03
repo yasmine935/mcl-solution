@@ -71,10 +71,16 @@
                 <label class="fit-tache-row" [class.fit-tache-checked]="tache.coche">
                   <input type="checkbox" [(ngModel)]="tache.coche" (change)="sauvegarderProgres()">
                   <span class="fit-tache-check">{{ tache.coche ? '✓' : '' }}</span>
-                  <span class="fit-tache-name">{{ tache.nom }}</span>
-                  @if (tache.selection) {
-                    <span class="fit-tache-badge">{{ tache.selection }}</span>
-                  }
+                  <span class="fit-tache-content">
+                    <span class="fit-tache-name">{{ tache.nom }}</span>
+                    @if (tache.selections?.length > 0) {
+                      <span class="fit-tache-selections">
+                        @for (sel of tache.selections; track sel) {
+                          <span class="fit-tache-badge">{{ sel }}</span>
+                        }
+                      </span>
+                    }
+                  </span>
                 </label>
               }
             </div>

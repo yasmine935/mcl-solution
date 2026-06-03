@@ -263,6 +263,17 @@
   font-weight: 700;
 }
 
+.fit-tache-content {
+  display: flex; flex-direction: column; gap: 5px; flex: 1;
+}
+.fit-tache-selections {
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+.fit-tache-selections .fit-tache-badge {
+  background: #e3f2fd; color: #01579b;
+  font-size: 0.68rem;
+}
+
 /* ══ DOCUMENTS ══ */
 .fit-docs-list { display: flex; flex-direction: column; gap: 8px; }
 
