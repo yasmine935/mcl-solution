@@ -1947,3 +1947,96 @@ nav {
   transition: background 0.15s;
 }
 .conge-modal-btn-close:hover { background: #0d47a1; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE MOBILE
+   ═══════════════════════════════════════════════════ */
+
+/* Tablette (768px) */
+@media (max-width: 768px) {
+
+  /* Sidebar cachée par défaut, glisse depuis la gauche */
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0; bottom: 0;
+    z-index: 999;
+    transition: left 0.3s ease;
+    width: 260px;
+  }
+
+  /* Sidebar visible quand .sidebar-open */
+  .dashboard-layout.sidebar-open .sidebar { left: 0; }
+
+  /* Overlay sombre derrière la sidebar */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+    width: 100%;
+    height: 100%;
+    border: none;
+    cursor: pointer;
+  }
+  .dashboard-layout.sidebar-open .sidebar-overlay { display: block; }
+
+  /* Contenu principal prend toute la largeur */
+  .main-content { width: 100%; }
+
+  /* Topbar compact */
+  .topbar { padding: 0 16px; height: 56px; }
+  .topbar-left h3 { font-size: 1rem; }
+  .topbar-greeting { display: none; }
+
+  /* Grille 2 colonnes sur tablette */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  /* Page content padding réduit */
+  .page-content { padding: 16px; }
+
+  /* Cards plus compactes */
+  .stat-card { padding: 18px 16px; }
+  .stat-card-number { font-size: 2rem; }
+  .stat-card-label { font-size: 0.68rem; letter-spacing: 0; }
+  .stat-card-icon { width: 44px; height: 44px; }
+  .stat-card-icon mat-icon { font-size: 22px; width: 22px; height: 22px; }
+
+  /* Hamburger visible */
+  .hamburger-btn { display: flex; }
+}
+
+/* Mobile (480px) */
+@media (max-width: 480px) {
+
+  /* Grille 1 seule colonne */
+  .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Cards plus petites */
+  .stat-card { padding: 16px 14px; flex-direction: row; align-items: center; gap: 14px; }
+  .stat-card-bg { display: none; }
+  .stat-card-number { font-size: 1.8rem; }
+  .stat-card-label { font-size: 0.7rem; white-space: normal; word-break: break-word; }
+
+  /* Topbar encore plus compact */
+  .topbar { padding: 0 12px; }
+  .topbar-left h3 { font-size: 0.9rem; }
+  .role-badge { font-size: 0.6rem; padding: 2px 6px; }
+
+  /* Page content */
+  .page-content { padding: 12px; }
+
+  /* Modals full screen sur mobile */
+  .modal-content, .modal-detail { width: 95vw !important; max-width: 95vw !important; margin: 10px; }
+
+  /* Welcome banner compact */
+  .home-welcome { padding: 16px 14px; flex-direction: column; gap: 10px; }
+  .home-welcome-avatar { width: 44px; height: 44px; font-size: 1.1rem; }
+  .home-welcome-text h2 { font-size: 1rem; }
+
+  /* Actions rapides en 2 colonnes */
+  .home-actions-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
+  .home-action-text strong { font-size: 0.75rem; }
+  .home-action-text span { font-size: 0.65rem; }
+}
