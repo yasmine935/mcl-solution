@@ -64,20 +64,30 @@ export class Planning implements OnInit {
         const local: any[] = stored ? JSON.parse(stored) : [];
         this.fichesIntervention = data.map(f => {
           const localF = local.find((l: any) => l.id === f.id);
+          let techIds: number[] = [];
+          if (f.technicienIds) {
+            techIds = f.technicienIds.split(',').map((id: string) => Number.parseInt(id.trim(), 10)).filter((n: number) => !Number.isNaN(n));
+          } else if (f.technicien?.id) {
+            techIds = [f.technicien.id];
+          }
           return {
             id: f.id,
             numProjet: f.numProjet,
             client: f.client,
             technicienId: f.technicien?.id || localF?.technicienId || null,
+            technicienIds: techIds,
             dateDebut: localF?.dateDebut || (f.dateIntervention ? f.dateIntervention.split('T')[0] : ''),
-            dateFin: localF?.dateFin || '',
+            dateFin: f.dateFin ? f.dateFin.split('T')[0] : (localF?.dateFin || ''),
             statut: f.statut
           };
         });
+        this.generateCalendrier();
+        this.generateSemaine();
       },
       error: () => {
         const stored = localStorage.getItem('fiches_intervention');
         this.fichesIntervention = stored ? JSON.parse(stored) : [];
+        this.generateCalendrier();
       }
     });
   }
@@ -124,11 +134,11 @@ export class Planning implements OnInit {
     });
   }
 
-  // ✅ CHARGER LES CONGES APPROUVES
+  // ✅ CHARGER TOUS LES CONGES (APPROUVE + EN_ATTENTE)
   loadCongesApprouves() {
     this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
       next: (data) => {
-        this.congesApprouves = data.filter((c: any) => c.statut === 'APPROUVE');
+        this.congesApprouves = data.filter((c: any) => c.statut === 'APPROUVE' || c.statut === 'EN_ATTENTE');
         this.generateCalendrier();
       },
       error: () => {
@@ -137,7 +147,7 @@ export class Planning implements OnInit {
     });
   }
 
-  // ✅ Vérifie si un jour donné est en congé approuvé pour un user
+  // ✅ Vérifie si un jour donné est en congé pour un user
   getCongeForUserOnDay(userId: number, date: Date): any | null {
     return this.congesApprouves.find((c: any) => {
       if (c.utilisateur?.id !== userId) return false;
@@ -145,24 +155,27 @@ export class Planning implements OnInit {
       const fin = new Date(c.dateFin);
       debut.setHours(0, 0, 0, 0);
       fin.setHours(23, 59, 59, 999);
-      return date >= debut && date <= fin;
+      const d = new Date(date);
+      d.setHours(12, 0, 0, 0);
+      return d >= debut && d <= fin;
     }) || null;
   }
 
-  // ✅ Libellé du congé selon le type
+  // ✅ Libellé du congé selon le type et statut
   getCongeLabel(conge: any): string {
+    const pending = conge.statut === 'EN_ATTENTE' ? '⏳ ' : '';
     const map: any = {
-      'ANNUEL': '🌴 Congé',
-      'RTT': '😴 RTT',
-      'MALADIE': '🏥 Maladie',
-      'FORMATION': '📚 Formation',
-      'SANS_SOLDE': '💼 Sans solde',
-      'AUTRE': '📋 Congé'
+      'ANNUEL': `${pending}🌴 Congé`,
+      'RTT': `${pending}😴 RTT`,
+      'MALADIE': `${pending}🏥 Maladie`,
+      'FORMATION': `${pending}📚 Formation`,
+      'SANS_SOLDE': `${pending}💼 Sans solde`,
+      'AUTRE': `${pending}📋 Congé`
     };
-    return map[conge.type] || '🏖️ Congé';
+    return map[conge.type] || `${pending}🏖️ Congé`;
   }
 
-  // ✅ Couleur du congé selon le type
+  // ✅ Couleur du congé (atténuée si EN_ATTENTE)
   getCongeColor(conge: any): string {
     const map: any = {
       'ANNUEL': '#1565c0',
@@ -172,7 +185,8 @@ export class Planning implements OnInit {
       'SANS_SOLDE': '#546e7a',
       'AUTRE': '#6a1b9a'
     };
-    return map[conge.type] || '#c62828';
+    const base = map[conge.type] || '#c62828';
+    return conge.statut === 'EN_ATTENTE' ? '#9e9e9e' : base;
   }
 
   generateCalendrier() {
@@ -193,8 +207,8 @@ export class Planning implements OnInit {
       const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
       const dateObj = new Date(annee, mois, jour);
 
-      // ✅ Vérifier si l'utilisateur courant a un congé ce jour
       const conge = this.getCongeForUserOnDay(this.currentUserId!, dateObj);
+      const fiche = this.getFicheForUserOnDay(this.currentUserId!, dateObj);
 
       this.joursAffiche.push({
         jour: mois === this.currentMonth ? jour : 0,
@@ -204,7 +218,8 @@ export class Planning implements OnInit {
         key: key,
         isWeekend,
         isToday: this.isToday(dateObj),
-        conge: conge
+        conge: conge,
+        fiche: fiche
       });
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -411,8 +426,8 @@ export class Planning implements OnInit {
 
   getFicheForUserOnDay(userId: number, date: Date): any | null {
     return this.fichesIntervention.find(f => {
-      if (f.technicienId !== userId) return false;
-      if (!f.dateDebut) return false;
+      const assigned = f.technicienId === userId || (f.technicienIds || []).includes(userId);
+      if (!assigned || !f.dateDebut) return false;
       const debut = new Date(f.dateDebut);
       const fin = f.dateFin ? new Date(f.dateFin) : new Date(f.dateDebut);
       debut.setHours(0, 0, 0, 0);

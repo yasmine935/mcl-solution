@@ -136,7 +136,7 @@
           [class.other-month]="jour.jour === 0"
           [class.weekend]="jour.isWeekend && jour.jour !== 0"
           [class.today]="jour.isToday"
-          [class.has-note]="(jour.note || jour.conge) && jour.jour !== 0"
+          [class.has-note]="(jour.note || jour.conge || jour.fiche) && jour.jour !== 0"
           [class.has-conge]="jour.conge && jour.jour !== 0"
           [class.cal-day-readonly]="!isManager"
           (click)="ouvrirJour(jour)">
@@ -144,6 +144,10 @@
           @if (jour.conge && jour.jour !== 0) {
             <div class="day-note conge-badge" [style.background]="getCongeColor(jour.conge)">
               {{ getCongeLabel(jour.conge) }}
+            </div>
+          } @else if (jour.fiche && jour.jour !== 0) {
+            <div class="day-note" [style.background]="'#1a6b3c'">
+              🔧 {{ jour.fiche.client || jour.fiche.numProjet }}
             </div>
           } @else if (jour.note && jour.jour !== 0) {
             <div class="day-note" [style.background]="getNoteColor(jour.note)">

@@ -468,22 +468,57 @@
       <div class="solde-card">
         <h4 class="solde-title">📊 Mon Solde de Congés {{ soldeCongesPerso.annee }}</h4>
         <div class="solde-grid">
+
+          <!-- CONGÉS ANNUELS -->
           <div class="solde-item">
-            <span class="solde-icon">🌴</span>
-            <div>
-              <div class="solde-type">Congés Annuels</div>
-              <div class="solde-detail">{{ soldeCongesPerso.congesAnnuelsPris }}j pris</div>
+            <div class="solde-item-header">
+              <span class="solde-icon">🌴</span>
+              <div>
+                <strong>Congés Annuels</strong>
+                <span class="solde-subtitle">2.5 jours/mois</span>
+              </div>
             </div>
-            <div class="solde-restant">{{ soldeCongesPerso.congesAnnuelsRestants }}j restants</div>
+            <div class="solde-bar-wrapper">
+              <div class="solde-bar">
+                <div class="solde-fill solde-fill-annuel"
+                  [style.width.%]="(soldeCongesPerso.joursAnnuelPris / soldeCongesPerso.soldeAnnuelTotal) * 100">
+                </div>
+              </div>
+              <div class="solde-numbers">
+                <span class="solde-pris">{{ soldeCongesPerso.joursAnnuelPris }}j pris</span>
+                <span class="solde-restant" [class.solde-alert]="soldeCongesPerso.soldeAnnuelRestant <= 5">
+                  {{ soldeCongesPerso.soldeAnnuelRestant }}j restants
+                </span>
+              </div>
+            </div>
+            <div class="solde-total">Sur {{ soldeCongesPerso.soldeAnnuelTotal }} jours au total</div>
           </div>
+
+          <!-- RTT -->
           <div class="solde-item">
-            <span class="solde-icon">😴</span>
-            <div>
-              <div class="solde-type">RTT</div>
-              <div class="solde-detail">{{ soldeCongesPerso.rttPris }}j pris</div>
+            <div class="solde-item-header">
+              <span class="solde-icon">😴</span>
+              <div>
+                <strong>RTT</strong>
+                <span class="solde-subtitle">1 jour/mois</span>
+              </div>
             </div>
-            <div class="solde-restant">{{ soldeCongesPerso.rttRestants }}j restants</div>
+            <div class="solde-bar-wrapper">
+              <div class="solde-bar">
+                <div class="solde-fill solde-fill-rtt"
+                  [style.width.%]="(soldeCongesPerso.joursRTTPris / soldeCongesPerso.soldeRTTTotal) * 100">
+                </div>
+              </div>
+              <div class="solde-numbers">
+                <span class="solde-pris">{{ soldeCongesPerso.joursRTTPris }}j pris</span>
+                <span class="solde-restant" [class.solde-alert]="soldeCongesPerso.soldeRTTRestant <= 2">
+                  {{ soldeCongesPerso.soldeRTTRestant }}j restants
+                </span>
+              </div>
+            </div>
+            <div class="solde-total">Sur {{ soldeCongesPerso.soldeRTTTotal }} jours au total</div>
           </div>
+
         </div>
       </div>
     }
@@ -491,36 +526,64 @@
     <!-- FORMULAIRE -->
     @if (showCongeFormPerso) {
       <div class="conge-form-card">
-        <h3>📝 Nouvelle demande de congé</h3>
-        <div class="conge-form-grid">
-          <div class="conge-form-field">
-            <label for="cp-type">Type *</label>
-            <select id="cp-type" [(ngModel)]="congePerso.type" class="conge-select">
-              @for (t of typesConge; track t) { <option [value]="t">{{ t }}</option> }
-            </select>
-          </div>
-          <div class="conge-form-field">
-            <label for="cp-debut">Date début *</label>
-            <input id="cp-debut" type="date" [(ngModel)]="congePerso.dateDebut" (change)="calculerJoursPerso()" class="conge-input">
-          </div>
-          <div class="conge-form-field">
-            <label for="cp-fin">Date fin *</label>
-            <input id="cp-fin" type="date" [(ngModel)]="congePerso.dateFin" (change)="calculerJoursPerso()" class="conge-input">
-          </div>
-          @if (nombreJoursPerso > 0) {
-            <div class="conge-duree-badge">⏱ {{ nombreJoursPerso }} jour(s)</div>
-          }
-          <div class="conge-form-field conge-form-full">
-            <label for="cp-motif">Motif</label>
-            <input id="cp-motif" type="text" [(ngModel)]="congePerso.motif" placeholder="Motif (optionnel)" class="conge-input">
+        <div class="conge-form-title">
+          <span>✨</span> Nouvelle Demande de Congé
+        </div>
+
+        <!-- TYPE -->
+        <div class="conge-field">
+          <label>Type de congé *</label>
+          <div class="conge-types-grid">
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'ANNUEL'" (click)="congePerso.type = 'ANNUEL'">🌴 Annuel</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'RTT'" (click)="congePerso.type = 'RTT'">😴 RTT</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'MALADIE'" (click)="congePerso.type = 'MALADIE'">🏥 Maladie</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'FORMATION'" (click)="congePerso.type = 'FORMATION'">📚 Formation</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'SANS_SOLDE'" (click)="congePerso.type = 'SANS_SOLDE'">💼 Sans solde</button>
           </div>
         </div>
+
+        <!-- DATES + COMPTEUR -->
+        <div class="conge-dates-row">
+          <div class="conge-field">
+            <label>📅 Date de début</label>
+            <input type="date" class="conge-input" [(ngModel)]="congePerso.dateDebut" (ngModelChange)="calculerJoursPerso()">
+          </div>
+
+          <div class="conge-jours-display">
+            @if (nombreJoursPerso > 0) {
+              <div class="jours-pill">
+                <span class="jours-number">{{ nombreJoursPerso }}</span>
+                <span class="jours-text">jour{{ nombreJoursPerso > 1 ? 's' : '' }}</span>
+              </div>
+            } @else {
+              <div class="jours-placeholder">
+                <span>📆</span>
+                <small>durée</small>
+              </div>
+            }
+          </div>
+
+          <div class="conge-field">
+            <label>📅 Date de fin</label>
+            <input type="date" class="conge-input" [(ngModel)]="congePerso.dateFin" (ngModelChange)="calculerJoursPerso()">
+          </div>
+        </div>
+
+        <!-- MOTIF -->
+        <div class="conge-field">
+          <label>💬 Motif (optionnel)</label>
+          <textarea class="conge-textarea" [(ngModel)]="congePerso.motif" rows="2" placeholder="Précisez si nécessaire..."></textarea>
+        </div>
+
+        <!-- ACTIONS -->
         <div class="conge-form-actions">
-          <button type="button" class="btn-envoyer-conge" (click)="deposerCongePerso()">
-            ✅ Envoyer à ESSAN
-          </button>
           <button type="button" class="btn-annuler-conge" (click)="showCongeFormPerso = false; resetCongeFormPerso()">
             Annuler
+          </button>
+          <button type="button" class="btn-envoyer-conge"
+            [disabled]="!congePerso.type || !congePerso.dateDebut || !congePerso.dateFin"
+            (click)="deposerCongePerso()">
+            ➤ Envoyer à ESSAN
           </button>
         </div>
       </div>

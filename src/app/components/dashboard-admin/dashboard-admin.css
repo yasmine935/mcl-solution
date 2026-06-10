@@ -957,3 +957,138 @@ nav {
 .conge-item-text strong { font-size: 0.9rem; color: #0d1b2a; }
 .conge-dates-text { font-size: 0.75rem; color: #90a4ae; }
 .conge-statut-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+/* ══════════ SOLDE CONGÉS FERID ══════════ */
+.solde-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  border: 1.5px solid #e1f5fe;
+}
+.solde-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #01579b;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.solde-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.solde-item {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid #e0e0e0;
+}
+.solde-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.solde-icon { font-size: 1.4rem; }
+.solde-item-header strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #0d1b2a;
+}
+.solde-subtitle {
+  font-size: 0.68rem;
+  color: #90a4ae;
+}
+.solde-bar-wrapper { margin-bottom: 6px; }
+.solde-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.solde-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.solde-fill-annuel { background: linear-gradient(90deg, #2e7d32, #43a047); }
+.solde-fill-rtt    { background: linear-gradient(90deg, #01579b, #0288d1); }
+.solde-numbers {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.solde-pris {
+  font-size: 0.72rem;
+  color: #90a4ae;
+}
+.solde-restant {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #2e7d32;
+}
+.solde-alert {
+  color: #c62828 !important;
+  animation: pulse-alert 1s ease infinite;
+}
+@keyframes pulse-alert {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+.solde-total {
+  font-size: 0.68rem;
+  color: #b0bec5;
+  margin-top: 4px;
+}
+
+/* ══════════ FORMULAIRE CONGÉ FERID ══════════ */
+.conge-form-title {
+  font-size: 0.95rem; font-weight: 800; color: #01579b;
+  margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+}
+.conge-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.conge-field > label { font-size: 0.78rem; font-weight: 700; color: #546e7a; }
+.conge-types-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.type-btn {
+  padding: 8px 16px; border-radius: 20px;
+  border: 2px solid #e0e0e0; background: #fafafa;
+  font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  transition: all 0.15s; font-family: inherit; color: #546e7a;
+}
+.type-btn:hover { border-color: #01579b; color: #01579b; background: #e1f5fe; }
+.type-btn-active {
+  background: #01579b !important; color: #fff !important;
+  border-color: #01579b !important;
+  box-shadow: 0 3px 8px rgba(1,87,155,0.3);
+}
+.conge-dates-row {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 14px; align-items: center; margin-bottom: 14px;
+}
+.conge-jours-display { display: flex; align-items: center; justify-content: center; }
+.jours-pill {
+  display: flex; flex-direction: column; align-items: center;
+  background: linear-gradient(135deg, #01579b, #0288d1);
+  color: #fff; padding: 10px 18px; border-radius: 14px;
+  animation: popIn 0.2s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.jours-number { font-size: 1.8rem; font-weight: 900; line-height: 1; }
+.jours-text { font-size: 0.65rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.jours-placeholder { display: flex; flex-direction: column; align-items: center; color: #b0bec5; gap: 2px; }
+.jours-placeholder span { font-size: 1.4rem; }
+.jours-placeholder small { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.conge-textarea {
+  border: 1.5px solid #e0e0e0; border-radius: 10px;
+  padding: 10px 14px; font-size: 0.88rem; outline: none;
+  font-family: inherit; resize: vertical; transition: border-color 0.2s;
+  width: 100%; box-sizing: border-box;
+}
+.conge-textarea:focus { border-color: #01579b; box-shadow: 0 0 0 3px rgba(1,87,155,0.1); }

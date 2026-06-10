@@ -123,16 +123,24 @@ export class Taches implements OnInit {
 
   ouvrirFichier(fichier: any) {
     if (!fichier.dataUrl) return;
-    if (fichier.mimeType?.startsWith('image/') || fichier.mimeType === 'application/pdf') {
-      window.open(fichier.dataUrl, '_blank');
+    const arr = fichier.dataUrl.split(',');
+    const mime = (arr[0].match(/:(.*?);/) || [])[1] || fichier.mimeType || 'application/octet-stream';
+    const bstr = atob(arr[1]);
+    const u8arr = new Uint8Array(bstr.length);
+    for (const [i, ch] of [...bstr].entries()) u8arr[i] = ch.codePointAt(0) ?? 0;
+    const blob = new Blob([u8arr], { type: mime });
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    if (mime.startsWith('image/') || mime === 'application/pdf') {
+      link.target = '_blank';
     } else {
-      const link = document.createElement('a');
-      link.href = fichier.dataUrl;
       link.download = fichier.nom;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
   }
 
   ouvrirAddClient(target: 'add' | 'edit') {
@@ -397,15 +405,22 @@ export class Taches implements OnInit {
 
   onFileSelectAdd(event: any) {
     const files = event.target.files;
-    if (files) {
-      for (let i = 0; i < files.length; i++) {
+    if (!files) return;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
         this.nouvelleTache.fichiers.push({
-          nom: files[i].name,
-          taille: (files[i].size / 1024).toFixed(2),
-          date: new Date().toLocaleString('fr-FR')
+          nom: file.name,
+          taille: (file.size / 1024).toFixed(2),
+          date: new Date().toLocaleString('fr-FR'),
+          dataUrl: e.target.result,
+          mimeType: file.type
         });
-      }
+      };
+      reader.readAsDataURL(file);
     }
+    event.target.value = '';
   }
 
   supprimerFichier(index: number) { this.nouvelleTache.fichiers.splice(index, 1); }
@@ -413,16 +428,22 @@ export class Taches implements OnInit {
 
   onFileSelectEdit(event: any) {
     const files = event.target.files;
-    if (files) {
-      if (!this.tacheEnEdition.fichiers) this.tacheEnEdition.fichiers = [];
-      for (let i = 0; i < files.length; i++) {
+    if (!files) return;
+    if (!this.tacheEnEdition.fichiers) this.tacheEnEdition.fichiers = [];
+    for (const file of Array.from(files as FileList)) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
         this.tacheEnEdition.fichiers.push({
-          nom: files[i].name,
-          taille: (files[i].size / 1024).toFixed(2),
-          date: new Date().toLocaleString('fr-FR')
+          nom: file.name,
+          taille: (file.size / 1024).toFixed(2),
+          date: new Date().toLocaleString('fr-FR'),
+          dataUrl: e.target.result,
+          mimeType: file.type
         });
-      }
+      };
+      reader.readAsDataURL(file);
     }
+    event.target.value = '';
   }
 
   getStatutColor(statut: string): string {
