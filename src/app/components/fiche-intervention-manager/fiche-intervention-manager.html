@@ -7,7 +7,7 @@
       <span class="fiches-count">{{ fiches.length }} fiche(s)</span>
     </div>
     <div class="header-actions">
-      <button mat-raised-button color="primary" (click)="showFormAdd = !showFormAdd; showFormEdit = false" class="btn-add">
+      <button mat-raised-button color="primary" (click)="toggleFormAdd()" class="btn-add">
         <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
         {{ showFormAdd ? 'Fermer' : 'Nouvelle Fiche' }}
       </button>

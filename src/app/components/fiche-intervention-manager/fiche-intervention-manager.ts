@@ -149,6 +149,12 @@ export class FicheInterventionManager implements OnInit {
     event.target.value = '';
   }
 
+  toggleFormAdd() {
+    this.showFormAdd = !this.showFormAdd;
+    this.showFormEdit = false;
+    if (this.showFormAdd) { this.loadEmployes(); }
+  }
+
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
       next: (data) => {

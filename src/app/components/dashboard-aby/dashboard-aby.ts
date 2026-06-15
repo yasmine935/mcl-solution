@@ -6,11 +6,13 @@ import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
+import { Planning } from '../planning/planning';
+import { Taches } from '../taches/taches';
 
 @Component({
   selector: 'app-dashboard-aby',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, ApprovisionnementComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, ApprovisionnementComponent, Planning, Taches],
   templateUrl: './dashboard-aby.html',
   styleUrl: './dashboard-aby.css'
 })
@@ -185,9 +187,9 @@ export class DashboardAby implements OnInit {
     const map: any = {
       'home': 'Tableau de Bord Supply Chain',
       'demandes': 'Demandes Matériel',
-      'commandes': 'Commandes & Achats',
-      'logistique': 'Logistique & Stock',
-      'approvisionnement': 'Fiches Approvisionnement'
+      'approvisionnement': 'Fiches Approvisionnement',
+      'planning': 'Planning MCL Solutions',
+      'projets': 'Suivi Projets'
     };
     return map[this.currentPage] || 'Supply Chain';
   }

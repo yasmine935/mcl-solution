@@ -128,43 +128,57 @@
           </div>
           <div class="home-welcome-badge"><mat-icon>admin_panel_settings</mat-icon> Admin MCL</div>
         </div>
-        <!-- STAT CARDS -->
-        <div class="stats-grid">
-          <div class="stat-card stat-blue" (click)="currentPage = 'employes'" style="cursor:pointer">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>people_alt</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Employés</span>
-              <span class="stat-card-number">{{ employes.length }}</span>
-              <span class="stat-card-sub">Actifs dans le système →</span>
-            </div>
+        <!-- BI CHARTS -->
+        <div class="bi-section">
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>bar_chart</mat-icon> Interventions / 6 derniers mois</div>
+            <apx-chart
+              [series]="chartFichesMoisSeries"
+              [chart]="chartBarOptions.chart"
+              [grid]="chartBarOptions.grid"
+              [colors]="['#1565c0']"
+              [xaxis]="{ categories: chartFichesMoisCategories }">
+            </apx-chart>
           </div>
-          <div class="stat-card stat-orange" (click)="currentPage = 'conges'" style="cursor:pointer">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>fact_check</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Demandes Congés</span>
-              <span class="stat-card-number">{{ conges.length }}</span>
-              <span class="stat-card-sub">À traiter →</span>
-            </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>donut_large</mat-icon> Statut des interventions</div>
+            <apx-chart
+              [series]="chartFichesStatutSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['En cours', 'Complétées', 'Validées']"
+              [colors]="['#1565c0', '#f57f17', '#2e7d32']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
           </div>
-          <div class="stat-card stat-green" (click)="currentPage = 'factures'" style="cursor:pointer">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>receipt</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Factures</span>
-              <span class="stat-card-number">{{ factures.length }}</span>
-              <span class="stat-card-sub">Ce mois-ci →</span>
-            </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>pie_chart</mat-icon> Congés par type</div>
+            <apx-chart
+              [series]="chartCongesTypeSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['Annuel', 'RTT', 'Maladie', 'Sans solde', 'Formation']"
+              [colors]="['#1565c0', '#6a1b9a', '#e65100', '#c62828', '#00695c']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
           </div>
-          <div class="stat-card stat-purple" (click)="currentPage = 'tickets'" style="cursor:pointer">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>support_agent</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Tickets Clients</span>
-              <span class="stat-card-number">{{ reclamations.length }}</span>
-              <span class="stat-card-sub">Remontées terrain →</span>
-            </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>task_alt</mat-icon> Statut des projets</div>
+            <apx-chart
+              [series]="chartTachesStatutSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['En qualification', 'En cours', 'Fait', 'Perdu', 'En attente']"
+              [colors]="['#546e7a', '#1565c0', '#2e7d32', '#c62828', '#f57f17']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
+          </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>flag</mat-icon> Priorité des projets</div>
+            <apx-chart
+              [series]="chartTachesPrioriteSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['Élevé', 'Moyenne', 'Faible']"
+              [colors]="['#c62828', '#f57f17', '#2e7d32']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
           </div>
         </div>
         <!-- ACTIONS RAPIDES -->

@@ -21,7 +21,7 @@ import { Voitures } from '../voitures/voitures';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
-
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -30,7 +30,8 @@ import { GestionClients } from '../clients/clients';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients
+    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients,
+    NgApexchartsModule
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'
@@ -57,6 +58,7 @@ export class DashboardAdmin implements OnInit {
   fichesFiltrees: any[] = [];
   ficheCompletees: any[] = [];
   conges: any[] = [];
+  taches: any[] = [];
   employes: any[] = [];
   reclamations: any[] = [];
   documents: any[] = [];
@@ -136,6 +138,14 @@ get minutesOk(): number {
   this.loadResetRequests();
   this.loadMesConges();
   this.loadSoldeCongesPerso();
+  this.loadTaches();
+}
+
+loadTaches() {
+  this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+    next: (data) => this.taches = data,
+    error: () => this.taches = []
+  });
 }
 
 loadMesConges() {
@@ -422,6 +432,68 @@ getStatutVoitureColor(statut: string): string {
   }
 
   get countResetPending(): number { return this.resetRequests.length; }
+
+  // ── BI CHARTS ──
+  readonly chartDonutOptions = {
+    chart: { type: 'donut' as const, height: 220, fontFamily: 'Roboto, sans-serif' },
+    legend: { position: 'bottom' as const, fontSize: '12px' },
+    dataLabels: { enabled: true },
+    plotOptions: { pie: { donut: { size: '65%' } } }
+  };
+
+  readonly chartBarOptions = {
+    chart: { type: 'bar' as const, height: 220, toolbar: { show: false }, fontFamily: 'Roboto, sans-serif' },
+    plotOptions: { bar: { borderRadius: 6, columnWidth: '50%' } },
+    dataLabels: { enabled: false },
+    grid: { borderColor: '#f0f4f8' }
+  };
+
+  get chartFichesStatutSeries(): number[] {
+    return [
+      this.fiches.filter((f: any) => f.statut === 'EN_COURS').length,
+      this.fiches.filter((f: any) => f.statut === 'COMPLETEE').length,
+      this.fiches.filter((f: any) => f.statut === 'VALIDEE').length
+    ];
+  }
+
+  get chartCongesTypeSeries(): number[] {
+    return ['ANNUEL','RTT','MALADIE','SANS_SOLDE','FORMATION']
+      .map(t => this.conges.filter((c: any) => c.type === t).length);
+  }
+
+  get chartFichesMoisSeries(): any[] {
+    const mois: Record<string, number> = {};
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      mois[d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })] = 0;
+    }
+    this.fiches.forEach((f: any) => {
+      const date = f.dateIntervention || f.dateCreation;
+      if (!date) return;
+      const key = new Date(date).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+      if (key in mois) mois[key]++;
+    });
+    return [{ name: 'Interventions', data: Object.values(mois) }];
+  }
+
+  get chartFichesMoisCategories(): string[] {
+    const now = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      return d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+    });
+  }
+
+  get chartTachesStatutSeries(): number[] {
+    const statuts = ['A_FAIRE', 'EN_COURS', 'TERMINEE', 'Perdu', 'En Attente'];
+    return statuts.map(s => this.taches.filter((t: any) => t.statut === s).length);
+  }
+
+  get chartTachesPrioriteSeries(): number[] {
+    return ['Élevé', 'Moyenne', 'Faible']
+      .map(p => this.taches.filter((t: any) => t.priorite === p).length);
+  }
 
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }

@@ -19,6 +19,8 @@ export class GestionClients implements OnInit {
   showForm = false;
   editingClient: any = null;
   showEditModal = false;
+  showDetailModal = false;
+  selectedClient: any = null;
   recherche = '';
 
   form = { nom: '', codeClient: '', email: '', adresse: '', contact: '' };
@@ -91,6 +93,9 @@ export class GestionClients implements OnInit {
   resetForm() {
     this.form = { nom: '', codeClient: '', email: '', adresse: '', contact: '' };
   }
+
+  ouvrirDetail(c: any) { this.selectedClient = c; this.showDetailModal = true; }
+  fermerDetail() { this.showDetailModal = false; this.selectedClient = null; }
 
   fermerEditModal() { this.showEditModal = false; this.editingClient = null; }
 }

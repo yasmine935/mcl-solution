@@ -61,12 +61,6 @@
       <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
         <mat-icon>assignment</mat-icon> Approvisionnement
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'stock'" (click)="currentPage = 'stock'">
-        <mat-icon>inventory_2</mat-icon> Stock
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
-        <mat-icon>shopping_cart</mat-icon> Commandes
-      </a>
 
       <div class="nav-divider"></div>
       <div class="nav-section-label">RH &amp; Terrain</div>
@@ -115,68 +109,94 @@
           <div class="home-welcome-badge"><mat-icon>star</mat-icon> Propriétaire</div>
         </div>
 
-        <div class="stats-grid">
-          <button type="button" class="stat-card stat-blue" (click)="currentPage = 'fiches'">
-            <span class="stat-card-bg"></span>
-            <span class="stat-card-icon"><mat-icon>description</mat-icon></span>
-            <span class="stat-card-body">
-              <span class="stat-card-label">Fiches d'Intervention</span>
-              <span class="stat-card-number">{{ totalFiches }}</span>
-              <span class="stat-card-sub">Voir toutes →</span>
-            </span>
-          </button>
-          <button type="button" class="stat-card stat-indigo" (click)="currentPage = 'factures'">
-            <span class="stat-card-bg"></span>
-            <span class="stat-card-icon"><mat-icon>receipt</mat-icon></span>
-            <span class="stat-card-body">
-              <span class="stat-card-label">Factures</span>
-              <span class="stat-card-number">{{ totalFactures }}</span>
-              <span class="stat-card-sub">Voir factures →</span>
-            </span>
-          </button>
-          <button type="button" class="stat-card stat-orange" (click)="currentPage = 'commandes'">
-            <span class="stat-card-bg"></span>
-            <span class="stat-card-icon"><mat-icon>shopping_cart</mat-icon></span>
-            <span class="stat-card-body">
-              <span class="stat-card-label">Commandes</span>
-              <span class="stat-card-number">{{ totalCommandes }}</span>
-              <span class="stat-card-sub">Voir commandes →</span>
-            </span>
-          </button>
-          <button type="button" class="stat-card stat-purple" (click)="currentPage = 'remontees'">
-            <span class="stat-card-bg"></span>
-            <span class="stat-card-icon"><mat-icon>report_problem</mat-icon></span>
-            <span class="stat-card-body">
-              <span class="stat-card-label">Remontées Terrain</span>
-              <span class="stat-card-number">{{ totalReclamations }}</span>
-              <span class="stat-card-sub">Voir remontées →</span>
-            </span>
-          </button>
-          <button type="button" class="stat-card stat-teal" (click)="currentPage = 'stock'">
-            <span class="stat-card-bg"></span>
-            <span class="stat-card-icon"><mat-icon>inventory</mat-icon></span>
-            <span class="stat-card-body">
-              <span class="stat-card-label">Valeur du Stock</span>
-              <span class="stat-card-number stat-number-lg">{{ getTotalStockValue() | number:'1.2-2' }} €</span>
-            </span>
-          </button>
-          <button type="button" class="stat-card stat-green" (click)="currentPage = 'factures'">
-            <span class="stat-card-bg"></span>
-            <span class="stat-card-icon"><mat-icon>euro</mat-icon></span>
-            <span class="stat-card-body">
-              <span class="stat-card-label">CA Total Factures</span>
-              <span class="stat-card-number stat-number-lg">{{ montantTotalFactures | number:'1.2-2' }} €</span>
-            </span>
-          </button>
-          <button type="button" class="stat-card stat-orange" (click)="currentPage = 'conges'">
-            <span class="stat-card-bg"></span>
-            <span class="stat-card-icon"><mat-icon>beach_access</mat-icon></span>
-            <span class="stat-card-body">
-              <span class="stat-card-label">Congés En Attente</span>
-              <span class="stat-card-number">{{ totalConges }}</span>
-              <span class="stat-card-sub">Voir congés →</span>
-            </span>
-          </button>
+        <!-- BI CHARTS -->
+        <div class="bi-section">
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>bar_chart</mat-icon> Interventions / 6 derniers mois</div>
+            <apx-chart
+              [series]="chartFichesMoisSeries"
+              [chart]="chartBarOptions.chart"
+              [grid]="chartBarOptions.grid"
+              [colors]="['#5e35b1']"
+              [xaxis]="{ categories: chartFichesMoisCategories }">
+            </apx-chart>
+          </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>donut_large</mat-icon> Statut des interventions</div>
+            <apx-chart
+              [series]="chartFichesStatutSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['En cours', 'Complétées', 'Validées']"
+              [colors]="['#5e35b1', '#f57f17', '#2e7d32']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
+          </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>pie_chart</mat-icon> Congés par type</div>
+            <apx-chart
+              [series]="chartCongesTypeSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['Annuel', 'RTT', 'Maladie', 'Sans solde', 'Formation']"
+              [colors]="['#5e35b1', '#6a1b9a', '#e65100', '#c62828', '#00695c']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
+          </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>task_alt</mat-icon> Statut des projets</div>
+            <apx-chart
+              [series]="chartTachesStatutSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['En qualification', 'En cours', 'Fait', 'Perdu', 'En attente']"
+              [colors]="['#546e7a', '#5e35b1', '#2e7d32', '#c62828', '#f57f17']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
+          </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>flag</mat-icon> Priorité des projets</div>
+            <apx-chart
+              [series]="chartTachesPrioriteSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['Élevé', 'Moyenne', 'Faible']"
+              [colors]="['#c62828', '#f57f17', '#2e7d32']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
+          </div>
+        </div>
+
+        <div class="home-actions-card">
+          <div class="home-actions-title"><mat-icon>bolt</mat-icon> Accès Rapide</div>
+          <div class="home-actions-grid">
+            <button type="button" class="home-action-btn" (click)="currentPage = 'fiches'">
+              <span class="home-action-icon home-action-blue"><mat-icon>description</mat-icon></span>
+              <span class="home-action-text"><strong>Fiches d'Intervention</strong><span>{{ totalFiches }} fiches</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'factures'">
+              <span class="home-action-icon home-action-indigo"><mat-icon>receipt</mat-icon></span>
+              <span class="home-action-text"><strong>Factures</strong><span>{{ totalFactures }} factures — {{ montantTotalFactures | number:'1.0-0' }} €</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'commandes'">
+              <span class="home-action-icon home-action-orange"><mat-icon>shopping_cart</mat-icon></span>
+              <span class="home-action-text"><strong>Commandes</strong><span>{{ totalCommandes }} commandes</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'remontees'">
+              <span class="home-action-icon home-action-red"><mat-icon>report_problem</mat-icon></span>
+              <span class="home-action-text"><strong>Remontées Terrain</strong><span>{{ totalReclamations }} remontées</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'stock'">
+              <span class="home-action-icon home-action-teal"><mat-icon>inventory</mat-icon></span>
+              <span class="home-action-text"><strong>Valeur du Stock</strong><span>{{ getTotalStockValue() | number:'1.2-2' }} €</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'conges'">
+              <span class="home-action-icon home-action-amber"><mat-icon>beach_access</mat-icon></span>
+              <span class="home-action-text"><strong>Congés en attente</strong><span>{{ totalConges }} demandes</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+          </div>
         </div>
       }
 
@@ -287,7 +307,7 @@
           } @else {
             <div class="emp-grid">
               @for (e of employes; track e.id) {
-                <div class="emp-card">
+                <div class="emp-card emp-card-clickable" (click)="ouvrirDetail(e)" (keydown.enter)="ouvrirDetail(e)" tabindex="0">
                   <div class="emp-card-top">
                     <div class="emp-avatar" [style.background]="getRoleColor(e.role)">
                       {{ e.prenom?.charAt(0) }}{{ e.nom?.charAt(0) }}
@@ -303,6 +323,15 @@
                       <span>{{ e.email }}</span>
                     </div>
                   }
+                  @if (e.telephone) {
+                    <div class="emp-detail">
+                      <mat-icon class="emp-icon-sm">phone</mat-icon>
+                      <span>{{ e.telephone }}</span>
+                    </div>
+                  }
+                  @if (!e.email) { @if (!e.telephone) {
+                    <span class="emp-no-info">Aucune information supplémentaire</span>
+                  } }
                 </div>
               }
             </div>
@@ -314,3 +343,56 @@
   </div>
   <button type="button" class="sidebar-overlay" (click)="closeSidebar()" aria-label="Fermer le menu"></button>
 </div>
+
+<!-- MODAL DÉTAIL EMPLOYÉ -->
+@if (showEmployeDetail && selectedEmploye) {
+  <div class="emp-modal-overlay" (click)="fermerDetail()" (keydown.escape)="fermerDetail()">
+    <div class="emp-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+
+      <div class="emp-modal-header" [style.background]="getRoleColor(selectedEmploye.role)">
+        <div class="emp-modal-avatar">
+          {{ selectedEmploye.prenom?.charAt(0) }}{{ selectedEmploye.nom?.charAt(0) }}
+        </div>
+        <div class="emp-modal-title">
+          <h3>{{ selectedEmploye.prenom }} {{ selectedEmploye.nom }}</h3>
+          <span class="emp-modal-role">{{ selectedEmploye.role }}</span>
+        </div>
+        <button type="button" class="emp-modal-close" (click)="fermerDetail()">✕</button>
+      </div>
+
+      <div class="emp-modal-body">
+        <div class="emp-modal-grid">
+          <div class="emp-modal-cell">
+            <span class="emp-modal-label">Email</span>
+            <span class="emp-modal-val">{{ selectedEmploye.email || '—' }}</span>
+          </div>
+          <div class="emp-modal-cell">
+            <span class="emp-modal-label">Téléphone</span>
+            <span class="emp-modal-val">{{ selectedEmploye.telephone || '—' }}</span>
+          </div>
+          <div class="emp-modal-cell">
+            <span class="emp-modal-label">Poste</span>
+            <span class="emp-modal-val">{{ selectedEmploye.poste || '—' }}</span>
+          </div>
+          <div class="emp-modal-cell">
+            <span class="emp-modal-label">Département</span>
+            <span class="emp-modal-val">{{ selectedEmploye.departement || '—' }}</span>
+          </div>
+          <div class="emp-modal-cell">
+            <span class="emp-modal-label">Date d'embauche</span>
+            <span class="emp-modal-val">{{ selectedEmploye.dateEmbauche || '—' }}</span>
+          </div>
+          <div class="emp-modal-cell">
+            <span class="emp-modal-label">Salaire</span>
+            <span class="emp-modal-val emp-modal-salaire">{{ selectedEmploye.salaire ? selectedEmploye.salaire + ' €' : '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="emp-modal-footer">
+        <button type="button" class="emp-modal-btn-close" (click)="fermerDetail()">Fermer</button>
+      </div>
+
+    </div>
+  </div>
+}

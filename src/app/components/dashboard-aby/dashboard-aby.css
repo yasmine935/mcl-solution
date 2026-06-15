@@ -110,7 +110,8 @@ nav { padding: 0 12px 20px; flex: 1; }
   border-bottom: 2px solid #fff3e0;
 }
 
-.topbar-left h3 { font-size: 1.1rem; font-weight: 800; color: #0d2137; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-left h3 { font-size: 1.1rem; font-weight: 800; color: #0d2137; white-space: nowrap; }
 .topbar-right { display: flex; align-items: center; gap: 12px; }
 .topbar-greeting { font-size: 0.88rem; color: #546e7a; }
 

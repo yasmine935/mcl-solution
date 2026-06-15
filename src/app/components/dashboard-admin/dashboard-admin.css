@@ -1092,3 +1092,41 @@ nav {
   width: 100%; box-sizing: border-box;
 }
 .conge-textarea:focus { border-color: #01579b; box-shadow: 0 0 0 3px rgba(1,87,155,0.1); }
+
+/* BI CHARTS */
+.bi-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+.bi-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1.5px solid #e8ecf0;
+  padding: 18px 16px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.bi-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #37474f;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+.bi-card-title mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: #1565c0;
+}
+@media (max-width: 1100px) {
+  .bi-section { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .bi-section { grid-template-columns: 1fr; }
+}

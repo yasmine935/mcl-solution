@@ -38,17 +38,20 @@
           <span class="nav-badge">{{ demandesEnAttente.length }}</span>
         }
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'commandes'" (click)="currentPage = 'commandes'">
-        <mat-icon>shopping_cart</mat-icon> Commandes & Achats
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'logistique'" (click)="currentPage = 'logistique'">
-        <mat-icon>inventory</mat-icon> Logistique & Stock
-      </a>
 
       <div class="nav-divider"></div>
       <div class="nav-section-label">Approvisionnement</div>
       <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
         <mat-icon>assignment</mat-icon> Fiches Appro. Reçues
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Suivi</div>
+      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
+        <mat-icon>calendar_month</mat-icon> Planning
+      </a>
+      <a class="nav-item" [class.active]="currentPage === 'projets'" (click)="currentPage = 'projets'">
+        <mat-icon>folder_special</mat-icon> Suivi Projets
       </a>
 
       <div class="nav-divider"></div>
@@ -153,6 +156,14 @@
       <!-- ══ FICHES APPROVISIONNEMENT ══ -->
       @if (currentPage === 'approvisionnement') {
         <app-approvisionnement [modeaby]="true"></app-approvisionnement>
+      }
+
+      @if (currentPage === 'planning') {
+        <app-planning></app-planning>
+      }
+
+      @if (currentPage === 'projets') {
+        <app-taches></app-taches>
       }
 
       <!-- ══ DEMANDES MATÉRIEL ══ -->

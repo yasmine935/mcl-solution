@@ -79,7 +79,7 @@
   } @else {
     <div class="clients-grid">
       @for (c of clientsFiltres(); track c.id) {
-        <div class="client-card">
+        <div class="client-card client-card-clickable" (click)="ouvrirDetail(c)" (keydown.enter)="ouvrirDetail(c)" tabindex="0">
           <div class="client-card-top">
             <div class="client-avatar" [style.background]="getAvatarColor(c.nom)">
               {{ getInitiales(c.nom) }}
@@ -90,7 +90,7 @@
                 <span class="client-code-badge">{{ c.codeClient }}</span>
               }
             </div>
-            <div class="client-card-btns">
+            <div class="client-card-btns" (click)="$event.stopPropagation()">
               <button mat-icon-button color="primary" (click)="ouvrirEdition(c)" title="Modifier" type="button">
                 <mat-icon>edit</mat-icon>
               </button>
@@ -128,6 +128,50 @@
   }
 
 </div>
+
+<!-- MODAL DÉTAIL CLIENT -->
+@if (showDetailModal && selectedClient) {
+  <div class="modal-overlay" (click)="fermerDetail()" (keydown.escape)="fermerDetail()" tabindex="-1">
+    <div class="detail-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+
+      <div class="detail-modal-header" [style.background]="getAvatarColor(selectedClient.nom)">
+        <div class="detail-modal-avatar">{{ getInitiales(selectedClient.nom) }}</div>
+        <div class="detail-modal-title">
+          <h3>{{ selectedClient.nom }}</h3>
+          @if (selectedClient.codeClient) {
+            <span class="detail-code-badge">{{ selectedClient.codeClient }}</span>
+          }
+        </div>
+        <button type="button" class="detail-modal-close" (click)="fermerDetail()">✕</button>
+      </div>
+
+      <div class="detail-modal-body">
+        <div class="detail-info-grid">
+          <div class="detail-info-cell">
+            <span class="detail-info-label">Email</span>
+            <span class="detail-info-val">{{ selectedClient.email || '—' }}</span>
+          </div>
+          <div class="detail-info-cell">
+            <span class="detail-info-label">Téléphone / Contact</span>
+            <span class="detail-info-val">{{ selectedClient.contact || '—' }}</span>
+          </div>
+          <div class="detail-info-cell detail-info-cell-wide">
+            <span class="detail-info-label">Adresse</span>
+            <span class="detail-info-val">{{ selectedClient.adresse || '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-modal-footer">
+        <button type="button" class="btn-edit-detail" (click)="fermerDetail(); ouvrirEdition(selectedClient)">
+          <mat-icon>edit</mat-icon> Modifier
+        </button>
+        <button type="button" class="btn-close-detail" (click)="fermerDetail()">Fermer</button>
+      </div>
+
+    </div>
+  </div>
+}
 
 <!-- MODAL ÉDITION -->
 @if (showEditModal && editingClient) {

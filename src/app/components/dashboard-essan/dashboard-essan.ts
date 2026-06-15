@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { NgApexchartsModule } from 'ng-apexcharts';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Taches } from '../taches/taches';
@@ -22,6 +23,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatIconModule, MatButtonModule,
+    NgApexchartsModule,
     FicheInterventionManager, FichesCompletees, Taches, GestionClients,
     Planning, Semainier, Documents, Factures, Conges,
     ApprovisionnementComponent, RemonteesTerrainComponent
@@ -42,10 +44,75 @@ export class DashboardEssan implements OnInit {
   totalConges = 0;
   montantTotalFactures = 0;
 
+  // Données complètes pour les graphiques BI
+  fiches: any[] = [];
+  congesAllData: any[] = [];
+  taches: any[] = [];
+
   // Stock & Commandes (pas de composant standalone)
   stock: any[] = [];
   commandes: any[] = [];
   employes: any[] = [];
+  selectedEmploye: any = null;
+  showEmployeDetail = false;
+
+  readonly chartDonutOptions = {
+    chart: { type: 'donut' as const, height: 220, fontFamily: 'Exo 2, sans-serif' },
+    legend: { position: 'bottom' as const, fontSize: '12px' },
+    dataLabels: { enabled: true },
+    plotOptions: { pie: { donut: { size: '65%' } } }
+  };
+
+  readonly chartBarOptions = {
+    chart: { type: 'bar' as const, height: 220, toolbar: { show: false }, fontFamily: 'Exo 2, sans-serif' },
+    plotOptions: { bar: { borderRadius: 6, columnWidth: '50%' } },
+    dataLabels: { enabled: false },
+    grid: { borderColor: '#f0f4f8' }
+  };
+
+  get chartFichesStatutSeries(): number[] {
+    return [
+      this.fiches.filter(f => f.statut === 'EN_COURS').length,
+      this.fiches.filter(f => f.statut === 'COMPLETEE').length,
+      this.fiches.filter(f => f.statut === 'VALIDEE').length
+    ];
+  }
+
+  get chartCongesTypeSeries(): number[] {
+    return ['ANNUEL', 'RTT', 'MALADIE', 'SANS_SOLDE', 'FORMATION']
+      .map(t => this.congesAllData.filter((c: any) => c.type === t).length);
+  }
+
+  get chartFichesMoisSeries() {
+    const now = new Date();
+    const data = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      return this.fiches.filter((f: any) => {
+        const fd = new Date(f.dateCreation || f.date || '');
+        return fd.getFullYear() === d.getFullYear() && fd.getMonth() === d.getMonth();
+      }).length;
+    });
+    return [{ name: 'Interventions', data }];
+  }
+
+  get chartTachesStatutSeries(): number[] {
+    const statuts = ['A_FAIRE', 'EN_COURS', 'TERMINEE', 'Perdu', 'En Attente'];
+    return statuts.map(s => this.taches.filter((t: any) => t.statut === s).length);
+  }
+
+  get chartTachesPrioriteSeries(): number[] {
+    return ['Élevé', 'Moyenne', 'Faible']
+      .map(p => this.taches.filter((t: any) => t.priorite === p).length);
+  }
+
+  get chartFichesMoisCategories(): string[] {
+    const moisFr = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    const now = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      return moisFr[d.getMonth()];
+    });
+  }
 
   constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
@@ -60,7 +127,7 @@ export class DashboardEssan implements OnInit {
 
   loadStats() {
     this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
-      next: (d) => this.totalFiches = d.length, error: () => {}
+      next: (d) => { this.fiches = d; this.totalFiches = d.length; }, error: () => {}
     });
     this.http.get<any[]>('http://localhost:8080/api/factures').subscribe({
       next: (d) => {
@@ -76,13 +143,16 @@ export class DashboardEssan implements OnInit {
       next: (d) => this.totalReclamations = d.length, error: () => {}
     });
     this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
-      next: (d) => this.totalConges = d.filter((c: any) => c.statut === 'EN_ATTENTE').length, error: () => {}
+      next: (d) => { this.congesAllData = d; this.totalConges = d.filter((c: any) => c.statut === 'EN_ATTENTE').length; }, error: () => {}
     });
     this.http.get<any[]>('http://localhost:8080/api/stock').subscribe({
       next: (d) => this.stock = d, error: () => {}
     });
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
       next: (d) => this.employes = d, error: () => {}
+    });
+    this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+      next: (d) => this.taches = d, error: () => {}
     });
   }
 
@@ -131,6 +201,9 @@ export class DashboardEssan implements OnInit {
     };
     return colors[role] || '#f5f5f5';
   }
+
+  ouvrirDetail(e: any) { this.selectedEmploye = e; this.showEmployeDetail = true; }
+  fermerDetail() { this.showEmployeDetail = false; this.selectedEmploye = null; }
 
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }
