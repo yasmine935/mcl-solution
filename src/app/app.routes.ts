@@ -16,10 +16,12 @@ import { DashboardAby } from './components/dashboard-aby/dashboard-aby';
 import { DashboardHaideh } from './components/dashboard-haideh/dashboard-haideh';
 import { DashboardNaccera } from './components/dashboard-naccera/dashboard-naccera';
 import { GestionClients } from './components/clients/clients';
+import { EcranVisiteur } from './components/ecran-visiteur/ecran-visiteur';
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
-  { path: 'nouveau-ticket', component: TicketingComponent },// ✅ PAGE PUBLIQUE CLIENT
+  { path: 'nouveau-ticket', component: TicketingComponent },
+  { path: 'ecran-visiteur', component: EcranVisiteur },
   { path: 'dashboard-admin', component: DashboardAdmin },
   { path: 'dashboard-technicien', component: DashboardTechnicien },
   { path: 'dashboard-kia', component: DashboardKia },
