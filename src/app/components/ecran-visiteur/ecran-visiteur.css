@@ -5,7 +5,7 @@
 .ecran-wrap {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #020c1b 0%, #0a1a35 50%, #041428 100%);
+  background: linear-gradient(135deg, #0d2137 0%, #1a3a6e 50%, #0e2d55 100%);
   display: flex;
   flex-direction: column;
   font-family: 'Exo 2', 'Segoe UI', sans-serif;
@@ -21,7 +21,7 @@
   justify-content: space-between;
   padding: 12px 48px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.05);
   flex-shrink: 0;
 }
 
@@ -33,7 +33,7 @@
 .logo-mcl {
   font-size: 1.8rem;
   font-weight: 900;
-  color: #29b6f6;
+  color: #7dd3fc;
   letter-spacing: -1px;
   text-transform: lowercase;
 }
@@ -48,7 +48,7 @@
   color: rgba(255,255,255,0.85);
   letter-spacing: 1px;
 }
-.logo-sol strong { color: #29b6f6; font-weight: 800; }
+.logo-sol strong { color: #7dd3fc; font-weight: 800; }
 
 .ecran-datetime {
   text-align: right;
@@ -97,7 +97,7 @@
 .ecran-bienvenue-sub {
   font-size: 1.6rem;
   font-weight: 400;
-  color: #29b6f6;
+  color: #7dd3fc;
   margin-top: 4px;
   animation: fadeSlideUp 0.9s ease both;
 }
@@ -105,7 +105,7 @@
 .ecran-separator {
   width: 80px;
   height: 4px;
-  background: linear-gradient(90deg, #29b6f6, #0d47a1);
+  background: linear-gradient(90deg, #7dd3fc, #0d47a1);
   border-radius: 2px;
   margin: 16px 0;
   animation: fadeSlideUp 1s ease both;
@@ -150,7 +150,7 @@
 
 .ecran-product-sub {
   font-size: 0.82rem;
-  color: #29b6f6;
+  color: #7dd3fc;
   margin-top: 10px;
   letter-spacing: 1px;
   font-weight: 600;
@@ -165,7 +165,7 @@
 }
 .ecran-orb1 {
   width: 220px; height: 220px;
-  background: #29b6f6;
+  background: #7dd3fc;
   top: -30px; right: 20px;
 }
 .ecran-orb2 {
@@ -198,7 +198,7 @@
 .ecran-valeur-titre {
   font-size: 0.8rem;
   font-weight: 800;
-  color: #29b6f6;
+  color: #7dd3fc;
   letter-spacing: 2px;
   margin-bottom: 6px;
 }
