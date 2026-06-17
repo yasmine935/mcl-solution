@@ -92,6 +92,15 @@
       </a>
 
       <div class="nav-divider"></div>
+      <div class="nav-section-label">Communication</div>
+      <a class="nav-item" [class.active]="currentPage === 'messages-aby'" (click)="currentPage = 'messages-aby'; loadMessagesAby()">
+        <mat-icon>forum</mat-icon> Messages ABY
+        @if (messagesAbyNonLus > 0) {
+          <span class="nav-badge">{{ messagesAbyNonLus }}</span>
+        }
+      </a>
+
+      <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout(); closeSidebar()">
         <mat-icon>logout</mat-icon> Déconnexion
       </a>
@@ -791,6 +800,87 @@
 @if (currentPage === 'voitures') {
   <app-voitures></app-voitures>
 }
+      <!-- ══ MESSAGES ABY ══ -->
+      @if (currentPage === 'messages-aby') {
+        <div class="messagerie-wrap">
+          <div class="msg-header-card">
+            <div class="msg-header-left">
+              <div class="msg-icon-wrap"><mat-icon>forum</mat-icon></div>
+              <div>
+                <h3>Messages ABY — Supply Chain</h3>
+                <p>Questions et demandes de {{ messagesAby[0]?.expediteur || 'ABY' }} sur les projets</p>
+              </div>
+            </div>
+            <span class="pill-count">{{ messagesAby.length }} message(s)</span>
+          </div>
+
+          @if (!messageAbySelectionne) {
+            @if (messagesAby.length === 0) {
+              <div class="empty-state msg-empty"><span>📬</span><p>Aucun message reçu</p></div>
+            } @else {
+              <div class="msg-list">
+                @for (m of messagesAby; track m.id) {
+                  <button type="button" class="msg-item" [class.msg-repondu]="m.reponse" (click)="messageAbySelectionne = m; reponseAbyTexte = ''">
+                    <span class="msg-item-left">
+                      <span class="msg-avatar" [class.msg-avatar-vert]="m.reponse" [class.msg-avatar-bleu]="!m.reponse">
+                        <mat-icon>{{ m.reponse ? 'mark_email_read' : 'email' }}</mat-icon>
+                      </span>
+                      <span class="msg-item-info">
+                        <span class="msg-sujet">{{ m.sujet }}</span>
+                        <span class="msg-preview">{{ m.contenu | slice:0:80 }}...</span>
+                        <span class="msg-date">{{ m.dateEnvoi | date:'dd/MM/yyyy HH:mm' }} — de {{ m.expediteur }}</span>
+                      </span>
+                    </span>
+                    <span class="msg-item-right">
+                      @if (m.reponse) {
+                        <span class="msg-badge-repondu">Répondu ✓</span>
+                      } @else {
+                        <span class="msg-badge-attente">À répondre</span>
+                      }
+                      <mat-icon class="msg-chevron">chevron_right</mat-icon>
+                    </span>
+                  </button>
+                }
+              </div>
+            }
+          }
+
+          @if (messageAbySelectionne) {
+            <div class="msg-detail">
+              <button type="button" class="btn-back" (click)="messageAbySelectionne = null; reponseAbyTexte = ''">
+                <mat-icon>arrow_back</mat-icon> Retour
+              </button>
+              <div class="msg-detail-card">
+                <div class="msg-detail-header">
+                  <h4>{{ messageAbySelectionne.sujet }}</h4>
+                  <span class="msg-detail-date">De {{ messageAbySelectionne.expediteur }} — {{ messageAbySelectionne.dateEnvoi | date:'dd/MM/yyyy à HH:mm' }}</span>
+                </div>
+                <div class="msg-bubble msg-bubble-sent">
+                  <div class="msg-bubble-label">Message d'ABY</div>
+                  <p>{{ messageAbySelectionne.contenu }}</p>
+                </div>
+
+                @if (messageAbySelectionne.reponse) {
+                  <div class="msg-bubble msg-bubble-reply">
+                    <div class="msg-bubble-label">Votre réponse — {{ messageAbySelectionne.repondantNom }}</div>
+                    <p>{{ messageAbySelectionne.reponse }}</p>
+                    <div class="msg-reply-date">{{ messageAbySelectionne.dateReponse | date:'dd/MM/yyyy à HH:mm' }}</div>
+                  </div>
+                } @else {
+                  <div class="reply-form">
+                    <label for="reponse-aby" class="reply-label">Votre réponse *</label>
+                    <textarea id="reponse-aby" class="fi fi-textarea" #reponseaby [value]="reponseAbyTexte" (input)="reponseAbyTexte = reponseaby.value" rows="4" placeholder="Répondez à ABY..."></textarea>
+                    <button type="button" class="btn-send" (click)="repondreMessageAby(messageAbySelectionne.id)" [disabled]="reponseEnCours">
+                      <mat-icon>send</mat-icon> {{ reponseEnCours ? 'Envoi...' : 'Envoyer la réponse' }}
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
     </div><!-- /page-content -->
   </div><!-- /main-content -->
   <div class="sidebar-overlay" (click)="closeSidebar()"></div>

@@ -125,6 +125,41 @@ get minutesAlertes(): number {
 get minutesOk(): number {
   return this.minutesSecurite.filter(m => m.statut !== 'ALERTE').length;
 }
+  // Messagerie ABY
+  messagesAby: any[] = [];
+  messageAbySelectionne: any = null;
+  reponseAbyTexte = '';
+  reponseEnCours = false;
+
+  loadMessagesAby() {
+    this.http.get<any[]>('http://localhost:8080/api/messages-aby').subscribe({
+      next: (data) => this.messagesAby = data,
+      error: () => this.messagesAby = []
+    });
+  }
+
+  repondreMessageAby(id: number) {
+    if (!this.reponseAbyTexte.trim()) { alert('Veuillez écrire une réponse'); return; }
+    this.reponseEnCours = true;
+    const body = {
+      reponse: this.reponseAbyTexte,
+      repondantNom: `${this.user.prenom || ''} ${this.user.nom || ''}`.trim() || 'MCL Solutions'
+    };
+    this.http.put<any>(`http://localhost:8080/api/messages-aby/${id}/repondre`, body).subscribe({
+      next: (updated) => {
+        const idx = this.messagesAby.findIndex(m => m.id === id);
+        if (idx !== -1) this.messagesAby[idx] = updated;
+        if (this.messageAbySelectionne?.id === id) this.messageAbySelectionne = updated;
+        this.reponseAbyTexte = '';
+        this.reponseEnCours = false;
+        alert('✅ Réponse envoyée !');
+      },
+      error: () => { alert('Erreur lors de l\'envoi'); this.reponseEnCours = false; }
+    });
+  }
+
+  get messagesAbyNonLus() { return this.messagesAby.filter(m => !m.lu).length; }
+
   loadData() {
   this.loadFiches();
   this.loadConges();
@@ -139,6 +174,7 @@ get minutesOk(): number {
   this.loadMesConges();
   this.loadSoldeCongesPerso();
   this.loadTaches();
+  this.loadMessagesAby();
 }
 
 loadTaches() {

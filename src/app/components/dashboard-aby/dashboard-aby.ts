@@ -31,6 +31,17 @@ export class DashboardAby implements OnInit {
   showFormCommande = false;
   showDetailDemande: any = null;
 
+  // Projets (lecture seule)
+  projets: any[] = [];
+  projetSelectionne: any = null;
+
+  // Messagerie ABY ↔ MCL
+  messages: any[] = [];
+  showComposeForm = false;
+  nouveauMessage = { sujet: '', contenu: '' };
+  messageSelectionne: any = null;
+  envoiEnCours = false;
+
   nouvelleCommande = {
     reference: '', fournisseur: '', description: '',
     quantite: '', prixUnitaire: '', statut: 'En attente',
@@ -39,7 +50,7 @@ export class DashboardAby implements OnInit {
 
   statutsCommande = ['En attente', 'Commandé', 'En transit', 'Livré', 'Annulé'];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -50,6 +61,50 @@ export class DashboardAby implements OnInit {
     this.loadDemandesMateriel();
     this.loadCommandes();
     this.loadStocks();
+    this.loadProjets();
+    this.loadMessages();
+  }
+
+  loadProjets() {
+    this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+      next: (data) => this.projets = data,
+      error: () => this.projets = []
+    });
+  }
+
+  loadMessages() {
+    const expediteur = this.user.username || this.user.prenom || 'ABY';
+    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/expediteur/${expediteur}`).subscribe({
+      next: (data) => this.messages = data,
+      error: () => this.messages = []
+    });
+  }
+
+  envoyerMessage() {
+    if (!this.nouveauMessage.sujet.trim() || !this.nouveauMessage.contenu.trim()) {
+      alert('Veuillez remplir le sujet et le message');
+      return;
+    }
+    this.envoiEnCours = true;
+    const expediteur = this.user.username || this.user.prenom || 'ABY';
+    const body = {
+      expediteur,
+      destinataire: 'MCL Solutions',
+      sujet: this.nouveauMessage.sujet,
+      contenu: this.nouveauMessage.contenu
+    };
+    this.http.post<any>('http://localhost:8080/api/messages-aby', body).subscribe({
+      next: (msg) => {
+        this.messages.unshift(msg);
+        this.nouveauMessage = { sujet: '', contenu: '' };
+        this.showComposeForm = false;
+        this.envoiEnCours = false;
+      },
+      error: () => {
+        alert('Erreur lors de l\'envoi. Réessayez.');
+        this.envoiEnCours = false;
+      }
+    });
   }
 
   // ✅ Demandes de matériel envoyées par Ferid/Aurélien
@@ -103,8 +158,8 @@ export class DashboardAby implements OnInit {
       numeroCommande: this.nouvelleCommande.reference,
       fournisseur: this.nouvelleCommande.fournisseur,
       description: this.nouvelleCommande.description,
-      quantite: parseInt(this.nouvelleCommande.quantite) || 1,
-      prixUnitaire: parseFloat(this.nouvelleCommande.prixUnitaire) || 0,
+      quantite: Number.parseInt(this.nouvelleCommande.quantite) || 1,
+      prixUnitaire: Number.parseFloat(this.nouvelleCommande.prixUnitaire) || 0,
       statut: 'EN_ATTENTE',
       dateCommande: this.nouvelleCommande.dateCommande || null,
       dateLivraisonPrevue: this.nouvelleCommande.dateLivraison || null
@@ -189,10 +244,37 @@ export class DashboardAby implements OnInit {
       'demandes': 'Demandes Matériel',
       'approvisionnement': 'Fiches Approvisionnement',
       'planning': 'Planning MCL Solutions',
-      'projets': 'Suivi Projets'
+      'projets': 'Suivi Projets',
+      'messagerie': 'Messagerie — MCL Solutions',
+      'commandes': 'Commandes & Achats',
+      'logistique': 'Logistique & Stock'
     };
     return map[this.currentPage] || 'Supply Chain';
   }
+
+  getPrioriteColor(priorite: string): string {
+    const map: any = { 'Élevé': '#c62828', 'Moyenne': '#f57f17', 'Faible': '#2e7d32' };
+    return map[priorite] || '#546e7a';
+  }
+
+  getProjetStatutColor(statut: string): string {
+    const map: any = {
+      'A_FAIRE': '#546e7a', 'EN_COURS': '#1565c0',
+      'TERMINEE': '#2e7d32', 'Perdu': '#c62828', 'En Attente': '#f57f17'
+    };
+    return map[statut] || '#546e7a';
+  }
+
+  getProjetStatutLabel(statut: string): string {
+    const map: any = {
+      'A_FAIRE': 'À faire', 'EN_COURS': 'En cours',
+      'TERMINEE': 'Terminée', 'Perdu': 'Perdu', 'En Attente': 'En attente'
+    };
+    return map[statut] || statut;
+  }
+
+  get messagesAvecReponse() { return this.messages.filter(m => m.reponse); }
+  get messagesEnAttente() { return this.messages.filter(m => !m.reponse); }
 
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }
