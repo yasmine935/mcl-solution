@@ -172,40 +172,86 @@
       }
 
       @if (currentPage === 'projets') {
-        <div class="section-card">
-          <div class="section-header">
-            <h3>📁 Suivi des Projets MCL Solutions</h3>
-            <span class="pill pill-bleu">{{ projets.length }} tâches</span>
-          </div>
-          @if (projets.length === 0) {
-            <div class="empty-state"><span>📂</span><p>Aucun projet disponible</p><small>Les projets apparaîtront ici</small></div>
-          } @else {
-            <div class="projets-list">
-              @for (p of projets; track p.id) {
-                <div class="projet-card">
-                  <div class="projet-card-top">
-                    <div class="projet-card-info">
-                      <span class="projet-titre">{{ p.titre || p.nom }}</span>
-                      @if (p.client) { <span class="projet-client">👤 {{ p.client }}</span> }
-                    </div>
-                    <div class="projet-badges">
-                      <span class="statut-pill" [style.background]="getProjetStatutColor(p.statut)">{{ getProjetStatutLabel(p.statut) }}</span>
-                      @if (p.priorite) {
-                        <span class="priorite-pill" [style.background]="getPrioriteColor(p.priorite)">{{ p.priorite }}</span>
-                      }
-                    </div>
-                  </div>
-                  @if (p.description) { <p class="projet-desc">{{ p.description }}</p> }
-                  <div class="projet-meta">
-                    @if (p.dateDebut) { <span>📅 Début : {{ p.dateDebut }}</span> }
-                    @if (p.dateFin || p.deadline) { <span>🏁 Fin : {{ p.dateFin || p.deadline }}</span> }
-                    @if (p.responsable) { <span>👷 {{ p.responsable }}</span> }
-                  </div>
-                </div>
-              }
+        <!-- BANNIÈRE -->
+        <div class="projets-header">
+          <div class="projets-header-left">
+            <div class="projets-header-icon"><mat-icon>folder_special</mat-icon></div>
+            <div>
+              <h2>Suivi des Projets MCL Solutions</h2>
+              <p>Vue lecture seule · {{ projets.length }} tâche(s) au total</p>
             </div>
-          }
+          </div>
+          <div class="projets-kpi-row">
+            <div class="projets-kpi projets-kpi-bleu">
+              <span class="projets-kpi-num">{{ projetsEnCours }}</span>
+              <span class="projets-kpi-label">En cours</span>
+            </div>
+            <div class="projets-kpi projets-kpi-vert">
+              <span class="projets-kpi-num">{{ projetsTermines }}</span>
+              <span class="projets-kpi-label">Terminées</span>
+            </div>
+            <div class="projets-kpi projets-kpi-gris">
+              <span class="projets-kpi-num">{{ projetsAFaire }}</span>
+              <span class="projets-kpi-label">À faire</span>
+            </div>
+            <div class="projets-kpi projets-kpi-rouge">
+              <span class="projets-kpi-num">{{ projetsPerdus }}</span>
+              <span class="projets-kpi-label">Perdus</span>
+            </div>
+          </div>
         </div>
+
+        @if (projets.length === 0) {
+          <div class="empty-state"><span>📂</span><p>Aucun projet disponible</p></div>
+        } @else {
+          <div class="projets-table-wrap">
+            <table class="projets-table">
+              <thead>
+                <tr>
+                  <th>Projet</th>
+                  <th>Client</th>
+                  <th>Statut</th>
+                  <th>Priorité</th>
+                  <th>Date début</th>
+                  <th>Date fin</th>
+                  <th>Responsable</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of projets; track p.id) {
+                  <tr class="projets-row" [class.row-en-cours]="p.statut === 'EN_COURS'" [class.row-terminee]="p.statut === 'TERMINEE'" [class.row-perdu]="p.statut === 'Perdu'">
+                    <td class="cell-titre">
+                      <span class="projet-dot" [style.background]="getProjetStatutColor(p.statut)"></span>
+                      <span>{{ p.titre || p.nom || '—' }}</span>
+                      @if (p.description) { <span class="cell-desc">{{ p.description | slice:0:40 }}…</span> }
+                    </td>
+                    <td class="cell-client">
+                      @if (p.client) {
+                        <span class="client-chip">{{ p.client }}</span>
+                      } @else { <span class="cell-vide">—</span> }
+                    </td>
+                    <td>
+                      <span class="statut-badge" [style.background]="getProjetStatutColor(p.statut)">
+                        {{ getProjetStatutLabel(p.statut) }}
+                      </span>
+                    </td>
+                    <td>
+                      @if (p.priorite) {
+                        <span class="priorite-badge" [style.color]="getPrioriteColor(p.priorite)">
+                          <span class="prio-dot" [style.background]="getPrioriteColor(p.priorite)"></span>
+                          {{ p.priorite }}
+                        </span>
+                      } @else { <span class="cell-vide">—</span> }
+                    </td>
+                    <td class="cell-date">{{ p.dateDebut || '—' }}</td>
+                    <td class="cell-date">{{ p.dateFin || p.deadline || '—' }}</td>
+                    <td class="cell-resp">{{ p.responsable || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       }
 
       <!-- ══ MESSAGERIE ══ -->

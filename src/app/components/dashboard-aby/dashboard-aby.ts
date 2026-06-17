@@ -304,6 +304,11 @@ export class DashboardAby implements OnInit {
   get messagesAvecReponse() { return this.messages.filter(m => m.reponse); }
   get messagesEnAttente() { return this.messages.filter(m => !m.reponse); }
 
+  get projetsEnCours() { return this.projets.filter(p => p.statut === 'EN_COURS').length; }
+  get projetsTermines() { return this.projets.filter(p => p.statut === 'TERMINEE').length; }
+  get projetsAFaire() { return this.projets.filter(p => p.statut === 'A_FAIRE').length; }
+  get projetsPerdus() { return this.projets.filter(p => p.statut === 'Perdu').length; }
+
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }
 
