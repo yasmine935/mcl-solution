@@ -41,6 +41,9 @@ export class DashboardAby implements OnInit {
   nouveauMessage = { sujet: '', contenu: '' };
   messageSelectionne: any = null;
   envoiEnCours = false;
+  repliesCourantes: any[] = [];
+  nouvelleReponse = '';
+  envoiReponseEnCours = false;
 
   nouvelleCommande = {
     reference: '', fournisseur: '', description: '',
@@ -77,6 +80,31 @@ export class DashboardAby implements OnInit {
     this.http.get<any[]>(`http://localhost:8080/api/messages-aby/expediteur/${expediteur}`).subscribe({
       next: (data) => this.messages = data,
       error: () => this.messages = []
+    });
+  }
+
+  ouvrirMessage(m: any) {
+    this.messageSelectionne = m;
+    this.repliesCourantes = [];
+    this.nouvelleReponse = '';
+    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/${m.id}/replies`).subscribe({
+      next: (data) => this.repliesCourantes = data,
+      error: () => this.repliesCourantes = []
+    });
+  }
+
+  envoyerReponseAby() {
+    if (!this.nouvelleReponse.trim() || !this.messageSelectionne) return;
+    this.envoiReponseEnCours = true;
+    const auteur = this.user.username || this.user.prenom || 'ABY';
+    const body = { auteur, auteurRole: 'ABY', contenu: this.nouvelleReponse };
+    this.http.post<any>(`http://localhost:8080/api/messages-aby/${this.messageSelectionne.id}/replies`, body).subscribe({
+      next: (reply) => {
+        this.repliesCourantes.push(reply);
+        this.nouvelleReponse = '';
+        this.envoiReponseEnCours = false;
+      },
+      error: () => { alert('Erreur lors de l\'envoi'); this.envoiReponseEnCours = false; }
     });
   }
 

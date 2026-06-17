@@ -820,7 +820,7 @@
             } @else {
               <div class="msg-list">
                 @for (m of messagesAby; track m.id) {
-                  <button type="button" class="msg-item" [class.msg-repondu]="m.reponse" (click)="messageAbySelectionne = m; reponseAbyTexte = ''">
+                  <button type="button" class="msg-item" [class.msg-repondu]="m.reponse" (click)="ouvrirMessageAby(m)">
                     <span class="msg-item-left">
                       <span class="msg-avatar" [class.msg-avatar-vert]="m.reponse" [class.msg-avatar-bleu]="!m.reponse">
                         <mat-icon>{{ m.reponse ? 'mark_email_read' : 'email' }}</mat-icon>
@@ -847,7 +847,7 @@
 
           @if (messageAbySelectionne) {
             <div class="msg-detail">
-              <button type="button" class="btn-back" (click)="messageAbySelectionne = null; reponseAbyTexte = ''">
+              <button type="button" class="btn-back" (click)="messageAbySelectionne = null; repliesAdmin = []; reponseAbyTexte = ''">
                 <mat-icon>arrow_back</mat-icon> Retour
               </button>
               <div class="msg-detail-card">
@@ -855,26 +855,31 @@
                   <h4>{{ messageAbySelectionne.sujet }}</h4>
                   <span class="msg-detail-date">De {{ messageAbySelectionne.expediteur }} — {{ messageAbySelectionne.dateEnvoi | date:'dd/MM/yyyy à HH:mm' }}</span>
                 </div>
-                <div class="msg-bubble msg-bubble-sent">
-                  <div class="msg-bubble-label">Message d'ABY</div>
+
+                <!-- Message initial d'ABY -->
+                <div class="thread-bubble thread-aby">
+                  <span class="thread-author">{{ messageAbySelectionne.expediteur }}</span>
                   <p>{{ messageAbySelectionne.contenu }}</p>
+                  <span class="thread-date">{{ messageAbySelectionne.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                 </div>
 
-                @if (messageAbySelectionne.reponse) {
-                  <div class="msg-bubble msg-bubble-reply">
-                    <div class="msg-bubble-label">Votre réponse — {{ messageAbySelectionne.repondantNom }}</div>
-                    <p>{{ messageAbySelectionne.reponse }}</p>
-                    <div class="msg-reply-date">{{ messageAbySelectionne.dateReponse | date:'dd/MM/yyyy à HH:mm' }}</div>
-                  </div>
-                } @else {
-                  <div class="reply-form">
-                    <label for="reponse-aby" class="reply-label">Votre réponse *</label>
-                    <textarea id="reponse-aby" class="fi fi-textarea" #reponseaby [value]="reponseAbyTexte" (input)="reponseAbyTexte = reponseaby.value" rows="4" placeholder="Répondez à ABY..."></textarea>
-                    <button type="button" class="btn-send" (click)="repondreMessageAby(messageAbySelectionne.id)" [disabled]="reponseEnCours">
-                      <mat-icon>send</mat-icon> {{ reponseEnCours ? 'Envoi...' : 'Envoyer la réponse' }}
-                    </button>
+                <!-- Thread de replies -->
+                @for (r of repliesAdmin; track r.id) {
+                  <div class="thread-bubble" [class.thread-aby]="r.auteurRole === 'ABY'" [class.thread-mcl]="r.auteurRole === 'MCL'">
+                    <span class="thread-author">{{ r.auteurRole === 'MCL' ? 'Vous (' + r.auteur + ')' : r.auteur }}</span>
+                    <p>{{ r.contenu }}</p>
+                    <span class="thread-date">{{ r.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                   </div>
                 }
+
+                <!-- Champ de réponse toujours disponible -->
+                <div class="thread-reply-form">
+                  <label for="rep-admin" class="reply-label">Votre réponse</label>
+                  <textarea id="rep-admin" class="fi fi-textarea" #repadmin [value]="reponseAbyTexte" (input)="reponseAbyTexte = repadmin.value" rows="3" placeholder="Répondez à ABY..."></textarea>
+                  <button type="button" class="btn-send" (click)="repondreMessageAby(messageAbySelectionne.id)" [disabled]="reponseEnCours || !reponseAbyTexte.trim()">
+                    <mat-icon>send</mat-icon> {{ reponseEnCours ? 'Envoi...' : 'Envoyer' }}
+                  </button>
+                </div>
               </div>
             </div>
           }

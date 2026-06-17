@@ -260,7 +260,7 @@
             } @else {
               <div class="msg-list">
                 @for (m of messages; track m.id) {
-                  <button type="button" class="msg-item" [class.msg-repondu]="m.reponse" (click)="messageSelectionne = m">
+                  <button type="button" class="msg-item" [class.msg-repondu]="m.reponse" (click)="ouvrirMessage(m)">
                     <span class="msg-item-left">
                       <span class="msg-avatar" [class.msg-avatar-vert]="m.reponse" [class.msg-avatar-bleu]="!m.reponse">
                         <mat-icon>{{ m.reponse ? 'mark_email_read' : 'email' }}</mat-icon>
@@ -285,10 +285,10 @@
             }
           }
 
-          <!-- DÉTAIL D'UN MESSAGE -->
+          <!-- DÉTAIL D'UN MESSAGE — THREAD -->
           @if (messageSelectionne) {
             <div class="msg-detail">
-              <button type="button" class="btn-back" (click)="messageSelectionne = null">
+              <button type="button" class="btn-back" (click)="messageSelectionne = null; repliesCourantes = []">
                 <mat-icon>arrow_back</mat-icon> Retour
               </button>
               <div class="msg-detail-card">
@@ -296,22 +296,37 @@
                   <h4>{{ messageSelectionne.sujet }}</h4>
                   <span class="msg-detail-date">{{ messageSelectionne.dateEnvoi | date:'dd/MM/yyyy à HH:mm' }}</span>
                 </div>
-                <div class="msg-bubble msg-bubble-sent">
-                  <div class="msg-bubble-label">Vous avez écrit</div>
+
+                <!-- Message initial ABY -->
+                <div class="thread-bubble thread-aby">
+                  <span class="thread-author">Vous</span>
                   <p>{{ messageSelectionne.contenu }}</p>
+                  <span class="thread-date">{{ messageSelectionne.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                 </div>
-                @if (messageSelectionne.reponse) {
-                  <div class="msg-bubble msg-bubble-reply">
-                    <div class="msg-bubble-label">Réponse de {{ messageSelectionne.repondantNom || 'MCL Solutions' }}</div>
-                    <p>{{ messageSelectionne.reponse }}</p>
-                    <div class="msg-reply-date">{{ messageSelectionne.dateReponse | date:'dd/MM/yyyy à HH:mm' }}</div>
+
+                <!-- Replies en fil de conversation -->
+                @for (r of repliesCourantes; track r.id) {
+                  <div class="thread-bubble" [class.thread-aby]="r.auteurRole === 'ABY'" [class.thread-mcl]="r.auteurRole === 'MCL'">
+                    <span class="thread-author">{{ r.auteurRole === 'ABY' ? 'Vous' : (r.auteur || 'MCL Solutions') }}</span>
+                    <p>{{ r.contenu }}</p>
+                    <span class="thread-date">{{ r.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                   </div>
-                } @else {
+                }
+
+                @if (repliesCourantes.length === 0) {
                   <div class="msg-waiting">
                     <mat-icon>schedule</mat-icon>
                     <span>En attente de réponse de l'équipe MCL Solutions</span>
                   </div>
                 }
+
+                <!-- Champ pour répondre -->
+                <div class="thread-reply-form">
+                  <textarea class="fi fi-textarea" #abyreply [value]="nouvelleReponse" (input)="nouvelleReponse = abyreply.value" rows="3" placeholder="Votre réponse..."></textarea>
+                  <button type="button" class="btn-send" (click)="envoyerReponseAby()" [disabled]="envoiReponseEnCours || !nouvelleReponse.trim()">
+                    <mat-icon>send</mat-icon> {{ envoiReponseEnCours ? 'Envoi...' : 'Répondre' }}
+                  </button>
+                </div>
               </div>
             </div>
           }

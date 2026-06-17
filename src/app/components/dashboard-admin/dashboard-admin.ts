@@ -130,6 +130,7 @@ get minutesOk(): number {
   messageAbySelectionne: any = null;
   reponseAbyTexte = '';
   reponseEnCours = false;
+  repliesAdmin: any[] = [];
 
   loadMessagesAby() {
     this.http.get<any[]>('http://localhost:8080/api/messages-aby').subscribe({
@@ -138,21 +139,32 @@ get minutesOk(): number {
     });
   }
 
+  ouvrirMessageAby(m: any) {
+    this.messageAbySelectionne = m;
+    this.repliesAdmin = [];
+    this.reponseAbyTexte = '';
+    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/${m.id}/replies`).subscribe({
+      next: (data) => this.repliesAdmin = data,
+      error: () => this.repliesAdmin = []
+    });
+    // Marquer comme lu
+    if (!m.lu) {
+      this.http.put(`http://localhost:8080/api/messages-aby/${m.id}/lu`, {}).subscribe({
+        next: () => { m.lu = true; }
+      });
+    }
+  }
+
   repondreMessageAby(id: number) {
-    if (!this.reponseAbyTexte.trim()) { alert('Veuillez écrire une réponse'); return; }
+    if (!this.reponseAbyTexte.trim()) { return; }
     this.reponseEnCours = true;
-    const body = {
-      reponse: this.reponseAbyTexte,
-      repondantNom: `${this.user.prenom || ''} ${this.user.nom || ''}`.trim() || 'MCL Solutions'
-    };
-    this.http.put<any>(`http://localhost:8080/api/messages-aby/${id}/repondre`, body).subscribe({
-      next: (updated) => {
-        const idx = this.messagesAby.findIndex(m => m.id === id);
-        if (idx !== -1) this.messagesAby[idx] = updated;
-        if (this.messageAbySelectionne?.id === id) this.messageAbySelectionne = updated;
+    const auteur = `${this.user.prenom || ''} ${this.user.nom || ''}`.trim() || 'MCL Solutions';
+    const body = { auteur, auteurRole: 'MCL', contenu: this.reponseAbyTexte };
+    this.http.post<any>(`http://localhost:8080/api/messages-aby/${id}/replies`, body).subscribe({
+      next: (reply) => {
+        this.repliesAdmin.push(reply);
         this.reponseAbyTexte = '';
         this.reponseEnCours = false;
-        alert('✅ Réponse envoyée !');
       },
       error: () => { alert('Erreur lors de l\'envoi'); this.reponseEnCours = false; }
     });
