@@ -407,6 +407,36 @@ nav { padding: 0 12px 20px; flex: 1; }
 .stat-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,0.7); text-transform: uppercase; }
 .stat-card-number { font-size: 2.4rem; font-weight: 800; color: #fff; line-height: 1; }
 .stat-card-sub { font-size: 0.72rem; color: rgba(255,255,255,0.55); }
+/* ══ KPI COMPACTS ══ */
+.home-kpi-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 16px;
+}
+
+.home-kpi-card {
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border: 1.5px solid #e8eef5; border-radius: 14px;
+  padding: 14px 16px; cursor: pointer; transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: left;
+}
+.home-kpi-card:hover { border-color: #90c4e8; box-shadow: 0 4px 16px rgba(0,0,0,0.09); transform: translateY(-2px); }
+
+.home-kpi-icon {
+  width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.home-kpi-icon mat-icon { font-size: 22px; width: 22px; height: 22px; color: #fff; }
+.home-kpi-orange { background: linear-gradient(135deg, #bf360c, #e64a19); }
+.home-kpi-bleu   { background: linear-gradient(135deg, #0d47a1, #1976d2); }
+.home-kpi-vert   { background: linear-gradient(135deg, #1a6b3c, #2e7d32); }
+.home-kpi-violet { background: linear-gradient(135deg, #4a148c, #7b1fa2); }
+
+.home-kpi-body { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.home-kpi-num { font-size: 1.6rem; font-weight: 900; color: #0d2137; line-height: 1.1; }
+.home-kpi-label { font-size: 0.72rem; color: #78909c; font-weight: 600; }
+
+.home-kpi-arrow { font-size: 18px !important; width: 18px !important; height: 18px !important; color: #cfd8dc; }
+
 .home-actions-card {
   background: #fff; border-radius: 16px; padding: 20px 22px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px;

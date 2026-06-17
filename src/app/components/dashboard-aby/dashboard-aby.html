@@ -1,4 +1,4 @@
-<div class="aby-layout" [class.sidebar-open]="sidebarOpen">
+<div class="aby-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -100,43 +100,66 @@
           </div>
           <div class="home-welcome-badge"><mat-icon>inventory</mat-icon> Supply Chain MCL</div>
         </div>
-        <!-- STAT CARDS -->
-        <div class="stats-grid">
-          <div class="stat-card stat-orange" (click)="currentPage = 'demandes'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>inbox</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Demandes en attente</span>
-              <span class="stat-card-number">{{ demandesEnAttente.length }}</span>
-              <span class="stat-card-sub">À traiter →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-blue" (click)="currentPage = 'commandes'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>shopping_cart</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Commandes en cours</span>
-              <span class="stat-card-number">{{ commandesEnCours.length }}</span>
-              <span class="stat-card-sub">Voir commandes →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-green" (click)="currentPage = 'commandes'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>check_circle</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Total commandes</span>
-              <span class="stat-card-number">{{ commandes.length }}</span>
-              <span class="stat-card-sub">Historique →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-purple" (click)="currentPage = 'logistique'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>inventory_2</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Articles en stock</span>
-              <span class="stat-card-number">{{ stocks.length }}</span>
-              <span class="stat-card-sub">Logistique →</span>
-            </div>
+        <!-- KPI COMPACTS -->
+        <div class="home-kpi-grid">
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'demandes'">
+            <span class="home-kpi-icon home-kpi-orange"><mat-icon>inbox</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ demandesEnAttente.length }}</span>
+              <span class="home-kpi-label">Demandes en attente</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'commandes'">
+            <span class="home-kpi-icon home-kpi-bleu"><mat-icon>shopping_cart</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ commandesEnCours.length }}</span>
+              <span class="home-kpi-label">Commandes en cours</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'commandes'">
+            <span class="home-kpi-icon home-kpi-vert"><mat-icon>check_circle</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ commandes.length }}</span>
+              <span class="home-kpi-label">Total commandes</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'logistique'">
+            <span class="home-kpi-icon home-kpi-violet"><mat-icon>inventory_2</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ stocks.length }}</span>
+              <span class="home-kpi-label">Articles en stock</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+        </div>
+
+        <!-- ACCÈS RAPIDE -->
+        <div class="home-actions-card">
+          <div class="home-actions-title"><mat-icon>flash_on</mat-icon> Accès rapide</div>
+          <div class="home-actions-grid">
+            <button type="button" class="home-action-btn" (click)="currentPage = 'projets'">
+              <span class="home-action-icon home-action-blue"><mat-icon>folder_special</mat-icon></span>
+              <span class="home-action-text"><strong>Suivi Projets</strong><span>Voir les tâches MCL</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'messagerie'; loadMessages()">
+              <span class="home-action-icon home-action-orange"><mat-icon>email</mat-icon></span>
+              <span class="home-action-text"><strong>Messagerie MCL</strong><span>{{ messages.length }} message(s)</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'planning'">
+              <span class="home-action-icon home-action-teal"><mat-icon>calendar_month</mat-icon></span>
+              <span class="home-action-text"><strong>Planning</strong><span>Voir le calendrier</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'approvisionnement'">
+              <span class="home-action-icon home-action-purple"><mat-icon>assignment</mat-icon></span>
+              <span class="home-action-text"><strong>Approvisionnement</strong><span>Fiches reçues</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
           </div>
         </div>
 
