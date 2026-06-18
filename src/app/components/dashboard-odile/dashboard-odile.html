@@ -1,4 +1,4 @@
-﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -114,60 +114,57 @@
           </div>
           <div class="home-welcome-badge"><mat-icon>manage_accounts</mat-icon> Manager MCL</div>
         </div>
-        <!-- STAT CARDS -->
-        <div class="stats-grid">
-          <div class="stat-card stat-blue" (click)="currentPage = 'factures'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>receipt</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Factures</span>
-              <span class="stat-card-number">{{ factures.length }}</span>
-              <span class="stat-card-sub">Ce mois-ci →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-green" (click)="currentPage = 'fiches'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>description</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Fiches</span>
-              <span class="stat-card-number">{{ fiches.length }}</span>
-              <span class="stat-card-sub">Total fiches →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-orange" (click)="currentPage = 'tickets'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>support_agent</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Tickets</span>
-              <span class="stat-card-number">{{ tickets.length }}</span>
-              <span class="stat-card-sub">En attente →</span>
-            </div>
-          </div>
+        <!-- KPI COMPACTS -->
+        <div class="home-kpi-grid">
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'factures'">
+            <span class="home-kpi-icon home-kpi-bleu"><mat-icon>receipt</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ factures.length }}</span>
+              <span class="home-kpi-label">Factures</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'fiches'">
+            <span class="home-kpi-icon home-kpi-vert"><mat-icon>description</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ fiches.length }}</span>
+              <span class="home-kpi-label">Fiches</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'tickets'">
+            <span class="home-kpi-icon home-kpi-orange"><mat-icon>support_agent</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ tickets.length }}</span>
+              <span class="home-kpi-label">Tickets</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
         </div>
         <!-- ACTIONS RAPIDES -->
         <div class="home-actions-card">
           <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
           <div class="home-actions-grid">
-            <div class="home-action-btn" (click)="currentPage = 'factures'">
-              <div class="home-action-icon home-action-blue"><mat-icon>receipt</mat-icon></div>
-              <div class="home-action-text"><strong>Factures</strong><span>{{ factures.length }} ce mois</span></div>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'factures'">
+              <span class="home-action-icon home-action-blue"><mat-icon>receipt</mat-icon></span>
+              <span class="home-action-text"><strong>Factures</strong><span>{{ factures.length }} ce mois</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'fiches'">
-              <div class="home-action-icon home-action-green"><mat-icon>description</mat-icon></div>
-              <div class="home-action-text"><strong>Fiches</strong><span>{{ fiches.length }} total</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'fiches'">
+              <span class="home-action-icon home-action-green"><mat-icon>description</mat-icon></span>
+              <span class="home-action-text"><strong>Fiches</strong><span>{{ fiches.length }} total</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'tickets'">
-              <div class="home-action-icon home-action-orange"><mat-icon>support_agent</mat-icon></div>
-              <div class="home-action-text"><strong>Tickets</strong><span>{{ tickets.length }} en attente</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'tickets'">
+              <span class="home-action-icon home-action-orange"><mat-icon>support_agent</mat-icon></span>
+              <span class="home-action-text"><strong>Tickets</strong><span>{{ tickets.length }} en attente</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'ged'">
-              <div class="home-action-icon home-action-purple"><mat-icon>folder_open</mat-icon></div>
-              <div class="home-action-text"><strong>Documents</strong><span>GED</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'ged'">
+              <span class="home-action-icon home-action-purple"><mat-icon>folder_open</mat-icon></span>
+              <span class="home-action-text"><strong>Documents</strong><span>GED</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
+            </button>
           </div>
         </div>
       }

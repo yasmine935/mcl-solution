@@ -34,6 +34,9 @@ export class DashboardAby implements OnInit {
   // Projets (lecture seule)
   projets: any[] = [];
   projetSelectionne: any = null;
+  rechercheProjet = '';
+  filtreStatut = '';
+  filtrePriorite = '';
 
   // Messagerie ABY ↔ MCL
   messages: any[] = [];
@@ -76,8 +79,7 @@ export class DashboardAby implements OnInit {
   }
 
   loadMessages() {
-    const expediteur = this.user.username || this.user.prenom || 'ABY';
-    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/expediteur/${expediteur}`).subscribe({
+    this.http.get<any[]>('http://localhost:8080/api/messages-aby').subscribe({
       next: (data) => this.messages = data,
       error: () => this.messages = []
     });
@@ -303,6 +305,19 @@ export class DashboardAby implements OnInit {
 
   get messagesAvecReponse() { return this.messages.filter(m => m.reponse); }
   get messagesEnAttente() { return this.messages.filter(m => !m.reponse); }
+
+  get projetsFiltres() {
+    const q = this.rechercheProjet.toLowerCase();
+    return this.projets.filter(p => {
+      const matchRecherche = !q ||
+        (p.titre || p.nom || '').toLowerCase().includes(q) ||
+        (p.client || '').toLowerCase().includes(q) ||
+        (p.assignes || '').toLowerCase().includes(q);
+      const matchStatut = !this.filtreStatut || p.statut === this.filtreStatut;
+      const matchPriorite = !this.filtrePriorite || p.priorite === this.filtrePriorite;
+      return matchRecherche && matchStatut && matchPriorite;
+    });
+  }
 
   get projetsEnCours() { return this.projets.filter(p => p.statut === 'EN_COURS').length; }
   get projetsTermines() { return this.projets.filter(p => p.statut === 'TERMINEE').length; }

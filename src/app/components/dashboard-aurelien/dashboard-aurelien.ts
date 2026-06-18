@@ -54,6 +54,16 @@ export class DashboardAurelien implements OnInit {
   fiches: any[] = [];
   selectedFiche: any = null;
 
+  // Messagerie ↔ MCL
+  messages: any[] = [];
+  showComposeForm = false;
+  nouveauMessage = { sujet: '', contenu: '' };
+  messageSelectionne: any = null;
+  envoiEnCours = false;
+  repliesCourantes: any[] = [];
+  nouvelleReponse = '';
+  envoiReponseEnCours = false;
+
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
   nombreJours = 0;
 
@@ -70,6 +80,7 @@ export class DashboardAurelien implements OnInit {
     this.loadDocuments();
     this.loadFiches();
     this.loadSoldeConges();
+    this.loadMessages();
   }
 
   loadConges() {
@@ -140,6 +151,60 @@ loadSoldeConges() {
   ouvrirDetailFiche(fiche: any) { this.selectedFiche = fiche; this.showDetailModal = true; }
   fermerDetailFiche() { this.showDetailModal = false; this.selectedFiche = null; }
 
+  loadMessages() {
+    const expediteur = this.user.username || this.user.prenom || 'AURELIEN';
+    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/expediteur/${expediteur}`).subscribe({
+      next: (data) => this.messages = data,
+      error: () => this.messages = []
+    });
+  }
+
+  ouvrirMessage(m: any) {
+    this.messageSelectionne = m;
+    this.repliesCourantes = [];
+    this.nouvelleReponse = '';
+    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/${m.id}/replies`).subscribe({
+      next: (data) => this.repliesCourantes = data,
+      error: () => this.repliesCourantes = []
+    });
+  }
+
+  envoyerMessage() {
+    if (!this.nouveauMessage.sujet.trim() || !this.nouveauMessage.contenu.trim()) {
+      alert('Veuillez remplir le sujet et le message');
+      return;
+    }
+    this.envoiEnCours = true;
+    const expediteur = this.user.username || this.user.prenom || 'AURELIEN';
+    const body = { expediteur, destinataire: 'MCL Solutions', sujet: this.nouveauMessage.sujet, contenu: this.nouveauMessage.contenu };
+    this.http.post<any>('http://localhost:8080/api/messages-aby', body).subscribe({
+      next: (msg) => {
+        this.messages.unshift(msg);
+        this.nouveauMessage = { sujet: '', contenu: '' };
+        this.showComposeForm = false;
+        this.envoiEnCours = false;
+      },
+      error: () => { alert('Erreur lors de l\'envoi. Réessayez.'); this.envoiEnCours = false; }
+    });
+  }
+
+  envoyerReponseAurelien() {
+    if (!this.nouvelleReponse.trim() || !this.messageSelectionne) return;
+    this.envoiReponseEnCours = true;
+    const auteur = this.user.username || this.user.prenom || 'AURELIEN';
+    const body = { auteur, auteurRole: 'ABY', contenu: this.nouvelleReponse };
+    this.http.post<any>(`http://localhost:8080/api/messages-aby/${this.messageSelectionne.id}/replies`, body).subscribe({
+      next: (reply) => {
+        this.repliesCourantes.push(reply);
+        this.nouvelleReponse = '';
+        this.envoiReponseEnCours = false;
+      },
+      error: () => { alert('Erreur lors de l\'envoi'); this.envoiReponseEnCours = false; }
+    });
+  }
+
+  get messagesEnAttente() { return this.messages.filter(m => !m.reponse); }
+
   getPageTitle(): string {
     switch(this.currentPage) {
       case 'home': return 'Mon Dashboard';
@@ -153,6 +218,7 @@ loadSoldeConges() {
       case 'factures': return 'Factures';
       case 'mes-conges': return 'Mes Conges';
       case 'approvisionnement': return 'Demandes d\'Approvisionnement';
+      case 'messagerie': return 'Messagerie MCL Solutions';
       default: return 'Dashboard';
     }
   }

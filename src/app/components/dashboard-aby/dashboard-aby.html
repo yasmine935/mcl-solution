@@ -195,13 +195,13 @@
       }
 
       @if (currentPage === 'projets') {
-        <!-- BANNIÈRE -->
+        <!-- BANNIÈRE KPI -->
         <div class="projets-header">
           <div class="projets-header-left">
             <div class="projets-header-icon"><mat-icon>folder_special</mat-icon></div>
             <div>
               <h2>Suivi des Projets MCL Solutions</h2>
-              <p>Vue lecture seule · {{ projets.length }} tâche(s) au total</p>
+              <p>{{ projetsFiltres.length }} / {{ projets.length }} tâche(s) affichée(s)</p>
             </div>
           </div>
           <div class="projets-kpi-row">
@@ -224,8 +224,33 @@
           </div>
         </div>
 
+        <!-- BARRE RECHERCHE + FILTRES -->
+        <div class="projets-toolbar">
+          <div class="projets-search-wrap">
+            <mat-icon class="projets-search-icon">search</mat-icon>
+            <input class="projets-search" type="text" #projetq [value]="rechercheProjet" (input)="rechercheProjet = projetq.value" placeholder="Rechercher par projet, client, assigné...">
+            @if (rechercheProjet) {
+              <button type="button" class="projets-search-clear" (click)="rechercheProjet = ''">✕</button>
+            }
+          </div>
+          <div class="projets-filters">
+            <span class="filter-label">Statut :</span>
+            <button type="button" class="filter-pill" [class.active]="filtreStatut === ''" (click)="filtreStatut = ''">Tous</button>
+            <button type="button" class="filter-pill filter-pill-bleu" [class.active]="filtreStatut === 'EN_COURS'" (click)="filtreStatut = filtreStatut === 'EN_COURS' ? '' : 'EN_COURS'">En cours</button>
+            <button type="button" class="filter-pill filter-pill-vert" [class.active]="filtreStatut === 'TERMINEE'" (click)="filtreStatut = filtreStatut === 'TERMINEE' ? '' : 'TERMINEE'">Terminée</button>
+            <button type="button" class="filter-pill filter-pill-gris" [class.active]="filtreStatut === 'A_FAIRE'" (click)="filtreStatut = filtreStatut === 'A_FAIRE' ? '' : 'A_FAIRE'">À faire</button>
+            <span class="filter-sep">|</span>
+            <span class="filter-label">Priorité :</span>
+            <button type="button" class="filter-pill filter-pill-rouge" [class.active]="filtrePriorite === 'Élevé'" (click)="filtrePriorite = filtrePriorite === 'Élevé' ? '' : 'Élevé'">Élevé</button>
+            <button type="button" class="filter-pill filter-pill-orange" [class.active]="filtrePriorite === 'Moyenne'" (click)="filtrePriorite = filtrePriorite === 'Moyenne' ? '' : 'Moyenne'">Moyenne</button>
+            <button type="button" class="filter-pill filter-pill-vert" [class.active]="filtrePriorite === 'Faible'" (click)="filtrePriorite = filtrePriorite === 'Faible' ? '' : 'Faible'">Faible</button>
+          </div>
+        </div>
+
         @if (projets.length === 0) {
           <div class="empty-state"><span>📂</span><p>Aucun projet disponible</p></div>
+        } @else if (projetsFiltres.length === 0) {
+          <div class="empty-state"><span>🔍</span><p>Aucun résultat pour cette recherche</p></div>
         } @else {
           <div class="projets-table-wrap">
             <table class="projets-table">
@@ -235,13 +260,13 @@
                   <th>Client</th>
                   <th>Statut</th>
                   <th>Priorité</th>
-                  <th>Date début</th>
-                  <th>Date fin</th>
-                  <th>Responsable</th>
+                  <th>Créé le</th>
+                  <th>Échéance</th>
+                  <th>Assigné(s)</th>
                 </tr>
               </thead>
               <tbody>
-                @for (p of projets; track p.id) {
+                @for (p of projetsFiltres; track p.id) {
                   <tr class="projets-row" [class.row-en-cours]="p.statut === 'EN_COURS'" [class.row-terminee]="p.statut === 'TERMINEE'" [class.row-perdu]="p.statut === 'Perdu'">
                     <td class="cell-titre">
                       <span class="projet-dot" [style.background]="getProjetStatutColor(p.statut)"></span>
@@ -251,6 +276,8 @@
                     <td class="cell-client">
                       @if (p.client) {
                         <span class="client-chip">{{ p.client }}</span>
+                      } @else if (p.clientFinal) {
+                        <span class="client-chip">{{ p.clientFinal }}</span>
                       } @else { <span class="cell-vide">—</span> }
                     </td>
                     <td>
@@ -266,9 +293,9 @@
                         </span>
                       } @else { <span class="cell-vide">—</span> }
                     </td>
-                    <td class="cell-date">{{ p.dateDebut || '—' }}</td>
-                    <td class="cell-date">{{ p.dateFin || p.deadline || '—' }}</td>
-                    <td class="cell-resp">{{ p.responsable || '—' }}</td>
+                    <td class="cell-date">{{ p.dateCreation ? (p.dateCreation | date:'dd/MM/yyyy') : '—' }}</td>
+                    <td class="cell-date">{{ p.dateEcheance ? (p.dateEcheance | date:'dd/MM/yyyy') : '—' }}</td>
+                    <td class="cell-resp">{{ p.assignes || p.utilisateur?.prenom || '—' }}</td>
                   </tr>
                 }
               </tbody>
@@ -336,7 +363,8 @@
                       </span>
                       <span class="msg-item-info">
                         <span class="msg-sujet">{{ m.sujet }}</span>
-                        <span class="msg-preview">{{ m.contenu | slice:0:80 }}...</span>
+                        <span class="msg-expediteur">De : {{ m.expediteur }}</span>
+                        <span class="msg-preview">{{ m.contenu | slice:0:70 }}...</span>
                         <span class="msg-date">{{ m.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                       </span>
                     </span>
@@ -366,9 +394,9 @@
                   <span class="msg-detail-date">{{ messageSelectionne.dateEnvoi | date:'dd/MM/yyyy à HH:mm' }}</span>
                 </div>
 
-                <!-- Message initial ABY -->
+                <!-- Message initial -->
                 <div class="thread-bubble thread-aby">
-                  <span class="thread-author">Vous</span>
+                  <span class="thread-author">{{ messageSelectionne.expediteur }}</span>
                   <p>{{ messageSelectionne.contenu }}</p>
                   <span class="thread-date">{{ messageSelectionne.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                 </div>
@@ -376,7 +404,7 @@
                 <!-- Replies en fil de conversation -->
                 @for (r of repliesCourantes; track r.id) {
                   <div class="thread-bubble" [class.thread-aby]="r.auteurRole === 'ABY'" [class.thread-mcl]="r.auteurRole === 'MCL'">
-                    <span class="thread-author">{{ r.auteurRole === 'ABY' ? 'Vous' : (r.auteur || 'MCL Solutions') }}</span>
+                    <span class="thread-author">{{ r.auteurRole === 'MCL' ? (r.auteur || 'MCL Solutions') : r.auteur }}</span>
                     <p>{{ r.contenu }}</p>
                     <span class="thread-date">{{ r.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                   </div>

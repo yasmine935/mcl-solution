@@ -1,4 +1,4 @@
-﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -69,6 +69,15 @@
       </a>
 
       <div class="nav-divider"></div>
+      <div class="nav-section-label">Communication</div>
+      <a class="nav-item" [class.active]="currentPage === 'messagerie'" (click)="currentPage = 'messagerie'; loadMessages()">
+        <mat-icon>email</mat-icon> Messagerie MCL
+        @if (messagesEnAttente.length > 0) {
+          <span class="nav-badge">{{ messagesEnAttente.length }}</span>
+        }
+      </a>
+
+      <div class="nav-divider"></div>
       <div class="nav-section-label">Approvisionnement</div>
       <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
         <mat-icon>shopping_cart</mat-icon> Demandes Appro.
@@ -111,60 +120,57 @@
           </div>
           <div class="home-welcome-badge"><mat-icon>manage_accounts</mat-icon> Manager MCL</div>
         </div>
-        <!-- STAT CARDS -->
-        <div class="stats-grid">
-          <div class="stat-card stat-blue" (click)="currentPage = 'fiches'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>engineering</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Interventions</span>
-              <span class="stat-card-number">{{ interventions.length }}</span>
-              <span class="stat-card-sub">En cours →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-green" (click)="currentPage = 'fiches'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>description</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Fiches</span>
-              <span class="stat-card-number">{{ fiches.length }}</span>
-              <span class="stat-card-sub">Total fiches →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-orange" (click)="currentPage = 'ged'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>folder_open</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Documents</span>
-              <span class="stat-card-number">{{ documents.length }}</span>
-              <span class="stat-card-sub">Dans la GED →</span>
-            </div>
-          </div>
+        <!-- KPI COMPACTS -->
+        <div class="home-kpi-grid">
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'fiches'">
+            <span class="home-kpi-icon home-kpi-bleu"><mat-icon>engineering</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ interventions.length }}</span>
+              <span class="home-kpi-label">Interventions</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'fiches'">
+            <span class="home-kpi-icon home-kpi-vert"><mat-icon>description</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ fiches.length }}</span>
+              <span class="home-kpi-label">Fiches</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'ged'">
+            <span class="home-kpi-icon home-kpi-orange"><mat-icon>folder_open</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ documents.length }}</span>
+              <span class="home-kpi-label">Documents GED</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
         </div>
         <!-- ACTIONS RAPIDES -->
         <div class="home-actions-card">
           <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
           <div class="home-actions-grid">
-            <div class="home-action-btn" (click)="currentPage = 'fiches'">
-              <div class="home-action-icon home-action-blue"><mat-icon>engineering</mat-icon></div>
-              <div class="home-action-text"><strong>Interventions</strong><span>{{ interventions.length }} en cours</span></div>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'fiches'">
+              <span class="home-action-icon home-action-blue"><mat-icon>engineering</mat-icon></span>
+              <span class="home-action-text"><strong>Interventions</strong><span>{{ interventions.length }} en cours</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'ged'">
-              <div class="home-action-icon home-action-orange"><mat-icon>folder_open</mat-icon></div>
-              <div class="home-action-text"><strong>Documents</strong><span>{{ documents.length }} fichiers</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'ged'">
+              <span class="home-action-icon home-action-orange"><mat-icon>folder_open</mat-icon></span>
+              <span class="home-action-text"><strong>Documents</strong><span>{{ documents.length }} fichiers</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'planning'">
-              <div class="home-action-icon home-action-teal"><mat-icon>calendar_month</mat-icon></div>
-              <div class="home-action-text"><strong>Planning</strong><span>Vue hebdomadaire</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'planning'">
+              <span class="home-action-icon home-action-teal"><mat-icon>calendar_month</mat-icon></span>
+              <span class="home-action-text"><strong>Planning</strong><span>Vue hebdomadaire</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'mes-conges'">
-              <div class="home-action-icon home-action-green"><mat-icon>beach_access</mat-icon></div>
-              <div class="home-action-text"><strong>Mes Congés</strong><span>Demandes</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'mes-conges'">
+              <span class="home-action-icon home-action-green"><mat-icon>beach_access</mat-icon></span>
+              <span class="home-action-text"><strong>Mes Congés</strong><span>Demandes</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
+            </button>
           </div>
         </div>
       }
@@ -204,6 +210,124 @@
 
       @if (currentPage === 'approvisionnement') {
         <app-approvisionnement [modetous]="true"></app-approvisionnement>
+      }
+
+      <!-- ══ MESSAGERIE ══ -->
+      @if (currentPage === 'messagerie') {
+        <div class="messagerie-wrap">
+          <div class="msg-header-card">
+            <div class="msg-header-left">
+              <div class="msg-icon-wrap"><mat-icon>email</mat-icon></div>
+              <div>
+                <h3>Messagerie MCL Solutions</h3>
+                <p>Posez vos questions, suivez les réponses de l'équipe MCL</p>
+              </div>
+            </div>
+            <button class="btn-compose" type="button" (click)="showComposeForm = !showComposeForm; messageSelectionne = null">
+              <mat-icon>edit</mat-icon> Nouveau message
+            </button>
+          </div>
+
+          @if (showComposeForm) {
+            <div class="compose-form">
+              <div class="compose-form-header">
+                <h4>✉️ Nouveau message à MCL Solutions</h4>
+                <button type="button" class="btn-close-compose" (click)="showComposeForm = false">✕</button>
+              </div>
+              <div class="fg">
+                <label for="aur-sujet">Sujet *</label>
+                <input id="aur-sujet" type="text" class="fi" #aursujet [value]="nouveauMessage.sujet" (input)="nouveauMessage.sujet = aursujet.value" placeholder="Ex: Question sur le projet...">
+              </div>
+              <div class="fg fg-mt">
+                <label for="aur-contenu">Message *</label>
+                <textarea id="aur-contenu" class="fi fi-textarea" #aurcontenu [value]="nouveauMessage.contenu" (input)="nouveauMessage.contenu = aurcontenu.value" rows="5" placeholder="Décrivez votre demande ou question..."></textarea>
+              </div>
+              <div class="compose-actions">
+                <button type="button" class="btn-send" (click)="envoyerMessage()" [disabled]="envoiEnCours">
+                  <mat-icon>send</mat-icon> {{ envoiEnCours ? 'Envoi...' : 'Envoyer' }}
+                </button>
+                <button type="button" class="btn-cancel-c" (click)="showComposeForm = false; nouveauMessage = { sujet: '', contenu: '' }">Annuler</button>
+              </div>
+            </div>
+          }
+
+          @if (!messageSelectionne) {
+            @if (messages.length === 0) {
+              <div class="empty-state msg-empty">
+                <span>📬</span>
+                <p>Aucun message envoyé</p>
+                <small>Cliquez sur "Nouveau message" pour contacter MCL Solutions</small>
+              </div>
+            } @else {
+              <div class="msg-list">
+                @for (m of messages; track m.id) {
+                  <button type="button" class="msg-item" [class.msg-repondu]="m.reponse" (click)="ouvrirMessage(m)">
+                    <span class="msg-item-left">
+                      <span class="msg-avatar" [class.msg-avatar-vert]="m.reponse" [class.msg-avatar-bleu]="!m.reponse">
+                        <mat-icon>{{ m.reponse ? 'mark_email_read' : 'email' }}</mat-icon>
+                      </span>
+                      <span class="msg-item-info">
+                        <span class="msg-sujet">{{ m.sujet }}</span>
+                        <span class="msg-preview">{{ m.contenu | slice:0:80 }}...</span>
+                        <span class="msg-date">{{ m.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
+                      </span>
+                    </span>
+                    <span class="msg-item-right">
+                      @if (m.reponse) {
+                        <span class="msg-badge-repondu">Répondu ✓</span>
+                      } @else {
+                        <span class="msg-badge-attente">En attente</span>
+                      }
+                      <mat-icon class="msg-chevron">chevron_right</mat-icon>
+                    </span>
+                  </button>
+                }
+              </div>
+            }
+          }
+
+          @if (messageSelectionne) {
+            <div class="msg-detail">
+              <button type="button" class="btn-back" (click)="messageSelectionne = null; repliesCourantes = []">
+                <mat-icon>arrow_back</mat-icon> Retour
+              </button>
+              <div class="msg-detail-card">
+                <div class="msg-detail-header">
+                  <h4>{{ messageSelectionne.sujet }}</h4>
+                  <span class="msg-detail-date">{{ messageSelectionne.dateEnvoi | date:'dd/MM/yyyy à HH:mm' }}</span>
+                </div>
+
+                <div class="thread-bubble thread-aby">
+                  <span class="thread-author">Vous</span>
+                  <p>{{ messageSelectionne.contenu }}</p>
+                  <span class="thread-date">{{ messageSelectionne.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+
+                @for (r of repliesCourantes; track r.id) {
+                  <div class="thread-bubble" [class.thread-aby]="r.auteurRole === 'ABY'" [class.thread-mcl]="r.auteurRole === 'MCL'">
+                    <span class="thread-author">{{ r.auteurRole === 'ABY' ? 'Vous' : (r.auteur || 'MCL Solutions') }}</span>
+                    <p>{{ r.contenu }}</p>
+                    <span class="thread-date">{{ r.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                }
+
+                @if (repliesCourantes.length === 0) {
+                  <div class="msg-waiting">
+                    <mat-icon>schedule</mat-icon>
+                    <span>En attente de réponse de l'équipe MCL Solutions</span>
+                  </div>
+                }
+
+                <div class="thread-reply-form">
+                  <textarea class="fi fi-textarea" #aurreply [value]="nouvelleReponse" (input)="nouvelleReponse = aurreply.value" rows="3" placeholder="Votre réponse..."></textarea>
+                  <button type="button" class="btn-send" (click)="envoyerReponseAurelien()" [disabled]="envoiReponseEnCours || !nouvelleReponse.trim()">
+                    <mat-icon>send</mat-icon> {{ envoiReponseEnCours ? 'Envoi...' : 'Répondre' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
       }
 
 @if (currentPage === 'mes-conges') {

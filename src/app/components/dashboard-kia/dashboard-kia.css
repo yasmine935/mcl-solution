@@ -914,3 +914,40 @@ nav {
 .solde-alert { color: #c62828 !important; animation: pulse-alert 1s ease infinite; }
 @keyframes pulse-alert { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .solde-total { font-size: 0.68rem; color: #b0bec5; margin-top: 4px; }
+
+/* ── KPI CARDS COMPACTES ── */
+.home-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.home-kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid #e8eaf6;
+  border-radius: 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.home-kpi-card:hover { box-shadow: 0 6px 20px rgba(69,39,160,0.12); transform: translateY(-2px); }
+.home-kpi-icon {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.home-kpi-bleu  { background: #e8eaf6; color: #3949ab; }
+.home-kpi-vert  { background: #e8f5e9; color: #2e7d32; }
+.home-kpi-orange{ background: #fff3e0; color: #e65100; }
+.home-kpi-violet{ background: #f3e5f5; color: #7b1fa2; }
+.home-kpi-teal  { background: #e0f2f1; color: #00695c; }
+.home-kpi-body  { display: flex; flex-direction: column; flex: 1; }
+.home-kpi-num   { font-size: 1.6rem; font-weight: 800; color: #1a237e; line-height: 1; }
+.home-kpi-label { font-size: 0.75rem; color: #78909c; margin-top: 2px; }
+.home-kpi-arrow { color: #b0bec5; margin-left: auto; font-size: 20px; }

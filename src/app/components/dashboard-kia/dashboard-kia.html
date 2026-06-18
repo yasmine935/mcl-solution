@@ -1,4 +1,4 @@
-﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -116,60 +116,57 @@
           </div>
           <div class="home-welcome-badge"><mat-icon>engineering</mat-icon> Tech Sup MCL</div>
         </div>
-        <!-- STAT CARDS -->
-        <div class="stats-grid">
-          <div class="stat-card stat-blue" (click)="currentPage = 'fiches'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>engineering</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Interventions</span>
-              <span class="stat-card-number">{{ interventions.length }}</span>
-              <span class="stat-card-sub">En cours →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-orange" (click)="currentPage = 'conges-tech'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>fact_check</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Congés à valider</span>
-              <span class="stat-card-number">{{ congesTechniciens.length }}</span>
-              <span class="stat-card-sub">En attente →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-green" (click)="currentPage = 'mes-conges'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>beach_access</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Mes Congés</span>
-              <span class="stat-card-number">{{ mesConges.length }}</span>
-              <span class="stat-card-sub">Total demandes →</span>
-            </div>
-          </div>
+        <!-- KPI COMPACTS -->
+        <div class="home-kpi-grid">
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'fiches'">
+            <span class="home-kpi-icon home-kpi-bleu"><mat-icon>engineering</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ interventions.length }}</span>
+              <span class="home-kpi-label">Interventions</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'conges-tech'">
+            <span class="home-kpi-icon home-kpi-orange"><mat-icon>fact_check</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ congesTechniciens.length }}</span>
+              <span class="home-kpi-label">Congés à valider</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
+          <button type="button" class="home-kpi-card" (click)="currentPage = 'mes-conges'">
+            <span class="home-kpi-icon home-kpi-vert"><mat-icon>beach_access</mat-icon></span>
+            <span class="home-kpi-body">
+              <span class="home-kpi-num">{{ mesConges.length }}</span>
+              <span class="home-kpi-label">Mes Congés</span>
+            </span>
+            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+          </button>
         </div>
         <!-- ACTIONS RAPIDES -->
         <div class="home-actions-card">
           <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
           <div class="home-actions-grid">
-            <div class="home-action-btn" (click)="currentPage = 'fiches'">
-              <div class="home-action-icon home-action-blue"><mat-icon>engineering</mat-icon></div>
-              <div class="home-action-text"><strong>Interventions</strong><span>{{ interventions.length }} en cours</span></div>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'fiches'">
+              <span class="home-action-icon home-action-blue"><mat-icon>engineering</mat-icon></span>
+              <span class="home-action-text"><strong>Interventions</strong><span>{{ interventions.length }} en cours</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'conges-tech'">
-              <div class="home-action-icon home-action-orange"><mat-icon>fact_check</mat-icon></div>
-              <div class="home-action-text"><strong>Congés à valider</strong><span>{{ congesTechniciens.length }} en attente</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'conges-tech'">
+              <span class="home-action-icon home-action-orange"><mat-icon>fact_check</mat-icon></span>
+              <span class="home-action-text"><strong>Congés à valider</strong><span>{{ congesTechniciens.length }} en attente</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'planning'">
-              <div class="home-action-icon home-action-teal"><mat-icon>calendar_month</mat-icon></div>
-              <div class="home-action-text"><strong>Planning</strong><span>Vue hebdomadaire</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'planning'">
+              <span class="home-action-icon home-action-teal"><mat-icon>calendar_month</mat-icon></span>
+              <span class="home-action-text"><strong>Planning</strong><span>Vue hebdomadaire</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
-            <div class="home-action-btn" (click)="currentPage = 'remonteesTerrain'">
-              <div class="home-action-icon home-action-purple"><mat-icon>report_problem</mat-icon></div>
-              <div class="home-action-text"><strong>Remontées</strong><span>Terrain</span></div>
+            </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'remonteesTerrain'">
+              <span class="home-action-icon home-action-purple"><mat-icon>report_problem</mat-icon></span>
+              <span class="home-action-text"><strong>Remontées</strong><span>Terrain</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
+            </button>
           </div>
         </div>
       }
