@@ -305,7 +305,7 @@
 
                 @for (r of repliesCourantes; track r.id) {
                   <div class="thread-bubble" [class.thread-aby]="r.auteurRole === 'ABY'" [class.thread-mcl]="r.auteurRole === 'MCL'">
-                    <span class="thread-author">{{ r.auteurRole === 'ABY' ? 'Vous' : (r.auteur || 'MCL Solutions') }}</span>
+                    <span class="thread-author">{{ (r.auteur === (user.username || user.prenom)) ? 'Vous' : (r.auteurRole === 'MCL' ? (r.auteur || 'MCL Solutions') : r.auteur) }}</span>
                     <p>{{ r.contenu }}</p>
                     <span class="thread-date">{{ r.dateEnvoi | date:'dd/MM/yyyy HH:mm' }}</span>
                   </div>
