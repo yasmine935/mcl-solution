@@ -36,56 +36,76 @@
   @if (showFormAdd) {
     <div class="form-voiture-card">
       <h3>🚗 Nouveau Véhicule</h3>
-      <div class="form-v-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Immatriculation *</mat-label>
-          <input matInput [(ngModel)]="nouvelleVoiture.immatriculation" placeholder="AB-123-CD"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Marque *</mat-label>
-          <input matInput [(ngModel)]="nouvelleVoiture.marque" placeholder="Renault"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Modèle</mat-label>
-          <input matInput [(ngModel)]="nouvelleVoiture.modele" placeholder="Kangoo"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Année</mat-label>
-          <input matInput [(ngModel)]="nouvelleVoiture.annee" placeholder="2022"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Kilométrage</mat-label>
-          <input matInput [(ngModel)]="nouvelleVoiture.kilometrage" placeholder="0"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Carburant</mat-label>
-          <mat-select [(ngModel)]="nouvelleVoiture.carburant">
-            @for (c of carburants; track c) { <mat-option [value]="c">{{ c }}</mat-option> }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Statut</mat-label>
-          <mat-select [(ngModel)]="nouvelleVoiture.statut">
-            @for (s of statutsVoiture; track s) { <mat-option [value]="s">{{ s }}</mat-option> }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Conducteur assigné</mat-label>
-          <input matInput [(ngModel)]="nouvelleVoiture.conducteur"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Assurance</mat-label>
-          <input matInput [(ngModel)]="nouvelleVoiture.assurance" placeholder="Ex: AXA, Allianz..."/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Expiration assurance</mat-label>
-          <input matInput type="date" [(ngModel)]="nouvelleVoiture.dateExpirationAssurance"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Prochain contrôle</mat-label>
-          <input matInput type="date" [(ngModel)]="nouvelleVoiture.prochainControle"/>
-        </mat-form-field>
+
+      <div class="form-v-section">
+        <div class="form-v-section-title">🪪 Identification</div>
+        <div class="form-v-grid">
+          <div class="field-group">
+            <label>Immatriculation *</label>
+            <input class="compact-input" [(ngModel)]="nouvelleVoiture.immatriculation" placeholder="AB-123-CD"/>
+          </div>
+          <div class="field-group">
+            <label>Marque *</label>
+            <input class="compact-input" [(ngModel)]="nouvelleVoiture.marque" placeholder="Renault"/>
+          </div>
+          <div class="field-group">
+            <label>Modèle</label>
+            <input class="compact-input" [(ngModel)]="nouvelleVoiture.modele" placeholder="Kangoo"/>
+          </div>
+          <div class="field-group">
+            <label>Année</label>
+            <input class="compact-input" type="number" [(ngModel)]="nouvelleVoiture.annee" placeholder="2022"/>
+          </div>
+        </div>
       </div>
+
+      <div class="form-v-section">
+        <div class="form-v-section-title">📊 Caractéristiques &amp; Statut</div>
+        <div class="form-v-grid">
+          <div class="field-group">
+            <label>Kilométrage</label>
+            <input class="compact-input" type="number" [(ngModel)]="nouvelleVoiture.kilometrage" placeholder="0"/>
+          </div>
+          <div class="field-group">
+            <label>Carburant</label>
+            <select class="compact-input" [(ngModel)]="nouvelleVoiture.carburant">
+              @for (c of carburants; track c) { <option [value]="c">{{ getCarburantIcon(c) }} {{ c }}</option> }
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Statut</label>
+            <select class="compact-input" [(ngModel)]="nouvelleVoiture.statut">
+              @for (s of statutsVoiture; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Conducteur assigné</label>
+            <input class="compact-input" [(ngModel)]="nouvelleVoiture.conducteur" placeholder="Nom du conducteur"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-v-section">
+        <div class="form-v-section-title">🛡️ Assurance &amp; Contrôle</div>
+        <div class="form-v-grid">
+          <div class="field-group">
+            <label>Assurance</label>
+            <input class="compact-input" [(ngModel)]="nouvelleVoiture.assurance" placeholder="Ex: AXA, Allianz..."/>
+          </div>
+          <div class="field-group">
+            <label>Expiration assurance</label>
+            <input class="compact-input" type="date" [(ngModel)]="nouvelleVoiture.dateExpirationAssurance"/>
+          </div>
+          <div class="field-group">
+            <label>Prochain contrôle</label>
+            <input class="compact-input" type="date" [(ngModel)]="nouvelleVoiture.prochainControle"/>
+          </div>
+          @if (isAssuranceExpiree(nouvelleVoiture.dateExpirationAssurance)) {
+            <div class="form-v-alerte">⚠️ Assurance expirée</div>
+          }
+        </div>
+      </div>
+
       <div class="form-v-actions">
         <button class="btn-save-v" (click)="ajouterVoiture()">💾 Sauvegarder</button>
         <button class="btn-cancel-v" (click)="showFormAdd = false; resetFormAdd()">Annuler</button>
@@ -97,56 +117,76 @@
   @if (showFormEdit && voitureEnEdition) {
     <div class="form-voiture-card form-edit-v">
       <h3>✏️ Modifier — {{ voitureEnEdition.immatriculation }}</h3>
-      <div class="form-v-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Immatriculation *</mat-label>
-          <input matInput [(ngModel)]="voitureEnEdition.immatriculation"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Marque *</mat-label>
-          <input matInput [(ngModel)]="voitureEnEdition.marque"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Modèle</mat-label>
-          <input matInput [(ngModel)]="voitureEnEdition.modele"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Année</mat-label>
-          <input matInput [(ngModel)]="voitureEnEdition.annee"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Kilométrage</mat-label>
-          <input matInput [(ngModel)]="voitureEnEdition.kilometrage"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Carburant</mat-label>
-          <mat-select [(ngModel)]="voitureEnEdition.carburant">
-            @for (c of carburants; track c) { <mat-option [value]="c">{{ c }}</mat-option> }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Statut</mat-label>
-          <mat-select [(ngModel)]="voitureEnEdition.statut">
-            @for (s of statutsVoiture; track s) { <mat-option [value]="s">{{ s }}</mat-option> }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Conducteur assigné</mat-label>
-          <input matInput [(ngModel)]="voitureEnEdition.conducteur"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Assurance</mat-label>
-          <input matInput [(ngModel)]="voitureEnEdition.assurance"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Expiration assurance</mat-label>
-          <input matInput type="date" [(ngModel)]="voitureEnEdition.dateExpirationAssurance"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Prochain contrôle</mat-label>
-          <input matInput type="date" [(ngModel)]="voitureEnEdition.prochainControle"/>
-        </mat-form-field>
+
+      <div class="form-v-section">
+        <div class="form-v-section-title">🪪 Identification</div>
+        <div class="form-v-grid">
+          <div class="field-group">
+            <label>Immatriculation *</label>
+            <input class="compact-input" [(ngModel)]="voitureEnEdition.immatriculation"/>
+          </div>
+          <div class="field-group">
+            <label>Marque *</label>
+            <input class="compact-input" [(ngModel)]="voitureEnEdition.marque"/>
+          </div>
+          <div class="field-group">
+            <label>Modèle</label>
+            <input class="compact-input" [(ngModel)]="voitureEnEdition.modele"/>
+          </div>
+          <div class="field-group">
+            <label>Année</label>
+            <input class="compact-input" type="number" [(ngModel)]="voitureEnEdition.annee"/>
+          </div>
+        </div>
       </div>
+
+      <div class="form-v-section">
+        <div class="form-v-section-title">📊 Caractéristiques &amp; Statut</div>
+        <div class="form-v-grid">
+          <div class="field-group">
+            <label>Kilométrage</label>
+            <input class="compact-input" type="number" [(ngModel)]="voitureEnEdition.kilometrage"/>
+          </div>
+          <div class="field-group">
+            <label>Carburant</label>
+            <select class="compact-input" [(ngModel)]="voitureEnEdition.carburant">
+              @for (c of carburants; track c) { <option [value]="c">{{ getCarburantIcon(c) }} {{ c }}</option> }
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Statut</label>
+            <select class="compact-input" [(ngModel)]="voitureEnEdition.statut">
+              @for (s of statutsVoiture; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Conducteur assigné</label>
+            <input class="compact-input" [(ngModel)]="voitureEnEdition.conducteur"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-v-section">
+        <div class="form-v-section-title">🛡️ Assurance &amp; Contrôle</div>
+        <div class="form-v-grid">
+          <div class="field-group">
+            <label>Assurance</label>
+            <input class="compact-input" [(ngModel)]="voitureEnEdition.assurance"/>
+          </div>
+          <div class="field-group">
+            <label>Expiration assurance</label>
+            <input class="compact-input" type="date" [(ngModel)]="voitureEnEdition.dateExpirationAssurance"/>
+          </div>
+          <div class="field-group">
+            <label>Prochain contrôle</label>
+            <input class="compact-input" type="date" [(ngModel)]="voitureEnEdition.prochainControle"/>
+          </div>
+          @if (isAssuranceExpiree(voitureEnEdition.dateExpirationAssurance)) {
+            <div class="form-v-alerte">⚠️ Assurance expirée</div>
+          }
+        </div>
+      </div>
+
       <div class="form-v-actions">
         <button class="btn-save-v" (click)="modifierVoiture()">💾 Enregistrer</button>
         <button class="btn-cancel-v" (click)="showFormEdit = false">Annuler</button>

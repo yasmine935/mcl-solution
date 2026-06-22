@@ -30,7 +30,7 @@ export class Documents implements OnInit {
 
   nouveauDocument = {
     nom: '', categorie: 'Administratif', description: '',
-    fichier: null as any, fichierNom: '', fichierTaille: ''
+    fichier: null as any, fichierNom: '', fichierTaille: '', fichierData: ''
   };
 
   documentEnEdition: any = {};
@@ -51,6 +51,9 @@ export class Documents implements OnInit {
       this.nouveauDocument.fichier = file;
       this.nouveauDocument.fichierNom = file.name;
       this.nouveauDocument.fichierTaille = (file.size / 1024).toFixed(2);
+      const reader = new FileReader();
+      reader.onload = () => { this.nouveauDocument.fichierData = reader.result as string; };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -60,6 +63,9 @@ export class Documents implements OnInit {
       const file = files[0];
       this.documentEnEdition.fichierNom = file.name;
       this.documentEnEdition.fichierTaille = (file.size / 1024).toFixed(2);
+      const reader = new FileReader();
+      reader.onload = () => { this.documentEnEdition.fichierData = reader.result as string; };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -76,12 +82,13 @@ export class Documents implements OnInit {
       description: this.nouveauDocument.description,
       fichierNom: this.nouveauDocument.fichierNom,
       fichierTaille: this.nouveauDocument.fichierTaille,
+      fichierData: this.nouveauDocument.fichierData,
       dateAjout: new Date().toLocaleString('fr-FR'),
       dateModification: new Date().toLocaleString('fr-FR'),
       auteur: 'Admin'
     };
     this.documents.push(doc);
-    localStorage.setItem('documents', JSON.stringify(this.documents));
+    this.persistDocuments();
     this.resetFormAdd();
     this.showFormAdd = false;
   }
@@ -101,7 +108,7 @@ export class Documents implements OnInit {
     if (index !== -1) {
       this.documentEnEdition.dateModification = new Date().toLocaleString('fr-FR');
       this.documents[index] = { ...this.documentEnEdition };
-      localStorage.setItem('documents', JSON.stringify(this.documents));
+      this.persistDocuments();
       this.resetFormEdit();
       this.showFormEdit = false;
     }
@@ -110,12 +117,36 @@ export class Documents implements OnInit {
   supprimerDocument(id: number) {
     if (confirm('Supprimer ce document ?')) {
       this.documents = this.documents.filter((d: any) => d.id !== id);
-      localStorage.setItem('documents', JSON.stringify(this.documents));
+      this.persistDocuments();
     }
   }
 
+  persistDocuments() {
+    try {
+      localStorage.setItem('documents', JSON.stringify(this.documents));
+    } catch {
+      alert('Stockage local plein : impossible de sauvegarder ce fichier (trop volumineux). Essayez un fichier plus petit.');
+      this.documents.pop();
+    }
+  }
+
+  voirDocument(document: any) {
+    if (!document.fichierData) {
+      alert('Fichier indisponible pour ce document (ajouté avant la mise à jour). Veuillez le re-déposer via "Modifier".');
+      return;
+    }
+    window.open(document.fichierData, '_blank');
+  }
+
   telechargerDocument(document: any) {
-    alert(`Téléchargement de: ${document.fichierNom}`);
+    if (!document.fichierData) {
+      alert('Fichier indisponible pour ce document (ajouté avant la mise à jour). Veuillez le re-déposer via "Modifier".');
+      return;
+    }
+    const a = globalThis.document.createElement('a');
+    a.href = document.fichierData;
+    a.download = document.fichierNom || 'document';
+    a.click();
   }
 
   ouvrirDetailModal(document: any) {
@@ -131,7 +162,7 @@ export class Documents implements OnInit {
   resetFormAdd() {
     this.nouveauDocument = {
       nom: '', categorie: 'Administratif', description: '',
-      fichier: null, fichierNom: '', fichierTaille: ''
+      fichier: null, fichierNom: '', fichierTaille: '', fichierData: ''
     };
   }
 

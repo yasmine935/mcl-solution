@@ -84,6 +84,10 @@ showFormVoiture = false;
 // ── MES CONGÉS (Ferid → ESSAN) ──
 mesConges: any[] = [];
 soldeCongesPerso: any = null;
+selectedConge: any = null;
+showCongeDetail = false;
+ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
+fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 showCongeFormPerso = false;
 congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '' };
 nombreJoursPerso = 0;

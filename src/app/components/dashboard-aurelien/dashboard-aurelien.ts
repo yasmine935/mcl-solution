@@ -139,6 +139,10 @@ export class DashboardAurelien implements OnInit {
     this.nombreJours = 0;
   }
 soldeConges: any = null;
+selectedConge: any = null;
+showCongeDetail = false;
+ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
+fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 
 loadSoldeConges() {
   if (!this.user.id) return;

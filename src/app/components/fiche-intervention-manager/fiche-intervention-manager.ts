@@ -205,8 +205,19 @@ export class FicheInterventionManager implements OnInit {
     };
   }
 
+  techDropdownNouvelleOpen = false;
+  techDropdownEditionOpen = false;
+
   isTechSelected(selectedIds: any[], techId: number): boolean {
     return (selectedIds || []).map(Number).includes(Number(techId));
+  }
+
+  getSelectedTechLabel(selectedIds: any[]): string {
+    const ids = (selectedIds || []).map(Number);
+    const techs = this.techniciens.filter((t: any) => ids.includes(Number(t.id)));
+    if (techs.length === 0) return 'Sélectionner technicien(s)...';
+    if (techs.length === 1) return `${techs[0].prenom} ${techs[0].nom}`;
+    return `${techs.length} techniciens sélectionnés`;
   }
 
   toggleTech(selectedIds: any[], techId: number, event: any) {

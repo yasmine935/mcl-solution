@@ -2,19 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 
 const API = 'http://localhost:8080/api/voitures';
 
 @Component({
   selector: 'app-voitures',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule,
-            MatFormFieldModule, MatInputModule, MatSelectModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './voitures.html',
   styleUrl: './voitures.css'
 })
@@ -128,6 +122,11 @@ export class Voitures implements OnInit {
       'En maintenance': '#f57f17', 'Hors service': '#c62828'
     };
     return map[statut] || '#546e7a';
+  }
+
+  isAssuranceExpiree(date: string): boolean {
+    if (!date) return false;
+    return new Date(date) < new Date();
   }
 
   getCarburantIcon(carburant: string): string {

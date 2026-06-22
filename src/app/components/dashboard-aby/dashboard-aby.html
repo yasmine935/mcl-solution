@@ -30,15 +30,6 @@
       </a>
 
       <div class="nav-divider"></div>
-      <div class="nav-section-label">Gestion</div>
-
-      <a class="nav-item" [class.active]="currentPage === 'demandes'" (click)="currentPage = 'demandes'">
-        <mat-icon>inbox</mat-icon> Demandes Matériel
-        @if (demandesEnAttente.length > 0) {
-          <span class="nav-badge">{{ demandesEnAttente.length }}</span>
-        }
-      </a>
-
       <div class="nav-divider"></div>
       <div class="nav-section-label">Approvisionnement</div>
       <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">

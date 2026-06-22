@@ -56,6 +56,10 @@ export class DashboardOdile implements OnInit {
   selectedFiche: any = null;
   selectedReclamation: any = null;
   soldeConges: any = null;
+  selectedConge: any = null;
+  showCongeDetail = false;
+  ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
+  fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
   nombreJours = 0;
   constructor(private http: HttpClient, private router: Router) {}

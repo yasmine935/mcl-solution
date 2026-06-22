@@ -1,4 +1,4 @@
-﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
 
   <!-- ══════════ SIDEBAR ══════════ -->
   <div class="sidebar">
@@ -607,7 +607,7 @@
 
         <!-- PREVENTION -->
         <div class="ms-field">
-          <label>🔧 Mesure de Prévention Immédiate Prise</label>
+          <label>🔧 Mesures de Prévention Immédiates Prises</label>
           <textarea [(ngModel)]="minuteForm.mesurePreventionImmediate"
             class="ms-textarea" rows="3"
             placeholder="Mesures prises pour sécuriser l'intervention..."></textarea>
@@ -931,7 +931,7 @@
             <textarea [(ngModel)]="minuteForm.risquesSpecifiques" class="ms-textarea" rows="3" placeholder="Decrivez les risques..."></textarea>
           </div>
           <div class="ms-field">
-            <label>Mesure de Prevention Immediate Prise</label>
+            <label>Mesures de Prévention Immédiates Prises</label>
             <textarea [(ngModel)]="minuteForm.mesurePreventionImmediate" class="ms-textarea" rows="3" placeholder="Mesures prises..."></textarea>
           </div>
           <div class="ms-validation">
@@ -965,7 +965,7 @@
               {{ selectedConge.type === 'ANNUEL' ? '🌴' : selectedConge.type === 'RTT' ? '😴' : selectedConge.type === 'MALADIE' ? '🏥' : selectedConge.type === 'FORMATION' ? '📚' : selectedConge.type === 'SANS_SOLDE' ? '💼' : '📋' }}
             </span>
             <div>
-              <h3 class="conge-modal-title">{{ selectedConge.type }}</h3>
+              <h3 class="conge-modal-title">{{ selectedConge.type === 'ANNUEL' ? 'Congé annuel' : selectedConge.type === 'RTT' ? 'RTT' : selectedConge.type === 'MALADIE' ? 'Maladie' : selectedConge.type === 'FORMATION' ? 'Formation' : selectedConge.type === 'SANS_SOLDE' ? 'Sans solde' : selectedConge.type === 'AUTRE' ? 'Autre' : (selectedConge.type || 'Congé') }}</h3>
               <span class="conge-modal-sub">Demande de congé</span>
             </div>
           </div>
@@ -1009,11 +1009,11 @@
           <div class="conge-detail-grid">
             <div class="conge-detail-field">
               <span class="conge-detail-lbl">Type</span>
-              <span class="conge-detail-val">{{ selectedConge.type || '—' }}</span>
+              <span class="conge-detail-val">{{ selectedConge.type === 'ANNUEL' ? 'Congé annuel' : selectedConge.type === 'RTT' ? 'RTT' : selectedConge.type === 'MALADIE' ? 'Maladie' : selectedConge.type === 'FORMATION' ? 'Formation' : selectedConge.type === 'SANS_SOLDE' ? 'Sans solde' : selectedConge.type === 'AUTRE' ? 'Autre' : (selectedConge.type || '—') }}</span>
             </div>
             <div class="conge-detail-field">
               <span class="conge-detail-lbl">Statut</span>
-              <span class="conge-detail-val">{{ selectedConge.statut || '—' }}</span>
+              <span class="conge-detail-val">{{ selectedConge.statut === 'APPROUVE' ? 'Approuvé' : selectedConge.statut === 'REFUSE' ? 'Refusé' : selectedConge.statut === 'EN_ATTENTE' ? 'En attente' : (selectedConge.statut || '—') }}</span>
             </div>
             @if (selectedConge.motif) {
               <div class="conge-detail-field conge-detail-full">

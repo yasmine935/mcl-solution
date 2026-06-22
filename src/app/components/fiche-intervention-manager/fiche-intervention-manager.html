@@ -53,14 +53,22 @@
           }
           <div class="field-lg">
             <label class="field-label">Technicien(s) Assigné(s)</label>
-            <div class="tech-checkboxes">
-              @for (tech of techniciens; track tech.id) {
-                <label class="tech-checkbox-item" [class.tech-selected]="isTechSelected(nouvelleFiche.selectedTechIds, tech.id)">
-                  <input type="checkbox" [checked]="isTechSelected(nouvelleFiche.selectedTechIds, tech.id)"
-                    (change)="toggleTech(nouvelleFiche.selectedTechIds, tech.id, $event)">
-                  <span class="tech-avatar-sm" [style.background]="getTechColor(tech.id)">{{ tech.prenom?.charAt(0) }}{{ tech.nom?.charAt(0) }}</span>
-                  <span>{{ tech.prenom }} {{ tech.nom }}</span>
-                </label>
+            <div class="tech-dropdown">
+              <button type="button" class="tech-dropdown-trigger" (click)="techDropdownNouvelleOpen = !techDropdownNouvelleOpen">
+                <span>{{ getSelectedTechLabel(nouvelleFiche.selectedTechIds) }}</span>
+                <mat-icon class="tech-dropdown-chevron" [class.open]="techDropdownNouvelleOpen">expand_more</mat-icon>
+              </button>
+              @if (techDropdownNouvelleOpen) {
+                <div class="tech-dropdown-panel">
+                  @for (tech of techniciens; track tech.id) {
+                    <label class="tech-checkbox-item" [class.tech-selected]="isTechSelected(nouvelleFiche.selectedTechIds, tech.id)">
+                      <input type="checkbox" [checked]="isTechSelected(nouvelleFiche.selectedTechIds, tech.id)"
+                        (change)="toggleTech(nouvelleFiche.selectedTechIds, tech.id, $event)">
+                      <span class="tech-avatar-sm" [style.background]="getTechColor(tech.id)">{{ tech.prenom?.charAt(0) }}{{ tech.nom?.charAt(0) }}</span>
+                      <span>{{ tech.prenom }} {{ tech.nom }}</span>
+                    </label>
+                  }
+                </div>
               }
             </div>
           </div>
@@ -251,14 +259,22 @@
           }
           <div class="field-lg">
             <label class="field-label">Technicien(s) Assigné(s)</label>
-            <div class="tech-checkboxes">
-              @for (tech of techniciens; track tech.id) {
-                <label class="tech-checkbox-item" [class.tech-selected]="isTechSelected(ficheEnEdition.selectedTechIds, tech.id)">
-                  <input type="checkbox" [checked]="isTechSelected(ficheEnEdition.selectedTechIds, tech.id)"
-                    (change)="toggleTech(ficheEnEdition.selectedTechIds, tech.id, $event)">
-                  <span class="tech-avatar-sm" [style.background]="getTechColor(tech.id)">{{ tech.prenom?.charAt(0) }}{{ tech.nom?.charAt(0) }}</span>
-                  <span>{{ tech.prenom }} {{ tech.nom }}</span>
-                </label>
+            <div class="tech-dropdown">
+              <button type="button" class="tech-dropdown-trigger" (click)="techDropdownEditionOpen = !techDropdownEditionOpen">
+                <span>{{ getSelectedTechLabel(ficheEnEdition.selectedTechIds) }}</span>
+                <mat-icon class="tech-dropdown-chevron" [class.open]="techDropdownEditionOpen">expand_more</mat-icon>
+              </button>
+              @if (techDropdownEditionOpen) {
+                <div class="tech-dropdown-panel">
+                  @for (tech of techniciens; track tech.id) {
+                    <label class="tech-checkbox-item" [class.tech-selected]="isTechSelected(ficheEnEdition.selectedTechIds, tech.id)">
+                      <input type="checkbox" [checked]="isTechSelected(ficheEnEdition.selectedTechIds, tech.id)"
+                        (change)="toggleTech(ficheEnEdition.selectedTechIds, tech.id, $event)">
+                      <span class="tech-avatar-sm" [style.background]="getTechColor(tech.id)">{{ tech.prenom?.charAt(0) }}{{ tech.nom?.charAt(0) }}</span>
+                      <span>{{ tech.prenom }} {{ tech.nom }}</span>
+                    </label>
+                  }
+                </div>
               }
             </div>
           </div>
