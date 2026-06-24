@@ -91,6 +91,7 @@ fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 showCongeFormPerso = false;
 congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '' };
 nombreJoursPerso = 0;
+congePersoEnEditionId: number | null = null;
 typesConge = ['ANNUEL', 'RTT', 'MALADIE', 'SANS_SOLDE', 'FORMATION'];
 nouvelleVoiture = {
   immatriculation: '', marque: '', modele: '',
@@ -224,6 +225,18 @@ deposerCongePerso() {
   if (!this.congePerso.dateDebut || !this.congePerso.dateFin || !this.congePerso.type) {
     alert('Veuillez remplir les champs obligatoires'); return;
   }
+  if (this.congePersoEnEditionId) {
+    this.http.put(`http://localhost:8080/api/conges/${this.congePersoEnEditionId}`, this.congePerso).subscribe({
+      next: () => {
+        this.loadMesConges();
+        this.loadSoldeCongesPerso();
+        this.showCongeFormPerso = false;
+        this.resetCongeFormPerso();
+      },
+      error: () => alert('Erreur lors de la modification')
+    });
+    return;
+  }
   const essanId = this.getEssanId();
   if (!essanId) { alert('Responsable ESSAN introuvable'); return; }
   const demande = { ...this.congePerso, utilisateur: { id: this.user.id }, manager: { id: essanId } };
@@ -239,17 +252,47 @@ deposerCongePerso() {
   });
 }
 
+modifierMonConge(c: any) {
+  this.congePersoEnEditionId = c.id;
+  this.congePerso = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '' };
+  this.calculerJoursPerso();
+  this.showCongeFormPerso = true;
+  this.showCongeDetail = false;
+}
+
+supprimerMonConge(id: number) {
+  if (!confirm('Supprimer cette demande de congé ?')) return;
+  this.http.delete(`http://localhost:8080/api/conges/${id}`).subscribe({
+    next: () => {
+      this.loadMesConges();
+      this.loadSoldeCongesPerso();
+      this.showCongeDetail = false;
+      this.selectedConge = null;
+    },
+    error: () => alert('Erreur lors de la suppression')
+  });
+}
+
 calculerJoursPerso() {
   if (this.congePerso.dateDebut && this.congePerso.dateFin) {
     const d = new Date(this.congePerso.dateDebut);
     const f = new Date(this.congePerso.dateFin);
-    this.nombreJoursPerso = Math.max(0, Math.ceil((f.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+    if (f < d) { this.nombreJoursPerso = 0; return; }
+    let jours = 0;
+    const courant = new Date(d);
+    while (courant <= f) {
+      const jourSemaine = courant.getDay();
+      if (jourSemaine !== 0 && jourSemaine !== 6) jours++;
+      courant.setDate(courant.getDate() + 1);
+    }
+    this.nombreJoursPerso = jours;
   }
 }
 
 resetCongeFormPerso() {
   this.congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '' };
   this.nombreJoursPerso = 0;
+  this.congePersoEnEditionId = null;
 }
 
   loadFiches() {
@@ -293,8 +336,15 @@ calculerJours(dateDebut: string, dateFin: string): string {
   if (!dateDebut || !dateFin || dateDebut === '-' || dateFin === '-') return '-';
   const debut = new Date(dateDebut);
   const fin = new Date(dateFin);
-  const diff = Math.ceil((fin.getTime() - debut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  return diff > 0 ? `${diff}j` : '-';
+  if (fin < debut) return '-';
+  let jours = 0;
+  const courant = new Date(debut);
+  while (courant <= fin) {
+    const jourSemaine = courant.getDay();
+    if (jourSemaine !== 0 && jourSemaine !== 6) jours++;
+    courant.setDate(courant.getDate() + 1);
+  }
+  return jours > 0 ? `${jours}j` : '-';
 }
   loadConges() {
     this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({

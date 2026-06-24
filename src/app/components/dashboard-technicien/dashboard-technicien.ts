@@ -55,6 +55,7 @@ export class DashboardTechnicien implements OnInit {
 
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
   nombreJours = 0;
+  congeEnEditionId: number | null = null;
 
   // ✅ Minute Sécurité
   showMinuteSecurite = false;
@@ -159,6 +160,15 @@ export class DashboardTechnicien implements OnInit {
   }
 
   deposerConge() {
+    if (this.congeEnEditionId) {
+      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, this.conge).subscribe(() => {
+        this.loadConges();
+        this.loadSoldeConges();
+        this.showCongeForm = false;
+        this.resetCongeForm();
+      }, error => console.error('Erreur modification conge', error));
+      return;
+    }
     const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 3 } };
     this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
       this.loadConges();
@@ -166,6 +176,27 @@ export class DashboardTechnicien implements OnInit {
       this.showCongeForm = false;
       this.resetCongeForm();
     }, error => console.error('Erreur envoi conge', error));
+  }
+
+  modifierMonConge(c: any) {
+    this.congeEnEditionId = c.id;
+    this.conge = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '' };
+    this.calculerNombreJours();
+    this.showCongeForm = true;
+    this.showCongeDetail = false;
+  }
+
+  supprimerMonConge(id: number) {
+    if (!confirm('Supprimer cette demande de congé ?')) return;
+    this.http.delete(`http://localhost:8080/api/conges/${id}`).subscribe({
+      next: () => {
+        this.loadConges();
+        this.loadSoldeConges();
+        this.showCongeDetail = false;
+        this.selectedConge = null;
+      },
+      error: () => alert('Erreur lors de la suppression')
+    });
   }
 
   calculerNombreJours() {
@@ -181,12 +212,20 @@ export class DashboardTechnicien implements OnInit {
     const debut = new Date(dateDebut);
     const fin = new Date(dateFin);
     if (fin < debut) return 0;
-    return Math.ceil((fin.getTime() - debut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    let jours = 0;
+    const courant = new Date(debut);
+    while (courant <= fin) {
+      const jourSemaine = courant.getDay();
+      if (jourSemaine !== 0 && jourSemaine !== 6) jours++;
+      courant.setDate(courant.getDate() + 1);
+    }
+    return jours;
   }
 
   resetCongeForm() {
     this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
     this.nombreJours = 0;
+    this.congeEnEditionId = null;
   }
 
   ouvrirFiche(fichId: number) {

@@ -244,7 +244,7 @@
         <div class="solde-item-header">
           <span class="solde-icon">🌴</span>
           <div>
-            <strong>Congés Annuels</strong>
+            <strong>Congé Annuel</strong>
             <span class="solde-subtitle">2.5 jours/mois</span>
           </div>
         </div>
@@ -310,12 +310,12 @@
 }
     @if (showCongeForm) {
       <div class="conge-form-card">
-        <div class="conge-form-title"><span>✨</span> Nouvelle Demande de Congé</div>
+        <div class="conge-form-title"><span>✨</span> {{ congeEnEditionId ? 'Modifier ma Demande de Congé' : 'Nouvelle Demande de Congé' }}</div>
 
         <div class="conge-field">
           <label>Type de congé *</label>
           <div class="conge-types-grid">
-            <button class="type-btn" [class.type-btn-active]="conge.type === 'ANNUEL'" (click)="conge.type = 'ANNUEL'">🌴 Annuel</button>
+            <button class="type-btn" [class.type-btn-active]="conge.type === 'ANNUEL'" (click)="conge.type = 'ANNUEL'">🌴 Congé Payé</button>
             <button class="type-btn" [class.type-btn-active]="conge.type === 'RTT'" (click)="conge.type = 'RTT'">😴 RTT</button>
             <button class="type-btn" [class.type-btn-active]="conge.type === 'MALADIE'" (click)="conge.type = 'MALADIE'">🏥 Maladie</button>
             <button class="type-btn" [class.type-btn-active]="conge.type === 'FORMATION'" (click)="conge.type = 'FORMATION'">📚 Formation</button>
@@ -356,7 +356,7 @@
           <button class="btn-annuler-conge" (click)="showCongeForm = false; resetCongeForm()">Annuler</button>
           <button class="btn-envoyer-conge" (click)="deposerConge()"
             [disabled]="!conge.type || !conge.dateDebut || !conge.dateFin">
-            ➤ Envoyer la demande
+            {{ congeEnEditionId ? '💾 Enregistrer' : '➤ Envoyer la demande' }}
           </button>
         </div>
       </div>
@@ -377,7 +377,7 @@
                 {{ c.type === 'ANNUEL' ? '🌴' : c.type === 'RTT' ? '😴' : c.type === 'MALADIE' ? '🏥' : c.type === 'FORMATION' ? '📚' : '📋' }}
               </span>
               <div>
-                <strong>{{ (c.type||'').toUpperCase() === 'ANNUEL' ? 'Congé annuel' : (c.type||'').toUpperCase() === 'RTT' ? 'RTT' : (c.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (c.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (c.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (c.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (c.type || 'Congé') }}</strong>
+                <strong>{{ (c.type||'').toUpperCase() === 'ANNUEL' ? 'Congé Annuel' : (c.type||'').toUpperCase() === 'RTT' ? 'RTT' : (c.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (c.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (c.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (c.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (c.type || 'Congé') }}</strong>
                 @if (c.dateDebut && c.dateFin) {
                   <span class="conge-dates-text">{{ c.dateDebut }} → {{ c.dateFin }}</span>
                   <span class="conge-duree">{{ calculerJours(c.dateDebut, c.dateFin) }} jour(s)</span>
@@ -418,7 +418,7 @@
             {{ (selectedConge.type||'').toUpperCase() === 'ANNUEL' ? '🌴' : (selectedConge.type||'').toUpperCase() === 'RTT' ? '😴' : (selectedConge.type||'').toUpperCase() === 'MALADIE' ? '🏥' : (selectedConge.type||'').toUpperCase() === 'FORMATION' ? '📚' : '📋' }}
           </span>
           <div>
-            <h3 class="conge-modal-title">{{ (selectedConge.type||'').toUpperCase() === 'ANNUEL' ? 'Congé annuel' : (selectedConge.type||'').toUpperCase() === 'RTT' ? 'RTT' : (selectedConge.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (selectedConge.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (selectedConge.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (selectedConge.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (selectedConge.type || 'Congé') }}</h3>
+            <h3 class="conge-modal-title">{{ (selectedConge.type||'').toUpperCase() === 'ANNUEL' ? 'Congé Annuel' : (selectedConge.type||'').toUpperCase() === 'RTT' ? 'RTT' : (selectedConge.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (selectedConge.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (selectedConge.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (selectedConge.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (selectedConge.type || 'Congé') }}</h3>
             <span class="conge-modal-sub">Demande de congé</span>
           </div>
         </div>
@@ -458,7 +458,7 @@
         <div class="conge-detail-grid">
           <div class="conge-detail-field">
             <span class="conge-detail-lbl">Type</span>
-            <span class="conge-detail-val">{{ (selectedConge.type||'').toUpperCase() === 'ANNUEL' ? 'Congé annuel' : (selectedConge.type||'').toUpperCase() === 'RTT' ? 'RTT' : (selectedConge.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (selectedConge.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (selectedConge.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (selectedConge.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (selectedConge.type || '—') }}</span>
+            <span class="conge-detail-val">{{ (selectedConge.type||'').toUpperCase() === 'ANNUEL' ? 'Congé Annuel' : (selectedConge.type||'').toUpperCase() === 'RTT' ? 'RTT' : (selectedConge.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (selectedConge.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (selectedConge.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (selectedConge.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (selectedConge.type || '—') }}</span>
           </div>
           <div class="conge-detail-field">
             <span class="conge-detail-lbl">Statut</span>
@@ -480,6 +480,10 @@
       </div>
 
       <div class="conge-modal-footer">
+        @if (selectedConge.statut === 'EN_ATTENTE') {
+          <button type="button" class="conge-modal-btn-supprimer" (click)="supprimerMonConge(selectedConge.id)">🗑 Supprimer</button>
+          <button type="button" class="conge-modal-btn-modifier" (click)="modifierMonConge(selectedConge)">✏️ Modifier</button>
+        }
         <button type="button" class="conge-modal-btn-close" (click)="fermerDetailConge()">Fermer</button>
       </div>
     </div>

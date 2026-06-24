@@ -17,7 +17,7 @@
   <!-- FORMULAIRE AJOUT -->
   @if (showFormAdd) {
     <div class="form-overlay">
-      <p class="form-title">📄 Nouveau Document</p>
+      <p class="form-title"><span class="form-title-icon">📄</span> Nouveau Document</p>
 
       <div class="form-grid-docs">
         <div class="field-group">
@@ -41,7 +41,8 @@
       <div class="upload-area">
         <input type="file" (change)="onFileSelect($event)" id="fileUpload" style="display:none"/>
         <label for="fileUpload">
-          📎 {{ nouveauDocument.fichierNom || 'Cliquez pour sélectionner un fichier' }}
+          <span class="upload-area-icon">📎</span>
+          {{ nouveauDocument.fichierNom || 'Cliquez pour sélectionner un fichier' }}
         </label>
       </div>
 
@@ -55,7 +56,7 @@
   <!-- FORMULAIRE EDITION -->
   @if (showFormEdit && selectedDocument) {
     <div class="form-overlay">
-      <p class="form-title">✏️ Modifier — {{ selectedDocument.nom }}</p>
+      <p class="form-title"><span class="form-title-icon">✏️</span> Modifier — {{ selectedDocument.nom }}</p>
 
       <div class="form-grid-docs">
         <div class="field-group">
@@ -79,7 +80,8 @@
       <div class="upload-area">
         <input type="file" (change)="onFileSelectEdit($event)" id="fileUploadEdit" style="display:none"/>
         <label for="fileUploadEdit">
-          📎 {{ documentEnEdition.fichierNom || 'Changer le fichier (optionnel)' }}
+          <span class="upload-area-icon">📎</span>
+          {{ documentEnEdition.fichierNom || 'Changer le fichier (optionnel)' }}
         </label>
       </div>
 
