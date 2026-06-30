@@ -64,7 +64,7 @@
                 </div>
                 <div>
                   <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
-                  <span class="type-badge">{{ getTypeIcon(c.type) }} {{ c.type }}</span>
+                  <span class="type-badge">{{ c.type }}</span>
                 </div>
               </div>
               <span class="statut-badge" [class.statut-approuve]="c.statut === 'APPROUVE'" [class.statut-refuse]="c.statut === 'REFUSE'" [class.statut-attente]="c.statut === 'EN_ATTENTE'">

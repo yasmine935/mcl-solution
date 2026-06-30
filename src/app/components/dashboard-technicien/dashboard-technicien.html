@@ -334,24 +334,19 @@
                     <div class="ci-item">
                       <span class="ci-icon">📅</span>
                       <div>
-                        <span class="ci-label">Date</span>
+                        <span class="ci-label">Date début</span>
                         <span class="ci-val">{{ formatDateFr(int.dateDebut) }}</span>
                       </div>
                     </div>
-                    <div class="ci-item">
-                      <span class="ci-icon">🕐</span>
-                      <div>
-                        <span class="ci-label">Début</span>
-                        <span class="ci-val">{{ int.heureDebut || '—' }}</span>
+                    @if (int.dateFin) {
+                      <div class="ci-item">
+                        <span class="ci-icon">📅</span>
+                        <div>
+                          <span class="ci-label">Date fin</span>
+                          <span class="ci-val">{{ formatDateFr(int.dateFin) }}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div class="ci-item">
-                      <span class="ci-icon">🕔</span>
-                      <div>
-                        <span class="ci-label">Fin</span>
-                        <span class="ci-val">{{ int.heureFin || '—' }}</span>
-                      </div>
-                    </div>
+                    }
                   </div>
 
                   <div class="completee-card-footer">
@@ -426,18 +421,6 @@
                       <span class="fd-label">Durée</span>
                       <span class="fd-val">{{ getDuree(ficheDetail.dateDebut, ficheDetail.dateFin) }} jour(s)</span>
                     </div>
-                    @if (ficheDetail.heureDebut) {
-                      <div class="fd-cell">
-                        <span class="fd-label">Heure début</span>
-                        <span class="fd-val">{{ ficheDetail.heureDebut }}</span>
-                      </div>
-                    }
-                    @if (ficheDetail.heureFin) {
-                      <div class="fd-cell">
-                        <span class="fd-label">Heure fin</span>
-                        <span class="fd-val">{{ ficheDetail.heureFin }}</span>
-                      </div>
-                    }
                     @if (ficheDetail.intervenants) {
                       <div class="fd-cell">
                         <span class="fd-label">Intervenants</span>
@@ -474,7 +457,11 @@
                         <div class="fd-tache" [class.fd-tache-ok]="t.coche">
                           <span class="fd-tache-check">{{ t.coche ? '✓' : '○' }}</span>
                           <span>{{ t.nom }}</span>
-                          @if (t.selection) { <span class="fd-tache-badge">{{ t.selection }}</span> }
+                          @if (t.selections?.length > 0) {
+                            @for (sel of t.selections; track sel) {
+                              <span class="fd-tache-badge">{{ sel }}</span>
+                            }
+                          }
                         </div>
                       }
                     </div>
@@ -673,7 +660,6 @@
       <!-- CONGÉS ANNUELS -->
       <div class="solde-item">
         <div class="solde-item-header">
-          <span class="solde-icon">🌴</span>
           <div>
             <strong>Congé Annuel</strong>
             <span class="solde-subtitle">2.5 jours/mois</span>
@@ -682,7 +668,7 @@
         <div class="solde-bar-wrapper">
           <div class="solde-bar">
             <div class="solde-fill solde-fill-annuel"
-              [style.width.%]="(soldeConges.joursAnnuelPris / soldeConges.soldeAnnuelTotal) * 100">
+              [style.width.%]="pourcentageSoldeRestant(soldeConges.soldeAnnuelRestant, soldeConges.soldeAnnuelTotal)">
             </div>
           </div>
           <div class="solde-numbers">
@@ -698,7 +684,6 @@
       <!-- RTT -->
       <div class="solde-item">
         <div class="solde-item-header">
-          <span class="solde-icon">😴</span>
           <div>
             <strong>RTT</strong>
             <span class="solde-subtitle">1 jour/mois</span>
@@ -707,7 +692,7 @@
         <div class="solde-bar-wrapper">
           <div class="solde-bar">
             <div class="solde-fill solde-fill-rtt"
-              [style.width.%]="(soldeConges.joursRTTPris / soldeConges.soldeRTTTotal) * 100">
+              [style.width.%]="pourcentageSoldeRestant(soldeConges.soldeRTTRestant, soldeConges.soldeRTTTotal)">
             </div>
           </div>
           <div class="solde-numbers">
@@ -724,7 +709,6 @@
       @if (soldeConges.joursMaladiePris > 0) {
         <div class="solde-item solde-item-maladie">
           <div class="solde-item-header">
-            <span class="solde-icon">🏥</span>
             <div>
               <strong>Maladie</strong>
               <span class="solde-subtitle">Cette année</span>
@@ -753,12 +737,12 @@
           <div class="conge-field">
             <label>Type de congé *</label>
             <div class="conge-types-grid">
-              <button class="type-btn" [class.type-btn-active]="conge.type === 'ANNUEL'" (click)="conge.type = 'ANNUEL'">🌴 Congé Payé</button>
-              <button class="type-btn" [class.type-btn-active]="conge.type === 'RTT'" (click)="conge.type = 'RTT'">😴 RTT</button>
-              <button class="type-btn" [class.type-btn-active]="conge.type === 'MALADIE'" (click)="conge.type = 'MALADIE'">🏥 Maladie</button>
-              <button class="type-btn" [class.type-btn-active]="conge.type === 'FORMATION'" (click)="conge.type = 'FORMATION'">📚 Formation</button>
-              <button class="type-btn" [class.type-btn-active]="conge.type === 'SANS_SOLDE'" (click)="conge.type = 'SANS_SOLDE'">💼 Sans solde</button>
-              <button class="type-btn" [class.type-btn-active]="conge.type === 'AUTRE'" (click)="conge.type = 'AUTRE'">📋 Autre</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'ANNUEL'" (click)="conge.type = 'ANNUEL'">Congé Payé</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'RTT'" (click)="conge.type = 'RTT'">RTT</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'MALADIE'" (click)="conge.type = 'MALADIE'">Maladie</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'FORMATION'" (click)="conge.type = 'FORMATION'">Formation</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'SANS_SOLDE'" (click)="conge.type = 'SANS_SOLDE'">Sans solde</button>
+              <button class="type-btn" [class.type-btn-active]="conge.type === 'AUTRE'" (click)="conge.type = 'AUTRE'">Autre</button>
             </div>
           </div>
 
@@ -792,6 +776,21 @@
           </div>
         </div>
 
+        @if (conge.dateDebut && conge.dateDebut === conge.dateFin) {
+          <div class="conge-field conge-demi-journee">
+            <label class="conge-checkbox-label">
+              <input type="checkbox" [checked]="!!conge.periode" (change)="onToggleDemiJournee($event.target.checked)"/>
+              Demi-journée seulement
+            </label>
+            @if (conge.periode) {
+              <div class="conge-periode-choix">
+                <button type="button" class="periode-btn" [class.periode-btn-active]="conge.periode === 'MATIN'" (click)="conge.periode = 'MATIN'; calculerNombreJours()">Matin</button>
+                <button type="button" class="periode-btn" [class.periode-btn-active]="conge.periode === 'APRES_MIDI'" (click)="conge.periode = 'APRES_MIDI'; calculerNombreJours()">Après-midi</button>
+              </div>
+            }
+          </div>
+        }
+
         <!-- MOTIF -->
         <div class="conge-field">
           <label>💬 Motif {{ conge.type === 'AUTRE' ? '*' : '(optionnel)' }}</label>
@@ -824,16 +823,13 @@
     } @else {
       <div class="conge-list">
         @for (c of conges; track c.id) {
-          <button type="button" class="conge-item" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'" (click)="ouvrirDetailConge(c)">
+          <button type="button" class="conge-item" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'" [class.conge-valide-kia]="c.statut === 'VALIDE_KIA'" (click)="ouvrirDetailConge(c)">
             <span class="conge-item-left">
-              <span class="conge-type-icon">
-                {{ c.type === 'ANNUEL' ? '🌴' : c.type === 'RTT' ? '😴' : c.type === 'MALADIE' ? '🏥' : c.type === 'FORMATION' ? '📚' : '📋' }}
-              </span>
               <span class="conge-item-text">
                 <strong>{{ c.type }}</strong>
                 <span class="conge-dates-text">{{ c.dateDebut }} → {{ c.dateFin }}</span>
                 @if (c.dateDebut && c.dateFin) {
-                  <span class="conge-duree">{{ calculerJours(c.dateDebut, c.dateFin) }} jour(s)</span>
+                  <span class="conge-duree">{{ calculerJours(c.dateDebut, c.dateFin, c.periode) }} jour(s){{ c.periode === 'MATIN' ? ' (Matin)' : c.periode === 'APRES_MIDI' ? ' (Après-midi)' : '' }}</span>
                 }
               </span>
             </span>
@@ -842,8 +838,9 @@
               <span class="conge-statut-badge"
                 [class.badge-approuve]="c.statut === 'APPROUVE'"
                 [class.badge-refuse]="c.statut === 'REFUSE'"
+                [class.badge-valide-kia]="c.statut === 'VALIDE_KIA'"
                 [class.badge-attente]="c.statut === 'EN_ATTENTE'">
-                {{ c.statut === 'APPROUVE' ? '✅ Approuvé' : c.statut === 'REFUSE' ? '❌ Refusé' : '⏳ En attente' }}
+                {{ c.statut === 'APPROUVE' ? '✅ Approuvé' : c.statut === 'REFUSE' ? '❌ Refusé' : c.statut === 'VALIDE_KIA' ? '🔄 Validé par KIA' : '⏳ En attente' }}
               </span>
               <span class="conge-voir-detail">👁 Détails</span>
             </span>
@@ -953,17 +950,30 @@
 
   <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
 
+  <!-- POPUP SOLDE ÉPUISÉ -->
+  @if (showSoldeEpuiseWarning) {
+    <div class="solde-warning-overlay" (click)="showSoldeEpuiseWarning = false">
+      <div class="solde-warning-modal" (click)="$event.stopPropagation()">
+        <div class="solde-warning-icon">⚠️</div>
+        <h3>Solde de congé annuel épuisé</h3>
+        <p>Vous avez déjà utilisé tous vos jours de congé payé pour cette année ({{ soldeConges?.soldeAnnuelRestant || 0 }}j restants).</p>
+        <p>Voulez-vous envoyer la demande quand même à votre responsable ?</p>
+        <div class="solde-warning-actions">
+          <button type="button" class="btn-annuler-conge" (click)="showSoldeEpuiseWarning = false">Annuler</button>
+          <button type="button" class="btn-envoyer-conge" (click)="confirmerEnvoiMalgreSolde()">Envoyer quand même</button>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- MODAL DÉTAIL CONGÉ -->
   @if (showCongeDetail && selectedConge) {
     <div class="conge-modal-overlay" (click)="fermerDetailConge()" (keydown.escape)="fermerDetailConge()" tabindex="-1">
       <div class="conge-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
 
         <!-- HEADER -->
-        <div class="conge-modal-header" [class.cmh-approuve]="selectedConge.statut === 'APPROUVE'" [class.cmh-refuse]="selectedConge.statut === 'REFUSE'" [class.cmh-attente]="selectedConge.statut === 'EN_ATTENTE'">
+        <div class="conge-modal-header" [class.cmh-approuve]="selectedConge.statut === 'APPROUVE'" [class.cmh-refuse]="selectedConge.statut === 'REFUSE'" [class.cmh-valide-kia]="selectedConge.statut === 'VALIDE_KIA'" [class.cmh-attente]="selectedConge.statut === 'EN_ATTENTE'">
           <div class="conge-modal-header-left">
-            <span class="conge-modal-icon">
-              {{ selectedConge.type === 'ANNUEL' ? '🌴' : selectedConge.type === 'RTT' ? '😴' : selectedConge.type === 'MALADIE' ? '🏥' : selectedConge.type === 'FORMATION' ? '📚' : selectedConge.type === 'SANS_SOLDE' ? '💼' : '📋' }}
-            </span>
             <div>
               <h3 class="conge-modal-title">{{ selectedConge.type === 'ANNUEL' ? 'Congé Annuel' : selectedConge.type === 'RTT' ? 'RTT' : selectedConge.type === 'MALADIE' ? 'Maladie' : selectedConge.type === 'FORMATION' ? 'Formation' : selectedConge.type === 'SANS_SOLDE' ? 'Sans solde' : selectedConge.type === 'AUTRE' ? 'Autre' : (selectedConge.type || 'Congé') }}</h3>
               <span class="conge-modal-sub">Demande de congé</span>
@@ -973,8 +983,9 @@
             <span class="conge-modal-statut-badge"
               [class.cms-approuve]="selectedConge.statut === 'APPROUVE'"
               [class.cms-refuse]="selectedConge.statut === 'REFUSE'"
+              [class.cms-valide-kia]="selectedConge.statut === 'VALIDE_KIA'"
               [class.cms-attente]="selectedConge.statut === 'EN_ATTENTE'">
-              {{ selectedConge.statut === 'APPROUVE' ? '✅ Approuvé' : selectedConge.statut === 'REFUSE' ? '❌ Refusé' : '⏳ En attente' }}
+              {{ selectedConge.statut === 'APPROUVE' ? '✅ Approuvé' : selectedConge.statut === 'REFUSE' ? '❌ Refusé' : selectedConge.statut === 'VALIDE_KIA' ? '🔄 Validé par KIA' : '⏳ En attente' }}
             </span>
             <button type="button" class="conge-modal-close" (click)="fermerDetailConge()">✕</button>
           </div>
@@ -999,7 +1010,7 @@
               @if (selectedConge.dateDebut && selectedConge.dateFin) {
                 <div class="conge-duree-box">
                   <span class="conge-date-lbl">Durée</span>
-                  <span class="conge-duree-val">{{ calculerJours(selectedConge.dateDebut, selectedConge.dateFin) }} jour(s)</span>
+                  <span class="conge-duree-val">{{ calculerJours(selectedConge.dateDebut, selectedConge.dateFin, selectedConge.periode) }} jour(s){{ selectedConge.periode === 'MATIN' ? ' (Matin)' : selectedConge.periode === 'APRES_MIDI' ? ' (Après-midi)' : '' }}</span>
                 </div>
               }
             </div>
@@ -1013,7 +1024,7 @@
             </div>
             <div class="conge-detail-field">
               <span class="conge-detail-lbl">Statut</span>
-              <span class="conge-detail-val">{{ selectedConge.statut === 'APPROUVE' ? 'Approuvé' : selectedConge.statut === 'REFUSE' ? 'Refusé' : selectedConge.statut === 'EN_ATTENTE' ? 'En attente' : (selectedConge.statut || '—') }}</span>
+              <span class="conge-detail-val">{{ selectedConge.statut === 'APPROUVE' ? 'Approuvé' : selectedConge.statut === 'REFUSE' ? 'Refusé' : selectedConge.statut === 'VALIDE_KIA' ? 'Validé par KIA — en attente de Ferid' : selectedConge.statut === 'EN_ATTENTE' ? 'En attente' : (selectedConge.statut || '—') }}</span>
             </div>
             @if (selectedConge.motif) {
               <div class="conge-detail-field conge-detail-full">
@@ -1039,7 +1050,7 @@
 
         <!-- FOOTER -->
         <div class="conge-modal-footer">
-          @if (selectedConge.statut === 'EN_ATTENTE') {
+          @if (!selectedConge.statut || selectedConge.statut === 'EN_ATTENTE') {
             <button type="button" class="conge-modal-btn-supprimer" (click)="supprimerMonConge(selectedConge.id)">🗑 Supprimer</button>
             <button type="button" class="conge-modal-btn-modifier" (click)="modifierMonConge(selectedConge)">✏️ Modifier</button>
           }

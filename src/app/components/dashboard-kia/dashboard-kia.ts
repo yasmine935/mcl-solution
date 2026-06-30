@@ -60,10 +60,16 @@ export class DashboardKia implements OnInit {
   soldeConges: any = null;
   selectedConge: any = null;
   showCongeDetail = false;
+
+  pourcentageSoldeRestant(restant: number, total: number): number {
+    if (!total) return 0;
+    return Math.max(0, Math.min(100, (restant / total) * 100));
+  }
+
   ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
   fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 
-  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
   nombreJours = 0;
   congeEnEditionId: number | null = null;
 
@@ -122,16 +128,24 @@ getCongesTechRefuses(): number {
   return this.congesTechniciens.filter((c: any) => c.statut === 'REFUSE').length;
 }
 
+getCongesTechValideesKia(): number {
+  return this.congesTechniciens.filter((c: any) => c.statut === 'VALIDE_KIA').length;
+}
+
 getCongesTechFiltres(): any[] {
   if (this.filtreConge === 'TOUS') return this.congesTechniciens;
   return this.congesTechniciens.filter((c: any) => c.statut === this.filtreConge);
 }
 
 // ✅ Version string pour affichage (différente de calculerJours qui retourne number)
-calculerJoursStr(dateDebut: string, dateFin: string): string {
+calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
   if (!dateDebut || !dateFin || dateDebut === '-' || dateFin === '-') return '-';
-  const jours = this.calculerJours(dateDebut, dateFin);
-  return jours > 0 ? `${jours}j` : '-';
+  const jours = this.calculerJours(dateDebut, dateFin, periode);
+  if (jours === 0) return '-';
+  let suffixe = '';
+  if (periode === 'MATIN') suffixe = ' (Matin)';
+  else if (periode === 'APRES_MIDI') suffixe = ' (Après-midi)';
+  return `${jours}j${suffixe}`;
 }
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
@@ -161,7 +175,22 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
     });
   }
 
+  showSoldeEpuiseWarning = false;
+
   deposerConge() {
+    if (this.conge.type === 'ANNUEL' && this.soldeConges && this.soldeConges.soldeAnnuelRestant <= 0) {
+      this.showSoldeEpuiseWarning = true;
+      return;
+    }
+    this.envoyerConge();
+  }
+
+  confirmerEnvoiMalgreSolde() {
+    this.showSoldeEpuiseWarning = false;
+    this.envoyerConge();
+  }
+
+  private envoyerConge() {
     if (this.congeEnEditionId) {
       this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, this.conge).subscribe({
         next: () => { this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm(); },
@@ -178,7 +207,7 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
 
   modifierMonConge(c: any) {
     this.congeEnEditionId = c.id;
-    this.conge = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '' };
+    this.conge = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '', periode: c.periode || '' };
     this.calculerNombreJours();
     this.showCongeForm = true;
     this.showCongeDetail = false;
@@ -198,18 +227,25 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
   }
 
   calculerNombreJours() {
+    if (this.conge.dateDebut !== this.conge.dateFin) this.conge.periode = '';
     if (this.conge.dateDebut && this.conge.dateFin) {
-      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin);
+      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin, this.conge.periode);
     } else {
       this.nombreJours = 0;
     }
   }
 
-  calculerJours(dateDebut: string, dateFin: string): number {
+  onToggleDemiJournee(checked: boolean) {
+    this.conge.periode = checked ? 'MATIN' : '';
+    this.calculerNombreJours();
+  }
+
+  calculerJours(dateDebut: string, dateFin: string, periode?: string): number {
     if (!dateDebut || !dateFin) return 0;
     const debut = new Date(dateDebut);
     const fin = new Date(dateFin);
     if (fin < debut) return 0;
+    if (dateDebut === dateFin && (periode === 'MATIN' || periode === 'APRES_MIDI')) return 0.5;
     let jours = 0;
     const courant = new Date(debut);
     while (courant <= fin) {
@@ -221,7 +257,7 @@ calculerJoursStr(dateDebut: string, dateFin: string): string {
   }
 
   resetCongeForm() {
-    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
     this.nombreJours = 0;
     this.congeEnEditionId = null;
   }

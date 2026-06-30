@@ -774,6 +774,7 @@ nav {
 .conge-kpi.green  { background: #2e7d32; }
 .conge-kpi.red    { background: #c62828; }
 .conge-kpi.blue   { background: #1565c0; }
+.conge-kpi.violet { background: #6a1b9a; }
 
 /* FILTRES */
 .conges-filtres { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -785,6 +786,7 @@ nav {
 .filtre-btn:hover { border-color: #01579b; color: #01579b; }
 .filtre-btn.active { background: #0d1b2a; color: #fff; border-color: #0d1b2a; }
 .filtre-attente.active { background: #f57c00; border-color: #f57c00; }
+.filtre-valide-kia.active { background: #6a1b9a; border-color: #6a1b9a; }
 .filtre-approuve.active { background: #2e7d32; border-color: #2e7d32; }
 .filtre-refuse.active  { background: #c62828; border-color: #c62828; }
 
@@ -802,6 +804,7 @@ nav {
 }
 .conge-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
 .conge-en-attente { border-color: #ffcc80; }
+.conge-valide-kia { border-color: #ce93d8; }
 .conge-approuve   { border-color: #a5d6a7; }
 .conge-refuse     { border-color: #ef9a9a; }
 
@@ -817,8 +820,21 @@ nav {
 
 .conge-statut-badge { padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
 .badge-attente { background: #fff3e0; color: #f57c00; }
+.badge-valide-kia { background: #f3e5f5; color: #6a1b9a; }
 .badge-approuve { background: #e8f5e9; color: #2e7d32; }
 .badge-refuse   { background: #ffebee; color: #c62828; }
+
+.conge-double-valid-note {
+  background: #f3e5f5; color: #6a1b9a; font-size: 0.8rem; font-weight: 600;
+  padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;
+  border: 1px solid #ce93d8;
+}
+
+.conge-trace-kia {
+  background: #f8f5fb; color: #6a1b9a; font-size: 0.76rem; font-weight: 600;
+  padding: 6px 12px; border-radius: 8px; margin-bottom: 12px;
+  border: 1px dashed #ce93d8;
+}
 
 /* INFOS */
 .conge-card-infos { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
@@ -846,6 +862,11 @@ nav {
 .btn-refuser:hover { background: #c62828; color: #fff; }
 .btn-remettre { background: #f5f5f5; color: #546e7a; border: 1.5px solid #e0e0e0; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.15s; }
 .btn-remettre:hover { background: #e0e0e0; }
+
+.conge-decision-finale {
+  padding-top: 12px; border-top: 1px solid #f0f4f8;
+  font-size: 0.82rem; font-weight: 700; color: #90a4ae;
+}
 
 /* ===== RESET PASSWORD ===== */
 .reset-section {
@@ -1085,6 +1106,25 @@ nav {
 .jours-placeholder { display: flex; flex-direction: column; align-items: center; color: #b0bec5; gap: 2px; }
 .jours-placeholder span { font-size: 1.4rem; }
 .jours-placeholder small { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.conge-demi-journee {
+  display: flex; flex-direction: column; gap: 8px;
+  background: #f5f7fa; border-radius: 10px; padding: 10px 14px;
+}
+.conge-checkbox-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; font-weight: 600; color: #37474f; cursor: pointer;
+}
+.conge-checkbox-label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+.conge-periode-choix { display: flex; gap: 8px; }
+.periode-btn {
+  flex: 1; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #cfd8dc;
+  background: #fff; color: #37474f; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.periode-btn:hover { border-color: #0288d1; }
+.periode-btn-active {
+  background: #01579b; border-color: #01579b; color: #fff;
+}
 .conge-textarea {
   border: 1.5px solid #e0e0e0; border-radius: 10px;
   padding: 10px 14px; font-size: 0.88rem; outline: none;
@@ -1378,3 +1418,36 @@ nav {
   transition: background 0.15s;
 }
 .conge-modal-btn-modifier:hover { background: #e3f2fd; }
+
+/* ══ POPUP SOLDE ÉPUISÉ ══ */
+.solde-warning-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2100; padding: 20px;
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.solde-warning-modal {
+  background: #fff; border-radius: 20px;
+  width: 100%; max-width: 440px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  animation: popIn 0.2s ease;
+  border-top: 5px solid #f57c00;
+}
+.solde-warning-icon {
+  font-size: 2.6rem; margin-bottom: 10px;
+}
+.solde-warning-modal h3 {
+  margin: 0 0 12px; font-size: 1.1rem; font-weight: 800; color: #0d1b2a;
+}
+.solde-warning-modal p {
+  margin: 0 0 8px; font-size: 0.9rem; color: #546e7a; line-height: 1.5;
+}
+.solde-warning-actions {
+  display: flex; gap: 10px; justify-content: center; margin-top: 22px;
+}
+.solde-warning-actions .btn-envoyer-conge { background: #f57c00; }
+.solde-warning-actions .btn-envoyer-conge:hover { background: #e65100; }

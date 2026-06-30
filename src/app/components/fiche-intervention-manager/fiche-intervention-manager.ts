@@ -59,18 +59,21 @@ export class FicheInterventionManager implements OnInit {
   showClientManager = false;
   nouveauClient: any = { nom: '', codeClient: '', adresse: '', contact: '' };
 
-  optionsTaches: any = {
-    'Installation des cameras': ['Camera HD 4K', 'Camera IP', 'Camera Thermique', 'Camera PTZ'],
-    'Mise en place support mural': ['Support universel', 'Support motorise', 'Support articule', 'Support fixe'],
-    'Fixation TV 65 sur Support': ['Support fixe', 'Support articule', 'Support motorise', 'Bras extensible'],
-    'Connectique et Parametrage': ['HDMI 2.1', 'Ethernet', 'WiFi 6', 'Fiber Optique', 'USB-C'],
-    'Test et Validation': ['Test video', 'Test audio', 'Test reseau', 'Test securite', 'Validation client']
-  };
+  optionsTaches: any = {};
+  tachesDisponibles: string[] = [];
 
-  tachesDisponibles = [
-    'Installation des cameras', 'Mise en place support mural',
-    'Fixation TV 65 sur Support', 'Connectique et Parametrage', 'Test et Validation'
-  ];
+  loadCategoriesTaches() {
+    this.http.get<any[]>('http://localhost:8080/api/categories-taches').subscribe({
+      next: (categories) => {
+        this.tachesDisponibles = categories.map((c: any) => c.nom);
+        this.optionsTaches = {};
+        categories.forEach((c: any) => {
+          this.optionsTaches[c.nom] = (c.options || []).map((o: any) => o.nom);
+        });
+      },
+      error: () => { this.tachesDisponibles = []; this.optionsTaches = {}; }
+    });
+  }
 
   nouvelleFiche: any = {
     numProjet: '', client: '', dateDebut: '', dateFin: '',
@@ -88,6 +91,7 @@ export class FicheInterventionManager implements OnInit {
     this.loadEmployes();
     this.loadFiches();
     this.loadClients();
+    this.loadCategoriesTaches();
   }
 
   loadClients() {

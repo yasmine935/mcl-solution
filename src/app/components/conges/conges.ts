@@ -58,11 +58,4 @@ export class Conges implements OnInit {
     return map[statut] || '❓';
   }
 
-  getTypeIcon(type: string): string {
-    const map: any = {
-      'ANNUEL': '🌴', 'MALADIE': '🏥', 'SANS_SOLDE': '💼',
-      'RTT': '😴', 'FORMATION': '📚', 'REPOS': '🛋️', 'AUTRE': '📋'
-    };
-    return map[type] || '📅';
-  }
 }

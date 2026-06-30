@@ -47,13 +47,19 @@ export class DashboardTechnicien implements OnInit {
   soldeConges: any = null;
   ficheDetail: any = null;
   selectedConge: any = null;
+
+  pourcentageSoldeRestant(restant: number, total: number): number {
+    if (!total) return 0;
+    return Math.max(0, Math.min(100, (restant / total) * 100));
+  }
+
   showCongeDetail = false;
 
   voirDetailFiche(fiche: any) { this.ficheDetail = fiche; }
   ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
   fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 
-  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
   nombreJours = 0;
   congeEnEditionId: number | null = null;
 
@@ -98,7 +104,8 @@ export class DashboardTechnicien implements OnInit {
           ...f,
           numProjet: f.numProjet || f.numeroProjet,
           dateDebut: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
-          dateFin: ''
+          dateFin: f.dateFin ? f.dateFin.split('T')[0] : '',
+          taches: f.taches ? JSON.parse(f.taches) : []
         }));
         this.interventions = mesFiches.filter((f: any) => f.statut !== 'COMPLETEE' && f.statut !== 'VALIDEE');
         this.interventionsCompletees = mesFiches.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE');
@@ -159,7 +166,22 @@ export class DashboardTechnicien implements OnInit {
     return all.filter((f: any) => f.technicienId === String(this.user.id)).length;
   }
 
+  showSoldeEpuiseWarning = false;
+
   deposerConge() {
+    if (this.conge.type === 'ANNUEL' && this.soldeConges && this.soldeConges.soldeAnnuelRestant <= 0) {
+      this.showSoldeEpuiseWarning = true;
+      return;
+    }
+    this.envoyerConge();
+  }
+
+  confirmerEnvoiMalgreSolde() {
+    this.showSoldeEpuiseWarning = false;
+    this.envoyerConge();
+  }
+
+  private envoyerConge() {
     if (this.congeEnEditionId) {
       this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, this.conge).subscribe(() => {
         this.loadConges();
@@ -180,7 +202,7 @@ export class DashboardTechnicien implements OnInit {
 
   modifierMonConge(c: any) {
     this.congeEnEditionId = c.id;
-    this.conge = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '' };
+    this.conge = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '', periode: c.periode || '' };
     this.calculerNombreJours();
     this.showCongeForm = true;
     this.showCongeDetail = false;
@@ -200,18 +222,25 @@ export class DashboardTechnicien implements OnInit {
   }
 
   calculerNombreJours() {
+    if (this.conge.dateDebut !== this.conge.dateFin) this.conge.periode = '';
     if (this.conge.dateDebut && this.conge.dateFin) {
-      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin);
+      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin, this.conge.periode);
     } else {
       this.nombreJours = 0;
     }
   }
 
-  calculerJours(dateDebut: string, dateFin: string): number {
+  onToggleDemiJournee(checked: boolean) {
+    this.conge.periode = checked ? 'MATIN' : '';
+    this.calculerNombreJours();
+  }
+
+  calculerJours(dateDebut: string, dateFin: string, periode?: string): number {
     if (!dateDebut || !dateFin) return 0;
     const debut = new Date(dateDebut);
     const fin = new Date(dateFin);
     if (fin < debut) return 0;
+    if (dateDebut === dateFin && (periode === 'MATIN' || periode === 'APRES_MIDI')) return 0.5;
     let jours = 0;
     const courant = new Date(debut);
     while (courant <= fin) {
@@ -223,7 +252,7 @@ export class DashboardTechnicien implements OnInit {
   }
 
   resetCongeForm() {
-    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
     this.nombreJours = 0;
     this.congeEnEditionId = null;
   }

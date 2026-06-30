@@ -165,14 +165,14 @@ export class Planning implements OnInit {
   getCongeLabel(conge: any): string {
     const pending = conge.statut === 'EN_ATTENTE' ? '⏳ ' : '';
     const map: any = {
-      'ANNUEL': `${pending}🌴 Congé`,
-      'RTT': `${pending}😴 RTT`,
-      'MALADIE': `${pending}🏥 Maladie`,
-      'FORMATION': `${pending}📚 Formation`,
-      'SANS_SOLDE': `${pending}💼 Sans solde`,
-      'AUTRE': `${pending}📋 Congé`
+      'ANNUEL': `${pending}Congé`,
+      'RTT': `${pending}RTT`,
+      'MALADIE': `${pending}Maladie`,
+      'FORMATION': `${pending}Formation`,
+      'SANS_SOLDE': `${pending}Sans solde`,
+      'AUTRE': `${pending}Congé`
     };
-    return map[conge.type] || `${pending}🏖️ Congé`;
+    return map[conge.type] || `${pending}Congé`;
   }
 
   // ✅ Couleur du congé (atténuée si EN_ATTENTE)

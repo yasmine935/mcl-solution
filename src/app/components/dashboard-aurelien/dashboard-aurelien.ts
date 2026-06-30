@@ -64,7 +64,7 @@ export class DashboardAurelien implements OnInit {
   nouvelleReponse = '';
   envoiReponseEnCours = false;
 
-  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+  conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
   nombreJours = 0;
   congeEnEditionId: number | null = null;
 
@@ -109,7 +109,22 @@ export class DashboardAurelien implements OnInit {
     this.fiches = stored ? JSON.parse(stored) : [];
   }
 
+  showSoldeEpuiseWarning = false;
+
   deposerConge() {
+    if (this.conge.type === 'ANNUEL' && this.soldeConges && this.soldeConges.soldeAnnuelRestant <= 0) {
+      this.showSoldeEpuiseWarning = true;
+      return;
+    }
+    this.envoyerConge();
+  }
+
+  confirmerEnvoiMalgreSolde() {
+    this.showSoldeEpuiseWarning = false;
+    this.envoyerConge();
+  }
+
+  private envoyerConge() {
     if (this.congeEnEditionId) {
       this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, this.conge).subscribe(() => {
         this.loadConges();
@@ -130,7 +145,7 @@ export class DashboardAurelien implements OnInit {
 
   modifierMonConge(c: any) {
     this.congeEnEditionId = c.id;
-    this.conge = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '' };
+    this.conge = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '', periode: c.periode || '' };
     this.calculerNombreJours();
     this.showCongeForm = true;
     this.showCongeDetail = false;
@@ -150,18 +165,25 @@ export class DashboardAurelien implements OnInit {
   }
 
   calculerNombreJours() {
+    if (this.conge.dateDebut !== this.conge.dateFin) this.conge.periode = '';
     if (this.conge.dateDebut && this.conge.dateFin) {
-      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin);
+      this.nombreJours = this.calculerJours(this.conge.dateDebut, this.conge.dateFin, this.conge.periode);
     } else {
       this.nombreJours = 0;
     }
   }
 
-  calculerJours(dateDebut: string, dateFin: string): number {
+  onToggleDemiJournee(checked: boolean) {
+    this.conge.periode = checked ? 'MATIN' : '';
+    this.calculerNombreJours();
+  }
+
+  calculerJours(dateDebut: string, dateFin: string, periode?: string): number {
     if (!dateDebut || !dateFin) return 0;
     const debut = new Date(dateDebut);
     const fin = new Date(dateFin);
     if (fin < debut) return 0;
+    if (dateDebut === dateFin && (periode === 'MATIN' || periode === 'APRES_MIDI')) return 0.5;
     let jours = 0;
     const courant = new Date(debut);
     while (courant <= fin) {
@@ -173,13 +195,19 @@ export class DashboardAurelien implements OnInit {
   }
 
   resetCongeForm() {
-    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '' };
+    this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
     this.nombreJours = 0;
     this.congeEnEditionId = null;
   }
 soldeConges: any = null;
 selectedConge: any = null;
 showCongeDetail = false;
+
+pourcentageSoldeRestant(restant: number, total: number): number {
+  if (!total) return 0;
+  return Math.max(0, Math.min(100, (restant / total) * 100));
+}
+
 ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
 fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 

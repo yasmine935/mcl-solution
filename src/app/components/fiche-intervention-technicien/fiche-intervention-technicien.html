@@ -40,8 +40,12 @@
               <span class="fit-val">{{ intervention.technicienAssigne || '—' }}</span>
             </div>
             <div class="fit-info-cell">
-              <span class="fit-label">Date</span>
-              <span class="fit-val">{{ intervention.date || '—' }}</span>
+              <span class="fit-label">Date début</span>
+              <span class="fit-val">{{ intervention.dateIntervention || '—' }}</span>
+            </div>
+            <div class="fit-info-cell">
+              <span class="fit-label">Date fin</span>
+              <span class="fit-val">{{ intervention.dateFin || '—' }}</span>
             </div>
           </div>
           @if (intervention.adresse || intervention.contact) {
@@ -92,16 +96,8 @@
           <div class="fit-card-title">⏱ Données d'Exécution</div>
           <div class="fit-form-grid">
             <div class="fit-field">
-              <label>Date</label>
+              <label>Date de réalisation</label>
               <input type="date" [(ngModel)]="form.dateDebut" class="fit-input"/>
-            </div>
-            <div class="fit-field">
-              <label>Heure début</label>
-              <input type="time" [(ngModel)]="form.heureDebut" class="fit-input"/>
-            </div>
-            <div class="fit-field">
-              <label>Heure fin</label>
-              <input type="time" [(ngModel)]="form.heureFin" class="fit-input"/>
             </div>
             <div class="fit-field fit-field-full">
               <label>Intervenants</label>

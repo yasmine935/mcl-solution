@@ -47,6 +47,9 @@
       <a class="nav-item" [class.active]="currentPage === 'clients'" (click)="currentPage = 'clients'">
         <mat-icon>people</mat-icon> Gestion des Clients
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'categories-taches'" (click)="currentPage = 'categories-taches'">
+        <mat-icon>category</mat-icon> Catégories de Tâches
+      </a>
       <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
@@ -290,6 +293,9 @@
       @if (currentPage === 'clients') {
         <app-gestion-clients></app-gestion-clients>
       }
+      @if (currentPage === 'categories-taches') {
+        <app-categories-taches></app-categories-taches>
+      }
       @if (currentPage === 'planning') {
         <app-planning></app-planning>
       }
@@ -495,7 +501,6 @@
           <!-- CONGÉS ANNUELS -->
           <div class="solde-item">
             <div class="solde-item-header">
-              <span class="solde-icon">🌴</span>
               <div>
                 <strong>Congé Annuel</strong>
                 <span class="solde-subtitle">2.5 jours/mois</span>
@@ -504,7 +509,7 @@
             <div class="solde-bar-wrapper">
               <div class="solde-bar">
                 <div class="solde-fill solde-fill-annuel"
-                  [style.width.%]="(soldeCongesPerso.joursAnnuelPris / soldeCongesPerso.soldeAnnuelTotal) * 100">
+                  [style.width.%]="pourcentageSoldeRestant(soldeCongesPerso.soldeAnnuelRestant, soldeCongesPerso.soldeAnnuelTotal)">
                 </div>
               </div>
               <div class="solde-numbers">
@@ -520,7 +525,6 @@
           <!-- RTT -->
           <div class="solde-item">
             <div class="solde-item-header">
-              <span class="solde-icon">😴</span>
               <div>
                 <strong>RTT</strong>
                 <span class="solde-subtitle">1 jour/mois</span>
@@ -529,7 +533,7 @@
             <div class="solde-bar-wrapper">
               <div class="solde-bar">
                 <div class="solde-fill solde-fill-rtt"
-                  [style.width.%]="(soldeCongesPerso.joursRTTPris / soldeCongesPerso.soldeRTTTotal) * 100">
+                  [style.width.%]="pourcentageSoldeRestant(soldeCongesPerso.soldeRTTRestant, soldeCongesPerso.soldeRTTTotal)">
                 </div>
               </div>
               <div class="solde-numbers">
@@ -557,11 +561,11 @@
         <div class="conge-field">
           <label>Type de congé *</label>
           <div class="conge-types-grid">
-            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'ANNUEL'" (click)="congePerso.type = 'ANNUEL'">🌴 Congé Payé</button>
-            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'RTT'" (click)="congePerso.type = 'RTT'">😴 RTT</button>
-            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'MALADIE'" (click)="congePerso.type = 'MALADIE'">🏥 Maladie</button>
-            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'FORMATION'" (click)="congePerso.type = 'FORMATION'">📚 Formation</button>
-            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'SANS_SOLDE'" (click)="congePerso.type = 'SANS_SOLDE'">💼 Sans solde</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'ANNUEL'" (click)="congePerso.type = 'ANNUEL'">Congé Payé</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'RTT'" (click)="congePerso.type = 'RTT'">RTT</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'MALADIE'" (click)="congePerso.type = 'MALADIE'">Maladie</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'FORMATION'" (click)="congePerso.type = 'FORMATION'">Formation</button>
+            <button type="button" class="type-btn" [class.type-btn-active]="congePerso.type === 'SANS_SOLDE'" (click)="congePerso.type = 'SANS_SOLDE'">Sans solde</button>
           </div>
         </div>
 
@@ -591,6 +595,21 @@
             <input type="date" class="conge-input" [(ngModel)]="congePerso.dateFin" (ngModelChange)="calculerJoursPerso()">
           </div>
         </div>
+
+        @if (congePerso.dateDebut && congePerso.dateDebut === congePerso.dateFin) {
+          <div class="conge-field conge-demi-journee">
+            <label class="conge-checkbox-label">
+              <input type="checkbox" [checked]="!!congePerso.periode" (change)="onToggleDemiJourneePerso($event.target.checked)"/>
+              Demi-journée seulement
+            </label>
+            @if (congePerso.periode) {
+              <div class="conge-periode-choix">
+                <button type="button" class="periode-btn" [class.periode-btn-active]="congePerso.periode === 'MATIN'" (click)="congePerso.periode = 'MATIN'; calculerJoursPerso()">Matin</button>
+                <button type="button" class="periode-btn" [class.periode-btn-active]="congePerso.periode === 'APRES_MIDI'" (click)="congePerso.periode = 'APRES_MIDI'; calculerJoursPerso()">Après-midi</button>
+              </div>
+            }
+          </div>
+        }
 
         <!-- MOTIF -->
         <div class="conge-field">
@@ -623,9 +642,6 @@
       <div class="conge-list">
         @for (c of mesConges; track c.id) {
           <div class="conge-item conge-item-clickable" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'" (click)="ouvrirDetailConge(c)">
-            <span class="conge-type-icon">
-              {{ c.type === 'ANNUEL' ? '🌴' : c.type === 'RTT' ? '😴' : c.type === 'MALADIE' ? '🏥' : c.type === 'FORMATION' ? '📚' : '📋' }}
-            </span>
             <span class="conge-item-text">
               <strong>{{ (c.type||'').toUpperCase() === 'ANNUEL' ? 'Congé Annuel' : (c.type||'').toUpperCase() === 'RTT' ? 'RTT' : (c.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (c.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (c.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (c.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (c.type || 'Congé') }}</strong>
               @if (c.dateDebut && c.dateFin) {
@@ -667,6 +683,10 @@
           <span>{{ getCongesEnAttente() }}</span>
           <small>En attente</small>
         </div>
+        <div class="conge-kpi violet">
+          <span>{{ getCongesValideesKia() }}</span>
+          <small>À valider (KIA ✓)</small>
+        </div>
         <div class="conge-kpi green">
           <span>{{ getCongesApprouves() }}</span>
           <small>Approuvés</small>
@@ -690,6 +710,9 @@
       <button class="filtre-btn filtre-attente" [class.active]="filtreConge === 'EN_ATTENTE'" (click)="filtreConge = 'EN_ATTENTE'">
         ⏳ En attente ({{ getCongesEnAttente() }})
       </button>
+      <button class="filtre-btn filtre-valide-kia" [class.active]="filtreConge === 'VALIDE_KIA'" (click)="filtreConge = 'VALIDE_KIA'">
+        🔄 À valider (KIA ✓) ({{ getCongesValideesKia() }})
+      </button>
       <button class="filtre-btn filtre-approuve" [class.active]="filtreConge === 'APPROUVE'" (click)="filtreConge = 'APPROUVE'">
         ✅ Approuvés ({{ getCongesApprouves() }})
       </button>
@@ -707,10 +730,10 @@
     } @else {
       <div class="conges-cards">
         @for (c of getCongesFiltres(); track c.id) {
-          <div class="conge-card" [class.conge-en-attente]="c.statut === 'EN_ATTENTE'" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
+          <div class="conge-card" [class.conge-en-attente]="c.statut === 'EN_ATTENTE'" [class.conge-valide-kia]="c.statut === 'VALIDE_KIA'" [class.conge-approuve]="c.statut === 'APPROUVE'" [class.conge-refuse]="c.statut === 'REFUSE'">
 
             <div class="conge-card-bar"
-              [style.background]="c.statut === 'APPROUVE' ? '#2e7d32' : c.statut === 'REFUSE' ? '#c62828' : '#f57c00'">
+              [style.background]="c.statut === 'APPROUVE' ? '#2e7d32' : c.statut === 'REFUSE' ? '#c62828' : c.statut === 'VALIDE_KIA' ? '#6a1b9a' : '#f57c00'">
             </div>
 
             <div class="conge-card-content">
@@ -719,7 +742,7 @@
               <div class="conge-card-top">
                 <div class="conge-employe">
                   <div class="conge-avatar"
-                    [style.background]="c.statut === 'APPROUVE' ? '#2e7d32' : c.statut === 'REFUSE' ? '#c62828' : '#f57c00'">
+                    [style.background]="c.statut === 'APPROUVE' ? '#2e7d32' : c.statut === 'REFUSE' ? '#c62828' : c.statut === 'VALIDE_KIA' ? '#6a1b9a' : '#f57c00'">
                     {{ c.utilisateur?.prenom?.charAt(0) }}{{ c.utilisateur?.nom?.charAt(0) }}
                   </div>
                   <div>
@@ -729,9 +752,10 @@
                 </div>
                 <div class="conge-statut-badge"
                   [class.badge-attente]="c.statut === 'EN_ATTENTE'"
+                  [class.badge-valide-kia]="c.statut === 'VALIDE_KIA'"
                   [class.badge-approuve]="c.statut === 'APPROUVE'"
                   [class.badge-refuse]="c.statut === 'REFUSE'">
-                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
+                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'VALIDE_KIA' ? '🔄 Validé (KIA)' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
                 </div>
               </div>
 
@@ -740,7 +764,7 @@
                 <div class="conge-info-item">
                   <label>Type</label>
                   <span class="conge-type-badge" [class]="'conge-type-' + c.type?.toLowerCase()">
-                    {{ c.type === 'ANNUEL' ? '🌴 Congé Payé' : c.type === 'RTT' ? '😴 RTT' : c.type === 'MALADIE' ? '🏥 Maladie' : c.type === 'FORMATION' ? '📚 Formation' : c.type === 'SANS_SOLDE' ? '💼 Sans solde' : c.type || '-' }}
+                    {{ c.type === 'ANNUEL' ? 'Congé Payé' : c.type === 'RTT' ? 'RTT' : c.type === 'MALADIE' ? 'Maladie' : c.type === 'FORMATION' ? 'Formation' : c.type === 'SANS_SOLDE' ? 'Sans solde' : c.type || '-' }}
                   </span>
                 </div>
                 <div class="conge-info-item">
@@ -753,8 +777,8 @@
                 </div>
                 <div class="conge-info-item">
                   <label>📆 Jours</label>
-                 @if (calculerJours(c.dateDebut, c.dateFin) !== '-') {
-  <span class="conge-jours">{{ calculerJours(c.dateDebut, c.dateFin) }}</span>
+                 @if (calculerJours(c.dateDebut, c.dateFin, c.periode) !== '-') {
+  <span class="conge-jours">{{ calculerJours(c.dateDebut, c.dateFin, c.periode) }}</span>
 } @else {
   <span>-</span>
 }
@@ -768,24 +792,32 @@
                 </div>
               }
 
+              @if (c.statut === 'VALIDE_KIA') {
+                <div class="conge-double-valid-note">
+                  🔄 Déjà validé par KIA (Tech Sup) — en attente de votre validation finale.
+                </div>
+              }
+              @if (c.valideParKia && (c.statut === 'APPROUVE' || c.statut === 'REFUSE')) {
+                <div class="conge-trace-kia">
+                  🔄 Validé par KIA (Tech Sup), puis {{ c.statut === 'APPROUVE' ? 'approuvé' : 'refusé' }} par vous.
+                </div>
+              }
+
               <!-- ACTIONS -->
-              <div class="conge-card-actions">
-                @if (c.statut !== 'APPROUVE') {
+              @if (c.statut === 'EN_ATTENTE' || c.statut === 'VALIDE_KIA') {
+                <div class="conge-card-actions">
                   <button class="btn-approuver" (click)="updateStatut(c.id, 'APPROUVE')">
-                    ✅ Approuver
+                    {{ c.statut === 'VALIDE_KIA' ? '✅ Valider définitivement' : '✅ Approuver' }}
                   </button>
-                }
-                @if (c.statut !== 'REFUSE') {
                   <button class="btn-refuser" (click)="updateStatut(c.id, 'REFUSE')">
                     ❌ Refuser
                   </button>
-                }
-                @if (c.statut !== 'EN_ATTENTE') {
-                  <button class="btn-remettre" (click)="updateStatut(c.id, 'EN_ATTENTE')">
-                    🔄 Remettre en attente
-                  </button>
-                }
-              </div>
+                </div>
+              } @else {
+                <div class="conge-decision-finale">
+                  {{ c.statut === 'APPROUVE' ? '✅ Décision finale : Approuvé' : '❌ Décision finale : Refusé' }}
+                </div>
+              }
 
             </div>
           </div>
@@ -896,15 +928,28 @@
   <div class="sidebar-overlay" (click)="closeSidebar()"></div>
 </div><!-- /dashboard-layout -->
 
+<!-- POPUP SOLDE ÉPUISÉ -->
+@if (showSoldeEpuiseWarning) {
+  <div class="solde-warning-overlay" (click)="showSoldeEpuiseWarning = false">
+    <div class="solde-warning-modal" (click)="$event.stopPropagation()">
+      <div class="solde-warning-icon">⚠️</div>
+      <h3>Solde de congé annuel épuisé</h3>
+      <p>Vous avez déjà utilisé tous vos jours de congé payé pour cette année ({{ soldeCongesPerso?.soldeAnnuelRestant || 0 }}j restants).</p>
+      <p>Voulez-vous envoyer la demande quand même à ESSAN ?</p>
+      <div class="solde-warning-actions">
+        <button type="button" class="btn-annuler-conge" (click)="showSoldeEpuiseWarning = false">Annuler</button>
+        <button type="button" class="btn-envoyer-conge" (click)="confirmerEnvoiMalgreSolde()">Envoyer quand même</button>
+      </div>
+    </div>
+  </div>
+}
+
 <!-- MODAL DÉTAIL CONGÉ -->
 @if (showCongeDetail && selectedConge) {
   <div class="conge-modal-overlay" (click)="fermerDetailConge()" (keydown.escape)="fermerDetailConge()" tabindex="-1">
     <div class="conge-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
       <div class="conge-modal-header" [class.cmh-approuve]="selectedConge.statut === 'APPROUVE'" [class.cmh-refuse]="selectedConge.statut === 'REFUSE'" [class.cmh-attente]="selectedConge.statut === 'EN_ATTENTE'">
         <div class="conge-modal-header-left">
-          <span class="conge-modal-icon">
-            {{ (selectedConge.type||'').toUpperCase() === 'ANNUEL' ? '🌴' : (selectedConge.type||'').toUpperCase() === 'RTT' ? '😴' : (selectedConge.type||'').toUpperCase() === 'MALADIE' ? '🏥' : (selectedConge.type||'').toUpperCase() === 'FORMATION' ? '📚' : '📋' }}
-          </span>
           <div>
             <h3 class="conge-modal-title">{{ (selectedConge.type||'').toUpperCase() === 'ANNUEL' ? 'Congé Annuel' : (selectedConge.type||'').toUpperCase() === 'RTT' ? 'RTT' : (selectedConge.type||'').toUpperCase() === 'MALADIE' ? 'Maladie' : (selectedConge.type||'').toUpperCase() === 'FORMATION' ? 'Formation' : (selectedConge.type||'').toUpperCase() === 'SANS_SOLDE' ? 'Sans solde' : (selectedConge.type||'').toUpperCase() === 'AUTRE' ? 'Autre' : (selectedConge.type || 'Congé') }}</h3>
             <span class="conge-modal-sub">Demande de congé</span>
@@ -937,7 +982,7 @@
             @if (selectedConge.dateDebut && selectedConge.dateFin) {
               <div class="conge-duree-box">
                 <span class="conge-date-lbl">Durée</span>
-                <span class="conge-duree-val">{{ calculerJours(selectedConge.dateDebut, selectedConge.dateFin) }}</span>
+                <span class="conge-duree-val">{{ calculerJours(selectedConge.dateDebut, selectedConge.dateFin, selectedConge.periode) }}</span>
               </div>
             }
           </div>
@@ -968,7 +1013,7 @@
       </div>
 
       <div class="conge-modal-footer">
-        @if (selectedConge.statut === 'EN_ATTENTE') {
+        @if (!selectedConge.statut || selectedConge.statut === 'EN_ATTENTE') {
           <button type="button" class="conge-modal-btn-supprimer" (click)="supprimerMonConge(selectedConge.id)">🗑 Supprimer</button>
           <button type="button" class="conge-modal-btn-modifier" (click)="modifierMonConge(selectedConge)">✏️ Modifier</button>
         }

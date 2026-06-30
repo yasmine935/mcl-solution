@@ -1,0 +1,75 @@
+<div class="cattaches-container">
+
+  <div class="cattaches-header">
+    <div class="cattaches-header-left">
+      <div class="cattaches-icon">🗂️</div>
+      <div>
+        <h2 class="cattaches-title">Catégories de Tâches</h2>
+        <p class="cattaches-subtitle">{{ categories.length }} catégorie(s) — utilisées lors de la création des fiches d'intervention</p>
+      </div>
+    </div>
+    <button type="button" class="btn-nouvelle-categorie" (click)="showForm = !showForm">
+      <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+      {{ showForm ? 'Fermer' : '+ Nouvelle Catégorie' }}
+    </button>
+  </div>
+
+  @if (showForm) {
+    <div class="categorie-form-card">
+      <input type="text" class="categorie-input" [(ngModel)]="nouvelleCategorie"
+        placeholder="Ex : Câblage réseau" (keyup.enter)="ajouterCategorie()">
+      <button type="button" class="btn-save-categorie" (click)="ajouterCategorie()">
+        <mat-icon>check</mat-icon> Ajouter
+      </button>
+    </div>
+  }
+
+  @if (categories.length === 0) {
+    <div class="cattaches-empty">
+      <span class="cattaches-empty-icon">🗂️</span>
+      <p>Aucune catégorie de tâche définie</p>
+      <small>Cliquez sur "+ Nouvelle Catégorie" pour commencer</small>
+    </div>
+  } @else {
+    <div class="categories-list">
+      @for (c of categories; track c.id) {
+        <div class="categorie-card">
+          <div class="categorie-card-top">
+            @if (categorieEnEditionId === c.id) {
+              <input type="text" class="categorie-input-inline" [(ngModel)]="nomEnEdition" (keyup.enter)="sauvegarderNom(c.id)">
+              <div class="categorie-card-btns">
+                <button type="button" class="btn-icon-action" (click)="sauvegarderNom(c.id)" title="Enregistrer"><mat-icon>check</mat-icon></button>
+                <button type="button" class="btn-icon-action" (click)="annulerEditionNom()" title="Annuler"><mat-icon>close</mat-icon></button>
+              </div>
+            } @else {
+              <strong class="categorie-nom">{{ c.nom }}</strong>
+              <div class="categorie-card-btns">
+                <button type="button" class="btn-icon-action" (click)="ouvrirEditionNom(c)" title="Renommer"><mat-icon>edit</mat-icon></button>
+                <button type="button" class="btn-icon-action btn-icon-danger" (click)="supprimerCategorie(c.id)" title="Supprimer"><mat-icon>delete</mat-icon></button>
+              </div>
+            }
+          </div>
+
+          <div class="options-chips">
+            @if (c.options.length === 0) {
+              <span class="options-empty">Aucune option prédéfinie</span>
+            }
+            @for (o of c.options; track o.id) {
+              <span class="option-chip">
+                {{ o.nom }}
+                <button type="button" class="option-chip-remove" (click)="supprimerOption(o.id)" title="Retirer">✕</button>
+              </span>
+            }
+          </div>
+
+          <div class="inline-add-option">
+            <input type="text" class="option-input" [(ngModel)]="nouvelleOptionParCategorie[c.id]"
+              placeholder="Ex : Câble RJ45" (keyup.enter)="ajouterOption(c.id)">
+            <button type="button" class="btn-add-option" (click)="ajouterOption(c.id)">+ Ajouter une option</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

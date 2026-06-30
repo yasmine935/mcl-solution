@@ -1171,6 +1171,26 @@ nav {
 .jours-placeholder span { font-size: 1.4rem; }
 .jours-placeholder small { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
+.conge-demi-journee {
+  display: flex; flex-direction: column; gap: 8px;
+  background: #f5f7fa; border-radius: 10px; padding: 10px 14px;
+}
+.conge-checkbox-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; font-weight: 600; color: #37474f; cursor: pointer;
+}
+.conge-checkbox-label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+.conge-periode-choix { display: flex; gap: 8px; }
+.periode-btn {
+  flex: 1; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #cfd8dc;
+  background: #fff; color: #37474f; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.periode-btn:hover { border-color: #0288d1; }
+.periode-btn-active {
+  background: #01579b; border-color: #01579b; color: #fff;
+}
+
 /* INPUTS */
 .conge-input {
   border: 1.5px solid #e0e0e0; border-radius: 10px;
@@ -1234,6 +1254,7 @@ nav {
 .conge-item:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.07); transform: translateY(-1px); }
 .conge-approuve { border-color: #a5d6a7; background: #f9fff9; }
 .conge-refuse { border-color: #ef9a9a; background: #fff9f9; }
+.conge-valide-kia { border-color: #ce93d8; background: #fbf5fc; }
 
 .conge-item-left { display: flex; align-items: center; gap: 12px; }
 .conge-item-text { display: flex; flex-direction: column; }
@@ -1270,6 +1291,7 @@ nav {
 .badge-approuve { background: #e8f5e9; color: #2e7d32; }
 .badge-refuse   { background: #ffebee; color: #c62828; }
 .badge-attente  { background: #fff8e1; color: #f57f17; }
+.badge-valide-kia { background: #f3e5f5; color: #6a1b9a; }
 
 /* EMPTY */
 .conge-empty {
@@ -1868,6 +1890,7 @@ nav {
 .cmh-approuve { background: linear-gradient(135deg, #2e7d32, #388e3c); }
 .cmh-refuse   { background: linear-gradient(135deg, #b71c1c, #c62828); }
 .cmh-attente  { background: linear-gradient(135deg, #e65100, #f57c00); }
+.cmh-valide-kia { background: linear-gradient(135deg, #6a1b9a, #8e24aa); }
 
 .conge-modal-header-left { display: flex; align-items: center; gap: 14px; }
 .conge-modal-header-right { display: flex; align-items: center; gap: 12px; }
@@ -1886,6 +1909,7 @@ nav {
 .cms-approuve { background: rgba(255,255,255,0.3); }
 .cms-refuse   { background: rgba(255,255,255,0.3); }
 .cms-attente  { background: rgba(255,255,255,0.3); }
+.cms-valide-kia { background: rgba(255,255,255,0.3); }
 .conge-modal-close {
   background: rgba(255,255,255,0.2); border: none;
   color: #fff; width: 32px; height: 32px;
@@ -2059,3 +2083,36 @@ nav {
   .home-action-text strong { font-size: 0.75rem; }
   .home-action-text span { font-size: 0.65rem; }
 }
+
+/* ══ POPUP SOLDE ÉPUISÉ ══ */
+.solde-warning-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2100; padding: 20px;
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.solde-warning-modal {
+  background: #fff; border-radius: 20px;
+  width: 100%; max-width: 440px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  animation: popIn 0.2s ease;
+  border-top: 5px solid #f57c00;
+}
+.solde-warning-icon {
+  font-size: 2.6rem; margin-bottom: 10px;
+}
+.solde-warning-modal h3 {
+  margin: 0 0 12px; font-size: 1.1rem; font-weight: 800; color: #0d1b2a;
+}
+.solde-warning-modal p {
+  margin: 0 0 8px; font-size: 0.9rem; color: #546e7a; line-height: 1.5;
+}
+.solde-warning-actions {
+  display: flex; gap: 10px; justify-content: center; margin-top: 22px;
+}
+.solde-warning-actions .btn-envoyer-conge { background: #f57c00; }
+.solde-warning-actions .btn-envoyer-conge:hover { background: #e65100; }

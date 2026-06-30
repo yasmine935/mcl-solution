@@ -33,7 +33,7 @@ export class FicheInterventionTechnicien implements OnInit {
   signatureClientData: string = '';
 
   form = {
-    dateDebut: '', heureDebut: '', heureFin: '', intervenants: '',
+    dateDebut: '', intervenants: '',
     photos: [], signatureTechnicien: '', signatureClient: '',
     nomClientSigne: '', dateSignature: ''
   };
@@ -76,8 +76,8 @@ export class FicheInterventionTechnicien implements OnInit {
   mapFromBackend(f: any): any {
     return {
       id: f.id, numProjet: f.numProjet, client: f.client, adresse: f.adresse,
-      contact: f.contact, dateIntervention: f.dateIntervention,
-      heureDebut: f.heureDebut, heureFin: f.heureFin, description: f.description,
+      contact: f.contact, dateIntervention: f.dateIntervention, dateFin: f.dateFin,
+      description: f.description,
       statut: f.statut,
       technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
       technicienId: f.technicien?.id,
@@ -207,8 +207,6 @@ export class FicheInterventionTechnicien implements OnInit {
     if (!this.form.nomClientSigne) { alert('Veuillez entrer le nom du client'); return; }
 
     const body = {
-      heureDebut: this.form.heureDebut,
-      heureFin: this.form.heureFin,
       intervenants: this.form.intervenants,
       signatureTechnicien: this.form.signatureTechnicien,
       signatureClient: this.form.signatureClient,

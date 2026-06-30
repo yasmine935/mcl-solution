@@ -21,6 +21,7 @@ import { Voitures } from '../voitures/voitures';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
+import { CategoriesTaches } from '../categories-taches/categories-taches';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 @Component({
@@ -30,7 +31,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients,
+    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches,
     NgApexchartsModule
   ],
   templateUrl: './dashboard-admin.html',
@@ -86,10 +87,16 @@ mesConges: any[] = [];
 soldeCongesPerso: any = null;
 selectedConge: any = null;
 showCongeDetail = false;
+
+pourcentageSoldeRestant(restant: number, total: number): number {
+  if (!total) return 0;
+  return Math.max(0, Math.min(100, (restant / total) * 100));
+}
+
 ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true; }
 fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 showCongeFormPerso = false;
-congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '' };
+congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '', periode: '' };
 nombreJoursPerso = 0;
 congePersoEnEditionId: number | null = null;
 typesConge = ['ANNUEL', 'RTT', 'MALADIE', 'SANS_SOLDE', 'FORMATION'];
@@ -221,10 +228,25 @@ getEssanId(): number | null {
   return essan ? essan.id : null;
 }
 
+showSoldeEpuiseWarning = false;
+
 deposerCongePerso() {
   if (!this.congePerso.dateDebut || !this.congePerso.dateFin || !this.congePerso.type) {
     alert('Veuillez remplir les champs obligatoires'); return;
   }
+  if (this.congePerso.type === 'ANNUEL' && this.soldeCongesPerso && this.soldeCongesPerso.soldeAnnuelRestant <= 0) {
+    this.showSoldeEpuiseWarning = true;
+    return;
+  }
+  this.envoyerCongePerso();
+}
+
+confirmerEnvoiMalgreSolde() {
+  this.showSoldeEpuiseWarning = false;
+  this.envoyerCongePerso();
+}
+
+private envoyerCongePerso() {
   if (this.congePersoEnEditionId) {
     this.http.put(`http://localhost:8080/api/conges/${this.congePersoEnEditionId}`, this.congePerso).subscribe({
       next: () => {
@@ -254,7 +276,7 @@ deposerCongePerso() {
 
 modifierMonConge(c: any) {
   this.congePersoEnEditionId = c.id;
-  this.congePerso = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '' };
+  this.congePerso = { dateDebut: c.dateDebut, dateFin: c.dateFin, type: c.type, motif: c.motif || '', description: c.description || '', periode: c.periode || '' };
   this.calculerJoursPerso();
   this.showCongeFormPerso = true;
   this.showCongeDetail = false;
@@ -274,10 +296,15 @@ supprimerMonConge(id: number) {
 }
 
 calculerJoursPerso() {
+  if (this.congePerso.dateDebut !== this.congePerso.dateFin) this.congePerso.periode = '';
   if (this.congePerso.dateDebut && this.congePerso.dateFin) {
     const d = new Date(this.congePerso.dateDebut);
     const f = new Date(this.congePerso.dateFin);
     if (f < d) { this.nombreJoursPerso = 0; return; }
+    if (this.congePerso.dateDebut === this.congePerso.dateFin && (this.congePerso.periode === 'MATIN' || this.congePerso.periode === 'APRES_MIDI')) {
+      this.nombreJoursPerso = 0.5;
+      return;
+    }
     let jours = 0;
     const courant = new Date(d);
     while (courant <= f) {
@@ -289,8 +316,13 @@ calculerJoursPerso() {
   }
 }
 
+onToggleDemiJourneePerso(checked: boolean) {
+  this.congePerso.periode = checked ? 'MATIN' : '';
+  this.calculerJoursPerso();
+}
+
 resetCongeFormPerso() {
-  this.congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '' };
+  this.congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '', periode: '' };
   this.nombreJoursPerso = 0;
   this.congePersoEnEditionId = null;
 }
@@ -327,16 +359,23 @@ getCongesRefuses(): number {
   return this.conges.filter((c: any) => c.statut === 'REFUSE').length;
 }
 
+getCongesValideesKia(): number {
+  return this.conges.filter((c: any) => c.statut === 'VALIDE_KIA').length;
+}
+
 getCongesFiltres(): any[] {
   if (this.filtreConge === 'TOUS') return this.conges;
   return this.conges.filter((c: any) => c.statut === this.filtreConge);
 }
 
-calculerJours(dateDebut: string, dateFin: string): string {
+calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
   if (!dateDebut || !dateFin || dateDebut === '-' || dateFin === '-') return '-';
   const debut = new Date(dateDebut);
   const fin = new Date(dateFin);
   if (fin < debut) return '-';
+  if (dateDebut === dateFin && (periode === 'MATIN' || periode === 'APRES_MIDI')) {
+    return periode === 'MATIN' ? '0.5j (Matin)' : '0.5j (Après-midi)';
+  }
   let jours = 0;
   const courant = new Date(debut);
   while (courant <= fin) {

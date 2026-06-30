@@ -1,0 +1,122 @@
+.cattaches-container {
+  display: flex; flex-direction: column; gap: 20px;
+  padding: 20px; width: 100%;
+}
+
+/* ══ HEADER ══ */
+.cattaches-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #0d1b2a, #1565c0);
+  border-radius: 16px; padding: 22px 28px; color: #fff;
+}
+.cattaches-header-left { display: flex; align-items: center; gap: 16px; }
+.cattaches-icon {
+  font-size: 2rem; background: rgba(255,255,255,0.15);
+  border-radius: 14px; width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.cattaches-title { margin: 0; font-size: 1.3rem; font-weight: 800; }
+.cattaches-subtitle { margin: 4px 0 0; font-size: 0.82rem; opacity: 0.8; }
+.btn-nouvelle-categorie {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; color: #1565c0;
+  border: none; border-radius: 12px;
+  padding: 10px 20px; font-size: 0.88rem; font-weight: 800;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s; box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+.btn-nouvelle-categorie:hover { background: #e3f2fd; transform: translateY(-1px); }
+.btn-nouvelle-categorie mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+/* ══ FORMULAIRE AJOUT CATÉGORIE ══ */
+.categorie-form-card {
+  display: flex; gap: 12px;
+  background: #fff; border-radius: 16px;
+  border: 1.5px solid #e0e0e0; padding: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border-left: 4px solid #1565c0;
+}
+.categorie-input {
+  flex: 1; border: 1.5px solid #e0e0e0; border-radius: 10px;
+  padding: 10px 14px; font-size: 0.88rem; font-family: inherit;
+  color: #263238; background: #f8faff; outline: none;
+  transition: border-color 0.2s;
+}
+.categorie-input:focus { border-color: #1565c0; background: #fff; }
+.btn-save-categorie {
+  display: flex; align-items: center; gap: 7px;
+  background: #1565c0; color: #fff;
+  border: none; border-radius: 10px;
+  padding: 10px 22px; font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.btn-save-categorie:hover { background: #0d47a1; }
+.btn-save-categorie mat-icon { font-size: 17px; width: 17px; height: 17px; }
+
+/* ══ EMPTY STATE ══ */
+.cattaches-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 50px 20px; color: #90a4ae; text-align: center;
+}
+.cattaches-empty-icon { font-size: 2.6rem; }
+.cattaches-empty p { margin: 0; font-weight: 700; color: #546e7a; }
+.cattaches-empty small { font-size: 0.8rem; }
+
+/* ══ LISTE CATÉGORIES ══ */
+.categories-list { display: flex; flex-direction: column; gap: 14px; }
+.categorie-card {
+  background: #fff; border-radius: 14px;
+  border: 1.5px solid #e0e0e0; padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.categorie-card-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; gap: 12px;
+}
+.categorie-nom { font-size: 1rem; font-weight: 800; color: #0d1b2a; }
+.categorie-input-inline {
+  flex: 1; border: 1.5px solid #1565c0; border-radius: 8px;
+  padding: 7px 12px; font-size: 0.9rem; font-family: inherit; outline: none;
+}
+.categorie-card-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-icon-action {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  border: none; background: #f0f4f8; color: #546e7a;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-icon-action:hover { background: #e3f2fd; color: #1565c0; }
+.btn-icon-action mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.btn-icon-danger:hover { background: #ffebee; color: #c62828; }
+
+/* ══ CHIPS OPTIONS ══ */
+.options-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.options-empty { font-size: 0.8rem; color: #b0bec5; font-style: italic; }
+.option-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: #f0f4f8; color: #37474f;
+  border-radius: 20px; padding: 6px 8px 6px 14px;
+  font-size: 0.82rem; font-weight: 600;
+}
+.option-chip-remove {
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  border: none; background: #e0e0e0; color: #546e7a;
+  font-size: 0.65rem; cursor: pointer; padding: 0;
+}
+.option-chip-remove:hover { background: #c62828; color: #fff; }
+
+/* ══ AJOUT OPTION ══ */
+.inline-add-option { display: flex; gap: 10px; }
+.option-input {
+  flex: 1; border: 1.5px solid #e0e0e0; border-radius: 8px;
+  padding: 8px 12px; font-size: 0.85rem; font-family: inherit;
+  background: #f8faff; outline: none; transition: border-color 0.2s;
+}
+.option-input:focus { border-color: #1565c0; background: #fff; }
+.btn-add-option {
+  background: #f0f4f8; color: #1565c0; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: background 0.15s; white-space: nowrap;
+}
+.btn-add-option:hover { background: #e3f2fd; }
