@@ -36,12 +36,14 @@ export class FichesCompletees implements OnInit {
     this.http.get<any[]>(API_FICHES).subscribe({
       next: (data) => {
         this.fichesCompletees = data
-          .filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE')
+          .filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE_KIA' || f.statut === 'VALIDEE')
           .map((f: any) => ({
             ...f,
             date: f.dateIntervention,
             technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
             approuvePar: f.approuvePar || (f.statut === 'VALIDEE' ? 'Manager' : null),
+            confirmeParKia: f.confirmeParKia || null,
+            dateConfirmationKia: f.dateConfirmationKia || null,
             signatureTechnicien: f.signatureTechnicien || '',
             signatureClient: f.signatureClient || '',
             nomClientSigne: f.nomClientSigne || '',
@@ -58,9 +60,11 @@ export class FichesCompletees implements OnInit {
     });
   }
 
+  isKia(): boolean { return this.currentUser?.role === 'TECHNICIEN_SUP'; }
+
   getFichesAffichees(): any[] {
     let liste = this.fichesCompletees;
-    if (this.filterStatut === 'PENDING') liste = liste.filter((f: any) => f.statut === 'COMPLETEE');
+    if (this.filterStatut === 'PENDING') liste = liste.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE_KIA');
     else if (this.filterStatut === 'VALIDEE') liste = liste.filter((f: any) => f.statut === 'VALIDEE');
     if (this.rechercheFC.trim()) {
       const q = this.rechercheFC.toLowerCase().trim();
@@ -99,7 +103,25 @@ export class FichesCompletees implements OnInit {
     }
   }
 
+  confirmerKia(fiche: any) {
+    const nom = `${this.currentUser.prenom} ${this.currentUser.nom}`;
+    if (!confirm('Confirmer ce travail en tant que Technicien Supérieur ?')) return;
+    this.http.put<any>(`${API_FICHES}/${fiche.id}/confirmer-kia`, { confirmePar: nom }).subscribe({
+      next: () => {
+        fiche.statut = 'VALIDEE_KIA';
+        fiche.confirmeParKia = nom;
+        this.loadFichesCompletees();
+        this.fermerDetail();
+      },
+      error: () => alert('Erreur lors de la confirmation')
+    });
+  }
+
   validerFiche(fiche: any) {
+    if (fiche.statut !== 'VALIDEE_KIA') {
+      alert('Ce travail doit d\'abord être confirmé par KIA (Technicien Supérieur).');
+      return;
+    }
     const nomManager = `${this.currentUser.prenom} ${this.currentUser.nom}`;
     if (confirm('Valider le travail du technicien ?')) {
       // 1. Mettre à jour le statut + approuvePar dans le backend
@@ -127,12 +149,13 @@ export class FichesCompletees implements OnInit {
     }
   }
 
-  getCountPending(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE').length; }
+  getCountPending(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE_KIA').length; }
   getCountValidees(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE').length; }
 
   getStatutBadgeClass(statut: string): string {
     switch(statut) {
       case 'VALIDEE': return 'badge-validee';
+      case 'VALIDEE_KIA': return 'badge-validee-kia';
       case 'EN_COURS': return 'badge-en-cours';
       default: return 'badge-pending';
     }

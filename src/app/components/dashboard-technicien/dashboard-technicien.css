@@ -2111,6 +2111,16 @@ nav {
 .solde-warning-modal p {
   margin: 0 0 8px; font-size: 0.9rem; color: #546e7a; line-height: 1.5;
 }
+.solde-warning-depassement {
+  background: #fdecea; color: #c62828; font-weight: 700;
+  border-radius: 8px; padding: 8px 12px; font-size: 0.85rem;
+}
+.conge-depassement-note {
+  display: inline-block; background: #fdecea; color: #c62828;
+  font-weight: 700; font-size: 0.7rem; border-radius: 6px;
+  padding: 3px 8px; margin-top: 4px;
+}
+.conge-depassement-note-modal { display: block; margin-top: 10px; font-size: 0.8rem; padding: 8px 12px; }
 .solde-warning-actions {
   display: flex; gap: 10px; justify-content: center; margin-top: 22px;
 }

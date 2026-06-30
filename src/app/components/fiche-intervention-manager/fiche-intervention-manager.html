@@ -174,14 +174,6 @@
           }
         </div>
 
-        <!-- ✅ AJOUTER UNE TACHE MANUELLE -->
-        <div class="inline-add" style="margin-top:10px">
-          <input class="compact-input" [(ngModel)]="nouvelleFiche.nouvelleTacheManuelle"
-            placeholder="Ex: Camera HD 4K, Câble RJ45, Alimentation 12V..."
-            (keyup.enter)="ajouterTacheManuelle(nouvelleFiche)"/>
-          <button class="btn-inline-add" (click)="ajouterTacheManuelle(nouvelleFiche)" type="button">+ Ajouter une tâche</button>
-        </div>
-
         @if (nouvelleFiche.taches?.length) {
           <div class="taches-list">
             @for (tache of nouvelleFiche.taches; track $index) {
@@ -197,10 +189,6 @@
                         {{ option }}
                       </span>
                     }
-                    <div class="autre-inline">
-                      <input class="compact-input-autre" [(ngModel)]="tache.autreTemp" placeholder="+ Autre..." (keyup.enter)="ajouterAutre(tache)"/>
-                      <button class="btn-autre" (click)="ajouterAutre(tache)" [disabled]="!tache.autreTemp?.trim()" type="button">+</button>
-                    </div>
                   </div>
                 }
                 <button mat-icon-button color="warn" (click)="supprimerTache(nouvelleFiche, $index)" type="button"><mat-icon>delete</mat-icon></button>
@@ -372,12 +360,6 @@
             </button>
           }
         </div>
-        <div class="inline-add" style="margin-top:10px">
-          <input class="compact-input" [(ngModel)]="ficheEnEdition.nouvelleTacheManuelle"
-            placeholder="Ex: Camera HD 4K, Câble RJ45..."
-            (keyup.enter)="ajouterTacheManuelle(ficheEnEdition)"/>
-          <button class="btn-inline-add" (click)="ajouterTacheManuelle(ficheEnEdition)" type="button">+ Ajouter une tâche</button>
-        </div>
         @if (ficheEnEdition.taches?.length) {
           <div class="taches-list">
             @for (tache of ficheEnEdition.taches; track $index) {
@@ -393,10 +375,6 @@
                         {{ option }}
                       </span>
                     }
-                    <div class="autre-inline">
-                      <input type="text" class="compact-input-autre" [(ngModel)]="tache.autreTemp" placeholder="+ Autre..." (keyup.enter)="ajouterAutre(tache)"/>
-                      <button class="btn-autre" (click)="ajouterAutre(tache)" [disabled]="!tache.autreTemp?.trim()" type="button">+</button>
-                    </div>
                   </div>
                 }
                 <button mat-icon-button color="warn" (click)="supprimerTache(ficheEnEdition, $index)" type="button"><mat-icon>delete</mat-icon></button>

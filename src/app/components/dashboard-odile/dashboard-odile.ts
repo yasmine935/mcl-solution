@@ -127,11 +127,16 @@ export class DashboardOdile implements OnInit {
     this.fiches = stored ? JSON.parse(stored) : [];
   }
   showSoldeEpuiseWarning = false;
+  joursEnTropSolde = 0;
 
   deposerConge() {
-    if (this.conge.type === 'ANNUEL' && this.soldeConges && this.soldeConges.soldeAnnuelRestant <= 0) {
-      this.showSoldeEpuiseWarning = true;
-      return;
+    if (this.conge.type === 'ANNUEL' && this.soldeConges) {
+      const restant = this.soldeConges.soldeAnnuelRestant || 0;
+      if (this.nombreJours > restant) {
+        this.joursEnTropSolde = this.nombreJours - Math.max(0, restant);
+        this.showSoldeEpuiseWarning = true;
+        return;
+      }
     }
     this.envoyerConge();
   }
@@ -142,13 +147,14 @@ export class DashboardOdile implements OnInit {
   }
 
   private envoyerConge() {
+    const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
     if (this.congeEnEditionId) {
-      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, this.conge).subscribe(() => {
+      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, { ...this.conge, joursDepassement }).subscribe(() => {
         this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm();
       }, error => console.error('Erreur', error));
       return;
     }
-    const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 4 } };
+    const demande = { ...this.conge, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: 4 } };
     this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
       this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm();
     }, error => console.error('Erreur', error));
@@ -202,6 +208,7 @@ export class DashboardOdile implements OnInit {
     this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
     this.nombreJours = 0;
     this.congeEnEditionId = null;
+    this.joursEnTropSolde = 0;
   }
   ouvrirDetailFiche(fiche: any) { this.selectedFiche = fiche; this.showDetailModal = true; }
   fermerDetailFiche() { this.showDetailModal = false; this.selectedFiche = null; }

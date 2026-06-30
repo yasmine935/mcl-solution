@@ -58,10 +58,12 @@
               <span class="fc-proj">{{ fiche.numProjet }}</span>
               <span class="fc-client">{{ fiche.client }}</span>
             </div>
-            @if (fiche.approuvePar) {
+            @if (fiche.statut === 'VALIDEE') {
               <span class="fc-badge fc-badge-ok">✅ VALIDÉE</span>
+            } @else if (fiche.statut === 'VALIDEE_KIA') {
+              <span class="fc-badge fc-badge-kia">🔄 Confirmée par KIA</span>
             } @else {
-              <span class="fc-badge fc-badge-wait">⏳ EN ATTENTE</span>
+              <span class="fc-badge fc-badge-wait">⏳ En attente KIA</span>
             }
           </div>
 
@@ -130,6 +132,12 @@
               }
             </div>
 
+            @if (fiche.confirmeParKia) {
+              <div class="fc-confirmed-by-kia">
+                <mat-icon>verified_user</mat-icon> Confirmé par {{ fiche.confirmeParKia }} (Tech Sup)
+                @if (fiche.dateConfirmationKia) { · {{ fiche.dateConfirmationKia | date:'dd/MM/yyyy' }} }
+              </div>
+            }
             @if (fiche.approuvePar) {
               <div class="fc-validated-by">
                 <mat-icon>verified</mat-icon> Validé par {{ fiche.approuvePar }}
@@ -143,10 +151,16 @@
             <button type="button" class="fc-btn-detail" (click)="ouvrirDetail(fiche)">
               <mat-icon>visibility</mat-icon> Voir détails
             </button>
-            @if (!fiche.approuvePar) {
+            @if (isKia() && fiche.statut === 'COMPLETEE') {
+              <button type="button" class="fc-btn-confirmer-kia" (click)="confirmerKia(fiche)">
+                <mat-icon>verified_user</mat-icon> Confirmer (Tech Sup)
+              </button>
+            } @else if (!isKia() && fiche.statut === 'VALIDEE_KIA') {
               <button type="button" class="fc-btn-valider" (click)="validerFiche(fiche)">
                 <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
               </button>
+            } @else if (!isKia() && fiche.statut === 'COMPLETEE') {
+              <span class="fc-attente-kia">⏳ En attente de confirmation par KIA</span>
             }
           </div>
         </div>
@@ -174,10 +188,12 @@
             </div>
           </div>
           <div class="md-header-right">
-            @if (selectedFiche.approuvePar) {
+            @if (selectedFiche.statut === 'VALIDEE') {
               <span class="md-badge-ok">✅ VALIDÉE</span>
+            } @else if (selectedFiche.statut === 'VALIDEE_KIA') {
+              <span class="md-badge-kia">🔄 Confirmée par KIA</span>
             } @else {
-              <span class="md-badge-wait">⏳ EN ATTENTE</span>
+              <span class="md-badge-wait">⏳ En attente KIA</span>
             }
             <button type="button" class="md-close" (click)="fermerDetail()"><mat-icon>close</mat-icon></button>
           </div>
@@ -226,6 +242,10 @@
               <div class="md-field"><span class="md-lbl">Intervenants</span><span class="md-val">{{ selectedFiche.intervenants || '-' }}</span></div>
               @if (selectedFiche.dateCompletion) {
                 <div class="md-field"><span class="md-lbl">Complétée le</span><span class="md-val">{{ selectedFiche.dateCompletion | date:'dd/MM/yyyy HH:mm' }}</span></div>
+              }
+              @if (selectedFiche.confirmeParKia) {
+                <div class="md-field"><span class="md-lbl">Confirmé par (Tech Sup)</span><span class="md-val">{{ selectedFiche.confirmeParKia }}</span></div>
+                <div class="md-field"><span class="md-lbl">Date confirmation</span><span class="md-val">{{ selectedFiche.dateConfirmationKia | date:'dd/MM/yyyy HH:mm' }}</span></div>
               }
               @if (selectedFiche.approuvePar) {
                 <div class="md-field"><span class="md-lbl">Validé par</span><span class="md-val">{{ selectedFiche.approuvePar }}</span></div>
@@ -339,10 +359,16 @@
 
         <!-- FOOTER -->
         <div class="md-footer">
-          @if (!selectedFiche.approuvePar) {
+          @if (isKia() && selectedFiche.statut === 'COMPLETEE') {
+            <button type="button" class="md-btn-confirmer-kia" (click)="confirmerKia(selectedFiche)">
+              <mat-icon>verified_user</mat-icon> Confirmer (Tech Sup)
+            </button>
+          } @else if (!isKia() && selectedFiche.statut === 'VALIDEE_KIA') {
             <button type="button" class="md-btn-valider" (click)="validerFiche(selectedFiche)">
               <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
             </button>
+          } @else if (!isKia() && selectedFiche.statut === 'COMPLETEE') {
+            <span class="md-attente-kia">⏳ En attente de confirmation par KIA</span>
           }
           <button type="button" class="md-btn-fermer" (click)="fermerDetail()">
             <mat-icon>close</mat-icon> Fermer

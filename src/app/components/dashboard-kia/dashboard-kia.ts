@@ -176,11 +176,16 @@ calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
   }
 
   showSoldeEpuiseWarning = false;
+  joursEnTropSolde = 0;
 
   deposerConge() {
-    if (this.conge.type === 'ANNUEL' && this.soldeConges && this.soldeConges.soldeAnnuelRestant <= 0) {
-      this.showSoldeEpuiseWarning = true;
-      return;
+    if (this.conge.type === 'ANNUEL' && this.soldeConges) {
+      const restant = this.soldeConges.soldeAnnuelRestant || 0;
+      if (this.nombreJours > restant) {
+        this.joursEnTropSolde = this.nombreJours - Math.max(0, restant);
+        this.showSoldeEpuiseWarning = true;
+        return;
+      }
     }
     this.envoyerConge();
   }
@@ -191,14 +196,15 @@ calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
   }
 
   private envoyerConge() {
+    const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
     if (this.congeEnEditionId) {
-      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, this.conge).subscribe({
+      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, { ...this.conge, joursDepassement }).subscribe({
         next: () => { this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm(); },
         error: () => {}
       });
       return;
     }
-    const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 4 } };
+    const demande = { ...this.conge, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: 4 } };
     this.http.post('http://localhost:8080/api/conges', demande).subscribe({
       next: () => { this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm(); },
       error: () => {}
@@ -260,6 +266,7 @@ calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
     this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
     this.nombreJours = 0;
     this.congeEnEditionId = null;
+    this.joursEnTropSolde = 0;
   }
 
   updateStatutConge(id: number, statut: string) {

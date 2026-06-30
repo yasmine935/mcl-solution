@@ -84,4 +84,16 @@ export class CategoriesTaches implements OnInit {
       error: () => alert('Erreur lors de la suppression')
     });
   }
+
+  getInitiales(nom: string): string {
+    if (!nom) return '?';
+    const parts = nom.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return nom.substring(0, 2).toUpperCase();
+  }
+
+  getAvatarColor(nom: string): string {
+    const colors = ['#1565c0', '#6a1b9a', '#2e7d32', '#e65100', '#00695c', '#ad1457', '#37474f'];
+    return colors[nom ? nom.charCodeAt(0) % colors.length : 0];
+  }
 }

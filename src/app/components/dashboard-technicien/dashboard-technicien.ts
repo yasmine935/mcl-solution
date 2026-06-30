@@ -167,11 +167,16 @@ export class DashboardTechnicien implements OnInit {
   }
 
   showSoldeEpuiseWarning = false;
+  joursEnTropSolde = 0;
 
   deposerConge() {
-    if (this.conge.type === 'ANNUEL' && this.soldeConges && this.soldeConges.soldeAnnuelRestant <= 0) {
-      this.showSoldeEpuiseWarning = true;
-      return;
+    if (this.conge.type === 'ANNUEL' && this.soldeConges) {
+      const restant = this.soldeConges.soldeAnnuelRestant || 0;
+      if (this.nombreJours > restant) {
+        this.joursEnTropSolde = this.nombreJours - Math.max(0, restant);
+        this.showSoldeEpuiseWarning = true;
+        return;
+      }
     }
     this.envoyerConge();
   }
@@ -182,8 +187,9 @@ export class DashboardTechnicien implements OnInit {
   }
 
   private envoyerConge() {
+    const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
     if (this.congeEnEditionId) {
-      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, this.conge).subscribe(() => {
+      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, { ...this.conge, joursDepassement }).subscribe(() => {
         this.loadConges();
         this.loadSoldeConges();
         this.showCongeForm = false;
@@ -191,7 +197,7 @@ export class DashboardTechnicien implements OnInit {
       }, error => console.error('Erreur modification conge', error));
       return;
     }
-    const demande = { ...this.conge, utilisateur: { id: this.user.id }, manager: { id: 3 } };
+    const demande = { ...this.conge, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: 3 } };
     this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
       this.loadConges();
       this.loadSoldeConges();
@@ -255,6 +261,7 @@ export class DashboardTechnicien implements OnInit {
     this.conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
     this.nombreJours = 0;
     this.congeEnEditionId = null;
+    this.joursEnTropSolde = 0;
   }
 
   ouvrirFiche(fichId: number) {

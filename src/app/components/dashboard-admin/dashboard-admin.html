@@ -649,6 +649,9 @@
               } @else {
                 <span class="conge-dates-text conge-dates-vide">Dates non précisées</span>
               }
+              @if (c.joursDepassement > 0) {
+                <span class="conge-depassement-note">⚠️ {{ c.joursDepassement }}j au-delà du solde</span>
+              }
             </span>
             <span class="conge-statut-badge"
               [class.badge-approuve]="c.statut === 'APPROUVE'"
@@ -785,6 +788,10 @@
                 </div>
               </div>
 
+              @if (c.joursDepassement > 0) {
+                <div class="conge-depassement-note conge-depassement-note-card">⚠️ Cette demande dépasse le solde disponible de {{ c.joursDepassement }} jour(s)</div>
+              }
+
               @if (c.motif) {
                 <div class="conge-motif">
                   <label>💬 Motif :</label>
@@ -816,6 +823,7 @@
               } @else {
                 <div class="conge-decision-finale">
                   {{ c.statut === 'APPROUVE' ? '✅ Décision finale : Approuvé' : '❌ Décision finale : Refusé' }}
+                  @if (c.validePar) { <span class="conge-decision-par">par {{ c.validePar }}</span> }
                 </div>
               }
 
@@ -933,8 +941,14 @@
   <div class="solde-warning-overlay" (click)="showSoldeEpuiseWarning = false">
     <div class="solde-warning-modal" (click)="$event.stopPropagation()">
       <div class="solde-warning-icon">⚠️</div>
-      <h3>Solde de congé annuel épuisé</h3>
-      <p>Vous avez déjà utilisé tous vos jours de congé payé pour cette année ({{ soldeCongesPerso?.soldeAnnuelRestant || 0 }}j restants).</p>
+      @if ((soldeCongesPerso?.soldeAnnuelRestant || 0) > 0) {
+        <h3>Solde de congé annuel insuffisant</h3>
+        <p>Il vous reste {{ soldeCongesPerso?.soldeAnnuelRestant }}j, mais vous demandez {{ nombreJoursPerso }}j.</p>
+        <p class="solde-warning-depassement">⚠️ {{ joursEnTropSolde }} jour(s) dépassent votre solde disponible.</p>
+      } @else {
+        <h3>Solde de congé annuel épuisé</h3>
+        <p>Vous avez déjà utilisé tous vos jours de congé payé pour cette année ({{ soldeCongesPerso?.soldeAnnuelRestant || 0 }}j restants).</p>
+      }
       <p>Voulez-vous envoyer la demande quand même à ESSAN ?</p>
       <div class="solde-warning-actions">
         <button type="button" class="btn-annuler-conge" (click)="showSoldeEpuiseWarning = false">Annuler</button>
@@ -986,6 +1000,9 @@
               </div>
             }
           </div>
+          @if (selectedConge.joursDepassement > 0) {
+            <div class="conge-depassement-note conge-depassement-note-modal">⚠️ Cette demande dépasse le solde disponible de {{ selectedConge.joursDepassement }} jour(s)</div>
+          }
         </div>
 
         <div class="conge-detail-grid">
@@ -997,6 +1014,12 @@
             <span class="conge-detail-lbl">Statut</span>
             <span class="conge-detail-val">{{ selectedConge.statut === 'APPROUVE' ? 'Approuvé' : selectedConge.statut === 'REFUSE' ? 'Refusé' : selectedConge.statut === 'EN_ATTENTE' ? 'En attente' : (selectedConge.statut || '—') }}</span>
           </div>
+          @if (selectedConge.validePar) {
+            <div class="conge-detail-field">
+              <span class="conge-detail-lbl">Décidé par</span>
+              <span class="conge-detail-val">{{ selectedConge.validePar }}</span>
+            </div>
+          }
           @if (selectedConge.motif) {
             <div class="conge-detail-field conge-detail-full">
               <span class="conge-detail-lbl">💬 Motif</span>

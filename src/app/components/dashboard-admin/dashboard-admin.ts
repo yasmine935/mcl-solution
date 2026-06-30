@@ -229,14 +229,19 @@ getEssanId(): number | null {
 }
 
 showSoldeEpuiseWarning = false;
+joursEnTropSolde = 0;
 
 deposerCongePerso() {
   if (!this.congePerso.dateDebut || !this.congePerso.dateFin || !this.congePerso.type) {
     alert('Veuillez remplir les champs obligatoires'); return;
   }
-  if (this.congePerso.type === 'ANNUEL' && this.soldeCongesPerso && this.soldeCongesPerso.soldeAnnuelRestant <= 0) {
-    this.showSoldeEpuiseWarning = true;
-    return;
+  if (this.congePerso.type === 'ANNUEL' && this.soldeCongesPerso) {
+    const restant = this.soldeCongesPerso.soldeAnnuelRestant || 0;
+    if (this.nombreJoursPerso > restant) {
+      this.joursEnTropSolde = this.nombreJoursPerso - Math.max(0, restant);
+      this.showSoldeEpuiseWarning = true;
+      return;
+    }
   }
   this.envoyerCongePerso();
 }
@@ -247,8 +252,9 @@ confirmerEnvoiMalgreSolde() {
 }
 
 private envoyerCongePerso() {
+  const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
   if (this.congePersoEnEditionId) {
-    this.http.put(`http://localhost:8080/api/conges/${this.congePersoEnEditionId}`, this.congePerso).subscribe({
+    this.http.put(`http://localhost:8080/api/conges/${this.congePersoEnEditionId}`, { ...this.congePerso, joursDepassement }).subscribe({
       next: () => {
         this.loadMesConges();
         this.loadSoldeCongesPerso();
@@ -261,7 +267,7 @@ private envoyerCongePerso() {
   }
   const essanId = this.getEssanId();
   if (!essanId) { alert('Responsable ESSAN introuvable'); return; }
-  const demande = { ...this.congePerso, utilisateur: { id: this.user.id }, manager: { id: essanId } };
+  const demande = { ...this.congePerso, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: essanId } };
   this.http.post('http://localhost:8080/api/conges', demande).subscribe({
     next: () => {
       this.loadMesConges();
@@ -325,6 +331,7 @@ resetCongeFormPerso() {
   this.congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '', periode: '' };
   this.nombreJoursPerso = 0;
   this.congePersoEnEditionId = null;
+  this.joursEnTropSolde = 0;
 }
 
   loadFiches() {
@@ -469,7 +476,12 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
   }
 
   updateStatut(id: number, statut: string) {
-    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {}).subscribe({
+    let url = `http://localhost:8080/api/conges/${id}/statut?statut=${statut}`;
+    if (statut === 'APPROUVE' || statut === 'REFUSE') {
+      const nomAdmin = `${this.user.prenom || ''} ${this.user.nom || ''}`.trim() || this.user.username || 'Admin';
+      url += `&validePar=${encodeURIComponent(nomAdmin)}`;
+    }
+    this.http.put(url, {}).subscribe({
       next: () => this.loadConges(),
       error: () => {}
     });

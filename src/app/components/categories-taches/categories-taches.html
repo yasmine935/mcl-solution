@@ -16,6 +16,7 @@
 
   @if (showForm) {
     <div class="categorie-form-card">
+      <div class="categorie-form-icon"><mat-icon>category</mat-icon></div>
       <input type="text" class="categorie-input" [(ngModel)]="nouvelleCategorie"
         placeholder="Ex : Câblage réseau" (keyup.enter)="ajouterCategorie()">
       <button type="button" class="btn-save-categorie" (click)="ajouterCategorie()">
@@ -31,23 +32,30 @@
       <small>Cliquez sur "+ Nouvelle Catégorie" pour commencer</small>
     </div>
   } @else {
-    <div class="categories-list">
+    <div class="categories-grid">
       @for (c of categories; track c.id) {
         <div class="categorie-card">
           <div class="categorie-card-top">
-            @if (categorieEnEditionId === c.id) {
-              <input type="text" class="categorie-input-inline" [(ngModel)]="nomEnEdition" (keyup.enter)="sauvegarderNom(c.id)">
-              <div class="categorie-card-btns">
-                <button type="button" class="btn-icon-action" (click)="sauvegarderNom(c.id)" title="Enregistrer"><mat-icon>check</mat-icon></button>
+            <div class="categorie-avatar" [style.background]="getAvatarColor(c.nom)">{{ getInitiales(c.nom) }}</div>
+
+            <div class="categorie-card-top-info">
+              @if (categorieEnEditionId === c.id) {
+                <input type="text" class="categorie-input-inline" [(ngModel)]="nomEnEdition" (keyup.enter)="sauvegarderNom(c.id)">
+              } @else {
+                <strong class="categorie-nom">{{ c.nom }}</strong>
+                <span class="categorie-count-badge">{{ c.options.length }} option{{ c.options.length > 1 ? 's' : '' }}</span>
+              }
+            </div>
+
+            <div class="categorie-card-btns">
+              @if (categorieEnEditionId === c.id) {
+                <button type="button" class="btn-icon-action btn-icon-success" (click)="sauvegarderNom(c.id)" title="Enregistrer"><mat-icon>check</mat-icon></button>
                 <button type="button" class="btn-icon-action" (click)="annulerEditionNom()" title="Annuler"><mat-icon>close</mat-icon></button>
-              </div>
-            } @else {
-              <strong class="categorie-nom">{{ c.nom }}</strong>
-              <div class="categorie-card-btns">
+              } @else {
                 <button type="button" class="btn-icon-action" (click)="ouvrirEditionNom(c)" title="Renommer"><mat-icon>edit</mat-icon></button>
                 <button type="button" class="btn-icon-action btn-icon-danger" (click)="supprimerCategorie(c.id)" title="Supprimer"><mat-icon>delete</mat-icon></button>
-              </div>
-            }
+              }
+            </div>
           </div>
 
           <div class="options-chips">
@@ -57,15 +65,19 @@
             @for (o of c.options; track o.id) {
               <span class="option-chip">
                 {{ o.nom }}
-                <button type="button" class="option-chip-remove" (click)="supprimerOption(o.id)" title="Retirer">✕</button>
+                <button type="button" class="option-chip-remove" (click)="supprimerOption(o.id)" title="Retirer">
+                  <mat-icon>close</mat-icon>
+                </button>
               </span>
             }
           </div>
 
           <div class="inline-add-option">
+            <mat-icon class="inline-add-icon">add_circle_outline</mat-icon>
             <input type="text" class="option-input" [(ngModel)]="nouvelleOptionParCategorie[c.id]"
-              placeholder="Ex : Câble RJ45" (keyup.enter)="ajouterOption(c.id)">
-            <button type="button" class="btn-add-option" (click)="ajouterOption(c.id)">+ Ajouter une option</button>
+              placeholder="Ajouter une option..." (keyup.enter)="ajouterOption(c.id)">
+            <button type="button" class="btn-add-option" (click)="ajouterOption(c.id)"
+              [disabled]="!nouvelleOptionParCategorie[c.id]?.trim()">Ajouter</button>
           </div>
         </div>
       }

@@ -80,8 +80,7 @@ export class FicheInterventionManager implements OnInit {
     technicienAssigne: '', selectedTechIds: [] as number[],
     description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
     adresse: '', contact: '', materielsHorsStandard: [],
-    nouveauMateriel: '', documentsImportes: [], taches: [],
-    nouvelleTacheManuelle: ''
+    nouveauMateriel: '', documentsImportes: [], taches: []
   };
 
   constructor(private http: HttpClient) {}
@@ -204,8 +203,7 @@ export class FicheInterventionManager implements OnInit {
       heureFin: f.heureFin,
       materielsHorsStandard: f.materielsHorsStandard ? JSON.parse(f.materielsHorsStandard) : [],
       documentsImportes: f.documentsImportes ? JSON.parse(f.documentsImportes) : [],
-      taches: f.taches ? JSON.parse(f.taches) : [],
-      nouvelleTacheManuelle: ''
+      taches: f.taches ? JSON.parse(f.taches) : []
     };
   }
 
@@ -304,7 +302,6 @@ export class FicheInterventionManager implements OnInit {
     if (this.ficheEnEdition.date) {
       this.ficheEnEdition.date = this.ficheEnEdition.date.toString().split('T')[0];
     }
-    if (!this.ficheEnEdition.nouvelleTacheManuelle) this.ficheEnEdition.nouvelleTacheManuelle = '';
     this.showFormEdit = true;
     this.showFormAdd = false;
   }
@@ -359,8 +356,7 @@ export class FicheInterventionManager implements OnInit {
       technicienAssigne: '', selectedTechIds: [] as number[],
       description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
       adresse: '', contact: '', materielsHorsStandard: [],
-      nouveauMateriel: '', documentsImportes: [], taches: [],
-      nouvelleTacheManuelle: ''
+      nouveauMateriel: '', documentsImportes: [], taches: []
     };
   }
 
@@ -412,18 +408,8 @@ export class FicheInterventionManager implements OnInit {
   ajouterTache(form: any, tache: string) {
     if (!form.taches) form.taches = [];
     if (!form.taches.some((t: any) => t.nom === tache)) {
-      form.taches.push({ nom: tache, coche: false, selections: [], customOptions: [], autreTemp: '' });
+      form.taches.push({ nom: tache, coche: false, selections: [], customOptions: [] });
     }
-  }
-
-  ajouterTacheManuelle(form: any) {
-    const nom = form.nouvelleTacheManuelle?.trim();
-    if (!nom) return;
-    if (!form.taches) form.taches = [];
-    if (!form.taches.some((t: any) => t.nom === nom)) {
-      form.taches.push({ nom: nom, coche: false, selections: [], customOptions: [], autreTemp: '' });
-    }
-    form.nouvelleTacheManuelle = '';
   }
 
   supprimerTache(form: any, index: number) { form.taches.splice(index, 1); }
@@ -445,16 +431,6 @@ export class FicheInterventionManager implements OnInit {
     const idx = tache.selections.indexOf(option);
     if (idx === -1) tache.selections.push(option);
     else tache.selections.splice(idx, 1);
-  }
-
-  ajouterAutre(tache: any) {
-    const val = tache.autreTemp?.trim();
-    if (!val) return;
-    if (!tache.customOptions) tache.customOptions = [];
-    if (!tache.selections) tache.selections = [];
-    if (!tache.customOptions.includes(val)) tache.customOptions.push(val);
-    if (!tache.selections.includes(val)) tache.selections.push(val);
-    tache.autreTemp = '';
   }
 
   tacheExiste(form: any, nomTache: string): boolean {

@@ -156,8 +156,13 @@ mat-form-field { width: 100%; }
 
 /* BADGES */
 .badge-priorite {
-  display: inline-block; padding: 5px 12px; border-radius: 6px;
+  display: inline-block; min-width: 78px; padding: 5px 12px; border-radius: 6px;
   font-size: 0.72rem; font-weight: 700; color: #fff; text-align: center; white-space: nowrap;
+}
+
+.badge-priorite-pastel {
+  display: inline-block; min-width: 78px; padding: 5px 12px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 700; text-align: center; white-space: nowrap;
 }
 
 /* STATUT — texte coloré sans cadre */

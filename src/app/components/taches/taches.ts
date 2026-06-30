@@ -220,12 +220,17 @@ export class Taches implements OnInit {
     };
   }
 
+  mapStatutToBackend(statutFr: string): string {
+    const map: any = { 'En Qualification': 'A_FAIRE', 'En cours': 'EN_COURS', 'Fait': 'TERMINEE' };
+    return map[statutFr] || statutFr;
+  }
+
   buildBody(tache: any, statut?: string): any {
     return {
       titre: tache.projet,
       description: tache.numCommande || '',
       priorite: tache.priorite,
-      statut: statut || (tache.statut === 'En cours' ? 'EN_COURS' : tache.statut === 'Fait' ? 'TERMINEE' : 'A_FAIRE'),
+      statut: statut || this.mapStatutToBackend(tache.statut),
       dateEcheance: tache.echeance && tache.echeance.match(/^\d{4}-\d{2}-\d{2}$/) ? tache.echeance : null,
       client: tache.client || '',
       clientFinal: tache.clientFinal || '',
@@ -454,9 +459,14 @@ export class Taches implements OnInit {
     return colors[statut] || '#CCCCCC';
   }
 
-  getPrioriteColor(priorite: string): string {
-    const colors: any = { 'Faible': '#26a69a', 'Élevé': '#7700CC', 'Moyenne': '#e65100' };
-    return colors[priorite] || '#546e7a';
+  getPrioriteBg(priorite: string): string {
+    const colors: any = { 'Faible': '#eff7f3', 'Élevé': '#f8eefa', 'Moyenne': '#faf1e6' };
+    return colors[priorite] || '#f1f3f5';
+  }
+
+  getPrioriteTextColor(priorite: string): string {
+    const colors: any = { 'Faible': '#5c9080', 'Élevé': '#8e44ad', 'Moyenne': '#9c8366' };
+    return colors[priorite] || '#78909c';
   }
 
   getEmployeeName(employeId: number): string {

@@ -487,7 +487,7 @@
                   </div>
                 </td>
                 <td><span class="badge-priorite" [style.background]="getStatutColor(tache.statut)">{{ tache.statut }}</span></td>
-                <td><span class="badge-priorite" [style.background]="getPrioriteColor(tache.priorite)">{{ tache.priorite }}</span></td>
+                <td><span class="badge-priorite-pastel" [style.background]="getPrioriteBg(tache.priorite)" [style.color]="getPrioriteTextColor(tache.priorite)">{{ tache.priorite }}</span></td>
                 <td>
                   @if (tache.echeance) {
                     <span class="badge-echeance">{{ tache.echeance }}</span>
@@ -594,7 +594,7 @@
           </div>
           <div class="detail-item">
             <strong>Priorité</strong>
-            <span class="badge-priorite" [style.background]="getPrioriteColor(selectedTache.priorite)">{{ selectedTache.priorite }}</span>
+            <span class="badge-priorite-pastel" [style.background]="getPrioriteBg(selectedTache.priorite)" [style.color]="getPrioriteTextColor(selectedTache.priorite)">{{ selectedTache.priorite }}</span>
           </div>
           <div class="detail-item">
             <strong>Client</strong>

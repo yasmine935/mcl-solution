@@ -831,6 +831,9 @@
                 @if (c.dateDebut && c.dateFin) {
                   <span class="conge-duree">{{ calculerJours(c.dateDebut, c.dateFin, c.periode) }} jour(s){{ c.periode === 'MATIN' ? ' (Matin)' : c.periode === 'APRES_MIDI' ? ' (Après-midi)' : '' }}</span>
                 }
+                @if (c.joursDepassement > 0) {
+                  <span class="conge-depassement-note">⚠️ {{ c.joursDepassement }}j au-delà du solde</span>
+                }
               </span>
             </span>
             <span class="conge-item-right">
@@ -955,8 +958,14 @@
     <div class="solde-warning-overlay" (click)="showSoldeEpuiseWarning = false">
       <div class="solde-warning-modal" (click)="$event.stopPropagation()">
         <div class="solde-warning-icon">⚠️</div>
-        <h3>Solde de congé annuel épuisé</h3>
-        <p>Vous avez déjà utilisé tous vos jours de congé payé pour cette année ({{ soldeConges?.soldeAnnuelRestant || 0 }}j restants).</p>
+        @if ((soldeConges?.soldeAnnuelRestant || 0) > 0) {
+          <h3>Solde de congé annuel insuffisant</h3>
+          <p>Il vous reste {{ soldeConges?.soldeAnnuelRestant }}j, mais vous demandez {{ nombreJours }}j.</p>
+          <p class="solde-warning-depassement">⚠️ {{ joursEnTropSolde }} jour(s) dépassent votre solde disponible.</p>
+        } @else {
+          <h3>Solde de congé annuel épuisé</h3>
+          <p>Vous avez déjà utilisé tous vos jours de congé payé pour cette année ({{ soldeConges?.soldeAnnuelRestant || 0 }}j restants).</p>
+        }
         <p>Voulez-vous envoyer la demande quand même à votre responsable ?</p>
         <div class="solde-warning-actions">
           <button type="button" class="btn-annuler-conge" (click)="showSoldeEpuiseWarning = false">Annuler</button>
@@ -1014,6 +1023,9 @@
                 </div>
               }
             </div>
+            @if (selectedConge.joursDepassement > 0) {
+              <div class="conge-depassement-note conge-depassement-note-modal">⚠️ Cette demande dépasse le solde disponible de {{ selectedConge.joursDepassement }} jour(s)</div>
+            }
           </div>
 
           <!-- Type + Motif -->
