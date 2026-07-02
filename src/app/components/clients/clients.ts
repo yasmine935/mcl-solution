@@ -22,12 +22,17 @@ export class GestionClients implements OnInit {
   showDetailModal = false;
   selectedClient: any = null;
   recherche = '';
+  showInactifs = false;
+  currentUser: any = {};
 
   form = { nom: '', codeClient: '', email: '', adresse: '', contact: '' };
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit() { this.loadClients(); }
+  ngOnInit() {
+    this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    this.loadClients();
+  }
 
   loadClients() {
     this.http.get<any[]>(API).subscribe({
@@ -57,25 +62,40 @@ export class GestionClients implements OnInit {
     });
   }
 
-  supprimer(id: number) {
-    if (confirm('Supprimer ce client ?')) {
-      this.http.delete(`${API}/${id}`).subscribe({
-        next: () => this.loadClients(),
-        error: () => alert('Erreur lors de la suppression')
+  desactiver(id: number, nomClient: string) {
+    const nomUser = `${this.currentUser.prenom || ''} ${this.currentUser.nom || ''}`.trim() || this.currentUser.username || 'Admin';
+    if (confirm(`Désactiver le client "${nomClient}" ? Il restera visible dans l'historique.`)) {
+      this.http.put<any>(`${API}/${id}/desactiver?desactivePar=${encodeURIComponent(nomUser)}`, {}).subscribe({
+        next: () => { this.loadClients(); this.fermerDetail(); },
+        error: () => alert('Erreur lors de la désactivation')
       });
     }
   }
 
+  reactiver(id: number) {
+    this.http.put<any>(`${API}/${id}/reactiver`, {}).subscribe({
+      next: () => this.loadClients(),
+      error: () => alert('Erreur lors de la réactivation')
+    });
+  }
+
   clientsFiltres(): any[] {
-    if (!this.recherche.trim()) return this.clients;
+    let liste = this.showInactifs
+      ? this.clients
+      : this.clients.filter(c => c.actif !== false);
+    if (!this.recherche.trim()) return liste;
     const q = this.recherche.toLowerCase().trim();
-    return this.clients.filter(c =>
+    return liste.filter(c =>
       (c.nom || '').toLowerCase().includes(q) ||
       (c.codeClient || '').toLowerCase().includes(q) ||
       (c.email || '').toLowerCase().includes(q) ||
       (c.adresse || '').toLowerCase().includes(q) ||
       (c.contact || '').toLowerCase().includes(q)
     );
+  }
+
+  get countInactifs(): number {
+    return this.clients.filter(c => c.actif === false).length;
   }
 
   getInitiales(nom: string): string {

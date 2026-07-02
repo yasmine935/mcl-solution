@@ -18,6 +18,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
+import { JournalTravail } from '../journal-travail/journal-travail';
 
 @Component({
   selector: 'app-dashboard-kia',
@@ -28,7 +29,7 @@ import { Taches } from '../taches/taches';
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees,
     Planning, Semainier, Documents,
-    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches
+    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'
@@ -179,6 +180,10 @@ calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
   joursEnTropSolde = 0;
 
   deposerConge() {
+    if (this.conge.dateDebut && this.conge.dateFin && this.conge.dateFin < this.conge.dateDebut) {
+      alert('La date de fin ne peut pas être avant la date de début.');
+      return;
+    }
     if (this.conge.type === 'ANNUEL' && this.soldeConges) {
       const restant = this.soldeConges.soldeAnnuelRestant || 0;
       if (this.nombreJours > restant) {
@@ -300,7 +305,7 @@ calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }
 
-  logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
+  logout() { localStorage.removeItem('user'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }
 
 

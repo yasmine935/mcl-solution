@@ -61,9 +61,6 @@
       <div class="nav-divider"></div>
       <div class="nav-section-label">Support</div>
 
-      <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
-        <mat-icon>support_agent</mat-icon> Tickets
-      </a>
       <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
@@ -196,9 +193,6 @@
       }
       @if (currentPage === 'Semainier') {
         <app-semenier></app-semenier>
-      }
-      @if (currentPage === 'tickets') {
-        <app-ticketing></app-ticketing>
       }
       @if (currentPage === 'factures') {
         <app-factures></app-factures>
@@ -458,7 +452,7 @@
           </div>
           <div class="conge-field">
             <label>📅 Date de fin</label>
-            <input type="date" class="conge-input" [(ngModel)]="conge.dateFin" (ngModelChange)="calculerNombreJours()"/>
+            <input type="date" class="conge-input" [(ngModel)]="conge.dateFin" [min]="conge.dateDebut" (ngModelChange)="calculerNombreJours()"/>
           </div>
         </div>
 

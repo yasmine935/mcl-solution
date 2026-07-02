@@ -1,0 +1,180 @@
+<div class="jt-container">
+
+  <!-- ══ VUE LISTE ══ -->
+  @if (vue === 'liste') {
+    <div class="jt-header">
+      <div class="jt-header-left">
+        <div class="jt-icon">✍️</div>
+        <div>
+          <h2 class="jt-title">{{ isManager ? 'Journaux de Travail — Équipe' : 'Journal de Travail' }}</h2>
+          <p class="jt-subtitle">{{ journaux.length }} rapport(s) rédigé(s) avec l'IA</p>
+        </div>
+      </div>
+      @if (!isManager) {
+        <button type="button" class="btn-nouveau-rapport" (click)="ouvrirFormulaire()">
+          <mat-icon>auto_awesome</mat-icon> Nouveau rapport IA
+        </button>
+      }
+    </div>
+
+    @if (journaux.length === 0) {
+      <div class="jt-empty">
+        <span class="jt-empty-icon">📝</span>
+        <p>Aucun rapport de journée</p>
+        <small>{{ isManager ? 'Les techniciens n\'ont pas encore rédigé de rapport.' : 'Décrivez votre journée en quelques mots et l\'IA rédige le rapport professionnel.' }}</small>
+        @if (!isManager) {
+          <button type="button" class="btn-nouveau-rapport mt" (click)="ouvrirFormulaire()">
+            <mat-icon>auto_awesome</mat-icon> Créer mon premier rapport
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="jt-grid">
+        @for (j of journaux; track j.id) {
+          <div class="jt-card" (click)="voirDetail(j)">
+            @if (isManager && j.utilisateur) {
+              <div class="jt-card-technicien">
+                <mat-icon>person</mat-icon>
+                {{ j.utilisateur.prenom }} {{ j.utilisateur.nom }}
+              </div>
+            }
+            <div class="jt-card-date">
+              <mat-icon>calendar_today</mat-icon>
+              {{ formatDate(j.dateJournee) }}
+            </div>
+            <div class="jt-card-preview">{{ apercu(j.rapportGenere) }}</div>
+            <div class="jt-card-footer">
+              <span class="jt-badge-ia"><mat-icon>auto_awesome</mat-icon> Généré par IA</span>
+              @if (!isManager) {
+                <button type="button" class="btn-supp-card" (click)="$event.stopPropagation(); supprimer(j.id)" title="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- ══ FORMULAIRE ══ -->
+  @if (vue === 'formulaire') {
+    <div class="jt-form-page">
+
+      <!-- Bannière formulaire -->
+      <div class="jt-form-banner">
+        <button type="button" class="btn-back" (click)="annuler()">
+          <mat-icon>arrow_back</mat-icon> Retour
+        </button>
+        <div class="jt-form-banner-center">
+          <div class="jt-form-banner-icon">✍️</div>
+          <div>
+            <h2>Nouveau rapport journalier</h2>
+            <p>Décrivez votre journée — l'IA rédige le rapport professionnel</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="jt-form-body jt-form-center">
+
+        <!-- Étape 1 : Date + Mic -->
+        <div class="jt-step-card">
+          <div class="jt-step-num">1</div>
+          <div class="jt-step-content">
+            <div class="jt-step-top">
+              <div class="jt-field jt-field-date">
+                <label class="jt-label">Date de la journée</label>
+                <input type="date" class="jt-input" [(ngModel)]="form.dateJournee">
+              </div>
+
+              <!-- Bouton micro -->
+              <div class="jt-mic-zone">
+                <button type="button" class="btn-mic-big" [class.btn-mic-big-actif]="isListening"
+                  (click)="toggleDictee()"
+                  [title]="isListening ? 'Arrêter la dictée' : 'Cliquez pour dicter'">
+                  @if (isListening) {
+                    <span class="mic-ring"></span>
+                    <mat-icon class="mic-icon">mic</mat-icon>
+                  } @else {
+                    <mat-icon class="mic-icon">mic_none</mat-icon>
+                  }
+                </button>
+                <span class="mic-label" [class.mic-label-actif]="isListening">
+                  {{ isListening ? '🔴 En écoute...' : '🎙️ Dicter' }}
+                </span>
+              </div>
+            </div>
+
+            <label class="jt-label">Décrivez votre journée</label>
+            <p class="jt-hint">Parlez ou tapez librement — interventions, matériels, problèmes rencontrés...</p>
+            <textarea class="jt-textarea" [class.jt-textarea-listening]="isListening"
+              [(ngModel)]="form.notesOriginales" rows="6"
+              placeholder="Ex: Matin posé 3 écrans Samsung chez Total, problème câblage HDMI résolu. Après-midi installation caméra IP chez FMR, test réseau OK...">
+            </textarea>
+          </div>
+        </div>
+
+        @if (erreurIA) {
+          <div class="jt-erreur">⚠️ {{ erreurIA }}</div>
+        }
+
+        <!-- Bouton génération IA -->
+        <button type="button" class="btn-generer-ia" (click)="genererRapportIA()" [disabled]="generationEnCours">
+          @if (generationEnCours) {
+            <span class="jt-spinner"></span>
+            <span>Génération en cours...</span>
+          } @else {
+            <mat-icon>auto_awesome</mat-icon>
+            <span>Générer le rapport avec l'IA</span>
+          }
+        </button>
+
+        <!-- Étape 2 : Rapport généré -->
+        @if (form.rapportGenere) {
+          <div class="jt-step-card jt-step-rapport">
+            <div class="jt-step-num jt-step-num-violet">2</div>
+            <div class="jt-step-content">
+              <div class="jt-rapport-badge">
+                <mat-icon>auto_awesome</mat-icon> Rapport généré par l'IA — modifiable avant sauvegarde
+              </div>
+              <textarea class="jt-textarea jt-rapport-area" [(ngModel)]="form.rapportGenere" rows="14"></textarea>
+
+              <button type="button" class="btn-sauvegarder" (click)="sauvegarder()" [disabled]="sauvegardeEnCours">
+                @if (sauvegardeEnCours) {
+                  Sauvegarde...
+                } @else {
+                  <mat-icon>save</mat-icon> Sauvegarder le rapport
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ══ DÉTAIL ══ -->
+  @if (vue === 'detail' && journalSelectionne) {
+    <div class="jt-detail-page">
+      <div class="jt-form-header">
+        <button type="button" class="btn-back" (click)="vue = 'liste'">
+          <mat-icon>arrow_back</mat-icon> Retour
+        </button>
+        <h2>{{ formatDate(journalSelectionne.dateJournee) }}</h2>
+      </div>
+
+      <div class="jt-detail-body">
+        <div class="jt-detail-section">
+          <div class="jt-detail-section-title"><mat-icon>notes</mat-icon> Notes originales du technicien</div>
+          <div class="jt-detail-notes">{{ journalSelectionne.notesOriginales || '—' }}</div>
+        </div>
+
+        <div class="jt-detail-section jt-detail-rapport">
+          <div class="jt-detail-section-title"><mat-icon>auto_awesome</mat-icon> Rapport généré par l'IA</div>
+          <div class="jt-rapport-text">{{ journalSelectionne.rapportGenere }}</div>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

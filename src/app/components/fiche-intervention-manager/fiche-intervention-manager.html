@@ -26,8 +26,13 @@
         <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
         <div class="form-row-compact">
           <div class="field-sm">
-            <label class="field-label">N° Projet *</label>
-            <input class="compact-input" [(ngModel)]="nouvelleFiche.numProjet" placeholder="PRJ-001"/>
+            <label class="field-label">Projet *</label>
+            <select class="compact-input" [(ngModel)]="nouvelleFiche.numProjet">
+              <option value="">— Sélectionner un projet —</option>
+              @for (p of projets; track p.id) {
+                <option [value]="p.titre">{{ p.titre }}@if (p.client) { — {{ p.client }}}</option>
+              }
+            </select>
           </div>
           <div class="field-lg">
             <label class="field-label">Client *</label>
@@ -44,7 +49,7 @@
           </div>
           <div class="field-sm">
             <label class="field-label">Date Fin</label>
-            <input type="date" class="compact-input" [(ngModel)]="nouvelleFiche.dateFin">
+            <input type="date" class="compact-input" [(ngModel)]="nouvelleFiche.dateFin" [min]="nouvelleFiche.dateDebut">
           </div>
           @if (nouvelleFiche.dateDebut && nouvelleFiche.dateFin) {
             <div class="field-sm duree-badge">
@@ -53,7 +58,7 @@
           }
           <div class="field-lg">
             <label class="field-label">Technicien(s) Assigné(s)</label>
-            <div class="tech-dropdown">
+            <div class="tech-dropdown" (click)="$event.stopPropagation()">
               <button type="button" class="tech-dropdown-trigger" (click)="techDropdownNouvelleOpen = !techDropdownNouvelleOpen">
                 <span>{{ getSelectedTechLabel(nouvelleFiche.selectedTechIds) }}</span>
                 <mat-icon class="tech-dropdown-chevron" [class.open]="techDropdownNouvelleOpen">expand_more</mat-icon>
@@ -220,8 +225,13 @@
         <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
         <div class="form-row-compact">
           <div class="field-sm">
-            <label class="field-label">N° Projet *</label>
-            <input class="compact-input" [(ngModel)]="ficheEnEdition.numProjet"/>
+            <label class="field-label">Projet *</label>
+            <select class="compact-input" [(ngModel)]="ficheEnEdition.numProjet">
+              <option value="">— Sélectionner un projet —</option>
+              @for (p of projets; track p.id) {
+                <option [value]="p.titre">{{ p.titre }}@if (p.client) { — {{ p.client }}}</option>
+              }
+            </select>
           </div>
           <div class="field-lg">
             <label class="field-label">Client</label>
@@ -238,7 +248,7 @@
           </div>
           <div class="field-sm">
             <label class="field-label">Date Fin</label>
-            <input type="date" class="compact-input" [(ngModel)]="ficheEnEdition.dateFin">
+            <input type="date" class="compact-input" [(ngModel)]="ficheEnEdition.dateFin" [min]="ficheEnEdition.dateDebut">
           </div>
           @if (ficheEnEdition.dateDebut && ficheEnEdition.dateFin) {
             <div class="field-sm duree-badge">
@@ -247,7 +257,7 @@
           }
           <div class="field-lg">
             <label class="field-label">Technicien(s) Assigné(s)</label>
-            <div class="tech-dropdown">
+            <div class="tech-dropdown" (click)="$event.stopPropagation()">
               <button type="button" class="tech-dropdown-trigger" (click)="techDropdownEditionOpen = !techDropdownEditionOpen">
                 <span>{{ getSelectedTechLabel(ficheEnEdition.selectedTechIds) }}</span>
                 <mat-icon class="tech-dropdown-chevron" [class.open]="techDropdownEditionOpen">expand_more</mat-icon>

@@ -276,6 +276,10 @@ export class Taches implements OnInit {
       alert('Veuillez remplir le nom du projet');
       return;
     }
+    if (this.nouvelleTache.date && this.nouvelleTache.echeance && this.nouvelleTache.echeance < this.nouvelleTache.date) {
+      alert("L'échéance ne peut pas être avant la date de début du projet.");
+      return;
+    }
     const body = this.buildBody(this.nouvelleTache, 'A_FAIRE');
     body.etapes = JSON.stringify(ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })));
     this.http.post<any>(API, body).subscribe({
@@ -299,6 +303,10 @@ export class Taches implements OnInit {
   modifierTache() {
     if (!this.tacheEnEdition.projet) {
       alert('Veuillez remplir le nom du projet');
+      return;
+    }
+    if (this.tacheEnEdition.date && this.tacheEnEdition.echeance && this.tacheEnEdition.echeance < this.tacheEnEdition.date) {
+      alert("L'échéance ne peut pas être avant la date de début du projet.");
       return;
     }
     this.http.put<any>(`${API}/${this.tacheEnEdition.id}`, this.buildBody(this.tacheEnEdition)).subscribe({

@@ -41,6 +41,10 @@
         <mat-icon>calendar_today</mat-icon> Semainier
       </a>
 
+      <a class="nav-item" [class.active]="currentPage === 'journal'" (click)="currentPage = 'journal'">
+        <mat-icon>auto_awesome</mat-icon> Journal IA
+      </a>
+
       <div class="nav-divider"></div>
       <div class="nav-section-label">Personnel</div>
 
@@ -74,6 +78,11 @@
     </div>
 
     <div class="page-content">
+
+      <!-- Journal de Travail IA -->
+      @if (currentPage === 'journal') {
+        <app-journal-travail></app-journal-travail>
+      }
 
       <!-- Semainier -->
       @if (currentPage === 'Semainier') {
@@ -281,7 +290,10 @@
                     <button class="btn-remplir" (click)="ouvrirFiche(int.id)" type="button">
                       📋 Remplir &amp; Signer la Fiche
                     </button>
-                    <button class="btn-terminer" (click)="marquerTerminee(int.id)" type="button">
+                    <button class="btn-terminer"
+                      [disabled]="!int.nomClientSigne"
+                      [title]="!int.nomClientSigne ? 'Remplissez et signez la fiche avant de marquer comme terminée' : 'Marquer comme terminée'"
+                      (click)="marquerTerminee(int.id)" type="button">
                       ✅ Terminée
                     </button>
                   </div>
@@ -772,7 +784,7 @@
 
           <div class="conge-field">
             <label>📅 Date de fin</label>
-            <input type="date" class="conge-input" [(ngModel)]="conge.dateFin" (ngModelChange)="calculerNombreJours()"/>
+            <input type="date" class="conge-input" [(ngModel)]="conge.dateFin" [min]="conge.dateDebut" (ngModelChange)="calculerNombreJours()"/>
           </div>
         </div>
 

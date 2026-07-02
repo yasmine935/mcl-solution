@@ -78,6 +78,17 @@
 .clients-toolbar {
   display: flex; align-items: center; gap: 14px;
 }
+.clients-toolbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.btn-toggle-inactifs {
+  display: flex; align-items: center; gap: 6px;
+  background: #f0f4f8; color: #37474f; border: 1.5px solid #e0e0e0;
+  border-radius: 10px; padding: 7px 14px; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.btn-toggle-inactifs mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.btn-toggle-inactifs:hover, .btn-toggle-inactifs.active {
+  background: #fff3e0; color: #bf360c; border-color: #ffcc80;
+}
 .clients-search-wrap {
   flex: 1; display: flex; align-items: center; gap: 10px;
   background: #fff; border: 1.5px solid #e0e0e0;
@@ -272,3 +283,50 @@
   border-radius: 8px; font-weight: 700; cursor: pointer; color: #37474f;
 }
 .btn-close-detail:hover { background: #cfd8dc; }
+
+/* ══ CLIENT INACTIF ══ */
+.client-inactif { opacity: 0.72; border-style: dashed !important; }
+.client-inactif .client-nom { text-decoration: line-through; color: #90a4ae; }
+
+.badge-desactive {
+  display: inline-block; background: #ffebee; color: #c62828;
+  font-size: 0.65rem; font-weight: 800; padding: 2px 8px;
+  border-radius: 10px; letter-spacing: 0.3px; text-transform: uppercase;
+}
+
+.client-desactive-trace {
+  display: flex; align-items: center; gap: 6px;
+  background: #fff8e1; color: #6d4c00; font-size: 0.75rem; font-weight: 600;
+  padding: 6px 12px; border-left: 3px solid #ffc107; margin: 0 16px 8px;
+  border-radius: 0 8px 8px 0;
+}
+.client-desactive-trace mat-icon { font-size: 15px; width: 15px; height: 15px; color: #f9a825; }
+
+/* Bouton désactiver (icône dans la carte) */
+.btn-desactiver-icon { color: #e65100 !important; }
+
+/* Boutons modal détail */
+.btn-desactiver-detail {
+  display: flex; align-items: center; gap: 6px;
+  background: #fff3e0; color: #bf360c; border: 1.5px solid #ffcc80;
+  padding: 9px 18px; border-radius: 8px; font-weight: 700;
+  cursor: pointer; font-size: 0.85rem; transition: all 0.15s;
+}
+.btn-desactiver-detail:hover { background: #bf360c; color: #fff; border-color: #bf360c; }
+.btn-reactiver-detail {
+  display: flex; align-items: center; gap: 6px;
+  background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7;
+  padding: 9px 18px; border-radius: 8px; font-weight: 700;
+  cursor: pointer; font-size: 0.85rem; transition: all 0.15s;
+}
+.btn-reactiver-detail:hover { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+
+/* Bloc traçabilité dans le modal détail */
+.detail-trace-bloc {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff8e1; border: 1px solid #ffc107; border-radius: 10px;
+  padding: 12px 16px; margin-top: 14px; color: #5d4000;
+}
+.detail-trace-bloc mat-icon { color: #f9a825; flex-shrink: 0; }
+.detail-trace-bloc strong { display: block; font-size: 0.88rem; }
+.detail-trace-bloc span { font-size: 0.78rem; opacity: 0.8; }

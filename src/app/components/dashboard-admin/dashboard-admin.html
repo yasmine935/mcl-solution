@@ -50,6 +50,9 @@
       <a class="nav-item" [class.active]="currentPage === 'categories-taches'" (click)="currentPage = 'categories-taches'">
         <mat-icon>category</mat-icon> Catégories de Tâches
       </a>
+      <a class="nav-item" [class.active]="currentPage === 'journal'" (click)="currentPage = 'journal'">
+        <mat-icon>auto_awesome</mat-icon> Journal IA
+      </a>
       <a class="nav-item" [class.active]="currentPage === 'mes-conges'" (click)="currentPage = 'mes-conges'">
         <mat-icon>beach_access</mat-icon> Mes Congés
       </a>
@@ -87,9 +90,6 @@
   <span class="nav-badge nav-badge-alert">{{ minutesAlertes }}</span>
 }
 </a>
-      <a class="nav-item" [class.active]="currentPage === 'tickets'" (click)="currentPage = 'tickets'">
-        <mat-icon>support_agent</mat-icon> Tickets
-      </a>
       <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
         <mat-icon>receipt</mat-icon> Factures
       </a>
@@ -212,11 +212,6 @@
               <div class="home-action-text"><strong>Interventions</strong><span>Fiches terrain</span></div>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </div>
-            <div class="home-action-btn" (click)="currentPage = 'tickets'">
-              <div class="home-action-icon home-action-purple"><mat-icon>support_agent</mat-icon></div>
-              <div class="home-action-text"><strong>Tickets</strong><span>{{ reclamations.length }} remontées</span></div>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </div>
           </div>
         </div>
 
@@ -296,6 +291,9 @@
       @if (currentPage === 'categories-taches') {
         <app-categories-taches></app-categories-taches>
       }
+      @if (currentPage === 'journal') {
+        <app-journal-travail></app-journal-travail>
+      }
       @if (currentPage === 'planning') {
         <app-planning></app-planning>
       }
@@ -307,9 +305,6 @@
       }
       @if (currentPage === 'documents') {
         <app-documents></app-documents>
-      }
-      @if (currentPage === 'tickets') {
-        <app-ticketing></app-ticketing>
       }
       @if (currentPage === 'factures') {
         <app-factures></app-factures>
@@ -592,7 +587,7 @@
 
           <div class="conge-field">
             <label>📅 Date de fin</label>
-            <input type="date" class="conge-input" [(ngModel)]="congePerso.dateFin" (ngModelChange)="calculerJoursPerso()">
+            <input type="date" class="conge-input" [(ngModel)]="congePerso.dateFin" [min]="congePerso.dateDebut" (ngModelChange)="calculerJoursPerso()">
           </div>
         </div>
 

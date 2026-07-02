@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
+import { JournalTravail } from '../journal-travail/journal-travail';
 
 @Component({
   selector: 'app-dashboard-technicien',
@@ -19,7 +20,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    Semainier, Planning, RemonteesTerrainComponent
+    Semainier, Planning, RemonteesTerrainComponent, JournalTravail
   ],
   templateUrl: './dashboard-technicien.html',
   styleUrl: './dashboard-technicien.css'
@@ -170,6 +171,10 @@ export class DashboardTechnicien implements OnInit {
   joursEnTropSolde = 0;
 
   deposerConge() {
+    if (this.conge.dateDebut && this.conge.dateFin && this.conge.dateFin < this.conge.dateDebut) {
+      alert('La date de fin ne peut pas être avant la date de début.');
+      return;
+    }
     if (this.conge.type === 'ANNUEL' && this.soldeConges) {
       const restant = this.soldeConges.soldeAnnuelRestant || 0;
       if (this.nombreJours > restant) {
@@ -359,7 +364,7 @@ export class DashboardTechnicien implements OnInit {
 
   logout() {
     localStorage.removeItem('user');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }
 

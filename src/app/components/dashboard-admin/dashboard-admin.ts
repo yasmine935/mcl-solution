@@ -22,6 +22,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
 import { CategoriesTaches } from '../categories-taches/categories-taches';
+import { JournalTravail } from '../journal-travail/journal-travail';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 @Component({
@@ -31,7 +32,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches,
+    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail,
     NgApexchartsModule
   ],
   templateUrl: './dashboard-admin.html',
@@ -234,6 +235,10 @@ joursEnTropSolde = 0;
 deposerCongePerso() {
   if (!this.congePerso.dateDebut || !this.congePerso.dateFin || !this.congePerso.type) {
     alert('Veuillez remplir les champs obligatoires'); return;
+  }
+  if (this.congePerso.dateFin < this.congePerso.dateDebut) {
+    alert('La date de fin ne peut pas être avant la date de début.');
+    return;
   }
   if (this.congePerso.type === 'ANNUEL' && this.soldeCongesPerso) {
     const restant = this.soldeCongesPerso.soldeAnnuelRestant || 0;
@@ -653,7 +658,7 @@ getStatutVoitureColor(statut: string): string {
 
   logout() {
     localStorage.removeItem('user');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }
 

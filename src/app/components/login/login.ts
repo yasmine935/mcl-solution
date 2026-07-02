@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -23,7 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class Login implements OnInit {
   username = '';
   password = '';
   errorMessage = '';
@@ -46,6 +46,17 @@ export class Login {
 
   constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
+  ngOnInit() {
+    // Si l'utilisateur est déjà connecté (localStorage), le rediriger directement
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try {
+        const user = JSON.parse(stored);
+        if (user?.role) { this.naviguerVersPage(user); }
+      } catch { localStorage.removeItem('user'); }
+    }
+  }
+
   ouvrirForgot() { this.showForgotModal = true; this.forgotUsername = ''; this.forgotMessage = ''; this.forgotError = ''; }
   fermerForgot() { this.showForgotModal = false; }
 
@@ -60,19 +71,20 @@ export class Login {
   }
 
   private naviguerVersPage(user: any) {
+    const opts = { replaceUrl: true }; // remplace /login dans l'historique → le retour ne peut plus y revenir
     switch (user.role) {
-      case 'TECHNICIEN':     this.router.navigate(['/dashboard-technicien']); break;
-      case 'TECHNICIEN_SUP': this.router.navigate(['/dashboard-kia']); break;
-      case 'AURELIEN':       this.router.navigate(['/dashboard-aurelien']); break;
-      case 'ODILE':          this.router.navigate(['/dashboard-odile']); break;
-      case 'FERID':          this.router.navigate(['/dashboard-admin']); break;
-      case 'ESSAN':          this.router.navigate(['/dashboard-essan']); break;
-      case 'KARINE':         this.router.navigate(['/dashboard-karine']); break;
-      case 'HAIDEH':         this.router.navigate(['/dashboard-haideh']); break;
-      case 'NACCERA':        this.router.navigate(['/dashboard-naccera']); break;
-      case 'ABY':            this.router.navigate(['/dashboard-aby']); break;
-      case 'UN':             this.router.navigate(['/dashboard-technicien']); break;
-      default:               this.router.navigate(['/login']);
+      case 'TECHNICIEN':     this.router.navigate(['/dashboard-technicien'], opts); break;
+      case 'TECHNICIEN_SUP': this.router.navigate(['/dashboard-kia'], opts); break;
+      case 'AURELIEN':       this.router.navigate(['/dashboard-aurelien'], opts); break;
+      case 'ODILE':          this.router.navigate(['/dashboard-odile'], opts); break;
+      case 'FERID':          this.router.navigate(['/dashboard-admin'], opts); break;
+      case 'ESSAN':          this.router.navigate(['/dashboard-essan'], opts); break;
+      case 'KARINE':         this.router.navigate(['/dashboard-karine'], opts); break;
+      case 'HAIDEH':         this.router.navigate(['/dashboard-haideh'], opts); break;
+      case 'NACCERA':        this.router.navigate(['/dashboard-naccera'], opts); break;
+      case 'ABY':            this.router.navigate(['/dashboard-aby'], opts); break;
+      case 'UN':             this.router.navigate(['/dashboard-technicien'], opts); break;
+      default:               this.router.navigate(['/login'], opts);
     }
   }
 

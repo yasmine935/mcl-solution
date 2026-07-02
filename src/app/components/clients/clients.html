@@ -55,7 +55,7 @@
     </div>
   }
 
-  <!-- BARRE DE RECHERCHE -->
+  <!-- BARRE DE RECHERCHE + TOGGLE INACTIFS -->
   <div class="clients-toolbar">
     <div class="clients-search-wrap">
       <mat-icon>search</mat-icon>
@@ -66,7 +66,15 @@
         </button>
       }
     </div>
-    <span class="clients-count-badge">{{ clientsFiltres().length }} / {{ clients.length }}</span>
+    <div class="clients-toolbar-right">
+      @if (countInactifs > 0) {
+        <button type="button" class="btn-toggle-inactifs" [class.active]="showInactifs" (click)="showInactifs = !showInactifs">
+          <mat-icon>{{ showInactifs ? 'visibility_off' : 'history' }}</mat-icon>
+          {{ showInactifs ? 'Masquer désactivés' : 'Désactivés (' + countInactifs + ')' }}
+        </button>
+      }
+      <span class="clients-count-badge">{{ clientsFiltres().length }} / {{ clients.length }}</span>
+    </div>
   </div>
 
   <!-- LISTE CLIENTS -->
@@ -79,9 +87,12 @@
   } @else {
     <div class="clients-grid">
       @for (c of clientsFiltres(); track c.id) {
-        <div class="client-card client-card-clickable" (click)="ouvrirDetail(c)" (keydown.enter)="ouvrirDetail(c)" tabindex="0">
+        <div class="client-card client-card-clickable"
+          [class.client-inactif]="c.actif === false"
+          (click)="ouvrirDetail(c)" (keydown.enter)="ouvrirDetail(c)" tabindex="0">
+
           <div class="client-card-top">
-            <div class="client-avatar" [style.background]="getAvatarColor(c.nom)">
+            <div class="client-avatar" [style.background]="c.actif === false ? '#90a4ae' : getAvatarColor(c.nom)">
               {{ getInitiales(c.nom) }}
             </div>
             <div class="client-card-info">
@@ -89,16 +100,33 @@
               @if (c.codeClient) {
                 <span class="client-code-badge">{{ c.codeClient }}</span>
               }
+              @if (c.actif === false) {
+                <span class="badge-desactive">Désactivé</span>
+              }
             </div>
             <div class="client-card-btns" (click)="$event.stopPropagation()">
-              <button mat-icon-button color="primary" (click)="ouvrirEdition(c)" title="Modifier" type="button">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="supprimer(c.id)" title="Supprimer" type="button">
-                <mat-icon>delete</mat-icon>
-              </button>
+              @if (c.actif !== false) {
+                <button mat-icon-button color="primary" (click)="ouvrirEdition(c)" title="Modifier" type="button">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="desactiver(c.id, c.nom)" title="Désactiver" type="button" class="btn-desactiver-icon">
+                  <mat-icon>person_off</mat-icon>
+                </button>
+              } @else {
+                <button mat-icon-button color="primary" (click)="reactiver(c.id)" title="Réactiver" type="button">
+                  <mat-icon>person_add</mat-icon>
+                </button>
+              }
             </div>
           </div>
+
+          @if (c.actif === false && c.desactivePar) {
+            <div class="client-desactive-trace">
+              <mat-icon>info_outline</mat-icon>
+              Désactivé par <strong>{{ c.desactivePar }}</strong> le {{ c.dateDesactivation }}
+            </div>
+          }
+
           <div class="client-card-body">
             @if (c.email) {
               <div class="client-info-row">
@@ -134,12 +162,15 @@
   <div class="modal-overlay" (click)="fermerDetail()" (keydown.escape)="fermerDetail()" tabindex="-1">
     <div class="detail-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
 
-      <div class="detail-modal-header" [style.background]="getAvatarColor(selectedClient.nom)">
+      <div class="detail-modal-header" [style.background]="selectedClient.actif === false ? '#90a4ae' : getAvatarColor(selectedClient.nom)">
         <div class="detail-modal-avatar">{{ getInitiales(selectedClient.nom) }}</div>
         <div class="detail-modal-title">
           <h3>{{ selectedClient.nom }}</h3>
           @if (selectedClient.codeClient) {
             <span class="detail-code-badge">{{ selectedClient.codeClient }}</span>
+          }
+          @if (selectedClient.actif === false) {
+            <span class="badge-desactive">Désactivé</span>
           }
         </div>
         <button type="button" class="detail-modal-close" (click)="fermerDetail()">✕</button>
@@ -160,12 +191,31 @@
             <span class="detail-info-val">{{ selectedClient.adresse || '—' }}</span>
           </div>
         </div>
+
+        @if (selectedClient.actif === false && selectedClient.desactivePar) {
+          <div class="detail-trace-bloc">
+            <mat-icon>history</mat-icon>
+            <div>
+              <strong>Désactivé par {{ selectedClient.desactivePar }}</strong>
+              <span>le {{ selectedClient.dateDesactivation }}</span>
+            </div>
+          </div>
+        }
       </div>
 
       <div class="detail-modal-footer">
-        <button type="button" class="btn-edit-detail" (click)="fermerDetail(); ouvrirEdition(selectedClient)">
-          <mat-icon>edit</mat-icon> Modifier
-        </button>
+        @if (selectedClient.actif !== false) {
+          <button type="button" class="btn-edit-detail" (click)="fermerDetail(); ouvrirEdition(selectedClient)">
+            <mat-icon>edit</mat-icon> Modifier
+          </button>
+          <button type="button" class="btn-desactiver-detail" (click)="desactiver(selectedClient.id, selectedClient.nom)">
+            <mat-icon>person_off</mat-icon> Désactiver
+          </button>
+        } @else {
+          <button type="button" class="btn-reactiver-detail" (click)="reactiver(selectedClient.id); fermerDetail()">
+            <mat-icon>person_add</mat-icon> Réactiver
+          </button>
+        }
         <button type="button" class="btn-close-detail" (click)="fermerDetail()">Fermer</button>
       </div>
 

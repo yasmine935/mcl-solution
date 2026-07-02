@@ -327,5 +327,5 @@ export class DashboardAby implements OnInit {
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }
 
-  logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
+  logout() { localStorage.removeItem('user'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }

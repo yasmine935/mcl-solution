@@ -46,7 +46,7 @@
           </div>
           <div class="proj-field-sm">
             <label class="field-label">Échéance</label>
-            <input class="compact-input" [(ngModel)]="nouvelleTache.echeance" type="date"/>
+            <input class="compact-input" [(ngModel)]="nouvelleTache.echeance" type="date" [min]="nouvelleTache.date"/>
           </div>
         </div>
       </div>
@@ -245,7 +245,7 @@
           </div>
           <div class="proj-field-sm">
             <label class="field-label">Échéance</label>
-            <input class="compact-input" [(ngModel)]="tacheEnEdition.echeance" type="date"/>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.echeance" type="date" [min]="tacheEnEdition.date"/>
           </div>
         </div>
       </div>

@@ -113,6 +113,10 @@ export class DashboardAurelien implements OnInit {
   joursEnTropSolde = 0;
 
   deposerConge() {
+    if (this.conge.dateDebut && this.conge.dateFin && this.conge.dateFin < this.conge.dateDebut) {
+      alert('La date de fin ne peut pas être avant la date de début.');
+      return;
+    }
     if (this.conge.type === 'ANNUEL' && this.soldeConges) {
       const restant = this.soldeConges.soldeAnnuelRestant || 0;
       if (this.nombreJours > restant) {
@@ -304,7 +308,7 @@ loadSoldeConges() {
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar() { this.sidebarOpen = false; }
 
-  logout() { localStorage.removeItem('user'); this.router.navigate(['/login']); }
+  logout() { localStorage.removeItem('user'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }
 
 

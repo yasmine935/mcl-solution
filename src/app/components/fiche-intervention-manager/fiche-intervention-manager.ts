@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -62,6 +62,16 @@ export class FicheInterventionManager implements OnInit {
   optionsTaches: any = {};
   tachesDisponibles: string[] = [];
 
+  // ── PROJETS LIÉS ──
+  projets: any[] = [];
+
+  loadProjets() {
+    this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+      next: (data) => this.projets = data.filter((p: any) => p.titre),
+      error: () => this.projets = []
+    });
+  }
+
   loadCategoriesTaches() {
     this.http.get<any[]>('http://localhost:8080/api/categories-taches').subscribe({
       next: (categories) => {
@@ -91,6 +101,7 @@ export class FicheInterventionManager implements OnInit {
     this.loadFiches();
     this.loadClients();
     this.loadCategoriesTaches();
+    this.loadProjets();
   }
 
   loadClients() {
@@ -210,6 +221,12 @@ export class FicheInterventionManager implements OnInit {
   techDropdownNouvelleOpen = false;
   techDropdownEditionOpen = false;
 
+  @HostListener('document:click')
+  fermerDropdownsTech() {
+    this.techDropdownNouvelleOpen = false;
+    this.techDropdownEditionOpen = false;
+  }
+
   isTechSelected(selectedIds: any[], techId: number): boolean {
     return (selectedIds || []).map(Number).includes(Number(techId));
   }
@@ -266,6 +283,10 @@ export class FicheInterventionManager implements OnInit {
       alert('Veuillez remplir les champs obligatoires');
       return;
     }
+    if (this.nouvelleFiche.dateDebut && this.nouvelleFiche.dateFin && this.nouvelleFiche.dateFin < this.nouvelleFiche.dateDebut) {
+      alert('La date de fin ne peut pas être avant la date de début.');
+      return;
+    }
     const techBody = this.buildTechBody(this.nouvelleFiche.selectedTechIds || []);
     const body = {
       numProjet: this.nouvelleFiche.numProjet,
@@ -309,6 +330,10 @@ export class FicheInterventionManager implements OnInit {
   modifierFiche() {
     if (!this.ficheEnEdition.numProjet) {
       alert('Veuillez remplir les champs obligatoires');
+      return;
+    }
+    if (this.ficheEnEdition.dateDebut && this.ficheEnEdition.dateFin && this.ficheEnEdition.dateFin < this.ficheEnEdition.dateDebut) {
+      alert('La date de fin ne peut pas être avant la date de début.');
       return;
     }
     const techBody = this.buildTechBody(this.ficheEnEdition.selectedTechIds || []);
