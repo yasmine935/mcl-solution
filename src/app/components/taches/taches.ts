@@ -252,14 +252,24 @@ export class Taches implements OnInit {
   marquerEtape(tache: any, index: number) {
     if (!tache.etapes) return;
     const etape = tache.etapes[index];
-    etape.done = !etape.done;
+
     if (etape.done) {
-      etape.doneBy = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-      etape.doneAt = new Date().toLocaleString('fr-FR');
-    } else {
-      etape.doneBy = '';
-      etape.doneAt = '';
+      // Étape déjà validée — irréversible
+      alert(`L'étape « ${etape.nom} » est définitivement validée et ne peut plus être annulée.`);
+      return;
     }
+
+    // Vérifier que toutes les étapes précédentes sont cochées avant de cocher celle-ci
+    for (let i = 0; i < index; i++) {
+      if (!tache.etapes[i].done) {
+        alert(`Vous devez d'abord valider l'étape « ${tache.etapes[i].nom} » avant de passer à « ${etape.nom} ».`);
+        return;
+      }
+    }
+
+    etape.done = true;
+    etape.doneBy = `${this.currentUser.prenom} ${this.currentUser.nom}`;
+    etape.doneAt = new Date().toLocaleString('fr-FR');
     this.http.put<any>(`${API}/${tache.id}`, this.buildBody(tache)).subscribe();
   }
 

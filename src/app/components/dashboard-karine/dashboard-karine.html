@@ -204,8 +204,8 @@
         </div>
       }
 
-      <!-- ══ MODAL TRAITER CONGÉ ══ -->
-      @if (showTraiterModal) {
+      <!-- modal moved to bottom of karine-layout -->
+      @if (false) {
         @if (congeSelectionne) {
           <div class="modal-overlay-traiter" (click)="fermerTraiter()">
             <div class="modal-traiter" (click)="$event.stopPropagation()">
@@ -303,4 +303,79 @@
     </div>
   </div>
   <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
+
+  <!-- ══ MODAL TRAITER CONGÉ — hors de tout conteneur scrollable ══ -->
+  @if (showTraiterModal && congeSelectionne) {
+    <div class="modal-overlay-traiter" (click)="fermerTraiter()">
+      <div class="modal-traiter" (click)="$event.stopPropagation()">
+
+        <div class="modal-traiter-header">
+          <div class="modal-traiter-id">
+            <span class="conge-ref">CONGÉ-{{ congeSelectionne.id }}</span>
+            <span class="badge-approuve">APPROUVÉ</span>
+          </div>
+          <button type="button" class="modal-close-x" (click)="fermerTraiter()">✕</button>
+        </div>
+
+        <div class="modal-traiter-body">
+          <div class="traiter-info-grid">
+            <div class="traiter-info-cell">
+              <span class="ti-icon">👤</span>
+              <div>
+                <p class="ti-label">EMPLOYÉ</p>
+                <p class="ti-val">{{ congeSelectionne.utilisateur?.prenom }} {{ congeSelectionne.utilisateur?.nom }}</p>
+              </div>
+            </div>
+            <div class="traiter-info-cell">
+              <span class="ti-icon">📅</span>
+              <div>
+                <p class="ti-label">DATE DÉBUT</p>
+                <p class="ti-val">{{ congeSelectionne.dateDebut }}</p>
+              </div>
+            </div>
+            <div class="traiter-info-cell">
+              <span class="ti-icon">📅</span>
+              <div>
+                <p class="ti-label">DATE FIN</p>
+                <p class="ti-val">{{ congeSelectionne.dateFin }}</p>
+              </div>
+            </div>
+            <div class="traiter-info-cell">
+              <span class="ti-icon">🏷️</span>
+              <div>
+                <p class="ti-label">TYPE</p>
+                <p class="ti-val">{{ congeSelectionne.type || '—' }}</p>
+              </div>
+            </div>
+          </div>
+
+          @if (congeSelectionne.motif) {
+            <div class="traiter-section">
+              <div class="traiter-section-title">💬 MOTIF</div>
+              <div class="traiter-text-box">{{ congeSelectionne.motif }}</div>
+            </div>
+          }
+
+          <div class="traiter-section">
+            <div class="traiter-section-title">📝 NOTE DE TRAITEMENT (optionnel)</div>
+            <textarea class="traiter-textarea" [(ngModel)]="noteTraitement"
+              placeholder="Ajouter une note de traitement RH..."></textarea>
+          </div>
+
+          @if (traitementSuccess) {
+            <div class="traiter-success">✅ Congé marqué comme traité !</div>
+          }
+        </div>
+
+        <div class="modal-traiter-footer">
+          <button type="button" class="btn-traiter-confirm" (click)="confirmerTraitement()" [disabled]="traitementSuccess">
+            📋 Marquer comme Traité
+          </button>
+          <button type="button" class="btn-traiter-close" (click)="fermerTraiter()">✕ Fermer</button>
+        </div>
+
+      </div>
+    </div>
+  }
+
 </div>
