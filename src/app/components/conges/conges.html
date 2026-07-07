@@ -91,20 +91,17 @@
 
             <!-- Actions -->
             <div class="card-actions">
-              @if (c.statut !== 'APPROUVE') {
+              @if (c.statut === 'EN_ATTENTE') {
                 <button class="action-btn btn-approuver" (click)="approuver(c.id)">
                   ✅ Approuver
                 </button>
-              }
-              @if (c.statut !== 'EN_ATTENTE') {
-                <button class="action-btn btn-attente" (click)="enAttente(c.id)">
-                  ⏳ En attente
-                </button>
-              }
-              @if (c.statut !== 'REFUSE') {
                 <button class="action-btn btn-refuser" (click)="refuser(c.id)">
                   ❌ Refuser
                 </button>
+              } @else {
+                <span class="decision-finale">
+                  {{ c.statut === 'APPROUVE' ? '✅ Décision finale : Approuvé' : c.statut === 'REFUSE' ? '❌ Décision finale : Refusé' : c.statut }}
+                </span>
               }
               <button class="action-btn btn-supprimer" (click)="delete(c.id)">
                 🗑️

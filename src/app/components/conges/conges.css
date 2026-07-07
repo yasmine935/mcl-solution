@@ -273,6 +273,12 @@
 .btn-supprimer { background: #fafafa; color: #90a4ae; }
 .btn-supprimer:hover { background: #ffebee; color: #c62828; }
 
+.decision-finale {
+  font-size: 0.82rem; font-weight: 700; color: #546e7a;
+  padding: 6px 12px; border-radius: 8px; background: #f5f7fa;
+  flex: 1;
+}
+
 /* EMPTY */
 .empty-state {
   text-align: center;
