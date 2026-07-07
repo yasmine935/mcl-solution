@@ -34,7 +34,7 @@ export class Planning implements OnInit {
   managerCell: { user: any; jour: any } | null = null;
   managerType = '';
   managerLieu = '';
-  readonly typeOptions = ['Bureau', 'Distance', 'Déplacement', 'Formation', 'RTT', 'Absent'];
+  readonly typeOptions = ['Bureau', 'Distance', 'Déplacement', 'Formation'];
 
   // ✅ Grille semaine manager
   currentWeekStart: Date = new Date();
