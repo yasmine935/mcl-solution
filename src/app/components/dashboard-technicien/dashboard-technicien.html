@@ -855,7 +855,7 @@
                 [class.badge-refuse]="c.statut === 'REFUSE'"
                 [class.badge-valide-kia]="c.statut === 'VALIDE_KIA'"
                 [class.badge-attente]="c.statut === 'EN_ATTENTE'">
-                {{ c.statut === 'APPROUVE' ? '✅ Approuvé' : c.statut === 'REFUSE' ? '❌ Refusé' : c.statut === 'VALIDE_KIA' ? '🔄 Validé par KIA' : '⏳ En attente' }}
+                {{ c.statut === 'APPROUVE' ? '✅ Approuvé' : c.statut === 'REFUSE' ? '❌ Refusé' : c.statut === 'VALIDE_KIA' ? '🔄 Validé par le Technicien Supérieur' : '⏳ En attente' }}
               </span>
               <span class="conge-voir-detail">👁 Détails</span>
             </span>
@@ -1006,7 +1006,7 @@
               [class.cms-refuse]="selectedConge.statut === 'REFUSE'"
               [class.cms-valide-kia]="selectedConge.statut === 'VALIDE_KIA'"
               [class.cms-attente]="selectedConge.statut === 'EN_ATTENTE'">
-              {{ selectedConge.statut === 'APPROUVE' ? '✅ Approuvé' : selectedConge.statut === 'REFUSE' ? '❌ Refusé' : selectedConge.statut === 'VALIDE_KIA' ? '🔄 Validé par KIA' : '⏳ En attente' }}
+              {{ selectedConge.statut === 'APPROUVE' ? '✅ Approuvé' : selectedConge.statut === 'REFUSE' ? '❌ Refusé' : selectedConge.statut === 'VALIDE_KIA' ? '🔄 Validé par le Technicien Supérieur' : '⏳ En attente' }}
             </span>
             <button type="button" class="conge-modal-close" (click)="fermerDetailConge()">✕</button>
           </div>
@@ -1048,7 +1048,7 @@
             </div>
             <div class="conge-detail-field">
               <span class="conge-detail-lbl">Statut</span>
-              <span class="conge-detail-val">{{ selectedConge.statut === 'APPROUVE' ? 'Approuvé' : selectedConge.statut === 'REFUSE' ? 'Refusé' : selectedConge.statut === 'VALIDE_KIA' ? 'Validé par KIA — en attente de Ferid' : selectedConge.statut === 'EN_ATTENTE' ? 'En attente' : (selectedConge.statut || '—') }}</span>
+              <span class="conge-detail-val">{{ selectedConge.statut === 'APPROUVE' ? 'Approuvé' : selectedConge.statut === 'REFUSE' ? 'Refusé' : selectedConge.statut === 'VALIDE_KIA' ? 'Validé par le Technicien Supérieur — en attente de Ferid' : selectedConge.statut === 'EN_ATTENTE' ? 'En attente' : (selectedConge.statut || '—') }}</span>
             </div>
             @if (selectedConge.motif) {
               <div class="conge-detail-field conge-detail-full">

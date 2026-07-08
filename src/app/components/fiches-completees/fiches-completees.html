@@ -61,9 +61,9 @@
             @if (fiche.statut === 'VALIDEE') {
               <span class="fc-badge fc-badge-ok">✅ VALIDÉE</span>
             } @else if (fiche.statut === 'VALIDEE_KIA') {
-              <span class="fc-badge fc-badge-kia">🔄 Confirmée par KIA</span>
+              <span class="fc-badge fc-badge-kia">🔄 Confirmée par le Technicien Supérieur</span>
             } @else {
-              <span class="fc-badge fc-badge-wait">⏳ En attente KIA</span>
+              <span class="fc-badge fc-badge-wait">⏳ En attente Tech. Sup.</span>
             }
           </div>
 
@@ -160,7 +160,7 @@
                 <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
               </button>
             } @else if (!isKia() && fiche.statut === 'COMPLETEE') {
-              <span class="fc-attente-kia">⏳ En attente de confirmation par KIA</span>
+              <span class="fc-attente-kia">⏳ En attente de confirmation par le Technicien Supérieur</span>
             }
           </div>
         </div>
@@ -191,9 +191,9 @@
             @if (selectedFiche.statut === 'VALIDEE') {
               <span class="md-badge-ok">✅ VALIDÉE</span>
             } @else if (selectedFiche.statut === 'VALIDEE_KIA') {
-              <span class="md-badge-kia">🔄 Confirmée par KIA</span>
+              <span class="md-badge-kia">🔄 Confirmée par le Technicien Supérieur</span>
             } @else {
-              <span class="md-badge-wait">⏳ En attente KIA</span>
+              <span class="md-badge-wait">⏳ En attente Tech. Sup.</span>
             }
             <button type="button" class="md-close" (click)="fermerDetail()"><mat-icon>close</mat-icon></button>
           </div>
@@ -368,7 +368,7 @@
               <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
             </button>
           } @else if (!isKia() && selectedFiche.statut === 'COMPLETEE') {
-            <span class="md-attente-kia">⏳ En attente de confirmation par KIA</span>
+            <span class="md-attente-kia">⏳ En attente de confirmation par le Technicien Supérieur</span>
           }
           <button type="button" class="md-btn-fermer" (click)="fermerDetail()">
             <mat-icon>close</mat-icon> Fermer

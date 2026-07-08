@@ -683,7 +683,7 @@
         </div>
         <div class="conge-kpi violet">
           <span>{{ getCongesValideesKia() }}</span>
-          <small>À valider (KIA ✓)</small>
+          <small>À valider (Tech. Sup. ✓)</small>
         </div>
         <div class="conge-kpi green">
           <span>{{ getCongesApprouves() }}</span>
@@ -709,7 +709,7 @@
         ⏳ En attente ({{ getCongesEnAttente() }})
       </button>
       <button class="filtre-btn filtre-valide-kia" [class.active]="filtreConge === 'VALIDE_KIA'" (click)="filtreConge = 'VALIDE_KIA'">
-        🔄 À valider (KIA ✓) ({{ getCongesValideesKia() }})
+        🔄 À valider (Tech. Sup. ✓) ({{ getCongesValideesKia() }})
       </button>
       <button class="filtre-btn filtre-approuve" [class.active]="filtreConge === 'APPROUVE'" (click)="filtreConge = 'APPROUVE'">
         ✅ Approuvés ({{ getCongesApprouves() }})
@@ -753,7 +753,7 @@
                   [class.badge-valide-kia]="c.statut === 'VALIDE_KIA'"
                   [class.badge-approuve]="c.statut === 'APPROUVE'"
                   [class.badge-refuse]="c.statut === 'REFUSE'">
-                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'VALIDE_KIA' ? '🔄 Validé (KIA)' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
+                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'VALIDE_KIA' ? '🔄 Validé (Tech. Sup.)' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
                 </div>
               </div>
 
@@ -796,12 +796,12 @@
 
               @if (c.statut === 'VALIDE_KIA') {
                 <div class="conge-double-valid-note">
-                  🔄 Déjà validé par KIA (Tech Sup) — en attente de votre validation finale.
+                  🔄 Déjà validé par le Technicien Supérieur — en attente de votre validation finale.
                 </div>
               }
               @if (c.valideParKia && (c.statut === 'APPROUVE' || c.statut === 'REFUSE')) {
                 <div class="conge-trace-kia">
-                  🔄 Validé par KIA (Tech Sup), puis {{ c.statut === 'APPROUVE' ? 'approuvé' : 'refusé' }} par vous.
+                  🔄 Validé par le Technicien Supérieur, puis {{ c.statut === 'APPROUVE' ? 'approuvé' : 'refusé' }} par vous.
                 </div>
               }
 
