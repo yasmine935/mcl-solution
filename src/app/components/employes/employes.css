@@ -73,7 +73,7 @@
   background: #fff; padding: 20px 24px; border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #eef0f5;
 }
-.table-header { padding: 0 0 14px; border-bottom: 1px solid #f0f4f8; margin-bottom: 14px; }
+.table-header { padding: 0 0 14px; border-bottom: 1px solid #f0f4f8; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .table-header h3 { margin: 0; font-size: 0.95rem; font-weight: 800; color: #0d1b2a; }
 .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #eef0f5; }
 
@@ -229,6 +229,26 @@
 
 /* ===== TABLE ROW CLICKABLE ===== */
 .clickable-row { cursor: pointer; }
+
+/* ===== EMPLOYÉ DÉSACTIVÉ ===== */
+.row-inactif { opacity: 0.65; background: #fafafa; }
+.nom-inactif { text-decoration: line-through; color: #90a4ae; }
+.badge-desactive-emp {
+  display: inline-block; background: #ffebee; color: #c62828;
+  font-size: 0.62rem; font-weight: 800; padding: 2px 7px;
+  border-radius: 10px; margin-left: 6px; text-transform: uppercase;
+}
+.btn-desactiver-emp { color: #e65100 !important; }
+.btn-toggle-inactifs-emp {
+  display: flex; align-items: center; gap: 6px;
+  background: #f0f4f8; color: #37474f; border: 1.5px solid #e0e0e0;
+  border-radius: 10px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.btn-toggle-inactifs-emp mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.btn-toggle-inactifs-emp:hover, .btn-toggle-inactifs-emp.active {
+  background: #fff3e0; color: #bf360c; border-color: #ffcc80;
+}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {

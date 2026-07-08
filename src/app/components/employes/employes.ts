@@ -25,6 +25,8 @@ export class Employes implements OnInit {
   showFormEdit = false;
   showDetailModal = false;
   selectedEmploye: any = null;
+  showInactifs = false;
+  currentUser: any = {};
 
   roles = [
     { value: 'TECHNICIEN', label: 'Technicien' },
@@ -64,8 +66,8 @@ export class Employes implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.canAdd = (user.role || '').toUpperCase() === 'KARINE';
+    this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    this.canAdd = (this.currentUser.role || '').toUpperCase() === 'KARINE';
     this.loadEmployes();
   }
 
@@ -146,17 +148,33 @@ export class Employes implements OnInit {
     }
   }
 
-  supprimerEmploye(id: number) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) {
-      this.employes = this.employes.filter((e: any) => e.id !== id);
-      localStorage.setItem('employes', JSON.stringify(this.employes));
+  get countInactifs(): number {
+    return this.employes.filter((e: any) => e.actif === false).length;
+  }
 
-      this.http.delete(`http://localhost:8080/api/utilisateurs/${id}`)
-        .subscribe(
-          () => {},
-          (error: any) => console.error('Erreur suppression', error)
-        );
+  employes_filtres(): any[] {
+    return this.showInactifs
+      ? this.employes
+      : this.employes.filter((e: any) => e.actif !== false);
+  }
+
+  desactiverEmploye(id: number, nomEmploye: string) {
+    const nomUser = `${this.currentUser.prenom || ''} ${this.currentUser.nom || ''}`.trim() || 'Admin';
+    if (confirm(`Désactiver l'employé "${nomEmploye}" ? Il restera dans l'historique.`)) {
+      this.http.put<any>(
+        `http://localhost:8080/api/utilisateurs/${id}/desactiver?desactivePar=${encodeURIComponent(nomUser)}`, {}
+      ).subscribe({
+        next: () => { this.loadEmployes(); this.showDetailModal = false; },
+        error: () => alert('Erreur lors de la désactivation')
+      });
     }
+  }
+
+  reactiverEmploye(id: number) {
+    this.http.put<any>(`http://localhost:8080/api/utilisateurs/${id}/reactiver`, {}).subscribe({
+      next: () => this.loadEmployes(),
+      error: () => alert('Erreur lors de la réactivation')
+    });
   }
 
   ouvrirDetailModal(employe: any) {

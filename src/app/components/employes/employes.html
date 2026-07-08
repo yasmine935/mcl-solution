@@ -155,7 +155,13 @@
   <!-- TABLEAU -->
   <div class="table-container">
     <div class="table-header">
-      <h3>Équipe ({{ employes.length }})</h3>
+      <h3>Équipe ({{ employes_filtres().length }})</h3>
+      @if (countInactifs > 0) {
+        <button type="button" class="btn-toggle-inactifs-emp" [class.active]="showInactifs" (click)="showInactifs = !showInactifs">
+          <mat-icon>{{ showInactifs ? 'visibility_off' : 'history' }}</mat-icon>
+          {{ showInactifs ? 'Masquer désactivés' : 'Désactivés (' + countInactifs + ')' }}
+        </button>
+      }
     </div>
     @if (employes.length === 0) {
       <div class="empty-state">
@@ -178,14 +184,20 @@
             </tr>
           </thead>
           <tbody>
-            @for (employe of employes; track employe.id) {
-              <tr class="clickable-row" (click)="ouvrirDetailModal(employe)">
+            @for (employe of employes_filtres(); track employe.id) {
+              <tr class="clickable-row" [class.row-inactif]="employe.actif === false" (click)="ouvrirDetailModal(employe)">
                 <td>
                   <div class="employe-name">
-                    <div class="avatar" [class]="'avatar-' + (employe.role?.toLowerCase() || 'default')">
+                    <div class="avatar" [class]="'avatar-' + (employe.role?.toLowerCase() || 'default')"
+                         [style.opacity]="employe.actif === false ? '0.5' : '1'">
                       {{ employe.prenom?.[0] }}{{ employe.nom?.[0] }}
                     </div>
-                    <strong>{{ employe.prenom }} {{ employe.nom }}</strong>
+                    <div>
+                      <strong [class.nom-inactif]="employe.actif === false">{{ employe.prenom }} {{ employe.nom }}</strong>
+                      @if (employe.actif === false) {
+                        <span class="badge-desactive-emp">Désactivé</span>
+                      }
+                    </div>
                   </div>
                 </td>
                 <td>
@@ -206,12 +218,18 @@
                   </span>
                 </td>
                 <td class="actions-cell" (click)="$event.stopPropagation()">
-                  <button mat-icon-button color="accent" (click)="ouvrirEdition(employe)" title="Modifier">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button color="warn" (click)="supprimerEmploye(employe.id)" title="Supprimer">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  @if (employe.actif !== false) {
+                    <button mat-icon-button color="accent" (click)="ouvrirEdition(employe)" title="Modifier">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="desactiverEmploye(employe.id, employe.prenom + ' ' + employe.nom)" title="Désactiver" class="btn-desactiver-emp">
+                      <mat-icon>person_off</mat-icon>
+                    </button>
+                  } @else {
+                    <button mat-icon-button color="primary" (click)="reactiverEmploye(employe.id)" title="Réactiver">
+                      <mat-icon>person_add</mat-icon>
+                    </button>
+                  }
                 </td>
               </tr>
             }
@@ -295,13 +313,21 @@
 
       <!-- FOOTER -->
       <div class="modal-fiche-footer">
-        <button mat-raised-button color="warn" (click)="supprimerEmploye(selectedEmploye.id); fermerDetailModal()">
-          <mat-icon>delete</mat-icon> Supprimer
-        </button>
-        <div class="footer-right">
-          <button mat-raised-button color="primary" (click)="ouvrirEdition(selectedEmploye); showDetailModal = false">
-            <mat-icon>edit</mat-icon> Modifier
+        @if (selectedEmploye.actif !== false) {
+          <button mat-raised-button color="warn" (click)="desactiverEmploye(selectedEmploye.id, selectedEmploye.prenom + ' ' + selectedEmploye.nom)">
+            <mat-icon>person_off</mat-icon> Désactiver
           </button>
+        } @else {
+          <button mat-raised-button color="primary" (click)="reactiverEmploye(selectedEmploye.id); fermerDetailModal()">
+            <mat-icon>person_add</mat-icon> Réactiver
+          </button>
+        }
+        <div class="footer-right">
+          @if (selectedEmploye.actif !== false) {
+            <button mat-raised-button color="primary" (click)="ouvrirEdition(selectedEmploye); showDetailModal = false">
+              <mat-icon>edit</mat-icon> Modifier
+            </button>
+          }
           <button mat-stroked-button (click)="fermerDetailModal()">
             <mat-icon>close</mat-icon> Fermer
           </button>
