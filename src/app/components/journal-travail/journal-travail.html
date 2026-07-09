@@ -139,7 +139,29 @@
               </div>
               <textarea class="jt-textarea jt-rapport-area" [(ngModel)]="form.rapportGenere" rows="14"></textarea>
 
-              <button type="button" class="btn-sauvegarder" (click)="sauvegarder()" [disabled]="sauvegardeEnCours">
+              <!-- Étape 3 : Signature -->
+              <div class="jt-signature-bloc">
+                <div class="jt-signature-header">
+                  <mat-icon>draw</mat-icon>
+                  <span>Signature du technicien <span class="sig-required">*</span></span>
+                  <button type="button" class="btn-effacer-sig" (click)="effacerSignature()" title="Effacer">
+                    <mat-icon>restart_alt</mat-icon>
+                  </button>
+                </div>
+                <canvas #signatureCanvas class="jt-canvas"
+                  (mousedown)="startDraw($event)" (mousemove)="draw($event)"
+                  (mouseup)="stopDraw()" (mouseleave)="stopDraw()"
+                  (touchstart)="startDraw($event)" (touchmove)="draw($event)"
+                  (touchend)="stopDraw()">
+                </canvas>
+                @if (signatureData) {
+                  <span class="sig-ok">✅ Signature enregistrée</span>
+                } @else {
+                  <span class="sig-hint">Signez dans le cadre ci-dessus</span>
+                }
+              </div>
+
+              <button type="button" class="btn-sauvegarder" (click)="sauvegarder()" [disabled]="sauvegardeEnCours || !signatureData">
                 @if (sauvegardeEnCours) {
                   Sauvegarde...
                 } @else {
@@ -173,6 +195,13 @@
           <div class="jt-detail-section-title"><mat-icon>auto_awesome</mat-icon> Rapport généré par l'IA</div>
           <div class="jt-rapport-text">{{ journalSelectionne.rapportGenere }}</div>
         </div>
+
+        @if (journalSelectionne.signature) {
+          <div class="jt-detail-section">
+            <div class="jt-detail-section-title"><mat-icon>draw</mat-icon> Signature du technicien</div>
+            <img [src]="journalSelectionne.signature" alt="Signature" class="jt-sig-img">
+          </div>
+        }
       </div>
     </div>
   }

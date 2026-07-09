@@ -272,3 +272,36 @@
 .jt-detail-notes { font-size: 0.88rem; color: #546e7a; background: #f8faff; border-radius: 10px; padding: 14px; line-height: 1.65; white-space: pre-wrap; }
 .jt-detail-rapport .jt-detail-section-title mat-icon { color: #6a1b9a; }
 .jt-rapport-text { font-size: 0.9rem; color: #263238; line-height: 1.75; white-space: pre-wrap; }
+
+/* ── Signature ── */
+.jt-signature-bloc {
+  display: flex; flex-direction: column; gap: 10px;
+  background: #f8faff; border-radius: 14px; padding: 16px 18px;
+  border: 1.5px dashed #1565c0;
+}
+.jt-signature-header {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.84rem; font-weight: 700; color: #0d1b2a;
+}
+.jt-signature-header mat-icon { font-size: 18px; width: 18px; height: 18px; color: #1565c0; }
+.sig-required { color: #c62828; font-size: 1rem; }
+.btn-effacer-sig {
+  margin-left: auto; display: flex; align-items: center;
+  background: #fff; border: 1.5px solid #cfd8dc; border-radius: 8px;
+  color: #546e7a; cursor: pointer; padding: 4px 10px; font-size: 0.76rem;
+  font-weight: 700; gap: 4px; transition: all 0.15s;
+}
+.btn-effacer-sig mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.btn-effacer-sig:hover { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
+.jt-canvas {
+  width: 100%; height: 140px; border-radius: 10px;
+  border: 1.5px solid #b0bec5; background: #fff; cursor: crosshair;
+  display: block; touch-action: none;
+}
+.sig-ok { font-size: 0.78rem; font-weight: 700; color: #2e7d32; }
+.sig-hint { font-size: 0.76rem; color: #78909c; }
+
+.jt-sig-img {
+  max-width: 300px; height: auto; border-radius: 10px;
+  border: 1.5px solid #e0e0e0; display: block;
+}

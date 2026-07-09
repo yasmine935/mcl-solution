@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -29,6 +29,71 @@ export class JournalTravail implements OnInit {
   generationEnCours = false;
   sauvegardeEnCours = false;
   erreurIA: string | null = null;
+
+  // ── Signature ──
+  @ViewChild('signatureCanvas') signatureCanvas!: ElementRef<HTMLCanvasElement>;
+  isDrawing = false;
+  signatureData = '';
+
+  initCanvas() {
+    const canvas = this.signatureCanvas?.nativeElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    canvas.width = canvas.offsetWidth || 500;
+    canvas.height = 140;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+  }
+
+  startDraw(e: MouseEvent | TouchEvent) {
+    const canvas = this.signatureCanvas.nativeElement;
+    const ctx = canvas.getContext('2d')!;
+    const pos = this.getPos(e, canvas);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    this.isDrawing = true;
+  }
+
+  draw(e: MouseEvent | TouchEvent) {
+    if (!this.isDrawing) return;
+    e.preventDefault();
+    const canvas = this.signatureCanvas.nativeElement;
+    const ctx = canvas.getContext('2d')!;
+    const pos = this.getPos(e, canvas);
+    ctx.strokeStyle = '#1565c0';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  }
+
+  stopDraw() {
+    if (!this.isDrawing) return;
+    this.isDrawing = false;
+    this.signatureData = this.signatureCanvas.nativeElement.toDataURL('image/png');
+  }
+
+  effacerSignature() {
+    const canvas = this.signatureCanvas.nativeElement;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    this.signatureData = '';
+  }
+
+  private getPos(e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) {
+    const rect = canvas.getBoundingClientRect();
+    if (e instanceof TouchEvent) {
+      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    }
+    return { x: (e as MouseEvent).clientX - rect.left, y: (e as MouseEvent).clientY - rect.top };
+  }
 
   // ── Dictée vocale ──
   recognition: any = null;
@@ -63,12 +128,14 @@ export class JournalTravail implements OnInit {
     };
     this.erreurIA = null;
     this.noteBase = '';
+    this.signatureData = '';
     this.arreterDictee();
     this.vue = 'formulaire';
   }
 
   annuler() {
     this.arreterDictee();
+    this.signatureData = '';
     this.vue = 'liste';
     this.erreurIA = null;
   }
@@ -128,6 +195,8 @@ export class JournalTravail implements OnInit {
       next: data => {
         this.form.rapportGenere = data.rapport || '';
         this.generationEnCours = false;
+        this.signatureData = '';
+        setTimeout(() => this.initCanvas(), 150);
       },
       error: err => {
         this.erreurIA = err?.error?.erreur || 'Erreur lors de la génération. Vérifiez la clé API.';
@@ -141,12 +210,17 @@ export class JournalTravail implements OnInit {
       alert('Générez d\'abord le rapport avant de sauvegarder.');
       return;
     }
+    if (!this.signatureData) {
+      alert('Veuillez signer le rapport avant de sauvegarder.');
+      return;
+    }
     this.sauvegardeEnCours = true;
     const payload = {
       userId: this.user.id,
       dateJournee: this.form.dateJournee,
       notesOriginales: this.form.notesOriginales,
-      rapportGenere: this.form.rapportGenere
+      rapportGenere: this.form.rapportGenere,
+      signature: this.signatureData
     };
     this.http.post<any>(API, payload).subscribe({
       next: () => {
