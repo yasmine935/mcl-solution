@@ -53,6 +53,27 @@
             @for (t of typesClient; track t) { <option [value]="t">{{ t }}</option> }
           </select>
         </div>
+        <div class="client-field client-field-wide">
+          <label class="client-label">Interlocuteurs</label>
+          <div class="interlocuteurs-grid">
+            <div class="interloc-field">
+              <span class="interloc-label">Achat</span>
+              <input type="text" class="client-input" [(ngModel)]="form.interlocuteurAchat" placeholder="Nom — Tél">
+            </div>
+            <div class="interloc-field">
+              <span class="interloc-label">Facture</span>
+              <input type="text" class="client-input" [(ngModel)]="form.interlocuteurFacture" placeholder="Nom — Tél">
+            </div>
+            <div class="interloc-field">
+              <span class="interloc-label">Commercial</span>
+              <input type="text" class="client-input" [(ngModel)]="form.interlocuteurCommercial" placeholder="Nom — Tél">
+            </div>
+            <div class="interloc-field">
+              <span class="interloc-label">Autres</span>
+              <input type="text" class="client-input" [(ngModel)]="form.interlocuteurAutres" placeholder="Nom — Tél">
+            </div>
+          </div>
+        </div>
       </div>
       <div class="client-form-actions">
         <button type="button" class="btn-save-client" (click)="ajouter()">
@@ -217,6 +238,26 @@
           </div>
         </div>
 
+        @if (selectedClient.interlocuteurAchat || selectedClient.interlocuteurFacture || selectedClient.interlocuteurCommercial || selectedClient.interlocuteurAutres) {
+          <div class="detail-interlocuteurs">
+            <span class="detail-info-label interloc-section-title">INTERLOCUTEURS</span>
+            <div class="interlocuteurs-grid">
+              @if (selectedClient.interlocuteurAchat) {
+                <div class="interloc-field"><span class="interloc-label">Achat</span><span class="interloc-val">{{ selectedClient.interlocuteurAchat }}</span></div>
+              }
+              @if (selectedClient.interlocuteurFacture) {
+                <div class="interloc-field"><span class="interloc-label">Facture</span><span class="interloc-val">{{ selectedClient.interlocuteurFacture }}</span></div>
+              }
+              @if (selectedClient.interlocuteurCommercial) {
+                <div class="interloc-field"><span class="interloc-label">Commercial</span><span class="interloc-val">{{ selectedClient.interlocuteurCommercial }}</span></div>
+              }
+              @if (selectedClient.interlocuteurAutres) {
+                <div class="interloc-field"><span class="interloc-label">Autres</span><span class="interloc-val">{{ selectedClient.interlocuteurAutres }}</span></div>
+              }
+            </div>
+          </div>
+        }
+
         @if (selectedClient.actif === false && selectedClient.desactivePar) {
           <div class="detail-trace-bloc">
             <mat-icon>history</mat-icon>
@@ -293,6 +334,27 @@
             <select id="e-type" class="client-input" [(ngModel)]="editingClient.typeClient">
               @for (t of typesClient; track t) { <option [value]="t">{{ t }}</option> }
             </select>
+          </div>
+          <div class="client-field client-field-wide">
+            <label class="client-label">Interlocuteurs</label>
+            <div class="interlocuteurs-grid">
+              <div class="interloc-field">
+                <span class="interloc-label">Achat</span>
+                <input type="text" class="client-input" [(ngModel)]="editingClient.interlocuteurAchat" placeholder="Nom — Tél">
+              </div>
+              <div class="interloc-field">
+                <span class="interloc-label">Facture</span>
+                <input type="text" class="client-input" [(ngModel)]="editingClient.interlocuteurFacture" placeholder="Nom — Tél">
+              </div>
+              <div class="interloc-field">
+                <span class="interloc-label">Commercial</span>
+                <input type="text" class="client-input" [(ngModel)]="editingClient.interlocuteurCommercial" placeholder="Nom — Tél">
+              </div>
+              <div class="interloc-field">
+                <span class="interloc-label">Autres</span>
+                <input type="text" class="client-input" [(ngModel)]="editingClient.interlocuteurAutres" placeholder="Nom — Tél">
+              </div>
+            </div>
           </div>
         </div>
       </div>

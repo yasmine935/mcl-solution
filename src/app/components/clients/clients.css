@@ -294,6 +294,14 @@
   border-radius: 10px; letter-spacing: 0.3px; text-transform: uppercase;
 }
 
+/* ── Interlocuteurs ── */
+.interlocuteurs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.interloc-field { display: flex; flex-direction: column; gap: 3px; }
+.interloc-label { font-size: 0.68rem; font-weight: 800; color: #37474f; text-transform: uppercase; letter-spacing: 0.4px; }
+.interloc-val { font-size: 0.85rem; font-weight: 600; color: #0d1b2a; }
+.interloc-section-title { display: block; font-size: 0.7rem; font-weight: 800; color: #37474f; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.detail-interlocuteurs { background: #f8faff; border-radius: 12px; padding: 14px 16px; margin-top: 12px; border: 1.5px solid #eef1f5; }
+
 .badge-type-client {
   display: inline-block; background: #e3f2fd; color: #1565c0;
   font-size: 0.65rem; font-weight: 800; padding: 2px 8px;

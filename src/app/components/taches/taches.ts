@@ -491,4 +491,14 @@ export class Taches implements OnInit {
     const emp = this.employes.find((e: any) => e.id === employeId);
     return emp ? `${emp.prenom} ${emp.nom}` : 'Inconnu';
   }
+
+  rechercheClientTache = '';
+
+  get clientsTries(): any[] {
+    const q = this.rechercheClientTache.toLowerCase().trim();
+    return [...this.clients]
+      .filter((c: any) => c.actif !== false)
+      .filter((c: any) => !q || (c.nom || '').toLowerCase().includes(q) || (c.codeClient || '').toLowerCase().includes(q))
+      .sort((a: any, b: any) => (a.nom || '').localeCompare(b.nom || '', 'fr'));
+  }
 }

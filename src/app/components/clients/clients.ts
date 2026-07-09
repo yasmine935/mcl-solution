@@ -25,7 +25,8 @@ export class GestionClients implements OnInit {
   showInactifs = false;
   currentUser: any = {};
 
-  form = { nom: '', codeClient: '', email: '', adresse: '', contact: '', responsableCommercial: '', typeClient: 'Client' };
+  form = { nom: '', codeClient: '', email: '', adresse: '', contact: '', responsableCommercial: '', typeClient: 'Client',
+    interlocuteurAchat: '', interlocuteurFacture: '', interlocuteurCommercial: '', interlocuteurAutres: '' };
   readonly typesClient = ['Client', 'Prospect'];
 
   constructor(private http: HttpClient) {}
@@ -112,7 +113,8 @@ export class GestionClients implements OnInit {
   }
 
   resetForm() {
-    this.form = { nom: '', codeClient: '', email: '', adresse: '', contact: '', responsableCommercial: '', typeClient: 'Client' };
+    this.form = { nom: '', codeClient: '', email: '', adresse: '', contact: '', responsableCommercial: '', typeClient: 'Client',
+      interlocuteurAchat: '', interlocuteurFacture: '', interlocuteurCommercial: '', interlocuteurAutres: '' };
   }
 
   ouvrirDetail(c: any) { this.selectedClient = c; this.showDetailModal = true; }
