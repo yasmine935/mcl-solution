@@ -89,8 +89,8 @@ export class FicheInterventionManager implements OnInit {
     numProjet: '', client: '', dateDebut: '', dateFin: '',
     technicienAssigne: '', selectedTechIds: [] as number[],
     description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
-    adresse: '', contact: '', materielsHorsStandard: [],
-    nouveauMateriel: '', documentsImportes: [], taches: []
+    adresse: '', contact: '', nomContactSite: '', telContactSite: '',
+    materielsHorsStandard: [], nouveauMateriel: '', documentsImportes: [], taches: []
   };
 
   constructor(private http: HttpClient) {}
@@ -209,6 +209,8 @@ export class FicheInterventionManager implements OnInit {
       description: f.description,
       adresse: f.adresse,
       contact: f.contact,
+      nomContactSite: f.nomContactSite || '',
+      telContactSite: f.telContactSite || '',
       statut: f.statut,
       heureDebut: f.heureDebut,
       heureFin: f.heureFin,
@@ -293,6 +295,8 @@ export class FicheInterventionManager implements OnInit {
       client: this.nouvelleFiche.client,
       adresse: this.nouvelleFiche.adresse,
       contact: this.nouvelleFiche.contact,
+      nomContactSite: this.nouvelleFiche.nomContactSite,
+      telContactSite: this.nouvelleFiche.telContactSite,
       dateIntervention: this.formatDate(this.nouvelleFiche.dateDebut),
       dateFin: this.formatDate(this.nouvelleFiche.dateFin),
       description: this.nouvelleFiche.description,
@@ -342,6 +346,8 @@ export class FicheInterventionManager implements OnInit {
       client: this.ficheEnEdition.client,
       adresse: this.ficheEnEdition.adresse,
       contact: this.ficheEnEdition.contact,
+      nomContactSite: this.ficheEnEdition.nomContactSite,
+      telContactSite: this.ficheEnEdition.telContactSite,
       dateIntervention: this.formatDate(this.ficheEnEdition.dateDebut || this.ficheEnEdition.date),
       dateFin: this.formatDate(this.ficheEnEdition.dateFin),
       description: this.ficheEnEdition.description,
@@ -380,7 +386,8 @@ export class FicheInterventionManager implements OnInit {
       numProjet: '', client: '', dateDebut: '', dateFin: '',
       technicienAssigne: '', selectedTechIds: [] as number[],
       description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
-      adresse: '', contact: '', materielsHorsStandard: [],
+      adresse: '', contact: '', nomContactSite: '', telContactSite: '',
+      materielsHorsStandard: [],
       nouveauMateriel: '', documentsImportes: [], taches: []
     };
   }

@@ -76,7 +76,8 @@ export class FicheInterventionTechnicien implements OnInit {
   mapFromBackend(f: any): any {
     return {
       id: f.id, numProjet: f.numProjet, client: f.client, adresse: f.adresse,
-      contact: f.contact, dateIntervention: f.dateIntervention, dateFin: f.dateFin,
+      contact: f.contact, nomContactSite: f.nomContactSite, telContactSite: f.telContactSite,
+      dateIntervention: f.dateIntervention, dateFin: f.dateFin,
       description: f.description,
       statut: f.statut,
       technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',

@@ -101,12 +101,16 @@
             <input class="compact-input" type="number" [(ngModel)]="nouvelleFiche.chiffreAffaire" placeholder="0.00"/>
           </div>
           <div class="field-lg">
-            <label class="field-label">Adresse</label>
+            <label class="field-label">Adresse du site</label>
             <input class="compact-input" [(ngModel)]="nouvelleFiche.adresse" placeholder="123 Rue de Paris"/>
           </div>
           <div class="field-md">
-            <label class="field-label">Contact</label>
-            <input class="compact-input" [(ngModel)]="nouvelleFiche.contact" placeholder="Nom — Téléphone"/>
+            <label class="field-label">Nom / Prénom contact sur site</label>
+            <input class="compact-input" [(ngModel)]="nouvelleFiche.nomContactSite" placeholder="Jean Dupont"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Tél Contact</label>
+            <input class="compact-input" [(ngModel)]="nouvelleFiche.telContactSite" placeholder="06 00 00 00 00"/>
           </div>
         </div>
       </div>
@@ -299,12 +303,16 @@
             <input class="compact-input" type="number" [(ngModel)]="ficheEnEdition.chiffreAffaire"/>
           </div>
           <div class="field-lg">
-            <label class="field-label">Adresse</label>
+            <label class="field-label">Adresse du site</label>
             <input class="compact-input" [(ngModel)]="ficheEnEdition.adresse"/>
           </div>
           <div class="field-md">
-            <label class="field-label">Contact</label>
-            <input class="compact-input" [(ngModel)]="ficheEnEdition.contact"/>
+            <label class="field-label">Nom / Prénom contact sur site</label>
+            <input class="compact-input" [(ngModel)]="ficheEnEdition.nomContactSite"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Tél Contact</label>
+            <input class="compact-input" [(ngModel)]="ficheEnEdition.telContactSite"/>
           </div>
         </div>
       </div>

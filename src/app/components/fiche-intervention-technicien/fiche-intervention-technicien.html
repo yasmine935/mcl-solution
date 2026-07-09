@@ -48,13 +48,16 @@
               <span class="fit-val">{{ intervention.dateFin || '—' }}</span>
             </div>
           </div>
-          @if (intervention.adresse || intervention.contact) {
+          @if (intervention.adresse || intervention.nomContactSite || intervention.telContactSite || intervention.contact) {
             <div class="fit-chips-row">
               @if (intervention.adresse) {
                 <span class="fit-chip"><span class="fit-chip-icon">📍</span>{{ intervention.adresse }}</span>
               }
-              @if (intervention.contact) {
-                <span class="fit-chip"><span class="fit-chip-icon">👤</span>{{ intervention.contact }}</span>
+              @if (intervention.nomContactSite) {
+                <span class="fit-chip"><span class="fit-chip-icon">👤</span>{{ intervention.nomContactSite }}</span>
+              }
+              @if (intervention.telContactSite) {
+                <span class="fit-chip"><span class="fit-chip-icon">📞</span>{{ intervention.telContactSite }}</span>
               }
             </div>
           }
