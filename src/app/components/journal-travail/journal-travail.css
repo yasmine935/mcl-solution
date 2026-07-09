@@ -298,8 +298,15 @@
   border: 1.5px solid #b0bec5; background: #fff; cursor: crosshair;
   display: block; touch-action: none;
 }
-.sig-ok { font-size: 0.78rem; font-weight: 700; color: #2e7d32; }
 .sig-hint { font-size: 0.76rem; color: #78909c; }
+
+.sig-confirmed {
+  display: flex; align-items: center; gap: 10px;
+  background: #e8f5e9; color: #2e7d32; font-weight: 700;
+  border-radius: 10px; padding: 14px 18px; font-size: 0.9rem;
+  border: 1.5px solid #a5d6a7;
+}
+.sig-confirmed mat-icon { font-size: 22px; width: 22px; height: 22px; }
 
 .jt-sig-img {
   max-width: 300px; height: auto; border-radius: 10px;

@@ -77,14 +77,8 @@ export class JournalTravail implements OnInit {
   }
 
   effacerSignature() {
-    const canvas = this.signatureCanvas.nativeElement;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = '#ccc';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
     this.signatureData = '';
+    setTimeout(() => this.initCanvas(), 100);
   }
 
   private getPos(e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) {
