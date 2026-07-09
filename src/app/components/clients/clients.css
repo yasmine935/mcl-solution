@@ -294,6 +294,15 @@
   border-radius: 10px; letter-spacing: 0.3px; text-transform: uppercase;
 }
 
+.badge-type-client {
+  display: inline-block; background: #e3f2fd; color: #1565c0;
+  font-size: 0.65rem; font-weight: 800; padding: 2px 8px;
+  border-radius: 10px; letter-spacing: 0.3px; text-transform: uppercase;
+}
+.badge-prospect {
+  background: #fff8e1; color: #e65100;
+}
+
 .client-desactive-trace {
   display: flex; align-items: center; gap: 6px;
   background: #fff8e1; color: #6d4c00; font-size: 0.75rem; font-weight: 600;

@@ -43,6 +43,16 @@
           <label class="client-label" for="c-contact">Contact / Téléphone</label>
           <input id="c-contact" type="text" class="client-input" [(ngModel)]="form.contact" placeholder="Jean Dupont — 06 00 00 00 00">
         </div>
+        <div class="client-field">
+          <label class="client-label" for="c-resp">Responsable Commercial</label>
+          <input id="c-resp" type="text" class="client-input" [(ngModel)]="form.responsableCommercial" placeholder="Ex : Alice Martin">
+        </div>
+        <div class="client-field">
+          <label class="client-label" for="c-type">Type</label>
+          <select id="c-type" class="client-input" [(ngModel)]="form.typeClient">
+            @for (t of typesClient; track t) { <option [value]="t">{{ t }}</option> }
+          </select>
+        </div>
       </div>
       <div class="client-form-actions">
         <button type="button" class="btn-save-client" (click)="ajouter()">
@@ -100,6 +110,9 @@
               @if (c.codeClient) {
                 <span class="client-code-badge">{{ c.codeClient }}</span>
               }
+              <span class="badge-type-client" [class.badge-prospect]="c.typeClient === 'Prospect'">
+                {{ c.typeClient || 'Client' }}
+              </span>
               @if (c.actif === false) {
                 <span class="badge-desactive">Désactivé</span>
               }
@@ -190,6 +203,18 @@
             <span class="detail-info-label">Adresse</span>
             <span class="detail-info-val">{{ selectedClient.adresse || '—' }}</span>
           </div>
+          <div class="detail-info-cell">
+            <span class="detail-info-label">Responsable Commercial</span>
+            <span class="detail-info-val">{{ selectedClient.responsableCommercial || '—' }}</span>
+          </div>
+          <div class="detail-info-cell">
+            <span class="detail-info-label">Type</span>
+            <span class="detail-info-val">
+              <span class="badge-type-client" [class.badge-prospect]="selectedClient.typeClient === 'Prospect'">
+                {{ selectedClient.typeClient || 'Client' }}
+              </span>
+            </span>
+          </div>
         </div>
 
         @if (selectedClient.actif === false && selectedClient.desactivePar) {
@@ -258,6 +283,16 @@
           <div class="client-field">
             <label class="client-label" for="e-contact">Contact / Téléphone</label>
             <input id="e-contact" type="text" class="client-input" [(ngModel)]="editingClient.contact">
+          </div>
+          <div class="client-field">
+            <label class="client-label" for="e-resp">Responsable Commercial</label>
+            <input id="e-resp" type="text" class="client-input" [(ngModel)]="editingClient.responsableCommercial" placeholder="Ex : Alice Martin">
+          </div>
+          <div class="client-field">
+            <label class="client-label" for="e-type">Type</label>
+            <select id="e-type" class="client-input" [(ngModel)]="editingClient.typeClient">
+              @for (t of typesClient; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
           </div>
         </div>
       </div>
