@@ -200,18 +200,18 @@
         </div>
       }
 
-      <!-- COMPOSANTS INTÉGRÉS -->
+      <!-- COMPOSANTS INTÉGRÉS — ESSAN en lecture seule -->
       @if (currentPage === 'fiches') {
-        <app-fiche-intervention-manager></app-fiche-intervention-manager>
+        <app-fiche-intervention-manager [modeConsultation]="true"></app-fiche-intervention-manager>
       }
       @if (currentPage === 'fiches-completees') {
         <app-fiches-completees></app-fiches-completees>
       }
       @if (currentPage === 'projets') {
-        <app-taches></app-taches>
+        <app-taches [modeConsultation]="true"></app-taches>
       }
       @if (currentPage === 'clients') {
-        <app-gestion-clients></app-gestion-clients>
+        <app-gestion-clients [modeConsultation]="true"></app-gestion-clients>
       }
       @if (currentPage === 'planning') {
         <app-planning></app-planning>

@@ -3,14 +3,16 @@
   <!-- HEADER -->
   <div class="page-header">
     <h2>📊 Gestion des Projets</h2>
-    <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
-      <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
-      {{ showFormAdd ? 'Fermer' : 'Nouveau Projet' }}
-    </button>
+    @if (!modeConsultation) {
+      <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
+        <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
+        {{ showFormAdd ? 'Fermer' : 'Nouveau Projet' }}
+      </button>
+    }
   </div>
 
   <!-- FORMULAIRE AJOUT -->
-  @if (showFormAdd) {
+  @if (showFormAdd && !modeConsultation) {
     <div class="form-container">
       <div class="form-header-bar">
         <mat-icon>add_circle</mat-icon>
@@ -210,7 +212,7 @@
   }
 
   <!-- FORMULAIRE ÉDITION -->
-  @if (showFormEdit && selectedTache) {
+  @if (showFormEdit && selectedTache && !modeConsultation) {
     <div class="form-container form-edit">
       <div class="form-header-bar form-header-edit">
         <mat-icon>edit</mat-icon>
@@ -517,12 +519,14 @@
                   <button mat-icon-button color="primary" (click)="ouvrirDetailModal(tache)" title="Détails">
                     <mat-icon>visibility</mat-icon>
                   </button>
-                  <button mat-icon-button color="accent" (click)="ouvrirEdition(tache)" title="Modifier">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button color="warn" (click)="supprimerTache(tache.id)" title="Supprimer">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  @if (!modeConsultation) {
+                    <button mat-icon-button color="accent" (click)="ouvrirEdition(tache)" title="Modifier">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="supprimerTache(tache.id)" title="Supprimer">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
                 </td>
               </tr>
             }

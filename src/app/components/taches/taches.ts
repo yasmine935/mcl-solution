@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -30,6 +30,7 @@ const ETAPES_PROJET = [
   styleUrl: './taches.css'
 })
 export class Taches implements OnInit {
+  @Input() modeConsultation = false;
   taches: any[] = [];
   employes: any[] = [];
   rechercheTache = '';

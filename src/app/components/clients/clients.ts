@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -15,6 +15,7 @@ const API = 'http://localhost:8080/api/clients';
   styleUrl: './clients.css'
 })
 export class GestionClients implements OnInit {
+  @Input() modeConsultation = false;
   clients: any[] = [];
   showForm = false;
   editingClient: any = null;

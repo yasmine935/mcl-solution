@@ -9,14 +9,16 @@
         <p class="clients-subtitle">{{ clients.length }} client(s) enregistré(s)</p>
       </div>
     </div>
-    <button type="button" class="btn-nouveau-client" (click)="showForm = !showForm">
-      <mat-icon>{{ showForm ? 'close' : 'person_add' }}</mat-icon>
-      {{ showForm ? 'Fermer' : '+ Nouveau Client' }}
-    </button>
+    @if (!modeConsultation) {
+      <button type="button" class="btn-nouveau-client" (click)="showForm = !showForm">
+        <mat-icon>{{ showForm ? 'close' : 'person_add' }}</mat-icon>
+        {{ showForm ? 'Fermer' : '+ Nouveau Client' }}
+      </button>
+    }
   </div>
 
   <!-- FORMULAIRE AJOUT -->
-  @if (showForm) {
+  @if (showForm && !modeConsultation) {
     <div class="client-form-card">
       <div class="client-form-title">
         <mat-icon>person_add</mat-icon>
@@ -139,17 +141,19 @@
               }
             </div>
             <div class="client-card-btns" (click)="$event.stopPropagation()">
-              @if (c.actif !== false) {
-                <button mat-icon-button color="primary" (click)="ouvrirEdition(c)" title="Modifier" type="button">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button (click)="desactiver(c.id, c.nom)" title="Désactiver" type="button" class="btn-desactiver-icon">
-                  <mat-icon>person_off</mat-icon>
-                </button>
-              } @else {
-                <button mat-icon-button color="primary" (click)="reactiver(c.id)" title="Réactiver" type="button">
-                  <mat-icon>person_add</mat-icon>
-                </button>
+              @if (!modeConsultation) {
+                @if (c.actif !== false) {
+                  <button mat-icon-button color="primary" (click)="ouvrirEdition(c)" title="Modifier" type="button">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="desactiver(c.id, c.nom)" title="Désactiver" type="button" class="btn-desactiver-icon">
+                    <mat-icon>person_off</mat-icon>
+                  </button>
+                } @else {
+                  <button mat-icon-button color="primary" (click)="reactiver(c.id)" title="Réactiver" type="button">
+                    <mat-icon>person_add</mat-icon>
+                  </button>
+                }
               }
             </div>
           </div>

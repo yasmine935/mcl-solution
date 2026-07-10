@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -24,6 +24,7 @@ const API = 'http://localhost:8080/api/fiches-intervention';
   styleUrl: './fiche-intervention-manager.css'
 })
 export class FicheInterventionManager implements OnInit {
+  @Input() modeConsultation = false;
   fiches: any[] = [];
   employes: any[] = [];
   techniciens: any[] = [];

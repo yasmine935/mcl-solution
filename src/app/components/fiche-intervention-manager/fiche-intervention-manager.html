@@ -7,14 +7,16 @@
       <span class="fiches-count">{{ fiches.length }} fiche(s)</span>
     </div>
     <div class="header-actions">
-      <button mat-raised-button color="primary" (click)="toggleFormAdd()" class="btn-add">
-        <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
-        {{ showFormAdd ? 'Fermer' : 'Nouvelle Fiche' }}
-      </button>
+      @if (!modeConsultation) {
+        <button mat-raised-button color="primary" (click)="toggleFormAdd()" class="btn-add">
+          <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
+          {{ showFormAdd ? 'Fermer' : 'Nouvelle Fiche' }}
+        </button>
+      }
     </div>
   </div>
 
-  @if (showFormAdd) {
+  @if (showFormAdd && !modeConsultation) {
     <div class="form-container">
       <div class="form-header">
         <mat-icon>add_circle</mat-icon>
@@ -468,10 +470,12 @@
                   }
                 </div>
               </div>
-              <div class="fiche-actions">
-                <button mat-icon-button color="primary" (click)="ouvrirEdition(fiche)"><mat-icon>edit</mat-icon></button>
-                <button mat-icon-button color="warn" (click)="supprimerFiche(fiche.id)"><mat-icon>delete</mat-icon></button>
-              </div>
+              @if (!modeConsultation) {
+                <div class="fiche-actions">
+                  <button mat-icon-button color="primary" (click)="ouvrirEdition(fiche)"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button color="warn" (click)="supprimerFiche(fiche.id)"><mat-icon>delete</mat-icon></button>
+                </div>
+              }
             </div>
             @if (fiche.description) { <p class="fiche-description">{{ fiche.description }}</p> }
             <div class="fiche-info-grid">
