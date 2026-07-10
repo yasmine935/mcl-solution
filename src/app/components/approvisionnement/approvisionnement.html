@@ -20,7 +20,9 @@
               <span class="attente-count">{{ listeAttente.length }}</span>
             }
           </button>
-          <button class="btn-new-appro" (click)="ouvrirNouveau()">+ Nouvelle Demande</button>
+          @if (!modeConsultation) {
+            <button class="btn-new-appro" (click)="ouvrirNouveau()">+ Nouvelle Demande</button>
+          }
         </div>
       }
     </div>
@@ -138,7 +140,7 @@
       <div class="appro-empty">
         <span>🛒</span>
         <p>Aucune demande d'approvisionnement</p>
-        @if (!modeaby) {
+        @if (!modeaby && !modeConsultation) {
           <button class="btn-new-appro" (click)="ouvrirNouveau()">+ Nouvelle Demande</button>
         }
       </div>

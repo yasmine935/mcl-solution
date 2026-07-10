@@ -15,6 +15,7 @@ const API = 'http://localhost:8080/api';
 export class ApprovisionnementComponent implements OnInit {
   @Input() modeaby = false;
   @Input() modetous = false;
+  @Input() modeConsultation = false;
 
   currentUser: any = {};
   view: 'liste' | 'nouveau' | 'detail' = 'liste';
