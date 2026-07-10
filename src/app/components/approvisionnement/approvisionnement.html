@@ -14,13 +14,13 @@
       </div>
       @if (!modeaby) {
         <div class="header-btns">
-          <button class="btn-attente-toggle" (click)="showListeAttente = !showListeAttente">
-            📌 Articles en attente
-            @if (listeAttente.length > 0) {
-              <span class="attente-count">{{ listeAttente.length }}</span>
-            }
-          </button>
           @if (!modeConsultation) {
+            <button class="btn-attente-toggle" (click)="showListeAttente = !showListeAttente">
+              📌 Articles en attente
+              @if (listeAttente.length > 0) {
+                <span class="attente-count">{{ listeAttente.length }}</span>
+              }
+            </button>
             <button class="btn-new-appro" (click)="ouvrirNouveau()">+ Nouvelle Demande</button>
           }
         </div>
@@ -38,9 +38,11 @@
               <p>Articles à approvisionner plus tard — {{ listeAttente.length }} article(s)</p>
             </div>
           </div>
-          <button class="btn-add-attente" (click)="showAddAttenteForm = !showAddAttenteForm">
-            {{ showAddAttenteForm ? '✕ Annuler' : '+ Ajouter un article' }}
-          </button>
+          @if (!modeConsultation) {
+            <button class="btn-add-attente" (click)="showAddAttenteForm = !showAddAttenteForm">
+              {{ showAddAttenteForm ? '✕ Annuler' : '+ Ajouter un article' }}
+            </button>
+          }
         </div>
 
         @if (showAddAttenteForm) {
