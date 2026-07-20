@@ -85,6 +85,10 @@
           <h4>Devis</h4>
         </div>
         <div class="proj-row proj-row-align-bottom">
+          <div class="proj-field-sm">
+            <label class="field-label" for="ca-devis-add">CA (€)</label>
+            <input id="ca-devis-add" class="compact-input" type="number" [(ngModel)]="nouvelleTache.caDevis" placeholder="0">
+          </div>
           <div class="proj-field-md">
             <label class="field-label" for="num-devis-add">N° Devis</label>
             <input id="num-devis-add" type="text" class="compact-input" [(ngModel)]="nouvelleTache.numDevis" placeholder="DEV-001">
@@ -322,6 +326,10 @@
           <h4>Devis</h4>
         </div>
         <div class="proj-row proj-row-align-bottom">
+          <div class="proj-field-sm">
+            <label class="field-label">CA (€)</label>
+            <input class="compact-input" type="number" [(ngModel)]="tacheEnEdition.caDevis"/>
+          </div>
           <div class="proj-field-md">
             <label class="field-label">N° Devis</label>
             <input class="compact-input" [(ngModel)]="tacheEnEdition.numDevis">

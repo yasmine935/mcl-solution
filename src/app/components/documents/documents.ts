@@ -130,12 +130,23 @@ export class Documents implements OnInit {
     }
   }
 
+  private dataUrlToBlobUrl(dataUrl: string): string {
+    const [header, base64] = dataUrl.split(',');
+    const mime = header.match(/data:(.*?);base64/)?.[1] || '';
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return URL.createObjectURL(new Blob([bytes], { type: mime }));
+  }
+
   voirDocument(document: any) {
     if (!document.fichierData) {
       alert('Fichier indisponible pour ce document (ajouté avant la mise à jour). Veuillez le re-déposer via "Modifier".');
       return;
     }
-    window.open(document.fichierData, '_blank');
+    // Chrome bloque l'ouverture directe d'une URL data: dans un nouvel onglet (onglet vide) — on passe par un blob URL
+    const url = document.fichierData.startsWith('data:') ? this.dataUrlToBlobUrl(document.fichierData) : document.fichierData;
+    window.open(url, '_blank');
   }
 
   telechargerDocument(document: any) {

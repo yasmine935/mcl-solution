@@ -43,12 +43,15 @@
 .client-form-title mat-icon { font-size: 1.2rem; }
 
 .client-form-grid {
-  display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 18px; margin-bottom: 18px;
 }
-.client-field { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 5px; }
-.client-field-wide { flex: 2; min-width: 300px; }
+.client-field { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.client-field-wide { grid-column: span 2; min-width: 0; }
 .client-label { font-size: 0.72rem; font-weight: 800; color: #546e7a; text-transform: uppercase; letter-spacing: 0.4px; }
 .client-input {
+  width: 100%; box-sizing: border-box;
   border: 1.5px solid #e0e0e0; border-radius: 10px;
   padding: 10px 14px; font-size: 0.88rem; font-family: inherit;
   color: #263238; background: #f8faff; outline: none;
@@ -189,13 +192,14 @@
 }
 .edit-modal {
   background: #fff; border-radius: 20px;
-  width: 100%; max-width: 560px;
+  width: 100%; max-width: 620px; max-height: 90vh;
+  display: flex; flex-direction: column;
   box-shadow: 0 24px 60px rgba(0,0,0,0.25);
   overflow: hidden;
 }
 .edit-modal-header {
   display: flex; align-items: center; gap: 14px;
-  padding: 20px 24px;
+  padding: 20px 24px; flex-shrink: 0;
   background: linear-gradient(135deg, #0d1b2a, #1565c0);
   color: #fff;
 }
@@ -204,27 +208,28 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 1rem; font-weight: 800; color: #fff; flex-shrink: 0;
 }
-.edit-modal-title { margin: 0; font-size: 1rem; font-weight: 800; }
-.edit-modal-sub { font-size: 0.78rem; opacity: 0.8; }
+.edit-modal-header > div { min-width: 0; }
+.edit-modal-title { margin: 0; font-size: 1rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.edit-modal-sub { font-size: 0.78rem; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 .edit-modal-close {
   margin-left: auto; background: rgba(255,255,255,0.2);
   border: none; color: #fff; width: 32px; height: 32px;
   border-radius: 50%; font-size: 1rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
+  transition: background 0.15s; flex-shrink: 0;
 }
 .edit-modal-close:hover { background: rgba(255,255,255,0.35); }
-.edit-modal-body { padding: 24px; }
+.edit-modal-body { padding: 24px; overflow-y: auto; flex: 1; min-height: 0; }
 .edit-modal-footer {
   display: flex; justify-content: flex-end; gap: 12px;
-  padding: 16px 24px; border-top: 1px solid #f0f4f8;
+  padding: 16px 24px; border-top: 1px solid #f0f4f8; flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
   .clients-header { flex-direction: column; gap: 14px; align-items: flex-start; }
   .clients-grid { grid-template-columns: 1fr; }
-  .client-form-grid { flex-direction: column; }
-  .client-field, .client-field-wide { flex: 1 1 100%; }
+  .client-form-grid { grid-template-columns: 1fr; }
+  .client-field-wide { grid-column: span 1; }
 }
 
 /* CARD CLIQUABLE */
@@ -295,9 +300,13 @@
 }
 
 /* ── Interlocuteurs ── */
-.interlocuteurs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.interloc-field { display: flex; flex-direction: column; gap: 3px; }
+.interlocuteurs-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+  background: #f8faff; border: 1.5px solid #e3ecf7; border-radius: 12px; padding: 14px;
+}
+.interloc-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .interloc-label { font-size: 0.68rem; font-weight: 800; color: #37474f; text-transform: uppercase; letter-spacing: 0.4px; }
+.interloc-field .client-input { background: #fff; }
 .interloc-val { font-size: 0.85rem; font-weight: 600; color: #0d1b2a; }
 .interloc-section-title { display: block; font-size: 0.7rem; font-weight: 800; color: #37474f; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 .detail-interlocuteurs { background: #f8faff; border-radius: 12px; padding: 14px 16px; margin-top: 12px; border: 1.5px solid #eef1f5; }

@@ -208,6 +208,7 @@ nav {
    ══════════════════════════════════════════ */
 .main-content {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;

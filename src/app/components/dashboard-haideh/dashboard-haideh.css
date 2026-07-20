@@ -30,7 +30,7 @@ nav { padding: 0 12px 20px; flex: 1; }
 .nav-item.logout { color: rgba(255,180,150,0.8); margin-top: 8px; }
 .nav-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 8px; }
 
-.main-content { flex: 1; display: flex; flex-direction: column; }
+.main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
 .topbar { background: #fff; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 2px solid #d8f3dc; }
 .topbar-left h3 { font-size: 1.1rem; font-weight: 800; color: #1a3c34; }

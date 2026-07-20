@@ -79,7 +79,7 @@ export class Taches implements OnInit {
   nouvelleTache = {
     projet: '', statut: 'En Qualification', date: '',
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
-    echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: ''
+    echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
   };
 
   tacheEnEdition: any = {};
@@ -214,6 +214,7 @@ export class Taches implements OnInit {
       chiffreAffaire: t.chiffreAffaire || '',
       numCommande: t.description || '',
       numDevis: t.numDevis || '',
+      caDevis: t.caDevis || '',
       fichiers: this.parseJsonField(t.fichiers, []),
       assignes: this.parseJsonField(t.assignes, []),
       notes: [],
@@ -237,6 +238,7 @@ export class Taches implements OnInit {
       clientFinal: tache.clientFinal || '',
       chiffreAffaire: tache.chiffreAffaire || '',
       numDevis: tache.numDevis || '',
+      caDevis: tache.caDevis || '',
       assignes: JSON.stringify(tache.assignes || []),
       etapes: JSON.stringify(tache.etapes || []),
       fichiers: JSON.stringify(tache.fichiers || []),
@@ -421,7 +423,7 @@ export class Taches implements OnInit {
     this.nouvelleTache = {
       projet: '', statut: 'En Qualification', date: '',
       priorite: 'Moyenne', fichiers: [], assignes: [],
-      echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: ''
+      echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
     };
   }
 

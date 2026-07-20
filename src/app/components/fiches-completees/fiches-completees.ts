@@ -87,12 +87,23 @@ export class FichesCompletees implements OnInit {
     return '';
   }
 
+  private dataUrlToBlobUrl(dataUrl: string): string {
+    const [header, base64] = dataUrl.split(',');
+    const mime = header.match(/data:(.*?);base64/)?.[1] || '';
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return URL.createObjectURL(new Blob([bytes], { type: mime }));
+  }
+
   ouvrirDocument(doc: any) {
     const dataUrl = doc.data || doc.dataUrl;
     if (!dataUrl) { alert('Fichier non disponible — réimportez-le depuis la fiche.'); return; }
     const mimeType = this.getMimeType(doc);
     if (mimeType.startsWith('image/') || mimeType === 'application/pdf') {
-      window.open(dataUrl, '_blank');
+      // Chrome bloque l'ouverture directe d'une URL data: dans un nouvel onglet (onglet vide) — on passe par un blob URL
+      const url = dataUrl.startsWith('data:') ? this.dataUrlToBlobUrl(dataUrl) : dataUrl;
+      window.open(url, '_blank');
     } else {
       const link = document.createElement('a');
       link.href = dataUrl;
