@@ -1,0 +1,41 @@
+<div class="visiteurs-container">
+
+  <div class="visiteurs-header">
+    <div class="visiteurs-header-left">
+      <div class="visiteurs-icon">🪪</div>
+      <div>
+        <h2 class="visiteurs-title">Visiteurs du jour</h2>
+        <p class="visiteurs-subtitle">Affichés sur l'écran d'accueil visiteur — plus besoin de toucher au code pour changer les noms</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="visiteur-form-card">
+    <div class="visiteur-form-icon"><mat-icon>person_add</mat-icon></div>
+    <input type="text" class="visiteur-input" [(ngModel)]="nouveauNom"
+      placeholder="Ex : Philippe Pelaprat" (keyup.enter)="ajouterVisiteur()">
+    <button type="button" class="btn-save-visiteur" (click)="ajouterVisiteur()">
+      <mat-icon>check</mat-icon> Ajouter
+    </button>
+  </div>
+
+  @if (visiteurs.length === 0) {
+    <div class="visiteurs-empty">
+      <span class="visiteurs-empty-icon">🪪</span>
+      <p>Aucun visiteur attendu</p>
+      <small>L'écran d'accueil affichera un message de bienvenue générique</small>
+    </div>
+  } @else {
+    <div class="visiteurs-chips">
+      @for (v of visiteurs; track v.id) {
+        <span class="visiteur-chip">
+          {{ v.nom }}
+          <button type="button" class="visiteur-chip-remove" (click)="supprimerVisiteur(v.id)" title="Retirer">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+    </div>
+  }
+
+</div>

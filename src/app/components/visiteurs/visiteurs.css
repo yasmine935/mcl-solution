@@ -1,0 +1,87 @@
+.visiteurs-container {
+  display: flex; flex-direction: column; gap: 22px;
+  padding: 24px; width: 100%;
+}
+
+/* ══ HEADER ══ */
+.visiteurs-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1565c0 60%, #1e88e5 100%);
+  border-radius: 18px; padding: 24px 30px; color: #fff;
+  box-shadow: 0 8px 24px rgba(13,27,42,0.18);
+  position: relative; overflow: hidden;
+}
+.visiteurs-header::after {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.visiteurs-header-left { display: flex; align-items: center; gap: 18px; z-index: 1; }
+.visiteurs-icon {
+  font-size: 2.1rem; background: rgba(255,255,255,0.16);
+  border-radius: 16px; width: 60px; height: 60px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+}
+.visiteurs-title { margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.2px; }
+.visiteurs-subtitle { margin: 5px 0 0; font-size: 0.84rem; opacity: 0.82; }
+
+/* ══ FORMULAIRE AJOUT ══ */
+.visiteur-form-card {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border-radius: 16px;
+  border: 1.5px solid #e0e0e0; padding: 16px 20px;
+  box-shadow: 0 4px 18px rgba(21,101,192,0.08);
+  border-left: 4px solid #1565c0;
+}
+.visiteur-form-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 10px;
+  background: #e3f2fd; color: #1565c0; flex-shrink: 0;
+}
+.visiteur-input {
+  flex: 1; box-sizing: border-box;
+  border: 1.5px solid #e0e0e0; border-radius: 10px;
+  padding: 11px 16px; font-size: 0.9rem; font-family: inherit;
+  color: #263238; background: #f8faff; outline: none;
+  transition: all 0.2s;
+}
+.visiteur-input:focus { border-color: #1565c0; background: #fff; box-shadow: 0 0 0 3px rgba(21,101,192,0.1); }
+.btn-save-visiteur {
+  display: flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg, #1565c0, #1e88e5); color: #fff;
+  border: none; border-radius: 10px;
+  padding: 11px 24px; font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+}
+.btn-save-visiteur:hover { background: linear-gradient(135deg, #0d47a1, #1565c0); transform: translateY(-1px); }
+.btn-save-visiteur mat-icon { font-size: 17px; width: 17px; height: 17px; }
+
+/* ══ EMPTY STATE ══ */
+.visiteurs-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 60px 20px; color: #90a4ae; text-align: center;
+  background: #fff; border-radius: 16px; border: 1.5px dashed #e0e0e0;
+}
+.visiteurs-empty-icon { font-size: 3rem; }
+.visiteurs-empty p { margin: 0; font-weight: 700; color: #455a64; font-size: 1rem; }
+.visiteurs-empty small { font-size: 0.8rem; }
+
+/* ══ CHIPS VISITEURS ══ */
+.visiteurs-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.visiteur-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: #eef4fc; color: #1a4d8f;
+  border-radius: 20px; padding: 10px 8px 10px 18px;
+  font-size: 0.88rem; font-weight: 700;
+  transition: background 0.15s;
+}
+.visiteur-chip:hover { background: #e0ecfa; }
+.visiteur-chip-remove {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: none; background: rgba(21,101,192,0.12); color: #0d47a1;
+  cursor: pointer; padding: 0; transition: all 0.15s;
+}
+.visiteur-chip-remove mat-icon { font-size: 14px; width: 14px; height: 14px; }
+.visiteur-chip-remove:hover { background: #c62828; color: #fff; }

@@ -71,6 +71,9 @@
 <a class="nav-item" [class.active]="currentPage === 'voitures'" (click)="currentPage = 'voitures'">
   <mat-icon>directions_car</mat-icon> Parc Automobile
 </a>
+<a class="nav-item" [class.active]="currentPage === 'visiteurs'" (click)="currentPage = 'visiteurs'">
+  <mat-icon>badge</mat-icon> Visiteurs (Écran accueil)
+</a>
 
       <div class="nav-divider"></div>
       <div class="nav-section-label">Approvisionnement</div>
@@ -839,6 +842,10 @@
 <!-- ══ VOITURES ══ -->
 @if (currentPage === 'voitures') {
   <app-voitures></app-voitures>
+}
+<!-- ══ VISITEURS ══ -->
+@if (currentPage === 'visiteurs') {
+  <app-visiteurs></app-visiteurs>
 }
       <!-- ══ MESSAGES ABY ══ -->
       @if (currentPage === 'messages-aby') {

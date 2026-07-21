@@ -23,6 +23,7 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
 import { GestionClients } from '../clients/clients';
 import { CategoriesTaches } from '../categories-taches/categories-taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
+import { Visiteurs } from '../visiteurs/visiteurs';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 @Component({
@@ -32,7 +33,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail,
+    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
     NgApexchartsModule
   ],
   templateUrl: './dashboard-admin.html',
