@@ -17,24 +17,25 @@ import { DashboardHaideh } from './components/dashboard-haideh/dashboard-haideh'
 import { DashboardNaccera } from './components/dashboard-naccera/dashboard-naccera';
 import { GestionClients } from './components/clients/clients';
 import { EcranVisiteur } from './components/ecran-visiteur/ecran-visiteur';
+import { authGuard } from './guards/auth.guard';
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'nouveau-ticket', component: TicketingComponent },
   { path: 'ecran-visiteur', component: EcranVisiteur },
-  { path: 'dashboard-admin', component: DashboardAdmin },
-  { path: 'dashboard-technicien', component: DashboardTechnicien },
-  { path: 'dashboard-kia', component: DashboardKia },
-  { path: 'dashboard-aurelien', component: DashboardAurelien },
-  { path: 'dashboard-odile', component: DashboardOdile },
-  { path: 'dashboard-essan', component: DashboardEssan },
-  { path: 'employes', component: Employes },
-  { path: 'conges', component: Conges },
-  { path: 'fiche-intervention', component: FicheInterventionManager },
-  { path: 'dashboard-karine', component: DashboardKarine },
-  { path: 'dashboard-aby', component: DashboardAby },
-  { path: 'dashboard-haideh', component: DashboardHaideh },
-  { path: 'dashboard-naccera', component: DashboardNaccera },
-  { path: 'fiche-intervention-tech/:id', component: FicheInterventionTechnicien },
-  { path: 'clients', component: GestionClients }
+  { path: 'dashboard-admin', component: DashboardAdmin, canActivate: [authGuard] },
+  { path: 'dashboard-technicien', component: DashboardTechnicien, canActivate: [authGuard] },
+  { path: 'dashboard-kia', component: DashboardKia, canActivate: [authGuard] },
+  { path: 'dashboard-aurelien', component: DashboardAurelien, canActivate: [authGuard] },
+  { path: 'dashboard-odile', component: DashboardOdile, canActivate: [authGuard] },
+  { path: 'dashboard-essan', component: DashboardEssan, canActivate: [authGuard] },
+  { path: 'employes', component: Employes, canActivate: [authGuard] },
+  { path: 'conges', component: Conges, canActivate: [authGuard] },
+  { path: 'fiche-intervention', component: FicheInterventionManager, canActivate: [authGuard] },
+  { path: 'dashboard-karine', component: DashboardKarine, canActivate: [authGuard] },
+  { path: 'dashboard-aby', component: DashboardAby, canActivate: [authGuard] },
+  { path: 'dashboard-haideh', component: DashboardHaideh, canActivate: [authGuard] },
+  { path: 'dashboard-naccera', component: DashboardNaccera, canActivate: [authGuard] },
+  { path: 'fiche-intervention-tech/:id', component: FicheInterventionTechnicien, canActivate: [authGuard] },
+  { path: 'clients', component: GestionClients, canActivate: [authGuard] }
 ];
