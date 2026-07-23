@@ -132,13 +132,13 @@ mat-form-field { width: 100%; }
 .table-container h3 { font-size: 0.95rem; font-weight: 800; color: #0d1b2a; margin: 0 0 16px; }
 .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #eef0f5; }
 
-.taches-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 900px; }
+.taches-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; table-layout: auto; }
 .taches-table thead { background: linear-gradient(135deg, #0d1b2a, #1a3a5c); }
 .taches-table th {
-  padding: 12px 14px; text-align: left; color: #fff; font-weight: 700;
-  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+  padding: 10px 8px; text-align: left; color: #fff; font-weight: 700;
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
 }
-.taches-table td { padding: 12px 14px; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
+.taches-table td { padding: 8px; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
 .taches-table tbody tr:hover { background: #f8fafc; }
 .taches-table tbody tr:last-child td { border-bottom: none; }
 
@@ -156,13 +156,13 @@ mat-form-field { width: 100%; }
 
 /* BADGES */
 .badge-priorite {
-  display: inline-block; min-width: 78px; padding: 5px 12px; border-radius: 6px;
-  font-size: 0.72rem; font-weight: 700; color: #fff; text-align: center; white-space: nowrap;
+  display: inline-block; min-width: 64px; padding: 4px 8px; border-radius: 6px;
+  font-size: 0.68rem; font-weight: 700; color: #fff; text-align: center; white-space: nowrap;
 }
 
 .badge-priorite-pastel {
-  display: inline-block; min-width: 78px; padding: 5px 12px; border-radius: 20px;
-  font-size: 0.72rem; font-weight: 700; text-align: center; white-space: nowrap;
+  display: inline-block; min-width: 64px; padding: 4px 8px; border-radius: 20px;
+  font-size: 0.68rem; font-weight: 700; text-align: center; white-space: nowrap;
 }
 
 /* STATUT — texte coloré sans cadre */
@@ -170,15 +170,15 @@ mat-form-field { width: 100%; }
   font-size: 0.85rem; font-weight: 700;
 }
 .badge-echeance {
-  display: inline-block; padding: 4px 10px; background: #f0f4f8; color: #546e7a;
-  border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+  display: inline-block; padding: 4px 8px; background: #f0f4f8; color: #546e7a;
+  border-radius: 20px; font-size: 0.68rem; font-weight: 600; white-space: nowrap;
 }
 
 /* ASSIGNES */
 .assignes-container { display: flex; flex-wrap: wrap; gap: 5px; }
 .assignee-badge {
   display: inline-block;
-  font-size: 0.85rem; font-weight: 500; color: #37474f;
+  font-size: 0.78rem; font-weight: 500; color: #37474f;
 }
 .assignee-empty { color: #ccc; }
 

@@ -20,11 +20,9 @@
 
   <!-- LÉGENDE -->
   <div class="legende">
-    <span class="leg-item"><span class="leg-dot" style="background:#1565c0"></span>Bureau</span>
     <span class="leg-item"><span class="leg-dot" style="background:#e65100"></span>Distance</span>
     <span class="leg-item"><span class="leg-dot" style="background:#6a1b9a"></span>Déplacement</span>
     <span class="leg-item"><span class="leg-dot" style="background:#c62828"></span>Congé/Maladie</span>
-    <span class="leg-item"><span class="leg-dot" style="background:#0277bd"></span>RTT</span>
     <span class="leg-item"><span class="leg-dot" style="background:#2e7d32"></span>Formation</span>
     <span class="leg-item"><span class="leg-dot" style="background:#1a6b3c"></span>Intervention</span>
   </div>
@@ -429,13 +427,13 @@
         </div>
         @if (!selectedJour.conge) {
           <div class="note-suggestions">
-            <span *ngFor="let s of ['Bureau', 'Télétravail', 'Déplacement', 'Congé', 'RTT', 'Formation']"
+            <span *ngFor="let s of ['Bureau', 'Télétravail', 'Déplacement', 'Formation']"
               class="suggestion-chip" (click)="selectedJour.note = s">
               {{ s }}
             </span>
           </div>
           <textarea class="note-textarea" [(ngModel)]="selectedJour.note"
-            placeholder="Ex: Bureau, Congé, Déplacement client..."></textarea>
+            placeholder="Ex: Bureau, Formation, Déplacement client..."></textarea>
           <div class="modal-note-actions">
             <button class="btn-modal-cancel" (click)="closeModal()">Annuler</button>
             <button class="btn-modal-save" (click)="sauvegarderNote()">✓ Sauvegarder</button>

@@ -76,6 +76,12 @@
             <input type="text" class="compact-input" [(ngModel)]="nouvelleTache.clientFinal" placeholder="Saisir le nom du client final">
           </div>
         </div>
+        <div class="proj-row">
+          <div class="proj-field-xl">
+            <label class="field-label">Adresse</label>
+            <input type="text" class="compact-input" [(ngModel)]="nouvelleTache.adresse" placeholder="Ex : 12 rue de Paris, 75001 Paris">
+          </div>
+        </div>
       </div>
 
       <!-- SECTION 3 : DEVIS -->
@@ -278,6 +284,12 @@
           <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
             <input type="text" class="compact-input" [(ngModel)]="tacheEnEdition.clientFinal" placeholder="Saisir le nom du client final">
+          </div>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-xl">
+            <label class="field-label">Adresse</label>
+            <input type="text" class="compact-input" [(ngModel)]="tacheEnEdition.adresse" placeholder="Ex : 12 rue de Paris, 75001 Paris">
           </div>
         </div>
       </div>

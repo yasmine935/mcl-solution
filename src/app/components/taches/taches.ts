@@ -67,7 +67,7 @@ export class Taches implements OnInit {
   noteTemp = '';
   currentUser: any = {};
 
-  statuts = ['En Qualification', 'En cours', 'Fait', 'Perdu', 'En Attente'];
+  statuts = ['En Qualification', 'En cours', 'Fait', 'Perdu', 'En Attente', 'Qualification', 'Devis', 'Validation Resp', 'Bon de commande', 'Réalisation', 'Clôture'];
   priorites = ['Faible', 'Élevé', 'Moyenne'];
 
   clients: any[] = [];
@@ -79,7 +79,7 @@ export class Taches implements OnInit {
   nouvelleTache = {
     projet: '', statut: 'En Qualification', date: '',
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
-    echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
+    echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
   };
 
   tacheEnEdition: any = {};
@@ -211,6 +211,7 @@ export class Taches implements OnInit {
       echeance: t.dateEcheance || '',
       client: t.client || '',
       clientFinal: t.clientFinal || '',
+      adresse: t.adresse || '',
       chiffreAffaire: t.chiffreAffaire || '',
       numCommande: t.description || '',
       numDevis: t.numDevis || '',
@@ -236,6 +237,7 @@ export class Taches implements OnInit {
       dateEcheance: tache.echeance && tache.echeance.match(/^\d{4}-\d{2}-\d{2}$/) ? tache.echeance : null,
       client: tache.client || '',
       clientFinal: tache.clientFinal || '',
+      adresse: tache.adresse || '',
       chiffreAffaire: tache.chiffreAffaire || '',
       numDevis: tache.numDevis || '',
       caDevis: tache.caDevis || '',
@@ -273,6 +275,7 @@ export class Taches implements OnInit {
     etape.done = true;
     etape.doneBy = `${this.currentUser.prenom} ${this.currentUser.nom}`;
     etape.doneAt = new Date().toLocaleString('fr-FR');
+    tache.statut = etape.nom === 'Clôture' ? 'Fait' : etape.nom;
     this.http.put<any>(`${API}/${tache.id}`, this.buildBody(tache)).subscribe();
   }
 
@@ -423,7 +426,7 @@ export class Taches implements OnInit {
     this.nouvelleTache = {
       projet: '', statut: 'En Qualification', date: '',
       priorite: 'Moyenne', fichiers: [], assignes: [],
-      echeance: '', client: '', clientFinal: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
+      echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
     };
   }
 
@@ -475,7 +478,9 @@ export class Taches implements OnInit {
   getStatutColor(statut: string): string {
     const colors: any = {
       'En Qualification': '#CCCCCC', 'En cours': '#FFA500',
-      'Fait': '#00CC00', 'Perdu': '#FF0000', 'En Attente': '#0066FF'
+      'Fait': '#00CC00', 'Perdu': '#FF0000', 'En Attente': '#0066FF',
+      'Qualification': '#9e9e9e', 'Devis': '#f57f17', 'Validation Resp': '#fb8c00',
+      'Bon de commande': '#1565c0', 'Réalisation': '#00838f', 'Clôture': '#00CC00'
     };
     return colors[statut] || '#CCCCCC';
   }

@@ -254,6 +254,30 @@ export class FicheInterventionManager implements OnInit {
     ids.forEach(id => selectedIds.push(id));
   }
 
+  getConflitTech(techId: number, form: any): any {
+    const debut = form?.dateDebut || form?.date;
+    if (!debut) return null;
+    const fin = form?.dateFin || debut;
+    const excludeId = form?.id || null;
+    return this.fiches.find((f: any) => {
+      if (excludeId && f.id === excludeId) return false;
+      if (!this.isTechSelected(f.selectedTechIds, techId)) return false;
+      const fDebut = f.dateDebut || f.date;
+      if (!fDebut) return false;
+      const fFin = f.dateFin || fDebut;
+      return debut <= fFin && fDebut <= fin;
+    }) || null;
+  }
+
+  getConflitLabel(techId: number, form: any): string {
+    const c = this.getConflitTech(techId, form);
+    if (!c) return '';
+    const periode = c.dateFin && c.dateFin !== c.dateDebut
+      ? `${this.afficherDate(c.dateDebut)} → ${this.afficherDate(c.dateFin)}`
+      : this.afficherDate(c.dateDebut);
+    return `Déjà occupé ${periode} — ${c.client || 'autre intervention'}`;
+  }
+
   getTechColor(techId: number): string {
     const colors = ['#1565c0', '#6a1b9a', '#2e7d32', '#e65100', '#00695c', '#c62828'];
     return colors[Number(techId) % colors.length];
