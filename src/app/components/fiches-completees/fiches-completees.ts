@@ -8,7 +8,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 const API_FICHES = 'http://localhost:8080/api/fiches-intervention';
-const API_FACTURES = 'http://localhost:8080/api/factures';
 
 @Component({
   selector: 'app-fiches-completees',
@@ -144,16 +143,9 @@ export class FichesCompletees implements OnInit {
         next: () => {
           fiche.statut = 'VALIDEE';
           fiche.approuvePar = nomManager;
-          // 2. Créer la facture
-          const facture = {
-            client: fiche.client, montantHT: fiche.chiffreAffaire || 0, tva: 20,
-            statut: 'EN_ATTENTE', dateFacture: new Date().toISOString().split('T')[0],
-            utilisateur: { id: this.currentUser.id }
-          };
-          this.http.post<any>(API_FACTURES, facture).subscribe({
-            next: (f) => { alert(`Fiche validee !\nFacture creee: ${f.numero}`); this.loadFichesCompletees(); this.fermerDetail(); },
-            error: () => { alert('Fiche validee ! (Erreur creation facture)'); this.loadFichesCompletees(); this.fermerDetail(); }
-          });
+          alert('Fiche validee !');
+          this.loadFichesCompletees();
+          this.fermerDetail();
         },
         error: () => alert('Erreur validation')
       });

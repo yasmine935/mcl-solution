@@ -157,7 +157,7 @@
               </button>
             } @else if (!isKia() && fiche.statut === 'VALIDEE_KIA') {
               <button type="button" class="fc-btn-valider" (click)="validerFiche(fiche)">
-                <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
+                <mat-icon>check_circle</mat-icon> Valider
               </button>
             } @else if (!isKia() && fiche.statut === 'COMPLETEE') {
               <span class="fc-attente-kia">⏳ En attente de confirmation par le Technicien Supérieur</span>
@@ -365,7 +365,7 @@
             </button>
           } @else if (!isKia() && selectedFiche.statut === 'VALIDEE_KIA') {
             <button type="button" class="md-btn-valider" (click)="validerFiche(selectedFiche)">
-              <mat-icon>check_circle</mat-icon> Valider &amp; Facturer
+              <mat-icon>check_circle</mat-icon> Valider
             </button>
           } @else if (!isKia() && selectedFiche.statut === 'COMPLETEE') {
             <span class="md-attente-kia">⏳ En attente de confirmation par le Technicien Supérieur</span>

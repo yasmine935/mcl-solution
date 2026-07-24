@@ -16,7 +16,7 @@
           {{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}
         </div>
         <div>
-          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <div class="user-name">{{ user.nom }}</div>
           <span class="role-tag">Manager</span>
         </div>
       </div>
@@ -56,10 +56,6 @@
       <a class="nav-item" [class.active]="currentPage === 'ged'" (click)="currentPage = 'ged'">
         <mat-icon>folder_open</mat-icon> Documents
       </a>
-      
-      <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
-        <mat-icon>receipt</mat-icon> Factures
-      </a>
 
       <div class="nav-divider"></div>
       <div class="nav-section-label">Approvisionnement</div>
@@ -94,7 +90,7 @@
         <h3>{{ getPageTitle() }}</h3>
       </div>
       <div class="topbar-right">
-        <span class="topbar-greeting"><strong>{{ user.prenom }} {{ user.nom }}</strong></span>
+        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
         <span class="role-badge">ODILE</span>
       </div>
     </div>
@@ -108,7 +104,7 @@
           <div class="home-welcome-left">
             <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
             <div class="home-welcome-text">
-              <h2>{{ user.prenom }} {{ user.nom }}</h2>
+              <h2>{{ user.nom }}</h2>
               <p>Voici un aperçu de votre activité du jour</p>
             </div>
           </div>
@@ -116,14 +112,6 @@
         </div>
         <!-- KPI COMPACTS -->
         <div class="home-kpi-grid">
-          <button type="button" class="home-kpi-card" (click)="currentPage = 'factures'">
-            <span class="home-kpi-icon home-kpi-bleu"><mat-icon>receipt</mat-icon></span>
-            <span class="home-kpi-body">
-              <span class="home-kpi-num">{{ factures.length }}</span>
-              <span class="home-kpi-label">Factures</span>
-            </span>
-            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
-          </button>
           <button type="button" class="home-kpi-card" (click)="currentPage = 'fiches'">
             <span class="home-kpi-icon home-kpi-vert"><mat-icon>description</mat-icon></span>
             <span class="home-kpi-body">
@@ -137,11 +125,6 @@
         <div class="home-actions-card">
           <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
           <div class="home-actions-grid">
-            <button type="button" class="home-action-btn" (click)="currentPage = 'factures'">
-              <span class="home-action-icon home-action-blue"><mat-icon>receipt</mat-icon></span>
-              <span class="home-action-text"><strong>Factures</strong><span>{{ factures.length }} ce mois</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
             <button type="button" class="home-action-btn" (click)="currentPage = 'fiches'">
               <span class="home-action-icon home-action-green"><mat-icon>description</mat-icon></span>
               <span class="home-action-text"><strong>Fiches</strong><span>{{ fiches.length }} total</span></span>
@@ -180,9 +163,6 @@
       }
       @if (currentPage === 'clients') {
         <app-gestion-clients></app-gestion-clients>
-      }
-      @if (currentPage === 'factures') {
-        <app-factures></app-factures>
       }
       @if (currentPage === 'approvisionnement') {
         <app-approvisionnement [modetous]="true"></app-approvisionnement>

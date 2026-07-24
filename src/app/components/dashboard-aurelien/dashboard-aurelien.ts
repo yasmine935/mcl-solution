@@ -11,7 +11,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { Taches } from '../taches/taches';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
-import { Factures } from '../factures/factures';
 import { Documents } from '../documents/documents';
 import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
@@ -27,7 +26,7 @@ import { GestionClients } from '../clients/clients';
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Taches, FichesCompletees,
-    Factures, Documents, Semainier, Planning, TicketingComponent,
+    Documents, Semainier, Planning, TicketingComponent,
     ApprovisionnementComponent, GestionClients
   ],
   templateUrl: './dashboard-aurelien.html',
@@ -297,7 +296,6 @@ loadSoldeConges() {
       case 'ged': return 'Documents';
       case 'Semainier': return 'Semainier';
       case 'tickets': return 'Tickets Clients';
-      case 'factures': return 'Factures';
       case 'mes-conges': return 'Mes Conges';
       case 'approvisionnement': return 'Demandes d\'Approvisionnement';
       case 'messagerie': return 'Messagerie MCL Solutions';

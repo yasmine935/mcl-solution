@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
-import { Factures } from '../factures/factures';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Documents } from '../documents/documents';
 import { Semainier } from '../semenier/semenier';
@@ -28,7 +27,7 @@ import { JournalTravail } from '../journal-travail/journal-travail';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, FichesCompletees, Factures, Documents, Semainier, Planning,
+    FicheInterventionManager, FichesCompletees, Documents, Semainier, Planning,
     TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail
   ],
   templateUrl: './dashboard-odile.html',
@@ -51,7 +50,6 @@ export class DashboardOdile implements OnInit {
   employes: any[] = [];
   documents: any[] = [];
   tickets: any[] = [];
-  factures: any[] = [];
   reclamations: any[] = [];
   fiches: any[] = [];
   selectedFiche: any = null;
@@ -79,7 +77,6 @@ export class DashboardOdile implements OnInit {
     this.loadConges();
     this.loadEmployes();
     this.loadDocuments();
-    this.loadFactures();
     this.loadReclamations();
     this.loadFiches();
     this.loadSoldeConges();
@@ -112,15 +109,6 @@ export class DashboardOdile implements OnInit {
       { id: 3, nom: 'Directives Entreprise', date: '2025-12-01', type: 'DOCX' },
       { id: 4, nom: 'Contrats Clients', date: '2025-11-15', type: 'PDF' },
       { id: 5, nom: 'Politique RH', date: '2025-10-01', type: 'DOCX' }
-    ];
-  }
-  loadFactures() {
-    this.factures = [
-      { id: 1, numero: 'FAC-2026-001', client: 'Client A', montant: '5000EUR', date: '2026-01-15', statut: 'PAYEE' },
-      { id: 2, numero: 'FAC-2026-002', client: 'Client B', montant: '3500EUR', date: '2026-01-12', statut: 'EN_ATTENTE' },
-      { id: 3, numero: 'FAC-2026-003', client: 'Client C', montant: '7200EUR', date: '2026-01-10', statut: 'PAYEE' },
-      { id: 4, numero: 'FAC-2026-004', client: 'Client D', montant: '4100EUR', date: '2026-01-08', statut: 'EN_ATTENTE' },
-      { id: 5, numero: 'FAC-2026-005', client: 'Client E', montant: '2800EUR', date: '2026-01-05', statut: 'PAYEE' }
     ];
   }
   loadFiches() {
@@ -226,7 +214,6 @@ export class DashboardOdile implements OnInit {
       case 'fiches-completees': return 'Fiches Completees';
       case 'ged': return 'Documents';
       case 'tickets': return 'Tickets Clients';
-      case 'factures': return 'Factures';
       case 'planning': return 'Planning';
       case 'Semainier': return 'Semainier';
       case 'mes-conges': return 'Mes Conges';

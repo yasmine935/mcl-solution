@@ -14,7 +14,7 @@
       <div class="user-card">
         <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
         <div>
-          <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+          <div class="user-name">{{ user.nom }}</div>
           <span class="role-tag">Comptable</span>
         </div>
       </div>
@@ -28,9 +28,6 @@
       <a class="nav-item" [class.active]="currentPage === 'ecritures'" (click)="currentPage = 'ecritures'">
         <mat-icon>book</mat-icon> Journal Comptable
       </a>
-      <a class="nav-item" [class.active]="currentPage === 'factures'" (click)="currentPage = 'factures'">
-        <mat-icon>receipt</mat-icon> Factures
-      </a>
       <div class="nav-divider"></div>
       <a class="nav-item logout" (click)="logout()">
         <mat-icon>logout</mat-icon> Deconnexion
@@ -43,7 +40,7 @@
     <div class="topbar">
       <div class="topbar-left"><button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button><h3>{{ getPageTitle() }}</h3></div>
       <div class="topbar-right">
-        <span class="topbar-greeting"><strong>{{ user.prenom }} {{ user.nom }}</strong></span>
+        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
         <span class="role-badge-top">COMPTABILITE</span>
       </div>
     </div>
@@ -57,7 +54,7 @@
           <div class="home-welcome-left">
             <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
             <div class="home-welcome-text">
-              <h2>{{ user.prenom }} {{ user.nom }}</h2>
+              <h2>{{ user.nom }}</h2>
               <p>Voici un aperçu de votre activité comptable</p>
             </div>
           </div>
@@ -65,33 +62,6 @@
         </div>
         <!-- STAT CARDS -->
         <div class="stats-grid">
-          <div class="stat-card stat-blue" (click)="currentPage = 'factures'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>receipt</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Total Factures</span>
-              <span class="stat-card-number">{{ factures.length }}</span>
-              <span class="stat-card-sub">Voir factures →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-green" (click)="currentPage = 'factures'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>check_circle</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Factures payées</span>
-              <span class="stat-card-number">{{ facturesPayees }}</span>
-              <span class="stat-card-sub">Réglées →</span>
-            </div>
-          </div>
-          <div class="stat-card stat-orange" (click)="currentPage = 'factures'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>hourglass_empty</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">En attente</span>
-              <span class="stat-card-number">{{ facturesEnAttente }}</span>
-              <span class="stat-card-sub">À traiter →</span>
-            </div>
-          </div>
           <div class="stat-card stat-purple" (click)="currentPage = 'ecritures'">
             <div class="stat-card-bg"></div>
             <div class="stat-card-icon"><mat-icon>book</mat-icon></div>
@@ -210,47 +180,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
-      }
-
-      <!-- FACTURES -->
-      @if (currentPage === 'factures') {
-        <div class="section-card">
-          <div class="section-header">
-            <h3>🧾 Factures & Paiements</h3>
-            <span class="pill pill-bleu">{{ factures.length }} factures</span>
-          </div>
-          @if (factures.length === 0) {
-            <div class="empty-state"><span>🧾</span><p>Aucune facture</p></div>
-          } @else {
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Numero</th>
-                  <th>Client</th>
-                  <th>Montant</th>
-                  <th>Date creation</th>
-                  <th>Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (f of factures; track f.id) {
-                  <tr>
-                    <td><strong>{{ f.numero }}</strong></td>
-                    <td>{{ f.client }}</td>
-                    <td><strong>{{ f.montant }}€</strong></td>
-                    <td>{{ f.dateCreation | date:'dd/MM/yyyy' }}</td>
-                    <td>
-                      <span class="statut-pill"
-                        [style.background]="f.statut === 'PAYEE' ? '#2e7d32' : f.statut === 'EN_ATTENTE' ? '#f57f17' : '#c62828'">
-                        {{ f.statut }}
-                      </span>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
         </div>
       }
 

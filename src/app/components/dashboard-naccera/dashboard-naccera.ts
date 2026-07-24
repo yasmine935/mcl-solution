@@ -21,7 +21,6 @@ export class DashboardNaccera implements OnInit {
   get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) { this._currentPage = value; }
 
-  factures: any[] = [];
   ecritures: any[] = [];
   showFormEcriture = false;
 
@@ -40,15 +39,7 @@ export class DashboardNaccera implements OnInit {
   }
 
   loadData() {
-    this.loadFactures();
     this.loadEcritures();
-  }
-
-  loadFactures() {
-    this.http.get<any[]>('http://localhost:8080/api/factures').subscribe({
-      next: (data) => this.factures = data,
-      error: () => this.factures = []
-    });
   }
 
   loadEcritures() {
@@ -82,14 +73,11 @@ export class DashboardNaccera implements OnInit {
   get totalDebit() { return this.ecritures.reduce((s, e) => s + (parseFloat(e.debit) || 0), 0); }
   get totalCredit() { return this.ecritures.reduce((s, e) => s + (parseFloat(e.credit) || 0), 0); }
   get solde() { return this.totalDebit - this.totalCredit; }
-  get facturesPayees() { return this.factures.filter(f => f.statut === 'PAYEE').length; }
-  get facturesEnAttente() { return this.factures.filter(f => f.statut === 'EN_ATTENTE' || f.statut === 'ENVOYEE').length; }
 
   getPageTitle(): string {
     const map: any = {
       'home': 'Tableau de Bord Comptabilite',
-      'ecritures': 'Journal Comptable',
-      'factures': 'Factures & Paiements'
+      'ecritures': 'Journal Comptable'
     };
     return map[this.currentPage] || 'Comptabilite';
   }

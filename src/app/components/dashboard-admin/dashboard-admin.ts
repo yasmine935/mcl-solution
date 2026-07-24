@@ -13,7 +13,6 @@ import { Employes } from '../employes/employes';
 import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
-import { Factures } from '../factures/factures';
 import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
@@ -33,7 +32,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Factures, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
+    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
     NgApexchartsModule
   ],
   templateUrl: './dashboard-admin.html',
@@ -66,7 +65,6 @@ export class DashboardAdmin implements OnInit {
   reclamations: any[] = [];
   documents: any[] = [];
   tickets: any[] = [];
-  factures: any[] = [];
   utilisateurs: any[] = [];
 
   selectedFiche: any = null;
@@ -193,7 +191,6 @@ get minutesOk(): number {
   this.loadReclamations();
   this.loadDocuments();
   this.loadTickets();
-  this.loadFactures();
   this.loadVoitures();
   this.loadMinutesSecurite();
   this.loadResetRequests();
@@ -443,14 +440,6 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
     ];
   }
 
-  loadFactures() {
-    this.factures = [
-      { id: 1, numero: 'FAC-2026-001', client: 'Client A', montant: '5000€', date: '2026-01-15', statut: 'PAYEE' },
-      { id: 2, numero: 'FAC-2026-002', client: 'Client B', montant: '3500€', date: '2026-01-12', statut: 'EN_ATTENTE' },
-      { id: 3, numero: 'FAC-2026-003', client: 'Client C', montant: '7200€', date: '2026-01-10', statut: 'PAYEE' }
-    ];
-  }
-
   creerFiche() {
     if (!this.nouveauFiche.numero || !this.nouveauFiche.client || !this.nouveauFiche.technicienId) {
       alert('Veuillez remplir tous les champs');
@@ -512,7 +501,6 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
       case 'documents': return 'Documents';
       case 'reclamations': return 'Réclamations';
       case 'support': return 'Support';
-      case 'factures': return 'Factures';
       case 'utilisateurs': return 'Utilisateurs';
       case 'tickets': return '🎫 Tickets Clients';
       default: return 'Dashboard Admin';

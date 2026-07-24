@@ -21,7 +21,6 @@ export class DashboardHaideh implements OnInit {
   get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) { this._currentPage = value; }
 
-  factures: any[] = [];
   budgets: any[] = [];
   servicesGeneraux: any[] = [];
   showFormBudget = false;
@@ -48,16 +47,8 @@ export class DashboardHaideh implements OnInit {
   }
 
   loadData() {
-    this.loadFactures();
     this.loadBudgets();
     this.loadServicesGeneraux();
-  }
-
-  loadFactures() {
-    this.http.get<any[]>('http://localhost:8080/api/factures').subscribe({
-      next: (data) => this.factures = data,
-      error: () => this.factures = []
-    });
   }
 
   loadBudgets() {
@@ -121,15 +112,12 @@ export class DashboardHaideh implements OnInit {
     return '#2e7d32';
   }
 
-  get totalFactures() { return this.factures.length; }
-  get facturesEnAttente() { return this.factures.filter(f => f.statut === 'EN_ATTENTE' || f.statut === 'ENVOYEE').length; }
   get totalBudgetAlloue() { return this.budgets.reduce((s, b) => s + (parseFloat(b.montantAlloue) || 0), 0); }
   get totalBudgetDepense() { return this.budgets.reduce((s, b) => s + (parseFloat(b.montantDepense) || 0), 0); }
 
   getPageTitle(): string {
     const map: any = {
       'home': 'Tableau de Bord DAF',
-      'comptabilite': 'Comptabilite & Factures',
       'budget': 'Budget & Finance',
       'services': 'Services Generaux'
     };

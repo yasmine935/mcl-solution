@@ -13,7 +13,6 @@ import { GestionClients } from '../clients/clients';
 import { Planning } from '../planning/planning';
 import { Semainier } from '../semenier/semenier';
 import { Documents } from '../documents/documents';
-import { Factures } from '../factures/factures';
 import { Conges } from '../conges/conges';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
@@ -25,7 +24,7 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
     CommonModule, FormsModule, MatIconModule, MatButtonModule,
     NgApexchartsModule,
     FicheInterventionManager, FichesCompletees, Taches, GestionClients,
-    Planning, Semainier, Documents, Factures, Conges,
+    Planning, Semainier, Documents, Conges,
     ApprovisionnementComponent, RemonteesTerrainComponent
   ],
   templateUrl: './dashboard-essan.html',
@@ -38,11 +37,9 @@ export class DashboardEssan implements OnInit {
 
   // Stats dashboard
   totalFiches = 0;
-  totalFactures = 0;
   totalCommandes = 0;
   totalReclamations = 0;
   totalConges = 0;
-  montantTotalFactures = 0;
 
   // Données complètes pour les graphiques BI
   fiches: any[] = [];
@@ -129,13 +126,6 @@ export class DashboardEssan implements OnInit {
     this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
       next: (d) => { this.fiches = d; this.totalFiches = d.length; }, error: () => {}
     });
-    this.http.get<any[]>('http://localhost:8080/api/factures').subscribe({
-      next: (d) => {
-        this.totalFactures = d.length;
-        this.montantTotalFactures = d.reduce((s: number, f: any) =>
-          s + (Number.parseFloat(f.montantHT) * (1 + Number.parseFloat(f.tva) / 100) || 0), 0);
-      }, error: () => {}
-    });
     this.http.get<any[]>('http://localhost:8080/api/commandes').subscribe({
       next: (d) => { this.commandes = d; this.totalCommandes = d.length; }, error: () => {}
     });
@@ -171,7 +161,6 @@ export class DashboardEssan implements OnInit {
       'planning': '📅 Planning',
       'semainier': '📆 Semainier',
       'documents': '📁 Documents',
-      'factures': '💰 Factures',
       'approvisionnement': '📋 Approvisionnement',
       'stock': '📦 Stock',
       'commandes': '🛒 Commandes',
