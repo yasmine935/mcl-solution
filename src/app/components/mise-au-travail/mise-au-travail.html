@@ -25,10 +25,6 @@
         <span class="kpi-num">{{ fichesValidees.length }}</span>
         <span class="kpi-lbl">Validées</span>
       </div>
-      <div class="kpi-card kpi-grey">
-        <span class="kpi-num">{{ fichesArchivees.length }}</span>
-        <span class="kpi-lbl">Archivées</span>
-      </div>
       <div class="kpi-card kpi-total">
         <span class="kpi-num">{{ fiches.length }}</span>
         <span class="kpi-lbl">Total</span>
@@ -67,9 +63,6 @@
                   <button class="btn-icon" (click)="voirDetail(fiche)" title="Voir">👁️</button>
                   @if (fiche.statut === 'Brouillon') {
                     <button class="btn-icon btn-valider" (click)="validerFiche(fiche)" title="Valider">✅</button>
-                  }
-                  @if (fiche.statut === 'Validée') {
-                    <button class="btn-icon btn-archiver" (click)="archiverFiche(fiche)" title="Archiver">📦</button>
                   }
                   <button class="btn-icon btn-del" (click)="supprimerFiche(fiche)" title="Supprimer">🗑️</button>
                 </td>
@@ -137,10 +130,10 @@
           <label>Modes opératoires validés ?</label>
           <div class="radio-group">
             <label class="radio-label">
-              <input type="radio" [(ngModel)]="form.modesOperatoiresValides" [value]="true"/> Oui
+              <input type="radio" name="modesOperatoiresValides" [(ngModel)]="form.modesOperatoiresValides" [value]="true"/> Oui
             </label>
             <label class="radio-label">
-              <input type="radio" [(ngModel)]="form.modesOperatoiresValides" [value]="false"/> Non (Si non, arrêt et validation)
+              <input type="radio" name="modesOperatoiresValides" [(ngModel)]="form.modesOperatoiresValides" [value]="false"/> Non (Si non, arrêt et validation)
             </label>
           </div>
         </div>
@@ -149,10 +142,10 @@
           <label>Co-activité identifiée ?</label>
           <div class="radio-group">
             <label class="radio-label">
-              <input type="radio" [(ngModel)]="form.coActiviteIdentifiee" [value]="true"/> Oui
+              <input type="radio" name="coActiviteIdentifiee" [(ngModel)]="form.coActiviteIdentifiee" [value]="true"/> Oui
             </label>
             <label class="radio-label">
-              <input type="radio" [(ngModel)]="form.coActiviteIdentifiee" [value]="false"/> Non
+              <input type="radio" name="coActiviteIdentifiee" [(ngModel)]="form.coActiviteIdentifiee" [value]="false"/> Non
             </label>
           </div>
           @if (form.coActiviteIdentifiee) {
@@ -164,10 +157,10 @@
           <label>Nécessité de permis spécifiques ?</label>
           <div class="radio-group">
             <label class="radio-label">
-              <input type="radio" [(ngModel)]="form.permisSpecifiques" [value]="false"/> Non
+              <input type="radio" name="permisSpecifiques" [(ngModel)]="form.permisSpecifiques" [value]="false"/> Non
             </label>
             <label class="radio-label">
-              <input type="radio" [(ngModel)]="form.permisSpecifiques" [value]="true"/> Oui
+              <input type="radio" name="permisSpecifiques" [(ngModel)]="form.permisSpecifiques" [value]="true"/> Oui
             </label>
           </div>
           @if (form.permisSpecifiques) {
@@ -310,9 +303,6 @@
         <div class="detail-actions">
           @if (selectedFiche.statut === 'Brouillon') {
             <button class="btn-valider-form" (click)="validerFiche(selectedFiche)">✅ Valider</button>
-          }
-          @if (selectedFiche.statut === 'Validée') {
-            <button class="btn-brouillon" (click)="archiverFiche(selectedFiche)">📦 Archiver</button>
           }
           <button class="btn-cancel" (click)="supprimerFiche(selectedFiche)">🗑️ Supprimer</button>
         </div>

@@ -382,7 +382,38 @@
             <button type="button" class="btn-modal-close" (click)="fermerManagerModal()">✕</button>
           </div>
           <div class="modal-assign-body">
-            <p class="assign-label">Type de journée</p>
+            @if (managerFiche) {
+              <div class="fiche-detail-box">
+                <div class="fiche-detail-header">🔧 Intervention en cours ce jour-là</div>
+                <div class="fiche-detail-row"><strong>Projet</strong> {{ managerFiche.numProjet || '—' }}</div>
+                <div class="fiche-detail-row"><strong>Client</strong> {{ managerFiche.client || '—' }}</div>
+                @if (managerFiche.adresse) {
+                  <div class="fiche-detail-row"><strong>Adresse</strong> {{ managerFiche.adresse }}</div>
+                }
+                @if (managerFiche.nomContactSite || managerFiche.telContactSite) {
+                  <div class="fiche-detail-row">
+                    <strong>Contact site</strong>
+                    {{ managerFiche.nomContactSite || '—' }}@if (managerFiche.telContactSite) { — {{ managerFiche.telContactSite }} }
+                  </div>
+                } @else if (managerFiche.contact) {
+                  <div class="fiche-detail-row"><strong>Contact</strong> {{ managerFiche.contact }}</div>
+                }
+                <div class="fiche-detail-row">
+                  <strong>Période</strong>
+                  {{ managerFiche.dateDebut }}
+                  @if (managerFiche.dateFin) {
+                    @if (managerFiche.dateFin !== managerFiche.dateDebut) { → {{ managerFiche.dateFin }} }
+                  }
+                </div>
+                @if (managerFiche.description) {
+                  <div class="fiche-detail-row"><strong>Description</strong> {{ managerFiche.description }}</div>
+                }
+                <div class="fiche-detail-row"><strong>Statut</strong> {{ managerFiche.statut === 'COMPLETEE' ? 'Terminée' : managerFiche.statut === 'VALIDEE' ? 'Validée' : 'En cours' }}</div>
+              </div>
+              <p class="assign-label assign-label-lieu">Type de journée</p>
+            } @else {
+              <p class="assign-label">Type de journée</p>
+            }
             <div class="assign-chips">
               @for (t of typeOptions; track t) {
                 <span class="assign-chip"

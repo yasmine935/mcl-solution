@@ -46,12 +46,6 @@
             <input class="compact-input" [(ngModel)]="nouvelEmploye.poste" placeholder="Électricien"/>
           </div>
           <div class="field-md">
-            <label class="field-label">Département</label>
-            <select class="compact-input" [(ngModel)]="nouvelEmploye.departement">
-              @for (dept of departements; track dept) { <option [value]="dept">{{ dept }}</option> }
-            </select>
-          </div>
-          <div class="field-md">
             <label class="field-label">Rôle</label>
             <select class="compact-input" [(ngModel)]="nouvelEmploye.role">
               @for (role of roles; track role.value) { <option [value]="role.value">{{ role.label }}</option> }

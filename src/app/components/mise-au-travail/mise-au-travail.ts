@@ -118,11 +118,6 @@ export class MiseAuTravail implements OnInit {
     this.saveFiches();
   }
 
-  archiverFiche(fiche: FicheMiseAuTravail) {
-    fiche.statut = 'Archivée';
-    this.saveFiches();
-  }
-
   supprimerFiche(fiche: FicheMiseAuTravail) {
     if (confirm(`Supprimer la fiche ${fiche.numero} ?`)) {
       this.fiches = this.fiches.filter(f => f.id !== fiche.id);

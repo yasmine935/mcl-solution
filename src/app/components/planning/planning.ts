@@ -34,6 +34,7 @@ export class Planning implements OnInit {
   managerCell: { user: any; jour: any } | null = null;
   managerType = '';
   managerLieu = '';
+  managerFiche: any = null;
   readonly typeOptions = ['Bureau', 'Distance', 'Déplacement', 'Formation'];
 
   // ✅ Grille semaine manager
@@ -74,6 +75,11 @@ export class Planning implements OnInit {
             id: f.id,
             numProjet: f.numProjet,
             client: f.client,
+            adresse: f.adresse || '',
+            contact: f.contact || '',
+            nomContactSite: f.nomContactSite || '',
+            telContactSite: f.telContactSite || '',
+            description: f.description || '',
             technicienId: f.technicien?.id || localF?.technicienId || null,
             technicienIds: techIds,
             dateDebut: localF?.dateDebut || (f.dateIntervention ? f.dateIntervention.split('T')[0] : ''),
@@ -348,6 +354,7 @@ export class Planning implements OnInit {
     this.managerType = parts[0] || '';
     this.managerLieu = parts.slice(1).join(' - ') || '';
     this.managerCell = { user, jour };
+    this.managerFiche = this.getFicheForUserOnDay(user.id, jour.date);
     this.showManagerModal = true;
   }
 
@@ -356,6 +363,7 @@ export class Planning implements OnInit {
     this.managerCell = null;
     this.managerType = '';
     this.managerLieu = '';
+    this.managerFiche = null;
   }
 
   sauvegarderAssignation() {
@@ -455,6 +463,7 @@ export class Planning implements OnInit {
     this.managerType = parts[0] || 'Bureau';
     this.managerLieu = parts.slice(1).join(' - ') || '';
     this.managerCell = { user, jour: { date: weekDay.date, jour: weekDay.jour, affichage: weekDay.jour } };
+    this.managerFiche = this.getFicheForUserOnDay(user.id, weekDay.date);
     this.showManagerModal = true;
   }
 

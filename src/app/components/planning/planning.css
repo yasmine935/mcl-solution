@@ -470,6 +470,17 @@
 .assign-label-lieu { margin-top: 16px; }
 .assign-optional { font-weight: 400; text-transform: none; color: #607d8b; font-size: 0.68rem; }
 
+.fiche-detail-box {
+  background: #eef8f0; border: 1.5px solid #b7e0c0; border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px;
+}
+.fiche-detail-header { font-size: 0.78rem; font-weight: 800; color: #1a6b3c; margin-bottom: 2px; }
+.fiche-detail-row { font-size: 0.8rem; color: #263238; line-height: 1.4; }
+.fiche-detail-row strong {
+  display: inline-block; min-width: 92px; font-weight: 700; color: #37474f;
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.3px; vertical-align: top;
+}
+
 .assign-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .assign-chip {
   padding: 6px 14px; border-radius: 20px;
