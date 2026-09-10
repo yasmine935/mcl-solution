@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
-
-const API = 'http://localhost:8080/api/visiteurs';
+import { VisiteursApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-visiteurs',
@@ -17,12 +15,12 @@ export class Visiteurs implements OnInit {
   visiteurs: any[] = [];
   nouveauNom = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private visiteursApi: VisiteursApi) {}
 
   ngOnInit() { this.loadVisiteurs(); }
 
   loadVisiteurs() {
-    this.http.get<any[]>(API).subscribe({
+    this.visiteursApi.lister<any>().subscribe({
       next: data => this.visiteurs = data,
       error: () => this.visiteurs = []
     });
@@ -31,14 +29,14 @@ export class Visiteurs implements OnInit {
   ajouterVisiteur() {
     const nom = this.nouveauNom.trim();
     if (!nom) return;
-    this.http.post<any>(API, { nom }).subscribe({
+    this.visiteursApi.creer<any>({ nom }).subscribe({
       next: () => { this.loadVisiteurs(); this.nouveauNom = ''; },
       error: () => alert('Erreur lors de l\'ajout du visiteur')
     });
   }
 
   supprimerVisiteur(id: number) {
-    this.http.delete(`${API}/${id}`).subscribe({
+    this.visiteursApi.supprimer(id).subscribe({
       next: () => this.visiteurs = this.visiteurs.filter((v: any) => v.id !== id),
       error: () => alert('Erreur lors de la suppression')
     });

@@ -2,13 +2,11 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-
-const API = 'http://localhost:8080/api/fiches-intervention';
+import { FichesInterventionApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-fiche-intervention-technicien',
@@ -38,7 +36,7 @@ export class FicheInterventionTechnicien implements OnInit {
     nomClientSigne: '', dateSignature: ''
   };
 
-  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
+  constructor(private router: Router, private route: ActivatedRoute, private fichesApi: FichesInterventionApi) {}
 
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -50,7 +48,7 @@ export class FicheInterventionTechnicien implements OnInit {
   }
 
   loadIntervention(id: number) {
-    this.http.get<any>(`${API}/${id}`).subscribe({
+    this.fichesApi.parId<any>(id).subscribe({
       next: (fiche) => {
         this.intervention = this.mapFromBackend(fiche);
         setTimeout(() => this.initSignatureCanvases(), 150);
@@ -61,7 +59,7 @@ export class FicheInterventionTechnicien implements OnInit {
 
   loadPremiereFiche() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.http.get<any[]>(`${API}/technicien/${user.id}`).subscribe({
+    this.fichesApi.get<any[]>(`technicien/${user.id}`).subscribe({
       next: (fiches) => {
         const fiche = fiches.find((f: any) => f.statut !== 'COMPLETEE');
         if (fiche) {
@@ -217,7 +215,7 @@ export class FicheInterventionTechnicien implements OnInit {
       photos: JSON.stringify(this.photos)
     };
 
-    this.http.put<any>(`${API}/${this.intervention.id}/completer`, body).subscribe({
+    this.fichesApi.put<any>(`${this.intervention.id}/completer`, body).subscribe({
       next: () => {
         alert('Fiche envoyee avec succes !');
         this.router.navigate(['/dashboard-technicien']);
@@ -230,7 +228,7 @@ export class FicheInterventionTechnicien implements OnInit {
     if (!this.intervention?.id) return;
     setTimeout(() => {
       const body = { taches: JSON.stringify(this.intervention.taches) };
-      this.http.put(`${API}/${this.intervention.id}/taches`, body).subscribe();
+      this.fichesApi.put(`${this.intervention.id}/taches`, body).subscribe();
     }, 50);
   }
 

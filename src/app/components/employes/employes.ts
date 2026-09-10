@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { UtilisateursApi } from '../../services/api/apis';
 
 @Component({
  selector: 'app-employes',
@@ -66,7 +66,7 @@ export class Employes implements OnInit {
 
   employeEnEdition: any = {};
 
-  constructor(private http: HttpClient) {}
+  constructor(private utilisateursApi: UtilisateursApi) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -75,7 +75,7 @@ export class Employes implements OnInit {
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
+    this.utilisateursApi.lister<any>()
       .subscribe(
         (data: any[]) => {
           this.employes = data;
@@ -110,7 +110,7 @@ export class Employes implements OnInit {
       statut: 'ACTIF'
     };
 
-    this.http.post<any>('http://localhost:8080/api/utilisateurs', payload)
+    this.utilisateursApi.creer<any>(payload)
       .subscribe({
         next: (created: any) => {
           this.employes.push(created);
@@ -140,7 +140,7 @@ export class Employes implements OnInit {
       this.employes[index] = { ...this.employeEnEdition };
       localStorage.setItem('employes', JSON.stringify(this.employes));
 
-      this.http.put(`http://localhost:8080/api/utilisateurs/${this.selectedEmploye.id}`, this.employeEnEdition)
+      this.utilisateursApi.modifier(this.selectedEmploye.id, this.employeEnEdition)
         .subscribe(
           () => {},
           (error: any) => console.error('Erreur modification', error)
@@ -164,9 +164,7 @@ export class Employes implements OnInit {
   desactiverEmploye(id: number, nomEmploye: string) {
     const nomUser = `${this.currentUser.prenom || ''} ${this.currentUser.nom || ''}`.trim() || 'Admin';
     if (confirm(`Désactiver l'employé "${nomEmploye}" ? Il restera dans l'historique.`)) {
-      this.http.put<any>(
-        `http://localhost:8080/api/utilisateurs/${id}/desactiver?desactivePar=${encodeURIComponent(nomUser)}`, {}
-      ).subscribe({
+      this.utilisateursApi.desactiver(id, nomUser).subscribe({
         next: () => { this.loadEmployes(); this.showDetailModal = false; },
         error: () => alert('Erreur lors de la désactivation')
       });
@@ -174,7 +172,7 @@ export class Employes implements OnInit {
   }
 
   reactiverEmploye(id: number) {
-    this.http.put<any>(`http://localhost:8080/api/utilisateurs/${id}/reactiver`, {}).subscribe({
+    this.utilisateursApi.reactiver(id).subscribe({
       next: () => this.loadEmployes(),
       error: () => alert('Erreur lors de la réactivation')
     });

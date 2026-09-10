@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { TicketsApi } from '../../services/api/apis';
 
 export interface Ticket {
   id: string;
@@ -31,8 +31,6 @@ export interface Ticket {
   fichiers: string[];
 }
 
-const API = 'http://localhost:8080/api/tickets';
-
 @Component({
   selector: 'app-ticketing',
   standalone: true,
@@ -60,7 +58,7 @@ export class TicketingComponent implements OnInit {
     { id: '5', nom: 'ODILE', prenom: 'Manager' },
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private ticketsApi: TicketsApi) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -69,7 +67,7 @@ export class TicketingComponent implements OnInit {
 
   // ✅ LOAD depuis le backend
   loadTickets() {
-    this.http.get<any[]>(API).subscribe({
+    this.ticketsApi.lister<any>().subscribe({
       next: (data) => {
         this.tickets = data.map(t => this.mapFromBackend(t));
       },
@@ -159,7 +157,7 @@ export class TicketingComponent implements OnInit {
       statut: 'EN_ATTENTE'
     };
 
-    this.http.post<any>(API, body).subscribe({
+    this.ticketsApi.creer<any>(body).subscribe({
       next: (ticket) => {
         this.tickets.unshift(this.mapFromBackend(ticket));
         this.showForm = false;
@@ -173,7 +171,7 @@ export class TicketingComponent implements OnInit {
   // ✅ PUT statut → EN_COURS
   mettreEnCours(ticket: Ticket, event: Event) {
     event.stopPropagation();
-    this.http.put(`${API}/${ticket.id}/statut?statut=EN_COURS`, {}).subscribe({
+    this.ticketsApi.changerStatut(ticket.id, 'EN_COURS').subscribe({
       next: () => {
         ticket.statut = 'En cours';
       },
@@ -186,7 +184,7 @@ export class TicketingComponent implements OnInit {
     event.stopPropagation();
     if (confirm(`Valider le ticket ${ticket.numero} ?`)) {
       const valideePar = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-      this.http.put(`${API}/${ticket.id}/statut?statut=VALIDEE&valideePar=${valideePar}`, {}).subscribe({
+      this.ticketsApi.changerStatut(ticket.id, 'VALIDEE', valideePar).subscribe({
         next: () => {
           ticket.statut = 'Validée';
           ticket.dateValidation = new Date().toISOString();
@@ -201,7 +199,7 @@ export class TicketingComponent implements OnInit {
   deleteTicket(ticket: Ticket, event: Event) {
     event.stopPropagation();
     if (confirm(`Supprimer le ticket ${ticket.numero} ?`)) {
-      this.http.delete(`${API}/${ticket.id}`).subscribe({
+      this.ticketsApi.supprimer(ticket.id).subscribe({
         next: () => {
           this.tickets = this.tickets.filter(t => t.id !== ticket.id);
           if (this.showDetail?.id === ticket.id) this.showDetail = null;

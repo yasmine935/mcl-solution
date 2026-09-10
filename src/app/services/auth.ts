@@ -50,6 +50,17 @@ export class Auth {
     return this.http.post(`${this.api}/forgot-password`, { username }, { responseType: 'text' });
   }
 
+  // ── Reset de mot de passe côté admin (rôle ADMINISTRATEUR requis par le backend) ──
+
+  demandesReset(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/reset-requests`);
+  }
+
+  reinitialiserMotDePasse(demandeId: number, newPassword: string): Observable<string> {
+    return this.http.put(`${this.api}/reset-requests/${demandeId}/reset`,
+      { newPassword }, { responseType: 'text' });
+  }
+
   utilisateurCourant(): UtilisateurConnecte | null {
     try {
       const stored = localStorage.getItem('user');

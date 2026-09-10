@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
-const API = 'http://localhost:8080/api/reclamations-sse';
+import { ReclamationsApi } from '../../services/api/apis';
 
 export interface FicheSSE {
   id: string;
@@ -50,7 +48,7 @@ export class RemonteesTerrainComponent implements OnInit {
   isManager = false;
   isSubmitting = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private reclamationsApi: ReclamationsApi) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -60,8 +58,10 @@ export class RemonteesTerrainComponent implements OnInit {
 
   // ✅ GET depuis backend
   loadFiches() {
-    const url = this.isManager ? API : `${API}/technicien/${this.currentUser.id}`;
-    this.http.get<any[]>(url).subscribe({
+    const fiches$ = this.isManager
+      ? this.reclamationsApi.lister<any>()
+      : this.reclamationsApi.get<any[]>(`technicien/${this.currentUser.id}`);
+    fiches$.subscribe({
       next: (data) => this.fiches = data.map(f => this.mapFromBackend(f)),
       error: () => this.fiches = []
     });
@@ -139,7 +139,7 @@ export class RemonteesTerrainComponent implements OnInit {
     statut: 'EN_ATTENTE'
   };
 
-  this.http.post<any>(API, body).subscribe({
+  this.reclamationsApi.creer<any>(body).subscribe({
     next: (fiche) => {
       this.fiches.unshift(this.mapFromBackend(fiche));
       this.view = 'liste';
@@ -168,7 +168,7 @@ export class RemonteesTerrainComponent implements OnInit {
       echeance: this.selectedFiche.echeance,
       informationDeclarant: this.selectedFiche.informationDeclarant
     };
-    this.http.put(`${API}/${this.selectedFiche.id}/encadrement`, body).subscribe({
+    this.reclamationsApi.put(`${this.selectedFiche.id}/encadrement`, body).subscribe({
       next: () => { this.loadFiches(); alert('✅ Encadrement sauvegarde !'); },
       error: () => alert('❌ Erreur')
     });
@@ -176,7 +176,7 @@ export class RemonteesTerrainComponent implements OnInit {
 
   // ✅ PUT statut
   changerStatut(fiche: FicheSSE, statut: FicheSSE['statut']) {
-  this.http.put(`${API}/${fiche.id}/statut?statut=${statut}`, {}).subscribe({
+  this.reclamationsApi.put(`${fiche.id}/statut`, {}, { statut }).subscribe({
     next: () => {
       // ✅ Force Angular à détecter le changement
       this.selectedFiche = null;
@@ -193,7 +193,7 @@ export class RemonteesTerrainComponent implements OnInit {
   // ✅ DELETE
   supprimerFiche(fiche: FicheSSE) {
     if (confirm(`Supprimer la fiche ${fiche.numero} ?`)) {
-      this.http.delete(`${API}/${fiche.id}`).subscribe({
+      this.reclamationsApi.supprimer(fiche.id).subscribe({
         next: () => { this.loadFiches(); this.view = 'liste'; },
         error: () => alert('❌ Erreur suppression')
       });

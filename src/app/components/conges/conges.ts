@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { CongesApi } from '../../services/api/apis';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -15,14 +15,13 @@ import { MatIconModule } from '@angular/material/icon';
 export class Conges implements OnInit {
   conges: any[] = [];
   filtreActif = 'TOUS';
-  private apiUrl = 'http://localhost:8080/api/conges';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private congesApi: CongesApi, private router: Router) {}
 
   ngOnInit() { this.loadConges(); }
 
   loadConges() {
-    this.http.get<any[]>(this.apiUrl).subscribe({
+    this.congesApi.lister<any>().subscribe({
       next: (data) => {
         // ESSAN ne valide que les congés personnels de Ferid (ADMIN/FERID)
         this.conges = data.filter((c: any) => c.utilisateur?.role === 'ADMINISTRATEUR');
@@ -32,7 +31,7 @@ export class Conges implements OnInit {
   }
 
   updateStatut(id: number, statut: string) {
-    this.http.put(`${this.apiUrl}/${id}/statut?statut=${statut}`, {})
+    this.congesApi.changerStatut(id, statut)
       .subscribe(() => this.loadConges());
   }
 
@@ -42,7 +41,7 @@ export class Conges implements OnInit {
 
   delete(id: number) {
     if (confirm('Supprimer cette demande ?')) {
-      this.http.delete(`${this.apiUrl}/${id}`)
+      this.congesApi.supprimer(id)
         .subscribe(() => this.loadConges());
     }
   }

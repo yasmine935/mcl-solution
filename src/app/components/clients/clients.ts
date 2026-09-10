@@ -1,11 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
-const API = 'http://localhost:8080/api/clients';
+import { ClientsApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-gestion-clients',
@@ -30,7 +28,7 @@ export class GestionClients implements OnInit {
     interlocuteurAchat: '', interlocuteurFacture: '', interlocuteurCommercial: '', interlocuteurAutres: '' };
   readonly typesClient = ['Client', 'Prospect'];
 
-  constructor(private http: HttpClient) {}
+  constructor(private clientsApi: ClientsApi) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -38,7 +36,7 @@ export class GestionClients implements OnInit {
   }
 
   loadClients() {
-    this.http.get<any[]>(API).subscribe({
+    this.clientsApi.lister<any>().subscribe({
       next: data => this.clients = data,
       error: () => this.clients = []
     });
@@ -46,7 +44,7 @@ export class GestionClients implements OnInit {
 
   ajouter() {
     if (!this.form.nom.trim()) { alert('Le nom du client est obligatoire'); return; }
-    this.http.post<any>(API, { ...this.form }).subscribe({
+    this.clientsApi.creer<any>({ ...this.form }).subscribe({
       next: () => { this.loadClients(); this.resetForm(); this.showForm = false; },
       error: () => alert('Erreur lors de l\'ajout du client')
     });
@@ -59,7 +57,7 @@ export class GestionClients implements OnInit {
 
   sauvegarderEdition() {
     if (!this.editingClient?.nom?.trim()) return;
-    this.http.put<any>(`${API}/${this.editingClient.id}`, this.editingClient).subscribe({
+    this.clientsApi.modifier<any>(this.editingClient.id, this.editingClient).subscribe({
       next: () => { this.loadClients(); this.fermerEditModal(); },
       error: () => alert('Erreur lors de la modification')
     });
@@ -68,7 +66,7 @@ export class GestionClients implements OnInit {
   desactiver(id: number, nomClient: string) {
     const nomUser = `${this.currentUser.prenom || ''} ${this.currentUser.nom || ''}`.trim() || this.currentUser.username || 'Admin';
     if (confirm(`Désactiver le client "${nomClient}" ? Il restera visible dans l'historique.`)) {
-      this.http.put<any>(`${API}/${id}/desactiver?desactivePar=${encodeURIComponent(nomUser)}`, {}).subscribe({
+      this.clientsApi.put<any>(`${id}/desactiver`, {}, { desactivePar: nomUser }).subscribe({
         next: () => { this.loadClients(); this.fermerDetail(); },
         error: () => alert('Erreur lors de la désactivation')
       });
@@ -76,7 +74,7 @@ export class GestionClients implements OnInit {
   }
 
   reactiver(id: number) {
-    this.http.put<any>(`${API}/${id}/reactiver`, {}).subscribe({
+    this.clientsApi.put<any>(`${id}/reactiver`, {}).subscribe({
       next: () => this.loadClients(),
       error: () => alert('Erreur lors de la réactivation')
     });

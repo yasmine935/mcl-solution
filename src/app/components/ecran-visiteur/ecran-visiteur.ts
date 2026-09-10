@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-
-const API = 'http://localhost:8080/api/visiteurs';
+import { VisiteursApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-ecran-visiteur',
@@ -22,7 +20,7 @@ export class EcranVisiteur implements OnInit, OnDestroy {
   readonly jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   readonly mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 
-  constructor(private readonly cdr: ChangeDetectorRef, private readonly http: HttpClient) {}
+  constructor(private readonly cdr: ChangeDetectorRef, private readonly visiteursApi: VisiteursApi) {}
 
   ngOnInit() {
     this.majHeure();
@@ -41,7 +39,7 @@ export class EcranVisiteur implements OnInit, OnDestroy {
   }
 
   loadVisiteurs() {
-    this.http.get<any[]>(API).subscribe({
+    this.visiteursApi.lister<any>().subscribe({
       next: (data) => {
         const noms = (data || []).map(v => v.nom).filter(n => n && n.trim());
         this.nomsVisiteurs = noms.length <= 1

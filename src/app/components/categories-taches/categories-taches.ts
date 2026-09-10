@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
-const API = 'http://localhost:8080/api/categories-taches';
+import { CategoriesTachesApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-categories-taches',
@@ -22,12 +20,12 @@ export class CategoriesTaches implements OnInit {
   nomEnEdition = '';
   nouvelleOptionParCategorie: { [id: number]: string } = {};
 
-  constructor(private http: HttpClient) {}
+  constructor(private api: CategoriesTachesApi) {}
 
   ngOnInit() { this.loadCategories(); }
 
   loadCategories() {
-    this.http.get<any[]>(API).subscribe({
+    this.api.lister<any>().subscribe({
       next: data => this.categories = data,
       error: () => this.categories = []
     });
@@ -36,7 +34,7 @@ export class CategoriesTaches implements OnInit {
   ajouterCategorie() {
     const nom = this.nouvelleCategorie.trim();
     if (!nom) return;
-    this.http.post<any>(API, { nom }).subscribe({
+    this.api.creer<any>({ nom }).subscribe({
       next: () => { this.loadCategories(); this.nouvelleCategorie = ''; this.showForm = false; },
       error: () => alert('Erreur lors de l\'ajout de la catégorie')
     });
@@ -55,7 +53,7 @@ export class CategoriesTaches implements OnInit {
   sauvegarderNom(id: number) {
     const nom = this.nomEnEdition.trim();
     if (!nom) return;
-    this.http.put<any>(`${API}/${id}`, { nom }).subscribe({
+    this.api.modifier<any>(id, { nom }).subscribe({
       next: () => { this.loadCategories(); this.annulerEditionNom(); },
       error: () => alert('Erreur lors de la modification')
     });
@@ -63,7 +61,7 @@ export class CategoriesTaches implements OnInit {
 
   supprimerCategorie(id: number) {
     if (!confirm('Supprimer cette catégorie et toutes ses options ?')) return;
-    this.http.delete(`${API}/${id}`).subscribe({
+    this.api.supprimer(id).subscribe({
       next: () => this.loadCategories(),
       error: () => alert('Erreur lors de la suppression')
     });
@@ -72,14 +70,14 @@ export class CategoriesTaches implements OnInit {
   ajouterOption(categorieId: number) {
     const nom = (this.nouvelleOptionParCategorie[categorieId] || '').trim();
     if (!nom) return;
-    this.http.post<any>(`${API}/${categorieId}/options`, { nom }).subscribe({
+    this.api.post<any>(`${categorieId}/options`, { nom }).subscribe({
       next: () => { this.loadCategories(); this.nouvelleOptionParCategorie[categorieId] = ''; },
       error: () => alert('Erreur lors de l\'ajout de l\'option')
     });
   }
 
   supprimerOption(optionId: number) {
-    this.http.delete(`${API}/options/${optionId}`).subscribe({
+    this.api.delete(`options/${optionId}`).subscribe({
       next: () => this.loadCategories(),
       error: () => alert('Erreur lors de la suppression')
     });

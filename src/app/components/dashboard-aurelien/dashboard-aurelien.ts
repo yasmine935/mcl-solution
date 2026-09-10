@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,6 +16,7 @@ import { TicketingComponent } from '../ticketing/ticketing';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+import { CongesApi, MessagesAbyApi, UtilisateursApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -96,7 +96,11 @@ export class DashboardAurelien implements OnInit {
   nombreJours = 0;
   congeEnEditionId: number | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private congesApi: CongesApi,
+    private messagesAbyApi: MessagesAbyApi,
+    private utilisateursApi: UtilisateursApi
+  ) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -113,7 +117,7 @@ export class DashboardAurelien implements OnInit {
   }
 
   loadConges() {
-    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
+    this.congesApi.parEmploye(this.user.id)
       .subscribe(data => this.conges = data, error => this.conges = []);
   }
 
@@ -128,7 +132,7 @@ export class DashboardAurelien implements OnInit {
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
+    this.utilisateursApi.lister()
       .subscribe(data => this.employes = data, error => this.employes = []);
   }
 
@@ -164,7 +168,7 @@ export class DashboardAurelien implements OnInit {
   private envoyerConge() {
     const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
     if (this.congeEnEditionId) {
-      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, { ...this.conge, joursDepassement }).subscribe(() => {
+      this.congesApi.modifier(this.congeEnEditionId, { ...this.conge, joursDepassement }).subscribe(() => {
         this.loadConges();
         this.showCongeForm = false;
         this.resetCongeForm();
@@ -173,7 +177,7 @@ export class DashboardAurelien implements OnInit {
       return;
     }
     const demande = { ...this.conge, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: 4 } };
-    this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
+    this.congesApi.creer(demande).subscribe(() => {
       this.loadConges();
       this.showCongeForm = false;
       this.resetCongeForm();
@@ -191,7 +195,7 @@ export class DashboardAurelien implements OnInit {
 
   supprimerMonConge(id: number) {
     if (!confirm('Supprimer cette demande de congé ?')) return;
-    this.http.delete(`http://localhost:8080/api/conges/${id}`).subscribe({
+    this.congesApi.supprimer(id).subscribe({
       next: () => {
         this.loadConges();
         this.loadSoldeConges();
@@ -252,7 +256,7 @@ fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 
 loadSoldeConges() {
   if (!this.user.id) return;
-  this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+  this.congesApi.solde(this.user.id).subscribe({
     next: (data) => this.soldeConges = data,
     error: () => this.soldeConges = null ,
 
@@ -263,7 +267,7 @@ loadSoldeConges() {
 
   loadMessages() {
     const expediteur = this.user.username || this.user.prenom || 'AURELIEN';
-    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/expediteur/${expediteur}`).subscribe({
+    this.messagesAbyApi.get<any[]>(`expediteur/${expediteur}`).subscribe({
       next: (data) => this.messages = data,
       error: () => this.messages = []
     });
@@ -273,7 +277,7 @@ loadSoldeConges() {
     this.messageSelectionne = m;
     this.repliesCourantes = [];
     this.nouvelleReponse = '';
-    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/${m.id}/replies`).subscribe({
+    this.messagesAbyApi.replies(m.id).subscribe({
       next: (data) => this.repliesCourantes = data,
       error: () => this.repliesCourantes = []
     });
@@ -287,7 +291,7 @@ loadSoldeConges() {
     this.envoiEnCours = true;
     const expediteur = this.user.username || this.user.prenom || 'AURELIEN';
     const body = { expediteur, destinataire: 'MCL Solutions', sujet: this.nouveauMessage.sujet, contenu: this.nouveauMessage.contenu };
-    this.http.post<any>('http://localhost:8080/api/messages-aby', body).subscribe({
+    this.messagesAbyApi.creer<any>(body).subscribe({
       next: (msg) => {
         this.messages.unshift(msg);
         this.nouveauMessage = { sujet: '', contenu: '' };
@@ -303,7 +307,7 @@ loadSoldeConges() {
     this.envoiReponseEnCours = true;
     const auteur = this.user.username || this.user.prenom || 'AURELIEN';
     const body = { auteur, auteurRole: 'ABY', contenu: this.nouvelleReponse };
-    this.http.post<any>(`http://localhost:8080/api/messages-aby/${this.messageSelectionne.id}/replies`, body).subscribe({
+    this.messagesAbyApi.post<any>(`${this.messageSelectionne.id}/replies`, body).subscribe({
       next: (reply) => {
         this.repliesCourantes.push(reply);
         this.nouvelleReponse = '';

@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { Voitures } from '../voitures/voitures';
 import { Employes } from '../employes/employes';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+import { CongesApi, UtilisateursApi, ReclamationsApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Groupe',
@@ -63,7 +63,11 @@ export class DashboardKarine implements OnInit {
 };
   statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private congesApi: CongesApi,
+    private utilisateursApi: UtilisateursApi,
+    private reclamationsApi: ReclamationsApi
+  ) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -78,21 +82,21 @@ export class DashboardKarine implements OnInit {
   }
 
   loadConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+    this.congesApi.lister<any>().subscribe({
       next: (data) => this.conges = data,
       error: () => this.conges = []
     });
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister<any>().subscribe({
       next: (data) => this.employes = data,
       error: () => this.employes = []
     });
   }
 
   loadSSE() {
-    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
+    this.reclamationsApi.lister<any>().subscribe({
       next: (data) => this.reclamationsSSE = data,
       error: () => this.reclamationsSSE = []
     });
@@ -138,7 +142,7 @@ export class DashboardKarine implements OnInit {
   }
 
   updateStatutConge(id: number, statut: string) {
-    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {})
+    this.congesApi.changerStatut(id, statut)
       .subscribe(() => this.loadConges());
   }
 
@@ -170,7 +174,7 @@ export class DashboardKarine implements OnInit {
 
   confirmerTraitement() {
     if (!this.congeSelectionne) return;
-    this.http.put(`http://localhost:8080/api/conges/${this.congeSelectionne.id}/statut?statut=TRAITE`, {})
+    this.congesApi.changerStatut(this.congeSelectionne.id, 'TRAITE')
       .subscribe({
         next: () => {
           this.traitementSuccess = true;

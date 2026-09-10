@@ -1,11 +1,9 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
-const API = 'http://localhost:8080/api/journal';
+import { JournalApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-journal-travail',
@@ -99,7 +97,7 @@ export class JournalTravail implements OnInit {
     return role === 'TECHNICIEN_SUP' || role === 'ADMINISTRATEUR' || role === 'RH' || role === 'DIRECTION' || role === 'MANAGER';
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private journalApi: JournalApi) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -107,8 +105,10 @@ export class JournalTravail implements OnInit {
   }
 
   chargerJournaux() {
-    const url = this.isManager ? API : `${API}/employe/${this.user.id}`;
-    this.http.get<any[]>(url).subscribe({
+    const requete = this.isManager
+      ? this.journalApi.lister<any>()
+      : this.journalApi.get<any[]>(`employe/${this.user.id}`);
+    requete.subscribe({
       next: data => this.journaux = data,
       error: () => this.journaux = []
     });
@@ -185,7 +185,7 @@ export class JournalTravail implements OnInit {
     }
     this.generationEnCours = true;
     this.erreurIA = null;
-    this.http.post<any>(`${API}/generer`, { notes: this.form.notesOriginales }).subscribe({
+    this.journalApi.post<any>('generer', { notes: this.form.notesOriginales }).subscribe({
       next: data => {
         this.form.rapportGenere = data.rapport || '';
         this.generationEnCours = false;
@@ -216,7 +216,7 @@ export class JournalTravail implements OnInit {
       rapportGenere: this.form.rapportGenere,
       signature: this.signatureData
     };
-    this.http.post<any>(API, payload).subscribe({
+    this.journalApi.creer<any>(payload).subscribe({
       next: () => {
         this.chargerJournaux();
         this.vue = 'liste';
@@ -233,7 +233,7 @@ export class JournalTravail implements OnInit {
 
   supprimer(id: number) {
     if (!confirm('Supprimer ce rapport de journée ?')) return;
-    this.http.delete(`${API}/${id}`).subscribe({
+    this.journalApi.supprimer(id).subscribe({
       next: () => this.chargerJournaux(),
       error: () => alert('Erreur lors de la suppression.')
     });

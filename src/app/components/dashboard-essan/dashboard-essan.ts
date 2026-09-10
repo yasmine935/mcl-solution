@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -17,6 +16,10 @@ import { Documents } from '../documents/documents';
 import { Conges } from '../conges/conges';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
+import {
+  CommandesApi, CongesApi, FichesInterventionApi, ReclamationsApi,
+  StockApi, TachesApi, UtilisateursApi
+} from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -137,7 +140,16 @@ export class DashboardEssan implements OnInit {
     });
   }
 
-  constructor(private readonly http: HttpClient, private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly fichesInterventionApi: FichesInterventionApi,
+    private readonly commandesApi: CommandesApi,
+    private readonly reclamationsApi: ReclamationsApi,
+    private readonly congesApi: CongesApi,
+    private readonly stockApi: StockApi,
+    private readonly utilisateursApi: UtilisateursApi,
+    private readonly tachesApi: TachesApi
+  ) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -149,25 +161,25 @@ export class DashboardEssan implements OnInit {
   }
 
   loadStats() {
-    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    this.fichesInterventionApi.lister().subscribe({
       next: (d) => { this.fiches = d; this.totalFiches = d.length; }, error: () => {}
     });
-    this.http.get<any[]>('http://localhost:8080/api/commandes').subscribe({
+    this.commandesApi.lister().subscribe({
       next: (d) => { this.commandes = d; this.totalCommandes = d.length; }, error: () => {}
     });
-    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
+    this.reclamationsApi.lister().subscribe({
       next: (d) => this.totalReclamations = d.length, error: () => {}
     });
-    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+    this.congesApi.lister().subscribe({
       next: (d) => { this.congesAllData = d; this.totalConges = d.filter((c: any) => c.statut === 'EN_ATTENTE').length; }, error: () => {}
     });
-    this.http.get<any[]>('http://localhost:8080/api/stock').subscribe({
+    this.stockApi.lister().subscribe({
       next: (d) => this.stock = d, error: () => {}
     });
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister().subscribe({
       next: (d) => this.employes = d, error: () => {}
     });
-    this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+    this.tachesApi.lister().subscribe({
       next: (d) => this.taches = d, error: () => {}
     });
   }

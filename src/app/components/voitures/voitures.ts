@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-
-const API = 'http://localhost:8080/api/voitures';
+import { VoituresApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-voitures',
@@ -32,7 +30,7 @@ export class Voitures implements OnInit {
 
   voitureEnEdition: any = {};
 
-  constructor(private http: HttpClient) {}
+  constructor(private voituresApi: VoituresApi) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -40,7 +38,7 @@ export class Voitures implements OnInit {
   }
 
   loadVoitures() {
-    this.http.get<any[]>(API).subscribe({
+    this.voituresApi.lister<any>().subscribe({
       next: (data) => this.voitures = data,
       error: () => this.voitures = []
     });
@@ -56,7 +54,7 @@ export class Voitures implements OnInit {
       prochainControle: this.nouvelleVoiture.prochainControle || null,
       dateExpirationAssurance: this.nouvelleVoiture.dateExpirationAssurance || null
     };
-    this.http.post<any>(API, body).subscribe({
+    this.voituresApi.creer<any>(body).subscribe({
       next: (v) => {
         this.voitures.push(v);
         this.resetFormAdd();
@@ -77,7 +75,7 @@ export class Voitures implements OnInit {
       alert('Champs obligatoires manquants');
       return;
     }
-    this.http.put<any>(`${API}/${this.voitureEnEdition.id}`, this.voitureEnEdition).subscribe({
+    this.voituresApi.modifier<any>(this.voitureEnEdition.id, this.voitureEnEdition).subscribe({
       next: (v) => {
         const idx = this.voitures.findIndex((x: any) => x.id === v.id);
         if (idx !== -1) this.voitures[idx] = v;
@@ -90,7 +88,7 @@ export class Voitures implements OnInit {
 
   supprimerVoiture(id: number) {
     if (confirm('Supprimer ce véhicule ?')) {
-      this.http.delete(`${API}/${id}`).subscribe({
+      this.voituresApi.supprimer(id).subscribe({
         next: () => this.voitures = this.voitures.filter((v: any) => v.id !== id),
         error: () => alert('❌ Erreur suppression')
       });
@@ -98,7 +96,7 @@ export class Voitures implements OnInit {
   }
 
   changerStatut(id: number, statut: string) {
-    this.http.put(`${API}/${id}/statut?statut=${statut}`, {}).subscribe({
+    this.voituresApi.put(`${id}/statut`, {}, { statut }).subscribe({
       next: () => {
         const v = this.voitures.find((x: any) => x.id === id);
         if (v) v.statut = statut;

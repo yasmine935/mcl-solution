@@ -1,7 +1,6 @@
 import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,8 +8,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-
-const API = 'http://localhost:8080/api/fiches-intervention';
+import {
+  CategoriesTachesApi, ClientsApi, FichesInterventionApi, TachesApi, UtilisateursApi
+} from '../../services/api/apis';
 
 @Component({
   selector: 'app-fiche-intervention-manager',
@@ -67,14 +67,14 @@ export class FicheInterventionManager implements OnInit {
   projets: any[] = [];
 
   loadProjets() {
-    this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+    this.tachesApi.lister<any>().subscribe({
       next: (data) => this.projets = data.filter((p: any) => p.titre),
       error: () => this.projets = []
     });
   }
 
   loadCategoriesTaches() {
-    this.http.get<any[]>('http://localhost:8080/api/categories-taches').subscribe({
+    this.categoriesTachesApi.lister<any>().subscribe({
       next: (categories) => {
         this.tachesDisponibles = categories.map((c: any) => c.nom);
         this.optionsTaches = {};
@@ -94,7 +94,13 @@ export class FicheInterventionManager implements OnInit {
     materielsHorsStandard: [], nouveauMateriel: '', documentsImportes: [], taches: []
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private fichesApi: FichesInterventionApi,
+    private clientsApi: ClientsApi,
+    private tachesApi: TachesApi,
+    private categoriesTachesApi: CategoriesTachesApi,
+    private utilisateursApi: UtilisateursApi
+  ) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -106,7 +112,7 @@ export class FicheInterventionManager implements OnInit {
   }
 
   loadClients() {
-    this.http.get<any[]>('http://localhost:8080/api/clients').subscribe({
+    this.clientsApi.lister<any>().subscribe({
       next: (data) => this.clients = data,
       error: () => this.clients = []
     });
@@ -115,7 +121,7 @@ export class FicheInterventionManager implements OnInit {
   ajouterClientLocal() {
     if (!this.nouveauClient.nom.trim()) { alert('Le nom du client est obligatoire'); return; }
     const client = { ...this.nouveauClient };
-    this.http.post<any>('http://localhost:8080/api/clients', client).subscribe({
+    this.clientsApi.creer<any>(client).subscribe({
       next: () => {
         this.loadClients();
         this.nouveauClient = { nom: '', codeClient: '', adresse: '', contact: '' };
@@ -127,7 +133,7 @@ export class FicheInterventionManager implements OnInit {
   supprimerClientLocal(index: number) {
     if (confirm('Supprimer ce client ?')) {
       const id = this.clients[index].id;
-      this.http.delete(`http://localhost:8080/api/clients/${id}`).subscribe({
+      this.clientsApi.supprimer(id).subscribe({
         next: () => this.loadClients(),
         error: () => alert('Erreur lors de la suppression')
       });
@@ -171,7 +177,7 @@ export class FicheInterventionManager implements OnInit {
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister<any>().subscribe({
       next: (data) => {
         this.employes = data;
         this.techniciens = data.filter((e: any) => e.role === 'TECHNICIEN' || e.role === 'TECHNICIEN_SUP');
@@ -181,7 +187,7 @@ export class FicheInterventionManager implements OnInit {
   }
 
   loadFiches() {
-    this.http.get<any[]>(API).subscribe({
+    this.fichesApi.lister<any>().subscribe({
       next: (data) => this.fiches = data.map(f => this.mapFromBackend(f)),
       error: () => this.fiches = []
     });
@@ -331,7 +337,7 @@ export class FicheInterventionManager implements OnInit {
       manager: { id: this.currentUser.id },
       ...techBody
     };
-    this.http.post<any>(API, body).subscribe({
+    this.fichesApi.creer<any>(body).subscribe({
       next: (fiche) => {
         const ficheData = this.mapFromBackend(fiche);
         ficheData.dateDebut = this.nouvelleFiche.dateDebut;
@@ -381,7 +387,7 @@ export class FicheInterventionManager implements OnInit {
       statut: this.ficheEnEdition.statut,
       ...techBody
     };
-    this.http.put<any>(`${API}/${this.ficheEnEdition.id}`, body).subscribe({
+    this.fichesApi.modifier<any>(this.ficheEnEdition.id, body).subscribe({
       next: (fiche) => {
         const index = this.fiches.findIndex((f: any) => f.id === this.ficheEnEdition.id);
         if (index !== -1) {
@@ -399,7 +405,7 @@ export class FicheInterventionManager implements OnInit {
 
   supprimerFiche(id: number) {
     if (confirm('Supprimer cette fiche ?')) {
-      this.http.delete(`${API}/${id}`).subscribe({
+      this.fichesApi.supprimer(id).subscribe({
         next: () => { this.fiches = this.fiches.filter((f: any) => f.id !== id); },
         error: () => alert('Erreur suppression')
       });

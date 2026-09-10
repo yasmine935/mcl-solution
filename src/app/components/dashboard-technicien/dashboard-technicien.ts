@@ -2,7 +2,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +12,7 @@ import { Planning } from '../planning/planning';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { JournalTravail } from '../journal-travail/journal-travail';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+import { CongesApi, FichesInterventionApi, MinutesSecuriteApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -103,7 +103,12 @@ export class DashboardTechnicien implements OnInit {
     nomSignataire: ''
   };
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private router: Router,
+    private congesApi: CongesApi,
+    private fichesApi: FichesInterventionApi,
+    private minutesApi: MinutesSecuriteApi
+  ) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -121,7 +126,7 @@ export class DashboardTechnicien implements OnInit {
   }
 
   loadInterventions() {
-    this.http.get<any[]>(`http://localhost:8080/api/fiches-intervention/technicien/${this.user.id}`).subscribe({
+    this.fichesApi.get<any[]>(`technicien/${this.user.id}`).subscribe({
       next: (data) => {
         localStorage.setItem('fiches_intervention', JSON.stringify(data));
         const mesFiches = data.map((f: any) => ({
@@ -139,9 +144,7 @@ export class DashboardTechnicien implements OnInit {
   }
 
   marquerTerminee(id: number) {
-    this.http.put<any>(`http://localhost:8080/api/fiches-intervention/${id}/statut`, null, {
-      params: { statut: 'COMPLETEE' }
-    }).subscribe({
+    this.fichesApi.put<any>(`${id}/statut`, null, { statut: 'COMPLETEE' }).subscribe({
       next: () => {
         const fiche = this.interventions.find((f: any) => f.id === id);
         if (fiche) { fiche.statut = 'COMPLETEE'; this.interventionsCompletees.push(fiche); }
@@ -169,13 +172,13 @@ export class DashboardTechnicien implements OnInit {
   }
 
   loadConges() {
-    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
+    this.congesApi.parEmploye(this.user.id)
       .subscribe(data => this.conges = data, error => this.conges = []);
   }
 
   loadSoldeConges() {
     if (!this.user.id) return;
-    this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+    this.congesApi.solde(this.user.id).subscribe({
       next: (data) => this.soldeConges = data,
       error: () => this.soldeConges = null
     });
@@ -217,7 +220,7 @@ export class DashboardTechnicien implements OnInit {
   private envoyerConge() {
     const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
     if (this.congeEnEditionId) {
-      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, { ...this.conge, joursDepassement }).subscribe(() => {
+      this.congesApi.modifier(this.congeEnEditionId, { ...this.conge, joursDepassement }).subscribe(() => {
         this.loadConges();
         this.loadSoldeConges();
         this.showCongeForm = false;
@@ -226,7 +229,7 @@ export class DashboardTechnicien implements OnInit {
       return;
     }
     const demande = { ...this.conge, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: 3 } };
-    this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
+    this.congesApi.creer(demande).subscribe(() => {
       this.loadConges();
       this.loadSoldeConges();
       this.showCongeForm = false;
@@ -244,7 +247,7 @@ export class DashboardTechnicien implements OnInit {
 
   supprimerMonConge(id: number) {
     if (!confirm('Supprimer cette demande de congé ?')) return;
-    this.http.delete(`http://localhost:8080/api/conges/${id}`).subscribe({
+    this.congesApi.supprimer(id).subscribe({
       next: () => {
         this.loadConges();
         this.loadSoldeConges();
@@ -333,7 +336,7 @@ export class DashboardTechnicien implements OnInit {
     };
     const today = new Date().toISOString().split('T')[0];
     const key = `minute_securite_${this.user.id}_${today}`;
-    this.http.post('http://localhost:8080/api/minutes-securite', body).subscribe({
+    this.minutesApi.creer(body).subscribe({
       next: () => {
         localStorage.setItem(key, 'done');
         this.minuteDejaFaite = true;

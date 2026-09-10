@@ -1,9 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-
-const API = 'http://localhost:8080/api';
+import { ArticlesAttenteApi, DemandesApproApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-approvisionnement',
@@ -34,7 +32,10 @@ export class ApprovisionnementComponent implements OnInit {
   nouvelArticleAttente = { marque: '', designation: '', refFournisseur: '', nomFournisseur: '', refMCL: '', quantite: 1 };
   showImportPanel = false;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly demandesApproApi: DemandesApproApi,
+    private readonly articlesAttenteApi: ArticlesAttenteApi
+  ) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -45,10 +46,10 @@ export class ApprovisionnementComponent implements OnInit {
   // ══════════ DEMANDES — BACKEND ══════════
 
   loadDemandes() {
-    const url = (this.modeaby || this.modetous)
-      ? `${API}/demandes-appro`
-      : `${API}/demandes-appro/demandeur/${this.currentUser.id}`;
-    this.http.get<any[]>(url).subscribe({
+    const source$ = (this.modeaby || this.modetous)
+      ? this.demandesApproApi.lister<any>()
+      : this.demandesApproApi.get<any[]>(`demandeur/${this.currentUser.id}`);
+    source$.subscribe({
       next: (data) => this.demandes = data,
       error: () => this.demandes = []
     });
@@ -113,7 +114,7 @@ export class ApprovisionnementComponent implements OnInit {
       return;
     }
     const body = { ...this.form, lignes: lignesValides };
-    this.http.post<any>(`${API}/demandes-appro`, body).subscribe({
+    this.demandesApproApi.creer<any>(body).subscribe({
       next: (created) => {
         this.demandes.unshift(created);
         this.view = 'liste';
@@ -133,9 +134,10 @@ export class ApprovisionnementComponent implements OnInit {
   changerStatut(statut: string) {
     if (!this.selectedDemande) return;
     const traitePar = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-    this.http.put<any>(
-      `${API}/demandes-appro/${this.selectedDemande.id}/statut?statut=${statut}&traitePar=${encodeURIComponent(traitePar)}`,
-      {}
+    this.demandesApproApi.put<any>(
+      `${this.selectedDemande.id}/statut`,
+      {},
+      { statut, traitePar }
     ).subscribe({
       next: (updated) => {
         this.selectedDemande = { ...updated };
@@ -149,7 +151,7 @@ export class ApprovisionnementComponent implements OnInit {
 
   loadListeAttente() {
     if (!this.currentUser.id || this.modeaby) return;
-    this.http.get<any[]>(`${API}/articles-attente/utilisateur/${this.currentUser.id}`).subscribe({
+    this.articlesAttenteApi.parUtilisateur(this.currentUser.id).subscribe({
       next: (data) => this.listeAttente = data,
       error: () => this.listeAttente = []
     });
@@ -165,7 +167,7 @@ export class ApprovisionnementComponent implements OnInit {
       utilisateurId: this.currentUser.id,
       dateAjout: new Date().toLocaleDateString('fr-FR')
     };
-    this.http.post<any>(`${API}/articles-attente`, body).subscribe({
+    this.articlesAttenteApi.creer<any>(body).subscribe({
       next: (created) => {
         this.listeAttente.push(created);
         this.nouvelArticleAttente = { marque: '', designation: '', refFournisseur: '', nomFournisseur: '', refMCL: '', quantite: 1 };
@@ -176,7 +178,7 @@ export class ApprovisionnementComponent implements OnInit {
   }
 
   supprimerDeListe(id: number) {
-    this.http.delete(`${API}/articles-attente/${id}`).subscribe({
+    this.articlesAttenteApi.supprimer(id).subscribe({
       next: () => this.listeAttente = this.listeAttente.filter(a => a.id !== id),
       error: () => alert('❌ Erreur suppression')
     });
@@ -204,7 +206,7 @@ export class ApprovisionnementComponent implements OnInit {
         refMCL: a.refMCL,
         quantite: a.quantite
       });
-      this.http.delete(`${API}/articles-attente/${a.id}`).subscribe();
+      this.articlesAttenteApi.supprimer(a.id).subscribe();
     });
     this.listeAttente = [];
     this.showImportPanel = false;

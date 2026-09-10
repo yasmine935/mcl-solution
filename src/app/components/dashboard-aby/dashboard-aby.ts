@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { Planning } from '../planning/planning';
 import { Taches } from '../taches/taches';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+import { CommandesApi, MessagesAbyApi, StockApi, TachesApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Groupe',
@@ -77,7 +77,12 @@ export class DashboardAby implements OnInit {
 
   statutsCommande = ['En attente', 'Commandé', 'En transit', 'Livré', 'Annulé'];
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly tachesApi: TachesApi,
+    private readonly messagesAbyApi: MessagesAbyApi,
+    private readonly commandesApi: CommandesApi,
+    private readonly stockApi: StockApi
+  ) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -93,14 +98,14 @@ export class DashboardAby implements OnInit {
   }
 
   loadProjets() {
-    this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+    this.tachesApi.lister().subscribe({
       next: (data) => this.projets = data,
       error: () => this.projets = []
     });
   }
 
   loadMessages() {
-    this.http.get<any[]>('http://localhost:8080/api/messages-aby').subscribe({
+    this.messagesAbyApi.lister().subscribe({
       next: (data) => this.messages = data,
       error: () => this.messages = []
     });
@@ -110,7 +115,7 @@ export class DashboardAby implements OnInit {
     this.messageSelectionne = m;
     this.repliesCourantes = [];
     this.nouvelleReponse = '';
-    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/${m.id}/replies`).subscribe({
+    this.messagesAbyApi.replies(m.id).subscribe({
       next: (data) => this.repliesCourantes = data,
       error: () => this.repliesCourantes = []
     });
@@ -121,7 +126,7 @@ export class DashboardAby implements OnInit {
     this.envoiReponseEnCours = true;
     const auteur = this.user.username || this.user.prenom || 'ABY';
     const body = { auteur, auteurRole: 'ABY', contenu: this.nouvelleReponse };
-    this.http.post<any>(`http://localhost:8080/api/messages-aby/${this.messageSelectionne.id}/replies`, body).subscribe({
+    this.messagesAbyApi.post<any>(`${this.messageSelectionne.id}/replies`, body).subscribe({
       next: (reply) => {
         this.repliesCourantes.push(reply);
         this.nouvelleReponse = '';
@@ -144,7 +149,7 @@ export class DashboardAby implements OnInit {
       sujet: this.nouveauMessage.sujet,
       contenu: this.nouveauMessage.contenu
     };
-    this.http.post<any>('http://localhost:8080/api/messages-aby', body).subscribe({
+    this.messagesAbyApi.creer<any>(body).subscribe({
       next: (msg) => {
         this.messages.unshift(msg);
         this.nouveauMessage = { sujet: '', contenu: '' };
@@ -166,7 +171,7 @@ export class DashboardAby implements OnInit {
 
   // ✅ Commandes depuis le backend
   loadCommandes() {
-    this.http.get<any[]>('http://localhost:8080/api/commandes').subscribe({
+    this.commandesApi.lister().subscribe({
       next: (data) => this.commandes = data,
       error: () => {
         const stored = localStorage.getItem('commandes_aby');
@@ -176,7 +181,7 @@ export class DashboardAby implements OnInit {
   }
 
   loadStocks() {
-    this.http.get<any[]>('http://localhost:8080/api/stock').subscribe({
+    this.stockApi.lister().subscribe({
       next: (data) => this.stocks = data,
       error: () => this.stocks = []
     });
@@ -216,7 +221,7 @@ export class DashboardAby implements OnInit {
       dateLivraisonPrevue: this.nouvelleCommande.dateLivraison || null
     };
 
-    this.http.post<any>('http://localhost:8080/api/commandes', body).subscribe({
+    this.commandesApi.creer<any>(body).subscribe({
       next: (cmd) => {
         this.commandes.push(cmd);
         // Marquer la demande comme traitée
@@ -247,7 +252,7 @@ export class DashboardAby implements OnInit {
   }
 
   updateStatutCommande(id: any, statut: string) {
-    this.http.put(`http://localhost:8080/api/commandes/${id}/statut?statut=${statut}`, {}).subscribe({
+    this.commandesApi.put(`${id}/statut`, {}, { statut }).subscribe({
       next: () => {
         const cmd = this.commandes.find(c => c.id === id);
         if (cmd) cmd.statut = statut;

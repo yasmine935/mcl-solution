@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-
-const API = 'http://localhost:8080/api/planning';
+import { CongesApi, FichesInterventionApi, PlanningApi, UtilisateursApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-planning',
@@ -44,7 +42,12 @@ export class Planning implements OnInit {
   // ✅ Onglets
   activeView = 'calendrier';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly congesApi: CongesApi,
+    private readonly fichesInterventionApi: FichesInterventionApi,
+    private readonly utilisateursApi: UtilisateursApi,
+    private readonly planningApi: PlanningApi
+  ) {}
 
   ngOnInit() {
     this.detectCurrentUser();
@@ -59,7 +62,7 @@ export class Planning implements OnInit {
   }
 
   loadFichesIntervention() {
-    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    this.fichesInterventionApi.lister().subscribe({
       next: (data) => {
         const stored = localStorage.getItem('fiches_intervention');
         const local: any[] = stored ? JSON.parse(stored) : [];
@@ -106,7 +109,7 @@ export class Planning implements OnInit {
   }
 
   loadUtilisateurs() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister().subscribe({
       next: (data) => {
         this.utilisateurs = data;
         localStorage.setItem('utilisateurs', JSON.stringify(data));
@@ -119,7 +122,7 @@ export class Planning implements OnInit {
   }
 
   loadAllNotes() {
-    this.http.get<any[]>(API).subscribe({
+    this.planningApi.lister().subscribe({
       next: (data) => {
         this.allNotes = {};
         data.forEach((note: any) => {
@@ -142,7 +145,7 @@ export class Planning implements OnInit {
 
   // ✅ CHARGER TOUS LES CONGES (APPROUVE + EN_ATTENTE)
   loadCongesApprouves() {
-    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+    this.congesApi.lister().subscribe({
       next: (data) => {
         this.congesApprouves = data.filter((c: any) => c.statut === 'APPROUVE' || c.statut === 'EN_ATTENTE');
         this.generateCalendrier();
@@ -264,7 +267,7 @@ export class Planning implements OnInit {
       date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
       utilisateur: { id: this.currentUserId }
     };
-    this.http.post<any>(`${API}/sauvegarder`, body).subscribe({
+    this.planningApi.post<any>('sauvegarder', body).subscribe({
       next: () => {
         this.allNotes[this.selectedJour.key] = this.selectedJour.note;
         localStorage.setItem('planningNotes', JSON.stringify(this.allNotes));
@@ -376,7 +379,7 @@ export class Planning implements OnInit {
     const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const body = { note, date: dateStr, utilisateur: { id: user.id } };
     const key = `${user.id}_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-    this.http.post<any>(`${API}/sauvegarder`, body).subscribe({
+    this.planningApi.post<any>('sauvegarder', body).subscribe({
       next: () => { this.allNotes[key] = note; this.applyAndClose(); },
       error: () => { this.allNotes[key] = note; this.applyAndClose(); }
     });

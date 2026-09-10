@@ -1,7 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,6 +23,11 @@ import { JournalTravail } from '../journal-travail/journal-travail';
 import { Visiteurs } from '../visiteurs/visiteurs';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+import {
+  UtilisateursApi, CongesApi, FichesInterventionApi, TachesApi,
+  VoituresApi, MinutesSecuriteApi, MessagesAbyApi, ReclamationsApi
+} from '../../services/api/apis';
+import { Auth } from '../../services/auth';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -143,7 +147,17 @@ nouvelleVoiture = {
   conducteur: '', prochainControle: ''
 };
 statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
-  constructor(private http: HttpClient) {}
+  constructor(
+    private utilisateursApi: UtilisateursApi,
+    private congesApi: CongesApi,
+    private fichesInterventionApi: FichesInterventionApi,
+    private tachesApi: TachesApi,
+    private voituresApi: VoituresApi,
+    private minutesSecuriteApi: MinutesSecuriteApi,
+    private messagesAbyApi: MessagesAbyApi,
+    private reclamationsApi: ReclamationsApi,
+    private auth: Auth
+  ) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -152,14 +166,14 @@ statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
 minutesSecurite: any[] = [];
 
 loadMinutesSecurite() {
-  this.http.get<any[]>('http://localhost:8080/api/minutes-securite').subscribe({
+  this.minutesSecuriteApi.lister().subscribe({
     next: (data) => this.minutesSecurite = data,
     error: () => this.minutesSecurite = []
   });
 }
 
 marquerMinuteLue(id: number) {
-  this.http.put(`http://localhost:8080/api/minutes-securite/${id}/lu`, {}).subscribe({
+  this.minutesSecuriteApi.marquerLu(id).subscribe({
     next: () => {
       const m = this.minutesSecurite.find(x => x.id === id);
       if (m) m.statut = 'LU';
@@ -182,7 +196,7 @@ get minutesOk(): number {
   repliesAdmin: any[] = [];
 
   loadMessagesAby() {
-    this.http.get<any[]>('http://localhost:8080/api/messages-aby').subscribe({
+    this.messagesAbyApi.lister().subscribe({
       next: (data) => this.messagesAby = data,
       error: () => this.messagesAby = []
     });
@@ -192,13 +206,13 @@ get minutesOk(): number {
     this.messageAbySelectionne = m;
     this.repliesAdmin = [];
     this.reponseAbyTexte = '';
-    this.http.get<any[]>(`http://localhost:8080/api/messages-aby/${m.id}/replies`).subscribe({
+    this.messagesAbyApi.replies(m.id).subscribe({
       next: (data) => this.repliesAdmin = data,
       error: () => this.repliesAdmin = []
     });
     // Marquer comme lu
     if (!m.lu) {
-      this.http.put(`http://localhost:8080/api/messages-aby/${m.id}/lu`, {}).subscribe({
+      this.messagesAbyApi.put(`${m.id}/lu`, {}).subscribe({
         next: () => { m.lu = true; }
       });
     }
@@ -209,7 +223,7 @@ get minutesOk(): number {
     this.reponseEnCours = true;
     const auteur = `${this.user.prenom || ''} ${this.user.nom || ''}`.trim() || 'MCL Solutions';
     const body = { auteur, auteurRole: 'MCL', contenu: this.reponseAbyTexte };
-    this.http.post<any>(`http://localhost:8080/api/messages-aby/${id}/replies`, body).subscribe({
+    this.messagesAbyApi.post<any>(`${id}/replies`, body).subscribe({
       next: (reply) => {
         this.repliesAdmin.push(reply);
         this.reponseAbyTexte = '';
@@ -238,14 +252,14 @@ get minutesOk(): number {
 }
 
 loadTaches() {
-  this.http.get<any[]>('http://localhost:8080/api/taches').subscribe({
+  this.tachesApi.lister().subscribe({
     next: (data) => this.taches = data,
     error: () => this.taches = []
   });
 }
 
 loadMesConges() {
-  this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`).subscribe({
+  this.congesApi.parEmploye(this.user.id).subscribe({
     next: (data) => this.mesConges = data,
     error: () => this.mesConges = []
   });
@@ -253,7 +267,7 @@ loadMesConges() {
 
 loadSoldeCongesPerso() {
   if (!this.user.id) return;
-  this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+  this.congesApi.solde(this.user.id).subscribe({
     next: (data) => this.soldeCongesPerso = data,
     error: () => this.soldeCongesPerso = null
   });
@@ -294,7 +308,7 @@ confirmerEnvoiMalgreSolde() {
 private envoyerCongePerso() {
   const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
   if (this.congePersoEnEditionId) {
-    this.http.put(`http://localhost:8080/api/conges/${this.congePersoEnEditionId}`, { ...this.congePerso, joursDepassement }).subscribe({
+    this.congesApi.modifier(this.congePersoEnEditionId, { ...this.congePerso, joursDepassement }).subscribe({
       next: () => {
         this.loadMesConges();
         this.loadSoldeCongesPerso();
@@ -308,7 +322,7 @@ private envoyerCongePerso() {
   const essanId = this.getEssanId();
   if (!essanId) { alert('Responsable ESSAN introuvable'); return; }
   const demande = { ...this.congePerso, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: essanId } };
-  this.http.post('http://localhost:8080/api/conges', demande).subscribe({
+  this.congesApi.creer(demande).subscribe({
     next: () => {
       this.loadMesConges();
       this.loadSoldeCongesPerso();
@@ -330,7 +344,7 @@ modifierMonConge(c: any) {
 
 supprimerMonConge(id: number) {
   if (!confirm('Supprimer cette demande de congé ?')) return;
-  this.http.delete(`http://localhost:8080/api/conges/${id}`).subscribe({
+  this.congesApi.supprimer(id).subscribe({
     next: () => {
       this.loadMesConges();
       this.loadSoldeCongesPerso();
@@ -375,7 +389,7 @@ resetCongeFormPerso() {
 }
 
   loadFiches() {
-    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    this.fichesInterventionApi.lister().subscribe({
       next: (data) => {
         this.fiches = data;
         this.fichesFiltrees = data.filter((f: any) => f.statut === 'EN_COURS');
@@ -433,14 +447,14 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
   return jours > 0 ? `${jours}j` : '-';
 }
   loadConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+    this.congesApi.lister().subscribe({
       next: (data) => this.conges = data,
       error: () => this.conges = []
     });
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister().subscribe({
       next: (data) => {
         this.employes = data;
         this.utilisateurs = data;
@@ -453,7 +467,7 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
   }
 
   loadReclamations() {
-    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
+    this.reclamationsApi.lister().subscribe({
       next: (data) => this.reclamations = data,
       error: () => this.reclamations = []
     });
@@ -508,12 +522,12 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
   }
 
   updateStatut(id: number, statut: string) {
-    let url = `http://localhost:8080/api/conges/${id}/statut?statut=${statut}`;
+    const params: Record<string, string> = { statut };
     if (statut === 'APPROUVE' || statut === 'REFUSE') {
       const nomAdmin = `${this.user.prenom || ''} ${this.user.nom || ''}`.trim() || this.user.username || 'Admin';
-      url += `&validePar=${encodeURIComponent(nomAdmin)}`;
+      params['validePar'] = nomAdmin;
     }
-    this.http.put(url, {}).subscribe({
+    this.congesApi.put(`${id}/statut`, {}, params).subscribe({
       next: () => this.loadConges(),
       error: () => {}
     });
@@ -545,7 +559,7 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
     }
   }
 loadVoitures() {
-  this.http.get<any[]>('http://localhost:8080/api/voitures').subscribe({
+  this.voituresApi.lister().subscribe({
     next: (data) => this.voitures = data,
     error: () => this.voitures = []
   });
@@ -556,7 +570,7 @@ ajouterVoiture() {
     alert('Champs obligatoires manquants');
     return;
   }
-  this.http.post<any>('http://localhost:8080/api/voitures', this.nouvelleVoiture).subscribe({
+  this.voituresApi.creer<any>(this.nouvelleVoiture).subscribe({
     next: () => {
       this.loadVoitures();
       this.nouvelleVoiture = { immatriculation: '', marque: '', modele: '', annee: '', kilometrage: '', statut: 'Disponible', conducteur: '', prochainControle: '' };
@@ -568,7 +582,7 @@ ajouterVoiture() {
 
 supprimerVoiture(id: number) {
   if (confirm('Supprimer ?')) {
-    this.http.delete(`http://localhost:8080/api/voitures/${id}`).subscribe({
+    this.voituresApi.supprimer(id).subscribe({
       next: () => this.loadVoitures(),
       error: () => alert('Erreur suppression')
     });
@@ -587,7 +601,7 @@ getStatutVoitureColor(statut: string): string {
   resetSuccess = '';
 
   loadResetRequests() {
-    this.http.get<any[]>('http://localhost:8080/api/auth/reset-requests').subscribe({
+    this.auth.demandesReset().subscribe({
       next: (data) => this.resetRequests = data,
       error: () => this.resetRequests = []
     });
@@ -604,8 +618,7 @@ getStatutVoitureColor(statut: string): string {
 
   confirmerReset() {
     if (!this.newPassword.trim()) { alert('Entrez un nouveau mot de passe'); return; }
-    this.http.put(`http://localhost:8080/api/auth/reset-requests/${this.selectedReset.id}/reset`,
-      { newPassword: this.newPassword }, { responseType: 'text' }).subscribe({
+    this.auth.reinitialiserMotDePasse(this.selectedReset.id, this.newPassword).subscribe({
       next: () => {
         this.resetSuccess = 'Mot de passe réinitialisé avec succès !';
         this.loadResetRequests();

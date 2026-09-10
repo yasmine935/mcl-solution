@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-
-const API = 'http://localhost:8080/api/planning';
+import { CongesApi, FichesInterventionApi, PlanningApi, UtilisateursApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-semenier',
@@ -24,7 +22,12 @@ export class Semainier implements OnInit {
 
   dayColors = ['#1565c0', '#1976d2', '#0288d1', '#0277bd', '#01579b'];
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly utilisateursApi: UtilisateursApi,
+    private readonly planningApi: PlanningApi,
+    private readonly congesApi: CongesApi,
+    private readonly fichesInterventionApi: FichesInterventionApi
+  ) {}
 
   ngOnInit() {
     this.detectCurrentUser();
@@ -42,7 +45,7 @@ export class Semainier implements OnInit {
   }
 
   loadUtilisateurs() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister<any>().subscribe({
       next: (data) => { this.utilisateurs = data; localStorage.setItem('utilisateurs', JSON.stringify(data)); },
       error: () => {
         const stored = localStorage.getItem('utilisateurs');
@@ -52,7 +55,7 @@ export class Semainier implements OnInit {
   }
 
   loadAllNotes() {
-    this.http.get<any[]>(API).subscribe({
+    this.planningApi.lister<any>().subscribe({
       next: (data) => {
         this.allNotes = {};
         data.forEach((note: any) => {
@@ -74,14 +77,14 @@ export class Semainier implements OnInit {
   }
 
   loadCongesApprouves() {
-    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+    this.congesApi.lister<any>().subscribe({
       next: (data) => { this.congesApprouves = data.filter((c: any) => c.statut === 'APPROUVE' || c.statut === 'EN_ATTENTE'); },
       error: () => { this.congesApprouves = []; }
     });
   }
 
   loadFichesIntervention() {
-    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    this.fichesInterventionApi.lister<any>().subscribe({
       next: (data) => {
         this.fichesIntervention = data.map(f => {
           let techIds: number[] = [];

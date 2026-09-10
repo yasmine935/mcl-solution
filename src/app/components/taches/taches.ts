@@ -1,14 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-
-const API = 'http://localhost:8080/api/taches';
+import { ClientsApi, TachesApi, UtilisateursApi } from '../../services/api/apis';
 
 const ETAPES_PROJET = [
   'Qualification',
@@ -84,7 +82,11 @@ export class Taches implements OnInit {
 
   tacheEnEdition: any = {};
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private tachesApi: TachesApi,
+    private clientsApi: ClientsApi,
+    private utilisateursApi: UtilisateursApi
+  ) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -94,7 +96,7 @@ export class Taches implements OnInit {
   }
 
   loadClients() {
-    this.http.get<any[]>('http://localhost:8080/api/clients').subscribe({
+    this.clientsApi.lister<any>().subscribe({
       next: (data) => this.clients = data,
       error: () => this.clients = []
     });
@@ -160,7 +162,7 @@ export class Taches implements OnInit {
     }
     this.showAddClientModal = false;
     if (!this.clients.some((c: any) => c.nom === nom)) {
-      this.http.post<any>('http://localhost:8080/api/clients', { nom, codeClient: '', adresse: '', contact: '', email: '' }).subscribe({
+      this.clientsApi.creer<any>({ nom, codeClient: '', adresse: '', contact: '', email: '' }).subscribe({
         next: () => this.loadClients(),
         error: () => {}
       });
@@ -168,14 +170,14 @@ export class Taches implements OnInit {
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister<any>().subscribe({
       next: (data) => this.employes = data,
       error: () => this.employes = []
     });
   }
 
   loadTaches() {
-    this.http.get<any[]>(API).subscribe({
+    this.tachesApi.lister<any>().subscribe({
       next: (data) => {
         this.taches = data.map(t => this.mapFromBackend(t));
         this.taches.forEach(tache => { tache.notes = this.loadNotesForTache(tache.id); });
@@ -276,7 +278,7 @@ export class Taches implements OnInit {
     etape.doneBy = `${this.currentUser.prenom} ${this.currentUser.nom}`;
     etape.doneAt = new Date().toLocaleString('fr-FR');
     tache.statut = etape.nom === 'Clôture' ? 'Fait' : etape.nom;
-    this.http.put<any>(`${API}/${tache.id}`, this.buildBody(tache)).subscribe();
+    this.tachesApi.modifier<any>(tache.id, this.buildBody(tache)).subscribe();
   }
 
   getActiviteRecente(tache: any): any[] {
@@ -298,7 +300,7 @@ export class Taches implements OnInit {
     }
     const body = this.buildBody(this.nouvelleTache, 'A_FAIRE');
     body.etapes = JSON.stringify(ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })));
-    this.http.post<any>(API, body).subscribe({
+    this.tachesApi.creer<any>(body).subscribe({
       next: (created) => {
         const t = this.mapFromBackend({ ...created, ...body });
         t.notes = [];
@@ -325,7 +327,7 @@ export class Taches implements OnInit {
       alert("L'échéance ne peut pas être avant la date de début du projet.");
       return;
     }
-    this.http.put<any>(`${API}/${this.tacheEnEdition.id}`, this.buildBody(this.tacheEnEdition)).subscribe({
+    this.tachesApi.modifier<any>(this.tacheEnEdition.id, this.buildBody(this.tacheEnEdition)).subscribe({
       next: () => {
         const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
         if (index !== -1) this.taches[index] = { ...this.tacheEnEdition };
@@ -338,7 +340,7 @@ export class Taches implements OnInit {
 
   supprimerTache(id: number) {
     if (confirm('Supprimer cette tâche ?')) {
-      this.http.delete(`${API}/${id}`).subscribe({
+      this.tachesApi.supprimer(id).subscribe({
         next: () => { this.taches = this.taches.filter((t: any) => t.id !== id); },
         error: () => alert('❌ Erreur suppression')
       });

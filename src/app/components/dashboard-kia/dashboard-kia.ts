@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +18,7 @@ import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+import { CongesApi, FichesInterventionApi, ReclamationsApi, UtilisateursApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -102,7 +102,12 @@ export class DashboardKia implements OnInit {
   nombreJours = 0;
   congeEnEditionId: number | null = null;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly congesApi: CongesApi,
+    private readonly utilisateursApi: UtilisateursApi,
+    private readonly reclamationsApi: ReclamationsApi,
+    private readonly fichesInterventionApi: FichesInterventionApi
+  ) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -119,7 +124,7 @@ export class DashboardKia implements OnInit {
   }
 
   loadConges() {
-    this.http.get<any[]>('http://localhost:8080/api/conges').subscribe({
+    this.congesApi.lister<any>().subscribe({
       next: (data) => {
         this.congesTechniciens = data.filter((c: any) => c.utilisateur?.role === 'TECHNICIEN');
         this.mesConges = data.filter((c: any) => c.utilisateur?.id === this.user.id);
@@ -130,7 +135,7 @@ export class DashboardKia implements OnInit {
 
   loadSoldeConges() {
     if (!this.user.id) return;
-    this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+    this.congesApi.solde(this.user.id).subscribe({
       next: (data) => this.soldeConges = data,
       error: () => this.soldeConges = null
     });
@@ -171,28 +176,28 @@ export class DashboardKia implements OnInit {
   }
 
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
+    this.utilisateursApi.lister<any>().subscribe({
       next: (data) => this.employes = data,
       error: () => this.employes = []
     });
   }
 
   loadReclamations() {
-    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
+    this.reclamationsApi.lister<any>().subscribe({
       next: (data) => this.reclamations = data,
       error: () => this.reclamations = []
     });
   }
 
   loadInterventions() {
-    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    this.fichesInterventionApi.lister<any>().subscribe({
       next: (data) => this.interventions = data,
       error: () => this.interventions = []
     });
   }
 
   loadFiches() {
-    this.http.get<any[]>('http://localhost:8080/api/fiches-intervention').subscribe({
+    this.fichesInterventionApi.lister<any>().subscribe({
       next: (data) => this.fiches = data.filter((f: any) => f.technicienId !== this.user.id),
       error: () => this.fiches = []
     });
@@ -225,14 +230,14 @@ export class DashboardKia implements OnInit {
   private envoyerConge() {
     const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
     if (this.congeEnEditionId) {
-      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, { ...this.conge, joursDepassement }).subscribe({
+      this.congesApi.modifier(this.congeEnEditionId, { ...this.conge, joursDepassement }).subscribe({
         next: () => { this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm(); },
         error: () => {}
       });
       return;
     }
     const demande = { ...this.conge, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: 4 } };
-    this.http.post('http://localhost:8080/api/conges', demande).subscribe({
+    this.congesApi.creer(demande).subscribe({
       next: () => { this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm(); },
       error: () => {}
     });
@@ -248,7 +253,7 @@ export class DashboardKia implements OnInit {
 
   supprimerMonConge(id: number) {
     if (!confirm('Supprimer cette demande de congé ?')) return;
-    this.http.delete(`http://localhost:8080/api/conges/${id}`).subscribe({
+    this.congesApi.supprimer(id).subscribe({
       next: () => {
         this.loadConges();
         this.loadSoldeConges();
@@ -297,7 +302,7 @@ export class DashboardKia implements OnInit {
   }
 
   updateStatutConge(id: number, statut: string) {
-    this.http.put(`http://localhost:8080/api/conges/${id}/statut?statut=${statut}`, {}).subscribe({
+    this.congesApi.changerStatut(id, statut).subscribe({
       next: () => this.loadConges(),
       error: () => {}
     });

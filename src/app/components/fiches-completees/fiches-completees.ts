@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-
-const API_FICHES = 'http://localhost:8080/api/fiches-intervention';
+import { FichesInterventionApi } from '../../services/api/apis';
 
 @Component({
   selector: 'app-fiches-completees',
@@ -24,7 +22,7 @@ export class FichesCompletees implements OnInit {
   rechercheFC = '';
   currentUser: any = {};
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly fichesApi: FichesInterventionApi) {}
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -32,7 +30,7 @@ export class FichesCompletees implements OnInit {
   }
 
   loadFichesCompletees() {
-    this.http.get<any[]>(API_FICHES).subscribe({
+    this.fichesApi.lister<any>().subscribe({
       next: (data) => {
         this.fichesCompletees = data
           .filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE_KIA' || f.statut === 'VALIDEE')
@@ -116,7 +114,7 @@ export class FichesCompletees implements OnInit {
   confirmerKia(fiche: any) {
     const nom = `${this.currentUser.prenom} ${this.currentUser.nom}`;
     if (!confirm('Confirmer ce travail en tant que Technicien Supérieur ?')) return;
-    this.http.put<any>(`${API_FICHES}/${fiche.id}/confirmer-kia`, { confirmePar: nom }).subscribe({
+    this.fichesApi.put<any>(`${fiche.id}/confirmer-kia`, { confirmePar: nom }).subscribe({
       next: () => {
         fiche.statut = 'VALIDEE_KIA';
         fiche.confirmeParKia = nom;
@@ -139,7 +137,7 @@ export class FichesCompletees implements OnInit {
         approuvePar: nomManager,
         dateApprobation: new Date().toISOString()
       };
-      this.http.put<any>(`${API_FICHES}/${fiche.id}/valider`, body).subscribe({
+      this.fichesApi.put<any>(`${fiche.id}/valider`, body).subscribe({
         next: () => {
           fiche.statut = 'VALIDEE';
           fiche.approuvePar = nomManager;

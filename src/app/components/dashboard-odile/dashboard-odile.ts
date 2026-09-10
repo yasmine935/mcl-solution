@@ -1,7 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +18,7 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
 import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
+import { CongesApi, ReclamationsApi, UtilisateursApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -94,7 +94,11 @@ export class DashboardOdile implements OnInit {
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
   nombreJours = 0;
   congeEnEditionId: number | null = null;
-  constructor(private http: HttpClient) {}
+  constructor(
+    private congesApi: CongesApi,
+    private utilisateursApi: UtilisateursApi,
+    private reclamationsApi: ReclamationsApi
+  ) {}
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadData();
@@ -108,22 +112,22 @@ export class DashboardOdile implements OnInit {
     this.loadSoldeConges();
   }
   loadConges() {
-    this.http.get<any[]>(`http://localhost:8080/api/conges/employe/${this.user.id}`)
+    this.congesApi.parEmploye(this.user.id)
       .subscribe(data => this.conges = data, error => this.conges = []);
   }
   loadSoldeConges() {
     if (!this.user.id) return;
-    this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
+    this.congesApi.solde(this.user.id).subscribe({
       next: (data) => this.soldeConges = data,
       error: () => this.soldeConges = null
     });
   }
   loadEmployes() {
-    this.http.get<any[]>('http://localhost:8080/api/utilisateurs')
+    this.utilisateursApi.lister()
       .subscribe(data => this.employes = data, error => this.employes = []);
   }
   loadReclamations() {
-    this.http.get<any[]>('http://localhost:8080/api/reclamations-sse').subscribe({
+    this.reclamationsApi.lister().subscribe({
       next: (data) => this.reclamations = data,
       error: () => { const s = localStorage.getItem('reclamations'); this.reclamations = s ? JSON.parse(s) : []; }
     });
@@ -168,13 +172,13 @@ export class DashboardOdile implements OnInit {
   private envoyerConge() {
     const joursDepassement = this.joursEnTropSolde > 0 ? this.joursEnTropSolde : null;
     if (this.congeEnEditionId) {
-      this.http.put(`http://localhost:8080/api/conges/${this.congeEnEditionId}`, { ...this.conge, joursDepassement }).subscribe(() => {
+      this.congesApi.modifier(this.congeEnEditionId, { ...this.conge, joursDepassement }).subscribe(() => {
         this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm();
       }, error => console.error('Erreur', error));
       return;
     }
     const demande = { ...this.conge, joursDepassement, utilisateur: { id: this.user.id }, manager: { id: 4 } };
-    this.http.post('http://localhost:8080/api/conges', demande).subscribe(() => {
+    this.congesApi.creer(demande).subscribe(() => {
       this.loadConges(); this.loadSoldeConges(); this.showCongeForm = false; this.resetCongeForm();
     }, error => console.error('Erreur', error));
   }
@@ -189,7 +193,7 @@ export class DashboardOdile implements OnInit {
 
   supprimerMonConge(id: number) {
     if (!confirm('Supprimer cette demande de congé ?')) return;
-    this.http.delete(`http://localhost:8080/api/conges/${id}`).subscribe({
+    this.congesApi.supprimer(id).subscribe({
       next: () => {
         this.loadConges();
         this.loadSoldeConges();
