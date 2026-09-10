@@ -31,10 +31,13 @@ export class Employes implements OnInit {
   roles = [
     { value: 'TECHNICIEN', label: 'Technicien' },
     { value: 'TECHNICIEN_SUP', label: 'Technicien Supérieur' },
-    { value: 'AURELIEN', label: 'Manager Aurelien' },
-    { value: 'ODILE', label: 'Manager Odile' },
-    { value: 'FERID', label: 'Admin Ferid' },
-    { value: 'ESSAN', label: 'Propriétaire Essan' }
+    { value: 'MANAGER', label: 'Manager' },
+    { value: 'ADMINISTRATEUR', label: 'Administrateur' },
+    { value: 'DIRECTION', label: 'Direction' },
+    { value: 'RH', label: 'Ressources Humaines' },
+    { value: 'COMPTABILITE', label: 'Comptabilité' },
+    { value: 'SUPPLY_CHAIN', label: 'Supply Chain' },
+    { value: 'ADMINISTRATIF', label: 'Direction Administrative' }
   ];
 
   departements = [
@@ -67,7 +70,7 @@ export class Employes implements OnInit {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    this.canAdd = (this.currentUser.role || '').toUpperCase() === 'KARINE';
+    this.canAdd = (this.currentUser.role || '').toUpperCase() === 'RH';
     this.loadEmployes();
   }
 

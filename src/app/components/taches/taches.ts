@@ -406,9 +406,9 @@ export class Taches implements OnInit {
   // Couleur avatar selon rôle
   getAvatarColor(note: any): string {
     const colors: any = {
-      'FERID': '#1565c0', 'AURELIEN': '#283593',
-      'ODILE': '#0277bd', 'TECHNICIEN_SUP': '#4527a0',
-      'TECHNICIEN': '#01579b', 'ESSAN': '#5e35b1'
+      'ADMINISTRATEUR': '#1565c0', 'MANAGER': '#283593',
+      'TECHNICIEN_SUP': '#4527a0',
+      'TECHNICIEN': '#01579b', 'DIRECTION': '#5e35b1'
     };
     return colors[note.role] || '#546e7a';
   }

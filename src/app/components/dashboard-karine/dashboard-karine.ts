@@ -183,10 +183,10 @@ export class DashboardKarine implements OnInit {
   }
 getRoleColor(role: string): string {
   const map: any = {
-    'FERID': '#1565c0', 'AURELIEN': '#283593', 'ODILE': '#0277bd',
+    'ADMINISTRATEUR': '#1565c0', 'MANAGER': '#283593',
     'TECHNICIEN_SUP': '#4527a0', 'TECHNICIEN': '#01579b',
-    'ESSAN': '#5e35b1', 'KARINE': '#7b1c1c', 'HAIDEH': '#4e342e',
-    'NACCERA': '#880e4f', 'ABY': '#1a237e'
+    'DIRECTION': '#5e35b1', 'RH': '#7b1c1c', 'ADMINISTRATIF': '#4e342e',
+    'COMPTABILITE': '#880e4f', 'SUPPLY_CHAIN': '#1a237e'
   };
   return map[role] || '#546e7a';
 }

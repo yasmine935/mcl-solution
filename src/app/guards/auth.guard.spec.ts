@@ -24,7 +24,7 @@ describe('authGuard', () => {
   });
 
   it("refuse un user sans jeton (session forgée ou incomplète)", () => {
-    localStorage.setItem('user', JSON.stringify({ id: 1, role: 'FERID' }));
+    localStorage.setItem('user', JSON.stringify({ id: 1, role: 'ADMINISTRATEUR' }));
     expect(executer()).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
   });
@@ -36,15 +36,15 @@ describe('authGuard', () => {
   });
 
   it('accepte quand le rôle figure dans data.roles', () => {
-    localStorage.setItem('user', JSON.stringify({ id: 1, role: 'KARINE' }));
+    localStorage.setItem('user', JSON.stringify({ id: 1, role: 'RH' }));
     localStorage.setItem('token', 'jeton');
-    expect(executer({ roles: ['KARINE', 'FERID'] })).toBe(true);
+    expect(executer({ roles: ['RH', 'ADMINISTRATEUR'] })).toBe(true);
   });
 
   it("redirige un rôle non autorisé vers son propre dashboard", () => {
     localStorage.setItem('user', JSON.stringify({ id: 1, role: 'TECHNICIEN' }));
     localStorage.setItem('token', 'jeton');
-    expect(executer({ roles: ['FERID'] })).toBe(false);
+    expect(executer({ roles: ['ADMINISTRATEUR'] })).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith(['/dashboard-technicien'], { replaceUrl: true });
   });
 

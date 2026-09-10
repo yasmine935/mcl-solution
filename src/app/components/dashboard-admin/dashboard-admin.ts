@@ -223,7 +223,7 @@ loadSoldeCongesPerso() {
 }
 
 getEssanId(): number | null {
-  const essan = this.employes.find((e: any) => e.role === 'ESSAN');
+  const essan = this.employes.find((e: any) => e.role === 'DIRECTION');
   return essan ? essan.id : null;
 }
 

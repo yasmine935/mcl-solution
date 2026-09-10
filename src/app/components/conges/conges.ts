@@ -25,7 +25,7 @@ export class Conges implements OnInit {
     this.http.get<any[]>(this.apiUrl).subscribe({
       next: (data) => {
         // ESSAN ne valide que les congés personnels de Ferid (ADMIN/FERID)
-        this.conges = data.filter((c: any) => c.utilisateur?.role === 'FERID');
+        this.conges = data.filter((c: any) => c.utilisateur?.role === 'ADMINISTRATEUR');
       },
       error: () => this.conges = []
     });

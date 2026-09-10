@@ -115,7 +115,7 @@ export class DashboardEssan implements OnInit {
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (this.user.role !== 'ESSAN') {
+    if (!['DIRECTION', 'ADMINISTRATEUR'].includes(this.user.role)) {
       this.router.navigate(['/login']);
       return;
     }
@@ -174,9 +174,9 @@ export class DashboardEssan implements OnInit {
   getRoleColor(role: string): string {
     const colors: Record<string, string> = {
       'TECHNICIEN': '#01579b', 'TECHNICIEN_SUP': '#4527a0',
-      'AURELIEN': '#1b5e20', 'ODILE': '#0d47a1', 'KIA': '#bf360c',
-      'FERID': '#37474f', 'ESSAN': '#5e35b1', 'KARINE': '#880e4f',
-      'AYDEH': '#e65100', 'NACCERA': '#2e7d32', 'ABY': '#00695c'
+      'MANAGER': '#1b5e20', 'ADMINISTRATEUR': '#37474f',
+      'DIRECTION': '#5e35b1', 'RH': '#880e4f',
+      'ADMINISTRATIF': '#e65100', 'COMPTABILITE': '#2e7d32', 'SUPPLY_CHAIN': '#00695c'
     };
     return colors[role] || '#546e7a';
   }
@@ -184,9 +184,9 @@ export class DashboardEssan implements OnInit {
   getRoleColorLight(role: string): string {
     const colors: Record<string, string> = {
       'TECHNICIEN': '#e3f2fd', 'TECHNICIEN_SUP': '#ede7f6',
-      'AURELIEN': '#e8f5e9', 'ODILE': '#e3f2fd', 'KIA': '#fbe9e7',
-      'FERID': '#eceff1', 'ESSAN': '#ede7f6', 'KARINE': '#fce4ec',
-      'AYDEH': '#fff3e0', 'NACCERA': '#e8f5e9', 'ABY': '#e0f2f1'
+      'MANAGER': '#e8f5e9', 'ADMINISTRATEUR': '#eceff1',
+      'DIRECTION': '#ede7f6', 'RH': '#fce4ec',
+      'ADMINISTRATIF': '#fff3e0', 'COMPTABILITE': '#e8f5e9', 'SUPPLY_CHAIN': '#e0f2f1'
     };
     return colors[role] || '#f5f5f5';
   }

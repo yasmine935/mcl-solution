@@ -96,7 +96,7 @@ export class JournalTravail implements OnInit {
 
   get isManager(): boolean {
     const role = this.user?.role;
-    return role === 'TECHNICIEN_SUP' || role === 'FERID' || role === 'KARINE' || role === 'ESSAN' || role === 'AURELIEN' || role === 'ODILE';
+    return role === 'TECHNICIEN_SUP' || role === 'ADMINISTRATEUR' || role === 'RH' || role === 'DIRECTION' || role === 'MANAGER';
   }
 
   constructor(private http: HttpClient) {}
