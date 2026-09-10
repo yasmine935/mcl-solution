@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { dashboardPourRole } from '../../services/role-routes';
 
 @Component({
   selector: 'app-login',
@@ -74,21 +75,8 @@ export class Login implements OnInit {
   }
 
   private naviguerVersPage(user: any) {
-    const opts = { replaceUrl: true }; // remplace /login dans l'historique → le retour ne peut plus y revenir
-    switch (user.role) {
-      case 'TECHNICIEN':     this.router.navigate(['/dashboard-technicien'], opts); break;
-      case 'TECHNICIEN_SUP': this.router.navigate(['/dashboard-kia'], opts); break;
-      case 'AURELIEN':       this.router.navigate(['/dashboard-aurelien'], opts); break;
-      case 'ODILE':          this.router.navigate(['/dashboard-odile'], opts); break;
-      case 'FERID':          this.router.navigate(['/dashboard-admin'], opts); break;
-      case 'ESSAN':          this.router.navigate(['/dashboard-essan'], opts); break;
-      case 'KARINE':         this.router.navigate(['/dashboard-karine'], opts); break;
-      case 'HAIDEH':         this.router.navigate(['/dashboard-haideh'], opts); break;
-      case 'NACCERA':        this.router.navigate(['/dashboard-naccera'], opts); break;
-      case 'ABY':            this.router.navigate(['/dashboard-aby'], opts); break;
-      case 'UN':             this.router.navigate(['/dashboard-technicien'], opts); break;
-      default:               this.router.navigate(['/login'], opts);
-    }
+    // replaceUrl : remplace /login dans l'historique → le retour ne peut plus y revenir
+    this.router.navigate([dashboardPourRole(user?.role)], { replaceUrl: true });
   }
 
   login() {
