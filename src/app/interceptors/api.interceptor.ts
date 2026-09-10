@@ -12,19 +12,22 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
     request = request.clone({ url: request.url.replace('http://localhost:8080', SERVER_URL) });
   }
 
-  // Joint le jeton JWT à toutes les requêtes API quand il existe
+  // Le jeton n'est joint qu'aux requêtes vers NOTRE API — jamais vers un domaine tiers
   const token = localStorage.getItem('token');
-  if (token) {
+  const versApi = request.url.startsWith(SERVER_URL);
+  if (token && versApi) {
     request = request.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
   }
 
   return next(request).pipe(
     catchError((err) => {
-      // Jeton absent, invalide ou expiré → retour au login.
-      // Exceptions : échec du login lui-même, et change-password (401 = mot de passe actuel incorrect)
+      // Jeton invalide ou expiré → retour au login.
+      // Uniquement si un jeton était réellement joint : un visiteur anonyme qui reçoit
+      // un 401 (écran public) ne doit pas être redirigé.
+      // Exceptions : le login lui-même et change-password (401 = mauvais mot de passe).
       const isAuthAttempt = request.url.includes('/api/auth/login')
         || request.url.includes('/api/auth/change-password');
-      if (err?.status === 401 && !isAuthAttempt) {
+      if (err?.status === 401 && token && versApi && !isAuthAttempt) {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         router.navigate(['/login'], { replaceUrl: true });

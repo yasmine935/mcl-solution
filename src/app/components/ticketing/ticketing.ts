@@ -237,6 +237,11 @@ export class TicketingComponent implements OnInit {
 get peutCreerTicket(): boolean {
   return !['FERID', 'AURELIEN', 'ODILE', 'TECHNICIEN_SUP', 'TECHNICIEN'].includes(this.currentUser?.role);
 }
+// Les actions (démarrer, valider, supprimer) exigent d'être connecté :
+// cet écran est aussi servi sur la route publique /nouveau-ticket
+get estConnecte(): boolean {
+  return !!this.currentUser?.id && !!localStorage.getItem('token');
+}
   formatDate(iso: string | undefined): string {
     if (!iso) return '-';
     const d = new Date(iso);

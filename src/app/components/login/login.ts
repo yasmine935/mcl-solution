@@ -48,15 +48,16 @@ export class Login implements OnInit {
   constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
   ngOnInit() {
-    // Si l'utilisateur est déjà connecté (localStorage), le rediriger directement
+    // Si l'utilisateur est déjà connecté (user + jeton), le rediriger directement
     const stored = localStorage.getItem('user');
-    if (stored) {
+    if (stored && localStorage.getItem('token')) {
       try {
         const user = JSON.parse(stored);
         if (user?.role) { this.naviguerVersPage(user); }
       } catch { localStorage.removeItem('user'); localStorage.removeItem('token'); }
     } else {
-      // Pas de session : purge un éventuel jeton orphelin (ex. modale de changement abandonnée)
+      // Session incomplète (user sans jeton, ou modale de changement abandonnée) : purge
+      localStorage.removeItem('user');
       localStorage.removeItem('token');
     }
   }

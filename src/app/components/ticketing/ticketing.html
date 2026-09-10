@@ -107,18 +107,18 @@
 
       <!-- Actions -->
       <div class="card-actions" (click)="$event.stopPropagation()">
-        <button *ngIf="ticket.statut === 'En attente'" class="btn-action btn-encours"
+        <button *ngIf="estConnecte && ticket.statut === 'En attente'" class="btn-action btn-encours"
           (click)="mettreEnCours(ticket, $event)">
           ⚙️ Mettre En cours
         </button>
-        <button *ngIf="ticket.statut === 'En cours'" class="btn-action btn-valider"
+        <button *ngIf="estConnecte && ticket.statut === 'En cours'" class="btn-action btn-valider"
           (click)="validerTicket(ticket, $event)">
           ✅ Valider (Résolu)
         </button>
         <button class="btn-action btn-detail" (click)="viewDetail(ticket)">
           👁️ Voir détails
         </button>
-        <button class="btn-action btn-suppr"
+        <button *ngIf="estConnecte" class="btn-action btn-suppr"
           (click)="deleteTicket(ticket, $event)">
           🗑️
         </button>
@@ -340,11 +340,11 @@
         </div>
       </div>
       <div class="detail-footer">
-        <button *ngIf="showDetail!.statut === 'En attente'"
+        <button *ngIf="estConnecte && showDetail!.statut === 'En attente'"
           class="btn-action btn-encours" (click)="mettreEnCours(showDetail!, $event)">⚙️ Mettre En cours</button>
-        <button *ngIf="showDetail!.statut === 'En cours'"
+        <button *ngIf="estConnecte && showDetail!.statut === 'En cours'"
           class="btn-action btn-valider" (click)="validerTicket(showDetail!, $event)">✅ Valider (Résolu)</button>
-        <button class="btn-action btn-suppr-detail"
+        <button *ngIf="estConnecte" class="btn-action btn-suppr-detail"
           (click)="deleteTicket(showDetail!, $event)">🗑️ Supprimer</button>
         <button class="btn-action btn-fermer" (click)="cancel()">Fermer</button>
       </div>
