@@ -1,0 +1,147 @@
+<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
+                      [pageTitle]="getPageTitle()"
+                      [badges]="{ 'a-traiter': ticketsATraiter.length }"
+                      (pageChange)="currentPage = $event">
+
+  <!-- BANDEAU DE MESSAGE -->
+  @if (message) {
+    <div class="banner" [class.banner-success]="messageType === 'success'"
+                        [class.banner-error]="messageType === 'error'"
+                        [class.banner-info]="messageType === 'info'">
+      <mat-icon>{{ messageType === 'success' ? 'check_circle' : messageType === 'error' ? 'error' : 'info' }}</mat-icon>
+      <span>{{ message }}</span>
+      <button class="banner-close" (click)="fermerMessage()" type="button">✕</button>
+    </div>
+  }
+
+  <!-- ════════════════════ PAGE À TRAITER ════════════════════ -->
+  @if (currentPage === 'a-traiter') {
+    <div class="section-card">
+      <div class="section-header">
+        <h3><mat-icon>inbox</mat-icon> Tickets en attente de validation</h3>
+        <span class="count-pill">{{ ticketsATraiter.length }}</span>
+      </div>
+
+      @if (chargement) {
+        <div class="empty-state"><span>⏳</span>Chargement…</div>
+      } @else if (ticketsATraiter.length === 0) {
+        <div class="empty-state"><span>✅</span>Aucun ticket en attente de validation.</div>
+      } @else {
+        <div class="ticket-list">
+          @for (t of ticketsATraiter; track t.id) {
+            <div class="ticket-card">
+              <div class="ticket-card-head">
+                <div class="ticket-card-titre">
+                  <span class="ticket-numero">{{ t.numero }}</span>
+                  <strong>{{ t.titre }}</strong>
+                </div>
+                <span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span>
+              </div>
+
+              <div class="ticket-meta">
+                <span><mat-icon>person</mat-icon> {{ t.client?.nom || '—' }}</span>
+                <span><mat-icon>category</mat-icon> {{ t.categorie || '—' }}</span>
+                <span><mat-icon>schedule</mat-icon> {{ formatDate(t.dateCreation) }}</span>
+              </div>
+
+              <p class="ticket-desc">{{ t.description }}</p>
+
+              <div class="ticket-action-zone">
+                <textarea class="fi" rows="2" placeholder="Commentaire (optionnel)…"
+                          [(ngModel)]="commentaires[t.id]"></textarea>
+                <div class="ticket-actions">
+                  <button class="btn btn-valider" (click)="valider(t)">
+                    <mat-icon>check</mat-icon> Valider
+                  </button>
+                  <button class="btn btn-rejeter" (click)="rejeter(t)">
+                    <mat-icon>close</mat-icon> Rejeter
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ════════════════════ PAGE TOUS ════════════════════ -->
+  @if (currentPage === 'tous') {
+    <div class="section-card">
+      <div class="section-header">
+        <h3><mat-icon>list</mat-icon> Tous les tickets clients</h3>
+        <span class="count-pill">{{ tousLesTickets.length }}</span>
+      </div>
+
+      @if (chargement) {
+        <div class="empty-state"><span>⏳</span>Chargement…</div>
+      } @else if (tousLesTickets.length === 0) {
+        <div class="empty-state"><span>📭</span>Aucun ticket.</div>
+      } @else {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th>Titre</th>
+                <th>Client</th>
+                <th>Catégorie</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+                <th>Traité par</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of tousLesTickets; track t.id) {
+                <tr>
+                  <td><span class="ticket-numero">{{ t.numero }}</span></td>
+                  <td>{{ t.titre }}</td>
+                  <td>{{ t.client?.nom || '—' }}</td>
+                  <td>{{ t.categorie || '—' }}</td>
+                  <td><span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span></td>
+                  <td>
+                    <span class="statut-badge" [ngClass]="statutClass(t.statut)">
+                      <span class="dot"></span>{{ statutLabel(t.statut) }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (t.traitePar) {
+                      <span class="traite-par" [class.moi]="estResponsable(t)">{{ t.traitePar.nom }}</span>
+                    } @else {
+                      <span class="traite-par vide">— à prendre</span>
+                    }
+                  </td>
+                  <td>
+                    @if (estResponsable(t)) {
+                      @if (t.statut === 'VALIDE') {
+                        <button class="btn btn-suite" (click)="prendreEnCharge(t)">
+                          <mat-icon>engineering</mat-icon> Prendre en charge
+                        </button>
+                      } @else if (t.statut === 'EN_COURS') {
+                        <button class="btn btn-suite" (click)="resoudre(t)">
+                          <mat-icon>task_alt</mat-icon> Résoudre
+                        </button>
+                      } @else if (t.statut === 'RESOLU') {
+                        <button class="btn btn-suite" (click)="cloturer(t)">
+                          <mat-icon>lock</mat-icon> Clôturer
+                        </button>
+                      } @else {
+                        <span class="readonly">—</span>
+                      }
+                    } @else if (t.traitePar) {
+                      <span class="readonly"><mat-icon>lock</mat-icon> Pris par {{ t.traitePar.nom }}</span>
+                    } @else {
+                      <span class="readonly">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+</app-dashboard-layout>

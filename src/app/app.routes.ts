@@ -17,6 +17,8 @@ import { DashboardHaideh } from './components/dashboard-haideh/dashboard-haideh'
 import { DashboardNaccera } from './components/dashboard-naccera/dashboard-naccera';
 import { GestionClients } from './components/clients/clients';
 import { EcranVisiteur } from './components/ecran-visiteur/ecran-visiteur';
+import { DashboardClient } from './components/dashboard-client/dashboard-client';
+import { TicketsClientValideur } from './components/tickets-client-valideur/tickets-client-valideur';
 import { authGuard } from './guards/auth.guard';
 export const appRoutes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -39,5 +41,8 @@ export const appRoutes: Routes = [
   { path: 'dashboard-haideh', component: DashboardHaideh, canActivate: [authGuard], data: { roles: ['ADMINISTRATIF', 'ADMINISTRATEUR'] } },
   { path: 'dashboard-naccera', component: DashboardNaccera, canActivate: [authGuard], data: { roles: ['COMPTABILITE', 'ADMINISTRATEUR'] } },
   { path: 'fiche-intervention-tech/:id', component: FicheInterventionTechnicien, canActivate: [authGuard] },
-  { path: 'clients', component: GestionClients, canActivate: [authGuard] }
+  { path: 'clients', component: GestionClients, canActivate: [authGuard] },
+  // Service de ticketing client (cahier des charges)
+  { path: 'dashboard-client', component: DashboardClient, canActivate: [authGuard], data: { roles: ['CLIENT'] } },
+  { path: 'tickets-clients', component: TicketsClientValideur, canActivate: [authGuard], data: { roles: ['MANAGER', 'ADMINISTRATEUR'] } }
 ];

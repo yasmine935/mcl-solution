@@ -1,0 +1,229 @@
+<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
+                      [pageTitle]="getPageTitle()"
+                      [badges]="{ tickets: nbTotal || null }"
+                      (pageChange)="currentPage = $event"
+                      translate="no" lang="fr">
+
+  <!-- ══════════ MES TICKETS ══════════ -->
+  @if (currentPage === 'tickets') {
+
+    <!-- Message de confirmation / erreur -->
+    @if (feedback) {
+      <div class="tc-alert" [class.tc-alert-success]="feedback.type === 'success'"
+           [class.tc-alert-error]="feedback.type === 'error'">
+        <span>{{ feedback.texte }}</span>
+        <button type="button" class="tc-alert-close" (click)="feedback = null">✕</button>
+      </div>
+    }
+
+    <!-- Bannière de bienvenue -->
+    <div class="tc-welcome">
+      <div class="tc-welcome-left">
+        <div class="tc-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div>
+          <h2>Bonjour {{ user.prenom || user.nom || 'Client' }}</h2>
+          <p>Suivez l'état de vos demandes de support</p>
+        </div>
+      </div>
+      <button type="button" class="tc-welcome-btn" (click)="currentPage = 'nouveau'">
+        <mat-icon>add_circle</mat-icon> Nouveau ticket
+      </button>
+    </div>
+
+    <!-- Indicateurs -->
+    <div class="tc-stats">
+      <div class="tc-stat">
+        <span class="tc-stat-num">{{ nbTotal }}</span>
+        <span class="tc-stat-label">Total</span>
+      </div>
+      <div class="tc-stat">
+        <span class="tc-stat-num" style="color:#f59e0b">{{ nbEnAttente }}</span>
+        <span class="tc-stat-label">En attente</span>
+      </div>
+      <div class="tc-stat">
+        <span class="tc-stat-num" style="color:#4f46e5">{{ nbEnCours }}</span>
+        <span class="tc-stat-label">En cours</span>
+      </div>
+      <div class="tc-stat">
+        <span class="tc-stat-num" style="color:#16a34a">{{ nbResolus }}</span>
+        <span class="tc-stat-label">Résolus / clôturés</span>
+      </div>
+    </div>
+
+    <!-- Barre d'outils -->
+    <div class="tc-toolbar">
+      <h3 class="tc-toolbar-title">Mes tickets</h3>
+      <div class="tc-filter">
+        <mat-icon>filter_list</mat-icon>
+        <select [(ngModel)]="filtreStatut" class="tc-select">
+          <option value="">Tous les statuts</option>
+          @for (s of statutsOptions; track s) {
+            <option [value]="s">{{ getStatutLabel(s) }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- États -->
+    @if (chargement) {
+      <div class="tc-empty"><span>⏳</span><p>Chargement de vos tickets…</p></div>
+    } @else if (erreurChargement) {
+      <div class="tc-empty tc-empty-error">
+        <span>⚠️</span>
+        <p>{{ erreurChargement }}</p>
+        <button type="button" class="tc-btn-ghost" (click)="chargerTickets()">Réessayer</button>
+      </div>
+    } @else if (tickets.length === 0) {
+      <div class="tc-empty">
+        <span>🎫</span>
+        <p>Vous n'avez aucun ticket pour l'instant.</p>
+        <button type="button" class="tc-btn-primary" (click)="currentPage = 'nouveau'">Créer mon premier ticket</button>
+      </div>
+    } @else if (ticketsFiltres.length === 0) {
+      <div class="tc-empty"><span>🔍</span><p>Aucun ticket pour ce statut.</p></div>
+    } @else {
+      <div class="tc-grid">
+        @for (t of ticketsFiltres; track t.id) {
+          <button type="button" class="tc-card" (click)="ouvrirDetail(t)">
+            <div class="tc-card-top">
+              <span class="tc-numero">{{ t.numero || ('#' + t.id) }}</span>
+              <span class="tc-statut" [style.background]="getStatutColor(t.statut)">{{ getStatutLabel(t.statut) }}</span>
+            </div>
+            <h4 class="tc-card-titre">{{ t.titre || 'Sans titre' }}</h4>
+            <div class="tc-card-meta">
+              @if (t.categorie) { <span class="tc-chip">{{ t.categorie }}</span> }
+              @if (t.priorite) {
+                <span class="tc-prio" [style.color]="getPrioriteColor(t.priorite)">
+                  <span class="tc-prio-dot" [style.background]="getPrioriteColor(t.priorite)"></span>{{ t.priorite }}
+                </span>
+              }
+            </div>
+            <div class="tc-card-footer">
+              <span class="tc-date">
+                <mat-icon>schedule</mat-icon>
+                {{ t.dateCreation ? (t.dateCreation | date:'dd/MM/yyyy') : '—' }}
+              </span>
+              @if (t.traitePar?.nom) {
+                <span class="tc-traite">
+                  <mat-icon>person</mat-icon>{{ t.traitePar.prenom }} {{ t.traitePar.nom }}
+                </span>
+              }
+            </div>
+          </button>
+        }
+      </div>
+    }
+  }
+
+  <!-- ══════════ NOUVEAU TICKET ══════════ -->
+  @if (currentPage === 'nouveau') {
+    <div class="tc-form-card">
+      <div class="tc-form-head">
+        <h3><mat-icon>add_circle</mat-icon> Créer un nouveau ticket</h3>
+        <p>Décrivez votre demande, notre équipe la prendra en charge.</p>
+      </div>
+
+      @if (formErreur) {
+        <div class="tc-alert tc-alert-error"><span>{{ formErreur }}</span></div>
+      }
+
+      <div class="tc-form-grid">
+        <div class="tc-fg tc-full">
+          <label>Titre <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.titre"
+                 placeholder="Ex : Imprimante du 2e étage en panne" />
+        </div>
+        <div class="tc-fg tc-full">
+          <label>Description <span class="tc-req">*</span></label>
+          <textarea class="tc-input" rows="5" [(ngModel)]="form.description"
+                    placeholder="Décrivez le problème rencontré en détail…"></textarea>
+        </div>
+        <div class="tc-fg">
+          <label>Catégorie</label>
+          <select class="tc-select" [(ngModel)]="form.categorie">
+            @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
+          </select>
+        </div>
+        <div class="tc-fg">
+          <label>Priorité</label>
+          <select class="tc-select" [(ngModel)]="form.priorite">
+            @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
+          </select>
+        </div>
+      </div>
+
+      <div class="tc-form-actions">
+        <button type="button" class="tc-btn-primary" (click)="creerTicket()" [disabled]="creationEnCours">
+          {{ creationEnCours ? 'Création…' : 'Créer le ticket' }}
+        </button>
+        <button type="button" class="tc-btn-ghost" (click)="resetForm()" [disabled]="creationEnCours">Réinitialiser</button>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════ MODAL DÉTAIL ══════════ -->
+  @if (ticketSelectionne) {
+    <div class="tc-overlay" (click)="fermerDetail()">
+      <div class="tc-modal" (click)="$event.stopPropagation()">
+        <div class="tc-modal-head" [style.borderTopColor]="getStatutColor(ticketSelectionne.statut)">
+          <div class="tc-modal-head-text">
+            <span class="tc-numero">{{ ticketSelectionne.numero || ('#' + ticketSelectionne.id) }}</span>
+            <h3>{{ ticketSelectionne.titre || 'Sans titre' }}</h3>
+          </div>
+          <button type="button" class="tc-close" (click)="fermerDetail()">✕</button>
+        </div>
+
+        <div class="tc-modal-body">
+          <div class="tc-modal-badges">
+            <span class="tc-statut" [style.background]="getStatutColor(ticketSelectionne.statut)">
+              {{ getStatutLabel(ticketSelectionne.statut) }}
+            </span>
+            @if (ticketSelectionne.categorie) { <span class="tc-chip">{{ ticketSelectionne.categorie }}</span> }
+            @if (ticketSelectionne.priorite) {
+              <span class="tc-prio" [style.color]="getPrioriteColor(ticketSelectionne.priorite)">
+                <span class="tc-prio-dot" [style.background]="getPrioriteColor(ticketSelectionne.priorite)"></span>
+                {{ ticketSelectionne.priorite }}
+              </span>
+            }
+          </div>
+
+          <div class="tc-field">
+            <label>Description</label>
+            <p>{{ ticketSelectionne.description || '—' }}</p>
+          </div>
+
+          <div class="tc-detail-grid">
+            <div class="tc-detail-item">
+              <label>Créé le</label>
+              <span>{{ ticketSelectionne.dateCreation ? (ticketSelectionne.dateCreation | date:'dd/MM/yyyy HH:mm') : '—' }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Traité le</label>
+              <span>{{ ticketSelectionne.dateTraitement ? (ticketSelectionne.dateTraitement | date:'dd/MM/yyyy HH:mm') : '—' }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Pris en charge par</label>
+              <span>
+                @if (ticketSelectionne.traitePar?.nom) {
+                  {{ ticketSelectionne.traitePar.prenom }} {{ ticketSelectionne.traitePar.nom }}
+                } @else { Non attribué }
+              </span>
+            </div>
+          </div>
+
+          @if (ticketSelectionne.commentaireValidation) {
+            <div class="tc-field tc-comment">
+              <label>Commentaire de validation</label>
+              <p>{{ ticketSelectionne.commentaireValidation }}</p>
+            </div>
+          }
+        </div>
+
+        <div class="tc-modal-foot">
+          <button type="button" class="tc-btn-ghost" (click)="fermerDetail()">Fermer</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</app-dashboard-layout>

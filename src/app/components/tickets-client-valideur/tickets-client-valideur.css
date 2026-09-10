@@ -1,0 +1,159 @@
+/* Styles de l'espace Valideur des tickets clients.
+   Le châssis (sidebar/topbar) vit dans layout/dashboard-layout.css.
+   Accent ambre/orange cohérent avec l'EspaceConfig du composant. */
+
+/* ── BANDEAU DE MESSAGE ── */
+.banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: 12px; margin-bottom: 18px;
+  font-size: 0.88rem; font-weight: 600;
+  animation: slideDown 0.2s ease;
+}
+.banner mat-icon { font-size: 20px; width: 20px; height: 20px; }
+.banner-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.banner-error   { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.banner-info    { background: #fff7ed; color: #b45309; border: 1px solid #fcd34d; }
+.banner-close {
+  margin-left: auto; background: transparent; border: none; cursor: pointer;
+  font-size: 1rem; color: inherit; opacity: 0.6; line-height: 1;
+}
+.banner-close:hover { opacity: 1; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── CARTE DE SECTION ── */
+.section-card {
+  background: #fff; border-radius: 14px; padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-top: 4px solid #b45309; margin-bottom: 20px;
+}
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+}
+.section-header h3 {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 1rem; font-weight: 800; color: #78350f;
+}
+.section-header h3 mat-icon { color: #b45309; }
+.count-pill {
+  background: #fef3c7; color: #b45309; font-weight: 800;
+  padding: 4px 14px; border-radius: 20px; font-size: 0.85rem;
+}
+
+/* ── LISTE DE CARTES (page À traiter) ── */
+.ticket-list { display: flex; flex-direction: column; gap: 14px; }
+.ticket-card {
+  border: 1.5px solid #fde68a; border-radius: 14px; padding: 18px 20px;
+  background: #fffdf7; transition: box-shadow 0.2s, transform 0.2s;
+}
+.ticket-card:hover { box-shadow: 0 6px 20px rgba(180, 83, 9, 0.12); transform: translateY(-2px); }
+.ticket-card-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; margin-bottom: 10px;
+}
+.ticket-card-titre { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ticket-card-titre strong { font-size: 1rem; color: #1a202c; }
+.ticket-numero {
+  background: #78350f; color: #fff; padding: 3px 10px; border-radius: 8px;
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.5px;
+}
+.ticket-meta {
+  display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 10px;
+  font-size: 0.78rem; color: #78716c;
+}
+.ticket-meta span { display: inline-flex; align-items: center; gap: 5px; }
+.ticket-meta mat-icon { font-size: 16px; width: 16px; height: 16px; color: #b45309; }
+.ticket-desc {
+  font-size: 0.86rem; color: #44403c; line-height: 1.5; margin: 0 0 14px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ticket-action-zone {
+  display: flex; flex-direction: column; gap: 10px;
+  border-top: 1px dashed #fde68a; padding-top: 14px;
+}
+.ticket-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+.fi {
+  width: 100%; box-sizing: border-box;
+  border: 1.5px solid #fcd34d; border-radius: 8px; padding: 9px 12px;
+  font-size: 0.85rem; outline: none; font-family: inherit;
+  background: #fff; resize: vertical; transition: border-color 0.2s;
+}
+.fi:focus { border-color: #b45309; }
+
+/* ── BOUTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: none; border-radius: 9px; padding: 9px 18px;
+  font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+.btn:hover { filter: brightness(0.94); }
+.btn:active { transform: translateY(1px); }
+.btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.btn-valider { background: #2e7d32; color: #fff; }
+.btn-rejeter { background: #c62828; color: #fff; }
+.btn-suite   { background: #b45309; color: #fff; }
+
+/* ── TABLEAU (page Tous) ── */
+.table-wrap { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.data-table thead th {
+  padding: 11px 14px; background: #fef3c7; color: #b45309;
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.5px; text-align: left; border-bottom: 2px solid #fcd34d;
+  white-space: nowrap;
+}
+.data-table tbody td {
+  padding: 12px 14px; border-bottom: 1px solid #f5f5f4;
+  color: #2d3748; vertical-align: middle;
+}
+.data-table tbody tr:hover { background: #fffbeb; }
+
+/* ── INDICATEURS DE STATUT ── */
+.statut-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+}
+.statut-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.st-nouveau                { background: #eef2ff; color: #4338ca; }
+.st-en-attente-validation  { background: #fff7ed; color: #b45309; }
+.st-valide                 { background: #e8f5e9; color: #2e7d32; }
+.st-rejete                 { background: #ffebee; color: #c62828; }
+.st-en-cours               { background: #e3f2fd; color: #1565c0; }
+.st-resolu                 { background: #e0f2f1; color: #00695c; }
+.st-cloture                { background: #eceff1; color: #455a64; }
+
+/* ── INDICATEURS DE PRIORITÉ ── */
+.indic {
+  display: inline-block; padding: 3px 10px; border-radius: 8px;
+  font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.4px; background: #f3f4f6; color: #374151;
+}
+.pr-basse, .pr-faible   { background: #e8f5e9; color: #2e7d32; }
+.pr-normale, .pr-moyenne { background: #fff7ed; color: #b45309; }
+.pr-haute, .pr-importante { background: #fff3e0; color: #e65100; }
+.pr-urgente, .pr-critique { background: #ffebee; color: #c62828; }
+
+/* ── TRAITÉ PAR / LECTURE SEULE ── */
+.traite-par { font-weight: 600; color: #44403c; }
+.traite-par.moi { color: #b45309; font-weight: 800; }
+.traite-par.vide { color: #a8a29e; font-style: italic; font-weight: 500; }
+.readonly {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: #a8a29e; font-size: 0.8rem; font-style: italic;
+}
+.readonly mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+/* ── ÉTAT VIDE ── */
+.empty-state { text-align: center; padding: 48px; color: #a8a29e; font-size: 0.9rem; }
+.empty-state span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+@media (max-width: 640px) {
+  .ticket-card-head { flex-direction: column; }
+  .ticket-actions { justify-content: stretch; }
+  .ticket-actions .btn { flex: 1; justify-content: center; }
+}

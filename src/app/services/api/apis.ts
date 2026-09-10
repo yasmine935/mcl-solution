@@ -58,6 +58,18 @@ export class ReclamationsApi extends ApiBase {
 }
 
 @Injectable({ providedIn: 'root' })
+export class TicketsClientApi extends ApiBase {
+  constructor() { super('tickets-client'); }
+
+  // Décisions des valideurs (le service backend applique le cycle de vie + « premier qui prend »)
+  valider(id: number, commentaire?: string): Observable<any> { return this.put(`${id}/valider`, { commentaire }); }
+  rejeter(id: number, commentaire?: string): Observable<any> { return this.put(`${id}/rejeter`, { commentaire }); }
+  prendreEnCharge(id: number): Observable<any> { return this.put(`${id}/prendre-en-charge`, {}); }
+  resoudre(id: number): Observable<any> { return this.put(`${id}/resoudre`, {}); }
+  cloturer(id: number): Observable<any> { return this.put(`${id}/cloturer`, {}); }
+}
+
+@Injectable({ providedIn: 'root' })
 export class MinutesSecuriteApi extends ApiBase {
   constructor() { super('minutes-securite'); }
 

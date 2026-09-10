@@ -12,6 +12,7 @@ export const DASHBOARD_PAR_ROLE: Record<string, string> = {
   COMPTABILITE: '/dashboard-naccera',
   SUPPLY_CHAIN: '/dashboard-aby',
   ADMINISTRATIF: '/dashboard-haideh',
+  CLIENT: '/dashboard-client',
 };
 
 export function dashboardPourRole(role: string | undefined): string {
