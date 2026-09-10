@@ -35,7 +35,13 @@
                   <span class="ticket-numero">{{ t.numero }}</span>
                   <strong>{{ t.titre }}</strong>
                 </div>
-                <span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span>
+                <div class="ticket-head-right">
+                  <span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span>
+                  <button class="btn-detail" type="button" (click)="ouvrirDetail(t)"
+                          title="Voir l'historique et répondre">
+                    <mat-icon>forum</mat-icon> Détail
+                  </button>
+                </div>
               </div>
 
               <div class="ticket-meta">
@@ -94,7 +100,7 @@
             </thead>
             <tbody>
               @for (t of tousLesTickets; track t.id) {
-                <tr>
+                <tr class="row-clickable" (click)="ouvrirDetail(t)" title="Voir le détail et l'historique">
                   <td><span class="ticket-numero">{{ t.numero }}</span></td>
                   <td>{{ t.titre }}</td>
                   <td>{{ t.client?.nom || '—' }}</td>
@@ -112,7 +118,7 @@
                       <span class="traite-par vide">— à prendre</span>
                     }
                   </td>
-                  <td>
+                  <td (click)="$event.stopPropagation()">
                     @if (estResponsable(t)) {
                       @if (t.statut === 'VALIDE') {
                         <button class="btn btn-suite" (click)="prendreEnCharge(t)">
@@ -141,6 +147,141 @@
           </table>
         </div>
       }
+    </div>
+  }
+
+  <!-- ════════════════════ DÉTAIL / TIMELINE ════════════════════ -->
+  @if (ticketSelectionne; as t) {
+    <div class="modal-overlay" (click)="fermerDetail()">
+      <div class="modal-detail" (click)="$event.stopPropagation()">
+
+        <!-- EN-TÊTE -->
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <span class="modal-num">{{ t.numero }}</span>
+            <span class="statut-badge" [ngClass]="statutClass(t.statut)">
+              <span class="dot"></span>{{ statutLabel(t.statut) }}
+            </span>
+          </div>
+          <button class="modal-close" type="button" (click)="fermerDetail()">✕</button>
+        </div>
+
+        <!-- CORPS -->
+        <div class="modal-body">
+
+          <!-- Infos du ticket -->
+          <div class="modal-section">
+            <h4 class="modal-titre">{{ t.titre }}</h4>
+            <div class="modal-info-row">
+              <div class="modal-info-item"><label>Client</label><span>{{ t.client?.nom || '—' }}</span></div>
+              <div class="modal-info-item"><label>Catégorie</label><span>{{ t.categorie || '—' }}</span></div>
+              <div class="modal-info-item">
+                <label>Priorité</label>
+                <span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span>
+              </div>
+              <div class="modal-info-item"><label>Créé le</label><span>{{ formatDate(t.dateCreation) }}</span></div>
+              <div class="modal-info-item"><label>Traité par</label><span>{{ t.traitePar?.nom || '—' }}</span></div>
+            </div>
+            @if (t.description) {
+              <p class="modal-desc">{{ t.description }}</p>
+            }
+          </div>
+
+          <!-- Timeline -->
+          <div class="modal-section">
+            <h4 class="modal-section-title"><mat-icon>history</mat-icon> Historique &amp; échanges</h4>
+
+            @if (chargementTimeline) {
+              <div class="timeline-empty">⏳ Chargement de l'historique…</div>
+            } @else if (timeline.length === 0) {
+              <div class="timeline-empty">Aucun événement pour ce ticket.</div>
+            } @else {
+              <ul class="timeline">
+                @for (ev of timeline; track $index) {
+                  @if (ev.type === 'COMMENTAIRE') {
+                    <li class="tl-item tl-comment" [class.from-client]="estCommentaireClient(ev)">
+                      <div class="bulle" [class.bulle-client]="estCommentaireClient(ev)">
+                        <div class="bulle-head">
+                          <span class="bulle-auteur">{{ auteurLabel(ev.auteur) }}</span>
+                          <span class="bulle-role" [class.role-client]="estCommentaireClient(ev)">
+                            {{ estCommentaireClient(ev) ? 'Client' : 'Interne' }}
+                          </span>
+                        </div>
+                        <p class="bulle-msg">{{ ev.message }}</p>
+                        <span class="bulle-date">{{ formatDate(ev.dateCreation) }}</span>
+                      </div>
+                    </li>
+                  } @else {
+                    <li class="tl-item tl-event">
+                      <span class="tl-dot"
+                            [ngClass]="ev.type === 'CREATION' ? 'tl-dot-creation' : 'tl-dot-statut'"></span>
+                      <div class="tl-content">
+                        <p class="tl-title">
+                          @if (ev.type === 'CREATION') {
+                            <mat-icon>add_circle</mat-icon> Ticket créé
+                          } @else {
+                            <mat-icon>swap_horiz</mat-icon>
+                            {{ statutLabel(ev.ancienStatut) }} → {{ statutLabel(ev.nouveauStatut) }}
+                          }
+                        </p>
+                        @if (ev.message) {
+                          <p class="tl-message">{{ ev.message }}</p>
+                        }
+                        <span class="tl-meta">{{ auteurLabel(ev.auteur) }} · {{ formatDate(ev.dateCreation) }}</span>
+                      </div>
+                    </li>
+                  }
+                }
+              </ul>
+            }
+          </div>
+        </div>
+
+        <!-- PIED : réponse + actions -->
+        <div class="modal-footer">
+          @if (detailErreur) {
+            <div class="detail-erreur"><mat-icon>error</mat-icon> {{ detailErreur }}</div>
+          }
+
+          <div class="repondre-zone">
+            <textarea class="fi" rows="2" placeholder="Écrire une réponse au client…"
+                      [(ngModel)]="nouveauCommentaire"></textarea>
+            <button class="btn btn-suite" type="button" (click)="repondre()"
+                    [disabled]="envoiEnCours || !nouveauCommentaire.trim()">
+              <mat-icon>send</mat-icon> {{ envoiEnCours ? 'Envoi…' : 'Répondre' }}
+            </button>
+          </div>
+
+          <!-- Actions de cycle de vie accessibles depuis le détail -->
+          @if (t.statut === 'EN_ATTENTE_VALIDATION' && !t.traitePar) {
+            <div class="modal-actions">
+              <button class="btn btn-valider" type="button" (click)="valider(t)">
+                <mat-icon>check</mat-icon> Valider
+              </button>
+              <button class="btn btn-rejeter" type="button" (click)="rejeter(t)">
+                <mat-icon>close</mat-icon> Rejeter
+              </button>
+            </div>
+          } @else if (estResponsable(t)) {
+            <div class="modal-actions">
+              @if (t.statut === 'VALIDE') {
+                <button class="btn btn-suite" type="button" (click)="prendreEnCharge(t)">
+                  <mat-icon>engineering</mat-icon> Prendre en charge
+                </button>
+              } @else if (t.statut === 'EN_COURS') {
+                <button class="btn btn-suite" type="button" (click)="resoudre(t)">
+                  <mat-icon>task_alt</mat-icon> Résoudre
+                </button>
+              } @else if (t.statut === 'RESOLU') {
+                <button class="btn btn-suite" type="button" (click)="cloturer(t)">
+                  <mat-icon>lock</mat-icon> Clôturer
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
     </div>
   }
 

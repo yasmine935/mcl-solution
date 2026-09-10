@@ -67,6 +67,10 @@ export class TicketsClientApi extends ApiBase {
   prendreEnCharge(id: number): Observable<any> { return this.put(`${id}/prendre-en-charge`, {}); }
   resoudre(id: number): Observable<any> { return this.put(`${id}/resoudre`, {}); }
   cloturer(id: number): Observable<any> { return this.put(`${id}/cloturer`, {}); }
+
+  // Timeline (historique + échanges) et ajout de commentaire
+  evenements(id: number): Observable<any[]> { return this.get(`${id}/evenements`); }
+  commenter(id: number, contenu: string): Observable<any> { return this.post(`${id}/commentaires`, { contenu }); }
 }
 
 @Injectable({ providedIn: 'root' })

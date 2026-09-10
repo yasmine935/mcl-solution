@@ -63,6 +63,19 @@ export class TicketsClientValideur implements OnInit {
   message = '';
   messageType: 'success' | 'error' | 'info' = 'info';
 
+  // ── Détail / timeline ───────────────────────────────────────
+
+  /** Ticket actuellement ouvert dans le panneau « Détail » (null = fermé). */
+  ticketSelectionne: TicketClient | null = null;
+  /** Événements de la timeline (historique + échanges) du ticket ouvert. */
+  timeline: any[] = [];
+  chargementTimeline = false;
+  /** Texte de réponse en cours de saisie dans le détail. */
+  nouveauCommentaire = '';
+  envoiEnCours = false;
+  /** Message d'erreur inline propre au panneau de détail. */
+  detailErreur = '';
+
   constructor(
     private readonly api: TicketsClientApi,
     private readonly auth: Auth
@@ -80,6 +93,14 @@ export class TicketsClientValideur implements OnInit {
       next: (data) => {
         this.tickets = Array.isArray(data) ? data : [];
         this.chargement = false;
+        // Si un ticket est ouvert dans le détail, on resynchronise son état
+        // (statut, responsable…) et on rafraîchit sa timeline.
+        const ouvert = this.ticketSelectionne;
+        if (ouvert) {
+          const maj = this.tickets.find((t) => t.id === ouvert.id);
+          this.ticketSelectionne = maj ?? ouvert;
+          this.chargerTimeline(ouvert.id);
+        }
       },
       error: () => {
         this.chargement = false;
@@ -162,11 +183,12 @@ export class TicketsClientValideur implements OnInit {
   }
 
   private gererErreur(err: any) {
-    if (err?.status === 409) {
-      this.afficherMessage('Ce ticket vient d\'être pris par un autre valideur', 'error');
-    } else {
-      this.afficherMessage('Une erreur est survenue. Veuillez réessayer.', 'error');
-    }
+    const texte = err?.status === 409
+      ? 'Ce ticket vient d\'être pris par un autre valideur'
+      : 'Une erreur est survenue. Veuillez réessayer.';
+    this.afficherMessage(texte, 'error');
+    // Si le détail est ouvert, on montre aussi l'erreur inline dans le panneau.
+    if (this.ticketSelectionne) this.detailErreur = texte;
     // Dans tous les cas on resynchronise l'état avec le backend.
     this.charger();
   }
@@ -178,6 +200,71 @@ export class TicketsClientValideur implements OnInit {
 
   fermerMessage() {
     this.message = '';
+  }
+
+  // ── Détail / timeline ───────────────────────────────────────
+
+  /** Ouvre le panneau de détail d'un ticket et charge sa timeline. */
+  ouvrirDetail(t: TicketClient) {
+    this.ticketSelectionne = t;
+    this.nouveauCommentaire = '';
+    this.detailErreur = '';
+    this.chargerTimeline(t.id);
+  }
+
+  fermerDetail() {
+    this.ticketSelectionne = null;
+    this.timeline = [];
+    this.nouveauCommentaire = '';
+    this.detailErreur = '';
+  }
+
+  /** (Re)charge la timeline (historique + échanges) d'un ticket. */
+  chargerTimeline(id: number) {
+    this.chargementTimeline = true;
+    this.api.evenements(id).subscribe({
+      next: (data) => {
+        this.timeline = Array.isArray(data) ? data : [];
+        this.chargementTimeline = false;
+      },
+      error: () => {
+        this.chargementTimeline = false;
+        this.detailErreur = 'Impossible de charger l\'historique du ticket.';
+      }
+    });
+  }
+
+  /** Ajoute un commentaire (réponse au client) puis recharge la timeline. */
+  repondre() {
+    if (!this.ticketSelectionne) return;
+    const texte = (this.nouveauCommentaire || '').trim();
+    if (!texte) return; // rien n'est envoyé si vide
+    const id = this.ticketSelectionne.id;
+    this.envoiEnCours = true;
+    this.detailErreur = '';
+    this.api.commenter(id, texte).subscribe({
+      next: () => {
+        this.envoiEnCours = false;
+        this.nouveauCommentaire = '';
+        this.chargerTimeline(id);
+      },
+      error: () => {
+        this.envoiEnCours = false;
+        this.detailErreur = 'Impossible d\'envoyer le commentaire. Veuillez réessayer.';
+      }
+    });
+  }
+
+  /** Vrai si l'auteur de l'événement est le client (vs un intervenant interne). */
+  estCommentaireClient(ev: any): boolean {
+    return ev?.auteur?.role === 'CLIENT';
+  }
+
+  /** Libellé lisible de l'auteur d'un événement (null = Système). */
+  auteurLabel(auteur: any): string {
+    if (!auteur) return 'Système';
+    const nomComplet = [auteur.prenom, auteur.nom].filter(Boolean).join(' ').trim();
+    return nomComplet || auteur.username || 'Système';
   }
 
   // ── Présentation ────────────────────────────────────────────

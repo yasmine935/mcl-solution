@@ -217,6 +217,83 @@
               <p>{{ ticketSelectionne.commentaireValidation }}</p>
             </div>
           }
+
+          <!-- ══ TIMELINE / HISTORIQUE & ÉCHANGES ══ -->
+          <div class="tc-timeline-section">
+            <label class="tc-timeline-label">Historique &amp; échanges</label>
+
+            @if (timelineEnCours) {
+              <div class="tc-timeline-state"><span>⏳</span> Chargement de l'historique…</div>
+            } @else if (timelineErreur) {
+              <div class="tc-timeline-state tc-timeline-state-error">
+                <span>⚠️</span> {{ timelineErreur }}
+                <button type="button" class="tc-btn-ghost tc-btn-sm" (click)="chargerTimeline(ticketSelectionne.id)">Réessayer</button>
+              </div>
+            } @else if (timeline.length === 0) {
+              <div class="tc-timeline-state"><span>📭</span> Aucun événement pour ce ticket.</div>
+            } @else {
+              <ul class="tc-timeline">
+                @for (ev of timeline; track ev.id) {
+                  @if (ev.type === 'COMMENTAIRE') {
+                    <!-- Bulle de discussion : client vs interne -->
+                    <li class="tc-tl-chat" [class.tc-tl-chat-client]="estCommentaireClient(ev)">
+                      <div class="tc-bubble" [class.tc-bubble-client]="estCommentaireClient(ev)">
+                        <div class="tc-bubble-head">
+                          <span class="tc-bubble-auteur">{{ getAuteurNom(ev.auteur) }}</span>
+                          <span class="tc-bubble-date">{{ ev.dateCreation ? (ev.dateCreation | date:'dd/MM/yyyy HH:mm') : '' }}</span>
+                        </div>
+                        <p class="tc-bubble-msg">{{ ev.message }}</p>
+                      </div>
+                    </li>
+                  } @else {
+                    <!-- Événement système (création / changement de statut) -->
+                    <li class="tc-tl-event">
+                      <span class="tc-tl-dot"
+                            [style.background]="ev.type === 'STATUT' ? getStatutColor(ev.nouveauStatut) : '#0d9488'"></span>
+                      <div class="tc-tl-content">
+                        <p class="tc-tl-title">
+                          @if (ev.type === 'CREATION') {
+                            Ticket créé
+                          } @else if (ev.type === 'STATUT') {
+                            Statut :
+                            <span class="tc-tl-statut" [style.color]="getStatutColor(ev.ancienStatut)">{{ getStatutLabel(ev.ancienStatut) }}</span>
+                            →
+                            <span class="tc-tl-statut" [style.color]="getStatutColor(ev.nouveauStatut)">{{ getStatutLabel(ev.nouveauStatut) }}</span>
+                          } @else {
+                            {{ ev.message || 'Événement' }}
+                          }
+                        </p>
+                        @if (ev.type === 'STATUT' && ev.message) {
+                          <p class="tc-tl-msg">{{ ev.message }}</p>
+                        }
+                        <span class="tc-tl-meta">
+                          {{ getAuteurNom(ev.auteur) }}
+                          @if (ev.dateCreation) { · {{ ev.dateCreation | date:'dd/MM/yyyy HH:mm' }} }
+                        </span>
+                      </div>
+                    </li>
+                  }
+                }
+              </ul>
+            }
+
+            <!-- ══ AJOUT DE COMMENTAIRE ══ -->
+            <div class="tc-comment-form">
+              @if (commentaireErreur) {
+                <div class="tc-alert tc-alert-error"><span>{{ commentaireErreur }}</span></div>
+              }
+              <textarea class="tc-input" rows="3" [(ngModel)]="nouveauCommentaire"
+                        [disabled]="commentaireEnCours"
+                        placeholder="Ajouter un commentaire…"></textarea>
+              <div class="tc-comment-actions">
+                <button type="button" class="tc-btn-primary"
+                        (click)="envoyerCommentaire()"
+                        [disabled]="commentaireEnCours || !nouveauCommentaire.trim()">
+                  {{ commentaireEnCours ? 'Envoi…' : 'Envoyer' }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="tc-modal-foot">

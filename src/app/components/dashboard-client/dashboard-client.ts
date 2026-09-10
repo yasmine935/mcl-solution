@@ -49,6 +49,16 @@ export class DashboardClient implements OnInit {
   ticketSelectionne: any = null;
   detailEnCours = false;
 
+  // ── Timeline (historique + échanges) ──
+  timeline: any[] = [];
+  timelineEnCours = false;
+  timelineErreur = '';
+
+  // ── Ajout de commentaire ──
+  nouveauCommentaire = '';
+  commentaireEnCours = false;
+  commentaireErreur = '';
+
   // ── Formulaire « nouveau ticket » ──
   categories = ['Matériel', 'Réseau', 'Logiciel', 'Autre'];
   priorites = ['Faible', 'Moyenne', 'Haute'];
@@ -126,6 +136,8 @@ export class DashboardClient implements OnInit {
     // Affichage immédiat avec la donnée de la liste, puis rafraîchissement via parId.
     this.ticketSelectionne = ticket;
     this.detailEnCours = true;
+    this.commentaireErreur = '';
+    this.nouveauCommentaire = '';
     this.ticketsApi.parId<any>(ticket.id).subscribe({
       next: (complet) => {
         if (complet) this.ticketSelectionne = complet;
@@ -133,11 +145,60 @@ export class DashboardClient implements OnInit {
       },
       error: () => { this.detailEnCours = false; }
     });
+    this.chargerTimeline(ticket.id);
   }
 
   fermerDetail() {
     this.ticketSelectionne = null;
     this.detailEnCours = false;
+    this.timeline = [];
+    this.timelineEnCours = false;
+    this.timelineErreur = '';
+    this.nouveauCommentaire = '';
+    this.commentaireEnCours = false;
+    this.commentaireErreur = '';
+  }
+
+  // ══════════ TIMELINE ══════════
+
+  chargerTimeline(id: number) {
+    this.timelineEnCours = true;
+    this.timelineErreur = '';
+    this.ticketsApi.evenements(id).subscribe({
+      next: (data) => {
+        this.timeline = data || [];
+        this.timelineEnCours = false;
+      },
+      error: () => {
+        this.timelineErreur = "Impossible de charger l'historique du ticket.";
+        this.timeline = [];
+        this.timelineEnCours = false;
+      }
+    });
+  }
+
+  envoyerCommentaire() {
+    this.commentaireErreur = '';
+    const contenu = this.nouveauCommentaire.trim();
+    if (!contenu) {
+      this.commentaireErreur = 'Veuillez saisir un commentaire avant de l\'envoyer.';
+      return;
+    }
+    if (!this.ticketSelectionne?.id) return;
+
+    const id = this.ticketSelectionne.id;
+    this.commentaireEnCours = true;
+    this.ticketsApi.commenter(id, contenu).subscribe({
+      next: () => {
+        this.commentaireEnCours = false;
+        this.nouveauCommentaire = '';
+        this.chargerTimeline(id);
+      },
+      error: () => {
+        this.commentaireEnCours = false;
+        this.commentaireErreur = "L'envoi du commentaire a échoué. Réessayez.";
+      }
+    });
   }
 
   // ══════════ CRÉATION ══════════
@@ -195,6 +256,16 @@ export class DashboardClient implements OnInit {
       Haute: '#dc2626'
     };
     return map[priorite] || '#546e7a';
+  }
+
+  getAuteurNom(auteur: any): string {
+    if (!auteur) return 'Système';
+    const nomComplet = [auteur.prenom, auteur.nom].filter(Boolean).join(' ').trim();
+    return nomComplet || auteur.username || 'Utilisateur';
+  }
+
+  estCommentaireClient(ev: any): boolean {
+    return ev?.auteur?.role === 'CLIENT';
   }
 
   getPageTitle(): string {

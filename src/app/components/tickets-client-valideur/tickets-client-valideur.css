@@ -152,8 +152,140 @@
 .empty-state { text-align: center; padding: 48px; color: #a8a29e; font-size: 0.9rem; }
 .empty-state span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
 
+/* ── BOUTON DÉTAIL / OUVERTURE ── */
+.ticket-head-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.btn-detail {
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 1.5px solid #fcd34d; background: #fff; color: #b45309;
+  border-radius: 8px; padding: 5px 12px; font-size: 0.76rem; font-weight: 700;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+.btn-detail:hover { background: #fef3c7; border-color: #b45309; }
+.btn-detail mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.row-clickable { cursor: pointer; }
+.row-clickable:hover { background: #fffbeb; }
+
+/* ── MODAL DÉTAIL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(41, 25, 5, 0.45); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-detail {
+  background: #fff; border-radius: 16px; width: 100%; max-width: 640px;
+  max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: slideDown 0.22s ease;
+}
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 16px 20px;
+  background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+}
+.modal-header-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.modal-num { font-size: 0.95rem; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
+.modal-header .statut-badge { background: rgba(255, 255, 255, 0.2); color: #fff; }
+.modal-close {
+  background: rgba(255, 255, 255, 0.18); border: none; color: #fff; cursor: pointer;
+  width: 30px; height: 30px; border-radius: 8px; font-size: 0.95rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+}
+.modal-close:hover { background: rgba(255, 255, 255, 0.35); }
+
+.modal-body {
+  flex: 1; overflow-y: auto; padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.modal-body::-webkit-scrollbar { width: 6px; }
+.modal-body::-webkit-scrollbar-thumb { background: #fde68a; border-radius: 4px; }
+
+.modal-titre { font-size: 1rem; font-weight: 800; color: #1a202c; margin: 0 0 12px; }
+.modal-info-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px;
+}
+.modal-info-item { display: flex; flex-direction: column; gap: 3px; }
+.modal-info-item label {
+  font-size: 0.66rem; font-weight: 700; color: #a8a29e;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.modal-info-item span { font-size: 0.84rem; color: #2d3748; font-weight: 600; }
+.modal-info-item .indic { align-self: flex-start; }
+.modal-desc {
+  font-size: 0.86rem; color: #44403c; line-height: 1.5; margin: 0;
+  background: #fffdf7; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 14px;
+}
+.modal-section-title {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.78rem; font-weight: 800; color: #78350f; margin: 0 0 14px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.modal-section-title mat-icon { font-size: 18px; width: 18px; height: 18px; color: #b45309; }
+
+/* ── TIMELINE ── */
+.timeline-empty { text-align: center; padding: 24px; color: #a8a29e; font-size: 0.85rem; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+
+/* Événement système (CREATION / STATUT) */
+.tl-event { display: flex; gap: 12px; align-items: flex-start; }
+.tl-dot {
+  width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
+  box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.12);
+}
+.tl-dot-creation { background: #78350f; }
+.tl-dot-statut { background: #b45309; }
+.tl-content { flex: 1; border-left: 2px solid #fde68a; padding-left: 12px; }
+.tl-title {
+  display: flex; align-items: center; gap: 6px; margin: 0 0 3px;
+  font-size: 0.85rem; font-weight: 700; color: #1a202c;
+}
+.tl-title mat-icon { font-size: 17px; width: 17px; height: 17px; color: #b45309; }
+.tl-message { margin: 2px 0; font-size: 0.82rem; color: #57534e; line-height: 1.45; }
+.tl-meta { font-size: 0.72rem; color: #a8a29e; font-weight: 600; }
+
+/* Commentaire (bulle) */
+.tl-comment { display: flex; }
+.tl-comment.from-client { justify-content: flex-start; }
+.tl-comment:not(.from-client) { justify-content: flex-end; }
+.bulle {
+  max-width: 80%; border-radius: 14px; padding: 10px 14px;
+  background: #fff7ed; border: 1.5px solid #fcd34d;
+}
+.bulle-client { background: #f1f5f9; border-color: #cbd5e1; }
+.bulle-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.bulle-auteur { font-size: 0.8rem; font-weight: 800; color: #1a202c; }
+.bulle-role {
+  font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+  padding: 2px 8px; border-radius: 12px; background: #fde68a; color: #78350f;
+}
+.bulle-role.role-client { background: #cbd5e1; color: #334155; }
+.bulle-msg { margin: 0 0 4px; font-size: 0.85rem; color: #292524; line-height: 1.5; white-space: pre-wrap; }
+.bulle-date { font-size: 0.7rem; color: #a8a29e; font-weight: 600; }
+
+/* ── PIED DE MODAL : RÉPONSE + ACTIONS ── */
+.modal-footer {
+  border-top: 1px solid #fde68a; padding: 16px 22px;
+  display: flex; flex-direction: column; gap: 12px; background: #fffdf7;
+}
+.detail-erreur {
+  display: flex; align-items: center; gap: 8px;
+  background: #ffebee; color: #c62828; border: 1px solid #ef9a9a;
+  border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; font-weight: 600;
+}
+.detail-erreur mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.repondre-zone { display: flex; gap: 10px; align-items: flex-end; }
+.repondre-zone .fi { flex: 1; }
+.repondre-zone .btn { white-space: nowrap; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+.modal-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
 @media (max-width: 640px) {
   .ticket-card-head { flex-direction: column; }
   .ticket-actions { justify-content: stretch; }
   .ticket-actions .btn { flex: 1; justify-content: center; }
+  .modal-info-row { grid-template-columns: 1fr 1fr; }
+  .repondre-zone { flex-direction: column; align-items: stretch; }
+  .repondre-zone .btn { justify-content: center; }
+  .bulle { max-width: 92%; }
 }

@@ -193,6 +193,72 @@ textarea.tc-input { resize: vertical; }
   padding: 16px 24px; border-top: 1px solid #eef2f1;
 }
 
+/* ══ TIMELINE / HISTORIQUE & ÉCHANGES ══ */
+.tc-timeline-section {
+  border-top: 1px solid #eef2f1; padding-top: 18px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.tc-timeline-label {
+  display: block; font-size: 0.72rem; font-weight: 800; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.tc-timeline-state {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 0.84rem; color: #64748b; font-weight: 600;
+  background: #f8fafa; border-radius: 12px; padding: 14px 16px;
+}
+.tc-timeline-state-error { color: #b91c1c; background: #fef2f2; }
+.tc-btn-sm { padding: 6px 12px; font-size: 0.78rem; }
+
+/* Liste de la timeline */
+.tc-timeline {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+/* Événement système (création / statut) */
+.tc-tl-event { display: flex; gap: 12px; align-items: flex-start; }
+.tc-tl-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+}
+.tc-tl-content { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.tc-tl-title { margin: 0; font-size: 0.86rem; font-weight: 700; color: #1f2a37; line-height: 1.4; }
+.tc-tl-statut { font-weight: 800; }
+.tc-tl-msg {
+  margin: 2px 0 0; font-size: 0.82rem; color: #475569; line-height: 1.45;
+  white-space: pre-wrap; font-style: italic;
+}
+.tc-tl-meta { font-size: 0.72rem; color: #94a3b8; font-weight: 600; }
+
+/* Bulles de discussion */
+.tc-tl-chat { display: flex; }
+.tc-tl-chat-client { justify-content: flex-end; }
+.tc-bubble {
+  max-width: 85%; border-radius: 14px; padding: 10px 14px;
+  background: #f0f4f3; border: 1px solid #e6eceb;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.tc-bubble-client {
+  background: #ccfbf1; border-color: #5eead4;
+  border-bottom-right-radius: 4px;
+}
+.tc-bubble:not(.tc-bubble-client) { border-bottom-left-radius: 4px; }
+.tc-bubble-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+}
+.tc-bubble-auteur { font-size: 0.78rem; font-weight: 800; color: #0f766e; }
+.tc-bubble-date { font-size: 0.68rem; color: #94a3b8; font-weight: 600; }
+.tc-bubble-msg { margin: 0; font-size: 0.86rem; color: #334155; line-height: 1.45; white-space: pre-wrap; }
+
+/* Formulaire d'ajout de commentaire */
+.tc-comment-form {
+  border-top: 1px dashed #dbe7e4; padding-top: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.tc-comment-form .tc-input { width: 100%; box-sizing: border-box; }
+.tc-comment-actions { display: flex; justify-content: flex-end; }
+
 /* ══ RESPONSIVE ══ */
 @media (max-width: 860px) {
   .tc-stats { grid-template-columns: repeat(2, 1fr); }
