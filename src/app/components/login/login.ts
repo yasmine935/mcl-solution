@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { dashboardPourRole } from '../../services/role-routes';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
@@ -45,20 +45,16 @@ export class Login implements OnInit {
   changePasswordLoading = false;
   changePasswordSuccess = false;
 
-  constructor(private readonly http: HttpClient, private readonly router: Router) {}
+  constructor(private readonly auth: Auth, private readonly router: Router) {}
 
   ngOnInit() {
     // Si l'utilisateur est déjà connecté (user + jeton), le rediriger directement
-    const stored = localStorage.getItem('user');
-    if (stored && localStorage.getItem('token')) {
-      try {
-        const user = JSON.parse(stored);
-        if (user?.role) { this.naviguerVersPage(user); }
-      } catch { localStorage.removeItem('user'); localStorage.removeItem('token'); }
+    const user = this.auth.utilisateurCourant();
+    if (user?.role) {
+      this.naviguerVersPage(user);
     } else {
-      // Session incomplète (user sans jeton, ou modale de changement abandonnée) : purge
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
+      // Session absente ou incomplète (modale de changement abandonnée) : purge
+      this.auth.deconnecter();
     }
   }
 
@@ -69,7 +65,7 @@ export class Login implements OnInit {
     if (!this.forgotUsername.trim()) { this.forgotError = 'Entrez votre nom d\'utilisateur'; return; }
     this.forgotLoading = true;
     this.forgotError = '';
-    this.http.post('http://localhost:8080/api/auth/forgot-password', { username: this.forgotUsername }, { responseType: 'text' }).subscribe({
+    this.auth.forgotPassword(this.forgotUsername).subscribe({
       next: () => { this.forgotLoading = false; this.forgotMessage = 'Demande envoyée ! L\'admin va réinitialiser votre mot de passe.'; },
       error: (e) => { this.forgotLoading = false; this.forgotError = e.status === 400 ? 'Nom d\'utilisateur introuvable.' : 'Erreur serveur, réessayez.'; }
     });
@@ -81,26 +77,20 @@ export class Login implements OnInit {
   }
 
   login() {
-    this.http.post<any>('http://localhost:8080/api/auth/login', {
-      username: this.username,
-      password: this.password
-    }).subscribe({
+    this.auth.login(this.username, this.password).subscribe({
       next: (res) => {
-        // Ne jamais persister le mot de passe côté navigateur
-        const { password: _pwd, ...safeUser } = res.user;
-        localStorage.setItem('token', res.token);
-        if (safeUser.premierConnexion) {
+        if (res.user.premierConnexion) {
           // Mot de passe temporaire → ne rien persister tant qu'il n'est pas changé
           // (sinon un rechargement de page permettrait de sauter cette étape)
-          this.pendingUser = safeUser;
+          this.pendingUser = res.user;
           this.newPassword = '';
           this.confirmPassword = '';
           this.changePasswordError = '';
           this.changePasswordSuccess = false;
           this.showChangePasswordModal = true;
         } else {
-          localStorage.setItem('user', JSON.stringify(safeUser));
-          this.naviguerVersPage(safeUser);
+          this.auth.persisterSession(res.user);
+          this.naviguerVersPage(res.user);
         }
       },
       error: () => {
@@ -111,8 +101,8 @@ export class Login implements OnInit {
 
   confirmerNouveauMotDePasse() {
     this.changePasswordError = '';
-    if (!this.newPassword || this.newPassword.length < 4) {
-      this.changePasswordError = 'Le mot de passe doit contenir au moins 4 caractères.';
+    if (!this.newPassword || this.newPassword.length < 8) {
+      this.changePasswordError = 'Le mot de passe doit contenir au moins 8 caractères.';
       return;
     }
     if (this.newPassword !== this.confirmPassword) {
@@ -120,16 +110,13 @@ export class Login implements OnInit {
       return;
     }
     this.changePasswordLoading = true;
-    this.http.put('http://localhost:8080/api/auth/change-password',
-      // Le backend exige désormais le mot de passe actuel (celui utilisé pour se connecter)
-      { username: this.pendingUser.username, currentPassword: this.password, newPassword: this.newPassword },
-      { responseType: 'text' }
-    ).subscribe({
+    // Le backend exige le mot de passe actuel (celui utilisé pour se connecter)
+    this.auth.changePassword(this.password, this.newPassword).subscribe({
       next: () => {
         this.changePasswordLoading = false;
         this.changePasswordSuccess = true;
         this.pendingUser.premierConnexion = false;
-        localStorage.setItem('user', JSON.stringify(this.pendingUser));
+        this.auth.persisterSession(this.pendingUser);
         setTimeout(() => {
           this.showChangePasswordModal = false;
           this.naviguerVersPage(this.pendingUser);
