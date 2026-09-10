@@ -62,7 +62,12 @@ export class TicketingComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    this.loadTickets();
+    // La liste des tickets (données personnelles) n'est chargée que pour les
+    // utilisateurs connectés. Sur la borne publique /nouveau-ticket, on ne
+    // montre que le formulaire de dépôt.
+    if (this.estConnecte) {
+      this.loadTickets();
+    }
   }
 
   // ✅ LOAD depuis le backend
