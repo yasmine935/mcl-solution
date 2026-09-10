@@ -164,7 +164,7 @@ export class DashboardKia implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('user');
+    localStorage.removeItem('user'); localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 }

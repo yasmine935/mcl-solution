@@ -53,7 +53,10 @@ export class Login implements OnInit {
       try {
         const user = JSON.parse(stored);
         if (user?.role) { this.naviguerVersPage(user); }
-      } catch { localStorage.removeItem('user'); }
+      } catch { localStorage.removeItem('user'); localStorage.removeItem('token'); }
+    } else {
+      // Pas de session : purge un éventuel jeton orphelin (ex. modale de changement abandonnée)
+      localStorage.removeItem('token');
     }
   }
 
@@ -93,20 +96,22 @@ export class Login implements OnInit {
       username: this.username,
       password: this.password
     }).subscribe({
-      next: (user) => {
-        localStorage.setItem('user', JSON.stringify(user));
-        const pwdChangedKey = `pwd_changed_${user.username}`;
-        const alreadyChanged = localStorage.getItem(pwdChangedKey) === 'true';
-        if (user.premierConnexion && !alreadyChanged) {
-          // Première connexion sur cet appareil → forcer changement de mot de passe
-          this.pendingUser = user;
+      next: (res) => {
+        // Ne jamais persister le mot de passe côté navigateur
+        const { password: _pwd, ...safeUser } = res.user;
+        localStorage.setItem('token', res.token);
+        if (safeUser.premierConnexion) {
+          // Mot de passe temporaire → ne rien persister tant qu'il n'est pas changé
+          // (sinon un rechargement de page permettrait de sauter cette étape)
+          this.pendingUser = safeUser;
           this.newPassword = '';
           this.confirmPassword = '';
           this.changePasswordError = '';
           this.changePasswordSuccess = false;
           this.showChangePasswordModal = true;
         } else {
-          this.naviguerVersPage(user);
+          localStorage.setItem('user', JSON.stringify(safeUser));
+          this.naviguerVersPage(safeUser);
         }
       },
       error: () => {
@@ -127,7 +132,8 @@ export class Login implements OnInit {
     }
     this.changePasswordLoading = true;
     this.http.put('http://localhost:8080/api/auth/change-password',
-      { username: this.pendingUser.username, newPassword: this.newPassword },
+      // Le backend exige désormais le mot de passe actuel (celui utilisé pour se connecter)
+      { username: this.pendingUser.username, currentPassword: this.password, newPassword: this.newPassword },
       { responseType: 'text' }
     ).subscribe({
       next: () => {
@@ -135,7 +141,6 @@ export class Login implements OnInit {
         this.changePasswordSuccess = true;
         this.pendingUser.premierConnexion = false;
         localStorage.setItem('user', JSON.stringify(this.pendingUser));
-        localStorage.setItem(`pwd_changed_${this.pendingUser.username}`, 'true');
         setTimeout(() => {
           this.showChangePasswordModal = false;
           this.naviguerVersPage(this.pendingUser);

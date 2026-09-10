@@ -646,7 +646,7 @@ getStatutVoitureColor(statut: string): string {
   closeSidebar() { this.sidebarOpen = false; }
 
   logout() {
-    localStorage.removeItem('user');
+    localStorage.removeItem('user'); localStorage.removeItem('token');
     this.router.navigate(['/login'], { replaceUrl: true });
   }
 }
