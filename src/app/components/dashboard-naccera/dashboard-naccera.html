@@ -1,189 +1,140 @@
-<div class="naccera-layout" [class.sidebar-open]="sidebarOpen">
+<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
+                      [pageTitle]="getPageTitle()" (pageChange)="currentPage = $event">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <div class="brand-logo">MCL</div>
-        <div class="brand-text">
-          <strong>MCL Groupe</strong>
-          <span>Comptabilite</span>
+  <!-- HOME -->
+  @if (currentPage === 'home') {
+    <!-- BANNIÈRE DE BIENVENUE -->
+    <div class="home-welcome">
+      <div class="home-welcome-left">
+        <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div class="home-welcome-text">
+          <h2>{{ user.nom }}</h2>
+          <p>Voici un aperçu de votre activité comptable</p>
         </div>
       </div>
-      <div class="user-card">
-        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-        <div>
-          <div class="user-name">{{ user.nom }}</div>
-          <span class="role-tag">Comptable</span>
+      <div class="home-welcome-badge"><mat-icon>receipt_long</mat-icon> Comptable MCL</div>
+    </div>
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card stat-purple" (click)="currentPage = 'ecritures'">
+        <div class="stat-card-bg"></div>
+        <div class="stat-card-icon"><mat-icon>book</mat-icon></div>
+        <div class="stat-card-body">
+          <span class="stat-card-label">Écritures comptables</span>
+          <span class="stat-card-number">{{ ecritures.length }}</span>
+          <span class="stat-card-sub">Journal →</span>
         </div>
       </div>
     </div>
 
-    <nav>
-      <div class="nav-section-label">Navigation</div>
-      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
-        <mat-icon>dashboard</mat-icon> Accueil
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'ecritures'" (click)="currentPage = 'ecritures'">
-        <mat-icon>book</mat-icon> Journal Comptable
-      </a>
-      <div class="nav-divider"></div>
-      <a class="nav-item logout" (click)="logout()">
-        <mat-icon>logout</mat-icon> Deconnexion
-      </a>
-    </nav>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main-content">
-    <div class="topbar">
-      <div class="topbar-left"><button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button><h3>{{ getPageTitle() }}</h3></div>
-      <div class="topbar-right">
-        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
-        <span class="role-badge-top">COMPTABILITE</span>
+    <!-- SOLDE -->
+    <div class="solde-card">
+      <div class="solde-item">
+        <span class="solde-label">Total Debit</span>
+        <span class="solde-num debit">{{ totalDebit | number }}€</span>
+      </div>
+      <div class="solde-sep">-</div>
+      <div class="solde-item">
+        <span class="solde-label">Total Credit</span>
+        <span class="solde-num credit">{{ totalCredit | number }}€</span>
+      </div>
+      <div class="solde-sep">=</div>
+      <div class="solde-item">
+        <span class="solde-label">Solde</span>
+        <span class="solde-num" [style.color]="solde >= 0 ? '#2e7d32' : '#c62828'">{{ solde | number }}€</span>
       </div>
     </div>
 
-    <div class="page-content">
-
-      <!-- HOME -->
-      @if (currentPage === 'home') {
-        <!-- BANNIÈRE DE BIENVENUE -->
-        <div class="home-welcome">
-          <div class="home-welcome-left">
-            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-            <div class="home-welcome-text">
-              <h2>{{ user.nom }}</h2>
-              <p>Voici un aperçu de votre activité comptable</p>
-            </div>
-          </div>
-          <div class="home-welcome-badge"><mat-icon>receipt_long</mat-icon> Comptable MCL</div>
-        </div>
-        <!-- STAT CARDS -->
-        <div class="stats-grid">
-          <div class="stat-card stat-purple" (click)="currentPage = 'ecritures'">
-            <div class="stat-card-bg"></div>
-            <div class="stat-card-icon"><mat-icon>book</mat-icon></div>
-            <div class="stat-card-body">
-              <span class="stat-card-label">Écritures comptables</span>
-              <span class="stat-card-number">{{ ecritures.length }}</span>
-              <span class="stat-card-sub">Journal →</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- SOLDE -->
-        <div class="solde-card">
-          <div class="solde-item">
-            <span class="solde-label">Total Debit</span>
-            <span class="solde-num debit">{{ totalDebit | number }}€</span>
-          </div>
-          <div class="solde-sep">-</div>
-          <div class="solde-item">
-            <span class="solde-label">Total Credit</span>
-            <span class="solde-num credit">{{ totalCredit | number }}€</span>
-          </div>
-          <div class="solde-sep">=</div>
-          <div class="solde-item">
-            <span class="solde-label">Solde</span>
-            <span class="solde-num" [style.color]="solde >= 0 ? '#2e7d32' : '#c62828'">{{ solde | number }}€</span>
-          </div>
-        </div>
-
-        <!-- DERNIÈRES ECRITURES -->
-        <div class="section-card">
-          <h3 class="section-title">📒 Dernieres Ecritures</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Libelle</th>
-                <th>Journal</th>
-                <th>Debit</th>
-                <th>Credit</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (e of ecritures.slice(0, 5); track e.id) {
-                <tr>
-                  <td>{{ e.date }}</td>
-                  <td>{{ e.libelle }}</td>
-                  <td><span class="journal-badge">{{ e.journal }}</span></td>
-                  <td class="td-debit">{{ e.debit ? (e.debit | number) + '€' : '-' }}</td>
-                  <td class="td-credit">{{ e.credit ? (e.credit | number) + '€' : '-' }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-
-      <!-- JOURNAL COMPTABLE -->
-      @if (currentPage === 'ecritures') {
-        <div class="section-card">
-          <div class="section-header">
-            <h3>📒 Journal Comptable</h3>
-            <button class="btn-add" (click)="showFormEcriture = !showFormEcriture">+ Nouvelle Ecriture</button>
-          </div>
-
-          @if (showFormEcriture) {
-            <div class="form-card">
-              <div class="form-grid-n">
-                <div class="fg"><label>Date *</label><input type="date" [(ngModel)]="nouvelleEcriture.date" class="fi"/></div>
-                <div class="fg"><label>Journal</label>
-                  <select [(ngModel)]="nouvelleEcriture.journal" class="fi">
-                    @for (j of journals; track j) { <option [value]="j">{{ j }}</option> }
-                  </select>
-                </div>
-                <div class="fg" style="grid-column:1/-1"><label>Libelle *</label><input type="text" [(ngModel)]="nouvelleEcriture.libelle" class="fi" placeholder="Description de l ecriture"/></div>
-                <div class="fg"><label>Compte</label><input type="text" [(ngModel)]="nouvelleEcriture.compte" class="fi" placeholder="Ex: 411000"/></div>
-                <div class="fg"><label>Debit (€)</label><input type="number" [(ngModel)]="nouvelleEcriture.debit" class="fi"/></div>
-                <div class="fg"><label>Credit (€)</label><input type="number" [(ngModel)]="nouvelleEcriture.credit" class="fi"/></div>
-              </div>
-              <div class="form-actions-n">
-                <button class="btn-save-n" (click)="ajouterEcriture()">💾 Sauvegarder</button>
-                <button class="btn-cancel-n" (click)="showFormEcriture = false">Annuler</button>
-              </div>
-            </div>
+    <!-- DERNIÈRES ECRITURES -->
+    <div class="section-card">
+      <h3 class="section-title">📒 Dernieres Ecritures</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Libelle</th>
+            <th>Journal</th>
+            <th>Debit</th>
+            <th>Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of ecritures.slice(0, 5); track e.id) {
+            <tr>
+              <td>{{ e.date }}</td>
+              <td>{{ e.libelle }}</td>
+              <td><span class="journal-badge">{{ e.journal }}</span></td>
+              <td class="td-debit">{{ e.debit ? (e.debit | number) + '€' : '-' }}</td>
+              <td class="td-credit">{{ e.credit ? (e.credit | number) + '€' : '-' }}</td>
+            </tr>
           }
+        </tbody>
+      </table>
+    </div>
+  }
 
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Libelle</th>
-                <th>Compte</th>
-                <th>Journal</th>
-                <th>Debit</th>
-                <th>Credit</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (e of ecritures; track e.id) {
-                <tr>
-                  <td>{{ e.date }}</td>
-                  <td>{{ e.libelle }}</td>
-                  <td><code>{{ e.compte || '-' }}</code></td>
-                  <td><span class="journal-badge">{{ e.journal }}</span></td>
-                  <td class="td-debit">{{ e.debit ? (e.debit | number) + '€' : '-' }}</td>
-                  <td class="td-credit">{{ e.credit ? (e.credit | number) + '€' : '-' }}</td>
-                  <td><button class="btn-del-n" (click)="supprimerEcriture(e.id)">🗑️</button></td>
-                </tr>
-              }
-              <tr class="total-row">
-                <td colspan="4"><strong>TOTAUX</strong></td>
-                <td class="td-debit"><strong>{{ totalDebit | number }}€</strong></td>
-                <td class="td-credit"><strong>{{ totalCredit | number }}€</strong></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
+  <!-- JOURNAL COMPTABLE -->
+  @if (currentPage === 'ecritures') {
+    <div class="section-card">
+      <div class="section-header">
+        <h3>📒 Journal Comptable</h3>
+        <button class="btn-add" (click)="showFormEcriture = !showFormEcriture">+ Nouvelle Ecriture</button>
+      </div>
+
+      @if (showFormEcriture) {
+        <div class="form-card">
+          <div class="form-grid-n">
+            <div class="fg"><label>Date *</label><input type="date" [(ngModel)]="nouvelleEcriture.date" class="fi"/></div>
+            <div class="fg"><label>Journal</label>
+              <select [(ngModel)]="nouvelleEcriture.journal" class="fi">
+                @for (j of journals; track j) { <option [value]="j">{{ j }}</option> }
+              </select>
+            </div>
+            <div class="fg" style="grid-column:1/-1"><label>Libelle *</label><input type="text" [(ngModel)]="nouvelleEcriture.libelle" class="fi" placeholder="Description de l ecriture"/></div>
+            <div class="fg"><label>Compte</label><input type="text" [(ngModel)]="nouvelleEcriture.compte" class="fi" placeholder="Ex: 411000"/></div>
+            <div class="fg"><label>Debit (€)</label><input type="number" [(ngModel)]="nouvelleEcriture.debit" class="fi"/></div>
+            <div class="fg"><label>Credit (€)</label><input type="number" [(ngModel)]="nouvelleEcriture.credit" class="fi"/></div>
+          </div>
+          <div class="form-actions-n">
+            <button class="btn-save-n" (click)="ajouterEcriture()">💾 Sauvegarder</button>
+            <button class="btn-cancel-n" (click)="showFormEcriture = false">Annuler</button>
+          </div>
         </div>
       }
 
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Libelle</th>
+            <th>Compte</th>
+            <th>Journal</th>
+            <th>Debit</th>
+            <th>Credit</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of ecritures; track e.id) {
+            <tr>
+              <td>{{ e.date }}</td>
+              <td>{{ e.libelle }}</td>
+              <td><code>{{ e.compte || '-' }}</code></td>
+              <td><span class="journal-badge">{{ e.journal }}</span></td>
+              <td class="td-debit">{{ e.debit ? (e.debit | number) + '€' : '-' }}</td>
+              <td class="td-credit">{{ e.credit ? (e.credit | number) + '€' : '-' }}</td>
+              <td><button class="btn-del-n" (click)="supprimerEcriture(e.id)">🗑️</button></td>
+            </tr>
+          }
+          <tr class="total-row">
+            <td colspan="4"><strong>TOTAUX</strong></td>
+            <td class="td-debit"><strong>{{ totalDebit | number }}€</strong></td>
+            <td class="td-credit"><strong>{{ totalCredit | number }}€</strong></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </div>
-  <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
-</div>
+  }
+
+</app-dashboard-layout>

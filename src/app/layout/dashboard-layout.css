@@ -1,0 +1,46 @@
+/* Châssis commun des espaces. Les variables --dl-* sont surchargées par
+   EspaceConfig (gradient/accent) ; les défauts ci-dessous sont le thème violet MCL.
+   Les règles responsive (hamburger, overlay, sidebar mobile) vivent dans styles.css. */
+
+:host {
+  display: block;
+  --dl-grad: linear-gradient(180deg, #1a0533 0%, #4a148c 50%, #6a1b9a 100%);
+  --dl-accent: #4a148c;
+  --dl-accent-soft: #ede7f6;
+  --dl-tag: #ce93d8;
+}
+
+.dashboard-layout { display: flex; min-height: 100vh; background: #f4f6f9; font-family: 'Exo 2', 'Segoe UI', sans-serif; }
+
+.sidebar { width: 260px; background: var(--dl-grad); display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.3); }
+
+.sidebar-header { padding: 24px 20px; }
+.sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.brand-logo { width: 44px; height: 44px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 900; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.brand-text strong { display: block; font-size: 0.95rem; font-weight: 800; color: #fff; }
+.brand-text span { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
+
+.user-card { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+.user-avatar { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 800; color: #fff; flex-shrink: 0; }
+.user-name { font-size: 0.85rem; font-weight: 700; color: #fff; }
+.role-tag { display: inline-block; background: rgba(255,255,255,0.2); color: var(--dl-tag); font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-top: 3px; }
+
+nav { padding: 0 12px 20px; flex: 1; }
+.nav-section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.35); padding: 16px 8px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 10px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.15s; font-size: 0.88rem; font-weight: 600; margin-bottom: 3px; text-decoration: none; }
+.nav-item:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.nav-item.active { background: rgba(255,255,255,0.2); color: #fff; font-weight: 700; }
+.nav-item mat-icon { font-size: 1.1rem; width: 20px; height: 20px; }
+.nav-item.logout { color: rgba(255,180,180,0.8); margin-top: 8px; }
+.nav-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 8px; }
+.nav-badge { margin-left: auto; background: #e53935; color: #fff; font-size: 0.68rem; font-weight: 800; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; }
+
+.main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar { background: #fff; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 2px solid var(--dl-accent-soft); }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-left h3 { font-size: 1.1rem; font-weight: 800; color: #1a2733; margin: 0; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-greeting { font-size: 0.88rem; color: #546e7a; }
+.role-badge-top { background: var(--dl-accent); color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; }
+
+.page-content { padding: 24px 28px; overflow-y: auto; flex: 1; }

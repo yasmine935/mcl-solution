@@ -1,337 +1,242 @@
-<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen">
+<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
+                      [pageTitle]="getPageTitle()" (pageChange)="currentPage = $event">
 
-  <!-- ══ SIDEBAR ══ -->
-  <div class="sidebar">
-    <div class="sidebar-close-btn"><button type="button" (click)="closeSidebar()">✕ Fermer</button></div>
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <div class="brand-icon">👑</div>
-        <div class="brand-text">
-          <strong>MCL Solutions</strong>
-          <span>Espace Propriétaire</span>
+  <!-- DASHBOARD STATS -->
+  @if (currentPage === 'dashboard') {
+    <div class="home-welcome">
+      <div class="home-welcome-left">
+        <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div class="home-welcome-text">
+          <h2>{{ user.nom }}</h2>
+          <p>Vue complète de MCL Solutions — toutes les rubriques disponibles</p>
         </div>
       </div>
-      <div class="user-card">
-        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-        <div>
-          <div class="user-name">{{ user.nom }}</div>
-          <span class="role-tag">⭐ Propriétaire</span>
-        </div>
+      <div class="home-welcome-badge"><mat-icon>star</mat-icon> Propriétaire</div>
+    </div>
+
+    <!-- BI CHARTS -->
+    <div class="bi-section">
+      <div class="bi-card">
+        <div class="bi-card-title"><mat-icon>bar_chart</mat-icon> Interventions / 6 derniers mois</div>
+        <apx-chart
+          [series]="chartFichesMoisSeries"
+          [chart]="chartBarOptions.chart"
+          [grid]="chartBarOptions.grid"
+          [colors]="['#5e35b1']"
+          [xaxis]="{ categories: chartFichesMoisCategories }">
+        </apx-chart>
+      </div>
+      <div class="bi-card">
+        <div class="bi-card-title"><mat-icon>donut_large</mat-icon> Statut des interventions</div>
+        <apx-chart
+          [series]="chartFichesStatutSeries"
+          [chart]="chartDonutOptions.chart"
+          [labels]="['En cours', 'Complétées', 'Validées']"
+          [colors]="['#5e35b1', '#f57f17', '#2e7d32']"
+          [legend]="chartDonutOptions.legend">
+        </apx-chart>
+      </div>
+      <div class="bi-card">
+        <div class="bi-card-title"><mat-icon>pie_chart</mat-icon> Congés par type</div>
+        <apx-chart
+          [series]="chartCongesTypeSeries"
+          [chart]="chartDonutOptions.chart"
+          [labels]="['Annuel', 'RTT', 'Maladie', 'Sans solde', 'Formation']"
+          [colors]="['#5e35b1', '#6a1b9a', '#e65100', '#c62828', '#00695c']"
+          [legend]="chartDonutOptions.legend">
+        </apx-chart>
+      </div>
+      <div class="bi-card">
+        <div class="bi-card-title"><mat-icon>task_alt</mat-icon> Statut des projets</div>
+        <apx-chart
+          [series]="chartTachesStatutSeries"
+          [chart]="chartDonutOptions.chart"
+          [labels]="['En qualification', 'En cours', 'Fait', 'Perdu', 'En attente']"
+          [colors]="['#546e7a', '#5e35b1', '#2e7d32', '#c62828', '#f57f17']"
+          [legend]="chartDonutOptions.legend">
+        </apx-chart>
+      </div>
+      <div class="bi-card">
+        <div class="bi-card-title"><mat-icon>flag</mat-icon> Priorité des projets</div>
+        <apx-chart
+          [series]="chartTachesPrioriteSeries"
+          [chart]="chartDonutOptions.chart"
+          [labels]="['Élevé', 'Moyenne', 'Faible']"
+          [colors]="['#c62828', '#f57f17', '#2e7d32']"
+          [legend]="chartDonutOptions.legend">
+        </apx-chart>
       </div>
     </div>
 
-    <nav>
-      <div class="nav-section-label">Général</div>
-      <a class="nav-item" [class.active]="currentPage === 'dashboard'" (click)="currentPage = 'dashboard'">
-        <mat-icon>dashboard</mat-icon> Dashboard
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Interventions</div>
-      <a class="nav-item" [class.active]="currentPage === 'fiches'" (click)="currentPage = 'fiches'">
-        <mat-icon>description</mat-icon> Fiches d'Intervention
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'fiches-completees'" (click)="currentPage = 'fiches-completees'">
-        <mat-icon>check_circle</mat-icon> Fiches Complétées
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Gestion</div>
-      <a class="nav-item" [class.active]="currentPage === 'projets'" (click)="currentPage = 'projets'">
-        <mat-icon>task_alt</mat-icon> Projets
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'clients'" (click)="currentPage = 'clients'">
-        <mat-icon>people</mat-icon> Clients
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
-        <mat-icon>calendar_month</mat-icon> Planning
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'semainier'" (click)="currentPage = 'semainier'">
-        <mat-icon>calendar_today</mat-icon> Semainier
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'documents'" (click)="currentPage = 'documents'">
-        <mat-icon>folder_open</mat-icon> Documents
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Finances</div>
-      <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
-        <mat-icon>assignment</mat-icon> Approvisionnement
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">RH &amp; Terrain</div>
-      <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
-        <mat-icon>beach_access</mat-icon> Congés
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'remontees'" (click)="currentPage = 'remontees'">
-        <mat-icon>report_problem</mat-icon> Remontées Terrain
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
-        <mat-icon>badge</mat-icon> Employés
-      </a>
-
-      <div class="nav-divider"></div>
-      <a class="nav-item logout" (click)="logout()">
-        <mat-icon>logout</mat-icon> Déconnexion
-      </a>
-    </nav>
-  </div>
-
-  <!-- ══ MAIN CONTENT ══ -->
-  <div class="main-content">
-    <div class="topbar">
-      <div class="topbar-left">
-        <button type="button" class="hamburger-btn" (click)="toggleSidebar()">☰</button>
-        <h3>{{ getPageTitle() }}</h3>
-      </div>
-      <div class="topbar-right">
-        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
-        <span class="role-badge">⭐ ESSAN</span>
+    <div class="home-actions-card">
+      <div class="home-actions-title"><mat-icon>bolt</mat-icon> Accès Rapide</div>
+      <div class="home-actions-grid">
+        <button type="button" class="home-action-btn" (click)="currentPage = 'fiches'">
+          <span class="home-action-icon home-action-blue"><mat-icon>description</mat-icon></span>
+          <span class="home-action-text"><strong>Fiches d'Intervention</strong><span>{{ totalFiches }} fiches</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
+        <button type="button" class="home-action-btn" (click)="currentPage = 'commandes'">
+          <span class="home-action-icon home-action-orange"><mat-icon>shopping_cart</mat-icon></span>
+          <span class="home-action-text"><strong>Commandes</strong><span>{{ totalCommandes }} commandes</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
+        <button type="button" class="home-action-btn" (click)="currentPage = 'remontees'">
+          <span class="home-action-icon home-action-red"><mat-icon>report_problem</mat-icon></span>
+          <span class="home-action-text"><strong>Remontées Terrain</strong><span>{{ totalReclamations }} remontées</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
+        <button type="button" class="home-action-btn" (click)="currentPage = 'stock'">
+          <span class="home-action-icon home-action-teal"><mat-icon>inventory</mat-icon></span>
+          <span class="home-action-text"><strong>Valeur du Stock</strong><span>{{ getTotalStockValue() | number:'1.2-2' }} €</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
+        <button type="button" class="home-action-btn" (click)="currentPage = 'conges'">
+          <span class="home-action-icon home-action-amber"><mat-icon>beach_access</mat-icon></span>
+          <span class="home-action-text"><strong>Congés en attente</strong><span>{{ totalConges }} demandes</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
       </div>
     </div>
+  }
 
-    <div class="page-content">
+  <!-- COMPOSANTS INTÉGRÉS — ESSAN en lecture seule -->
+  @if (currentPage === 'fiches') {
+    <app-fiche-intervention-manager [modeConsultation]="true"></app-fiche-intervention-manager>
+  }
+  @if (currentPage === 'fiches-completees') {
+    <app-fiches-completees></app-fiches-completees>
+  }
+  @if (currentPage === 'projets') {
+    <app-taches [modeConsultation]="true"></app-taches>
+  }
+  @if (currentPage === 'clients') {
+    <app-gestion-clients [modeConsultation]="true"></app-gestion-clients>
+  }
+  @if (currentPage === 'planning') {
+    <app-planning></app-planning>
+  }
+  @if (currentPage === 'semainier') {
+    <app-semenier></app-semenier>
+  }
+  @if (currentPage === 'documents') {
+    <app-documents></app-documents>
+  }
+  @if (currentPage === 'approvisionnement') {
+    <app-approvisionnement [modeConsultation]="true"></app-approvisionnement>
+  }
+  @if (currentPage === 'conges') {
+    <app-conges></app-conges>
+  }
+  @if (currentPage === 'remontees') {
+    <app-remontees-terrain></app-remontees-terrain>
+  }
 
-      <!-- DASHBOARD STATS -->
-      @if (currentPage === 'dashboard') {
-        <div class="home-welcome">
-          <div class="home-welcome-left">
-            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-            <div class="home-welcome-text">
-              <h2>{{ user.nom }}</h2>
-              <p>Vue complète de MCL Solutions — toutes les rubriques disponibles</p>
-            </div>
+  <!-- Stock — pas de composant standalone -->
+  @if (currentPage === 'stock') {
+    <div class="table-card">
+      <h3>📦 Stock ({{ stock.length }})</h3>
+      @if (stock.length === 0) {
+        <div class="empty">Aucun article en stock</div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr><th>Référence</th><th>Nom</th><th>Catégorie</th><th>Quantité</th><th>Prix Unitaire</th><th>Valeur Totale</th></tr>
+          </thead>
+          <tbody>
+            @for (a of stock; track a.id) {
+              <tr>
+                <td><strong>{{ a.reference }}</strong></td>
+                <td>{{ a.nom }}</td>
+                <td>{{ a.categorie }}</td>
+                <td>{{ a.quantite }}</td>
+                <td>{{ a.prixUnitaire }} €</td>
+                <td><strong>{{ a.quantite * a.prixUnitaire | number:'1.2-2' }} €</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- Commandes — pas de composant standalone -->
+  @if (currentPage === 'commandes') {
+    <div class="table-card">
+      <h3>🛒 Commandes ({{ commandes.length }})</h3>
+      @if (commandes.length === 0) {
+        <div class="empty">Aucune commande</div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr><th>Numéro</th><th>Fournisseur</th><th>Montant</th><th>Description</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            @for (c of commandes; track c.id) {
+              <tr>
+                <td><strong>{{ c.numero }}</strong></td>
+                <td>{{ c.fournisseur }}</td>
+                <td>{{ c.montant }} €</td>
+                <td>{{ c.description }}</td>
+                <td>{{ c.dateCreation | date:'dd/MM/yyyy' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- Employés -->
+  @if (currentPage === 'employes') {
+    <div class="emp-container">
+      <div class="emp-header">
+        <div class="emp-header-left">
+          <div class="emp-icon">👷</div>
+          <div>
+            <h2 class="emp-title">Employés</h2>
+            <p class="emp-subtitle">{{ employes.length }} membre(s) de l'équipe</p>
           </div>
-          <div class="home-welcome-badge"><mat-icon>star</mat-icon> Propriétaire</div>
         </div>
-
-        <!-- BI CHARTS -->
-        <div class="bi-section">
-          <div class="bi-card">
-            <div class="bi-card-title"><mat-icon>bar_chart</mat-icon> Interventions / 6 derniers mois</div>
-            <apx-chart
-              [series]="chartFichesMoisSeries"
-              [chart]="chartBarOptions.chart"
-              [grid]="chartBarOptions.grid"
-              [colors]="['#5e35b1']"
-              [xaxis]="{ categories: chartFichesMoisCategories }">
-            </apx-chart>
-          </div>
-          <div class="bi-card">
-            <div class="bi-card-title"><mat-icon>donut_large</mat-icon> Statut des interventions</div>
-            <apx-chart
-              [series]="chartFichesStatutSeries"
-              [chart]="chartDonutOptions.chart"
-              [labels]="['En cours', 'Complétées', 'Validées']"
-              [colors]="['#5e35b1', '#f57f17', '#2e7d32']"
-              [legend]="chartDonutOptions.legend">
-            </apx-chart>
-          </div>
-          <div class="bi-card">
-            <div class="bi-card-title"><mat-icon>pie_chart</mat-icon> Congés par type</div>
-            <apx-chart
-              [series]="chartCongesTypeSeries"
-              [chart]="chartDonutOptions.chart"
-              [labels]="['Annuel', 'RTT', 'Maladie', 'Sans solde', 'Formation']"
-              [colors]="['#5e35b1', '#6a1b9a', '#e65100', '#c62828', '#00695c']"
-              [legend]="chartDonutOptions.legend">
-            </apx-chart>
-          </div>
-          <div class="bi-card">
-            <div class="bi-card-title"><mat-icon>task_alt</mat-icon> Statut des projets</div>
-            <apx-chart
-              [series]="chartTachesStatutSeries"
-              [chart]="chartDonutOptions.chart"
-              [labels]="['En qualification', 'En cours', 'Fait', 'Perdu', 'En attente']"
-              [colors]="['#546e7a', '#5e35b1', '#2e7d32', '#c62828', '#f57f17']"
-              [legend]="chartDonutOptions.legend">
-            </apx-chart>
-          </div>
-          <div class="bi-card">
-            <div class="bi-card-title"><mat-icon>flag</mat-icon> Priorité des projets</div>
-            <apx-chart
-              [series]="chartTachesPrioriteSeries"
-              [chart]="chartDonutOptions.chart"
-              [labels]="['Élevé', 'Moyenne', 'Faible']"
-              [colors]="['#c62828', '#f57f17', '#2e7d32']"
-              [legend]="chartDonutOptions.legend">
-            </apx-chart>
-          </div>
-        </div>
-
-        <div class="home-actions-card">
-          <div class="home-actions-title"><mat-icon>bolt</mat-icon> Accès Rapide</div>
-          <div class="home-actions-grid">
-            <button type="button" class="home-action-btn" (click)="currentPage = 'fiches'">
-              <span class="home-action-icon home-action-blue"><mat-icon>description</mat-icon></span>
-              <span class="home-action-text"><strong>Fiches d'Intervention</strong><span>{{ totalFiches }} fiches</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-            <button type="button" class="home-action-btn" (click)="currentPage = 'commandes'">
-              <span class="home-action-icon home-action-orange"><mat-icon>shopping_cart</mat-icon></span>
-              <span class="home-action-text"><strong>Commandes</strong><span>{{ totalCommandes }} commandes</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-            <button type="button" class="home-action-btn" (click)="currentPage = 'remontees'">
-              <span class="home-action-icon home-action-red"><mat-icon>report_problem</mat-icon></span>
-              <span class="home-action-text"><strong>Remontées Terrain</strong><span>{{ totalReclamations }} remontées</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-            <button type="button" class="home-action-btn" (click)="currentPage = 'stock'">
-              <span class="home-action-icon home-action-teal"><mat-icon>inventory</mat-icon></span>
-              <span class="home-action-text"><strong>Valeur du Stock</strong><span>{{ getTotalStockValue() | number:'1.2-2' }} €</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-            <button type="button" class="home-action-btn" (click)="currentPage = 'conges'">
-              <span class="home-action-icon home-action-amber"><mat-icon>beach_access</mat-icon></span>
-              <span class="home-action-text"><strong>Congés en attente</strong><span>{{ totalConges }} demandes</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-          </div>
-        </div>
-      }
-
-      <!-- COMPOSANTS INTÉGRÉS — ESSAN en lecture seule -->
-      @if (currentPage === 'fiches') {
-        <app-fiche-intervention-manager [modeConsultation]="true"></app-fiche-intervention-manager>
-      }
-      @if (currentPage === 'fiches-completees') {
-        <app-fiches-completees></app-fiches-completees>
-      }
-      @if (currentPage === 'projets') {
-        <app-taches [modeConsultation]="true"></app-taches>
-      }
-      @if (currentPage === 'clients') {
-        <app-gestion-clients [modeConsultation]="true"></app-gestion-clients>
-      }
-      @if (currentPage === 'planning') {
-        <app-planning></app-planning>
-      }
-      @if (currentPage === 'semainier') {
-        <app-semenier></app-semenier>
-      }
-      @if (currentPage === 'documents') {
-        <app-documents></app-documents>
-      }
-      @if (currentPage === 'approvisionnement') {
-        <app-approvisionnement [modeConsultation]="true"></app-approvisionnement>
-      }
-      @if (currentPage === 'conges') {
-        <app-conges></app-conges>
-      }
-      @if (currentPage === 'remontees') {
-        <app-remontees-terrain></app-remontees-terrain>
-      }
-
-      <!-- Stock — pas de composant standalone -->
-      @if (currentPage === 'stock') {
-        <div class="table-card">
-          <h3>📦 Stock ({{ stock.length }})</h3>
-          @if (stock.length === 0) {
-            <div class="empty">Aucun article en stock</div>
-          } @else {
-            <table class="data-table">
-              <thead>
-                <tr><th>Référence</th><th>Nom</th><th>Catégorie</th><th>Quantité</th><th>Prix Unitaire</th><th>Valeur Totale</th></tr>
-              </thead>
-              <tbody>
-                @for (a of stock; track a.id) {
-                  <tr>
-                    <td><strong>{{ a.reference }}</strong></td>
-                    <td>{{ a.nom }}</td>
-                    <td>{{ a.categorie }}</td>
-                    <td>{{ a.quantite }}</td>
-                    <td>{{ a.prixUnitaire }} €</td>
-                    <td><strong>{{ a.quantite * a.prixUnitaire | number:'1.2-2' }} €</strong></td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
-        </div>
-      }
-
-      <!-- Commandes — pas de composant standalone -->
-      @if (currentPage === 'commandes') {
-        <div class="table-card">
-          <h3>🛒 Commandes ({{ commandes.length }})</h3>
-          @if (commandes.length === 0) {
-            <div class="empty">Aucune commande</div>
-          } @else {
-            <table class="data-table">
-              <thead>
-                <tr><th>Numéro</th><th>Fournisseur</th><th>Montant</th><th>Description</th><th>Date</th></tr>
-              </thead>
-              <tbody>
-                @for (c of commandes; track c.id) {
-                  <tr>
-                    <td><strong>{{ c.numero }}</strong></td>
-                    <td>{{ c.fournisseur }}</td>
-                    <td>{{ c.montant }} €</td>
-                    <td>{{ c.description }}</td>
-                    <td>{{ c.dateCreation | date:'dd/MM/yyyy' }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
-        </div>
-      }
-
-      <!-- Employés -->
-      @if (currentPage === 'employes') {
-        <div class="emp-container">
-          <div class="emp-header">
-            <div class="emp-header-left">
-              <div class="emp-icon">👷</div>
-              <div>
-                <h2 class="emp-title">Employés</h2>
-                <p class="emp-subtitle">{{ employes.length }} membre(s) de l'équipe</p>
+      </div>
+      @if (employes.length === 0) {
+        <div class="emp-empty">Aucun employé</div>
+      } @else {
+        <div class="emp-grid">
+          @for (e of employes; track e.id) {
+            <div class="emp-card emp-card-clickable" (click)="ouvrirDetail(e)" (keydown.enter)="ouvrirDetail(e)" tabindex="0">
+              <div class="emp-card-top">
+                <div class="emp-avatar" [style.background]="getRoleColor(e.role)">
+                  {{ e.prenom?.charAt(0) }}{{ e.nom?.charAt(0) }}
+                </div>
+                <div class="emp-info">
+                  <strong class="emp-nom">{{ e.prenom }} {{ e.nom }}</strong>
+                  <span class="emp-role-badge" [style.background]="getRoleColorLight(e.role)" [style.color]="getRoleColor(e.role)">{{ e.role }}</span>
+                </div>
               </div>
-            </div>
-          </div>
-          @if (employes.length === 0) {
-            <div class="emp-empty">Aucun employé</div>
-          } @else {
-            <div class="emp-grid">
-              @for (e of employes; track e.id) {
-                <div class="emp-card emp-card-clickable" (click)="ouvrirDetail(e)" (keydown.enter)="ouvrirDetail(e)" tabindex="0">
-                  <div class="emp-card-top">
-                    <div class="emp-avatar" [style.background]="getRoleColor(e.role)">
-                      {{ e.prenom?.charAt(0) }}{{ e.nom?.charAt(0) }}
-                    </div>
-                    <div class="emp-info">
-                      <strong class="emp-nom">{{ e.prenom }} {{ e.nom }}</strong>
-                      <span class="emp-role-badge" [style.background]="getRoleColorLight(e.role)" [style.color]="getRoleColor(e.role)">{{ e.role }}</span>
-                    </div>
-                  </div>
-                  @if (e.email) {
-                    <div class="emp-detail">
-                      <mat-icon class="emp-icon-sm">email</mat-icon>
-                      <span>{{ e.email }}</span>
-                    </div>
-                  }
-                  @if (e.telephone) {
-                    <div class="emp-detail">
-                      <mat-icon class="emp-icon-sm">phone</mat-icon>
-                      <span>{{ e.telephone }}</span>
-                    </div>
-                  }
-                  @if (!e.email) { @if (!e.telephone) {
-                    <span class="emp-no-info">Aucune information supplémentaire</span>
-                  } }
+              @if (e.email) {
+                <div class="emp-detail">
+                  <mat-icon class="emp-icon-sm">email</mat-icon>
+                  <span>{{ e.email }}</span>
                 </div>
               }
+              @if (e.telephone) {
+                <div class="emp-detail">
+                  <mat-icon class="emp-icon-sm">phone</mat-icon>
+                  <span>{{ e.telephone }}</span>
+                </div>
+              }
+              @if (!e.email) { @if (!e.telephone) {
+                <span class="emp-no-info">Aucune information supplémentaire</span>
+              } }
             </div>
           }
         </div>
       }
-
     </div>
-  </div>
-  <button type="button" class="sidebar-overlay" (click)="closeSidebar()" aria-label="Fermer le menu"></button>
-</div>
+  }
+
+</app-dashboard-layout>
 
 <!-- MODAL DÉTAIL EMPLOYÉ -->
 @if (showEmployeDetail && selectedEmploye) {

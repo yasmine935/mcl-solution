@@ -1,25 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Groupe',
+  sousTitre: 'Comptabilite',
+  roleLabel: 'Comptable',
+  badge: 'COMPTABILITE',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Accueil', section: 'Navigation' },
+    { key: 'ecritures', icon: 'book', label: 'Journal Comptable' }
+  ]
+};
 
 @Component({
   selector: 'app-dashboard-naccera',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, DashboardLayout],
   templateUrl: './dashboard-naccera.html',
   styleUrl: './dashboard-naccera.css'
 })
 export class DashboardNaccera implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
-
-  private _currentPage = 'home';
-  get currentPage(): string { return this._currentPage; }
-  set currentPage(value: string) { this._currentPage = value; }
+  currentPage = 'home';
 
   ecritures: any[] = [];
   showFormEcriture = false;
@@ -31,7 +39,7 @@ export class DashboardNaccera implements OnInit {
 
   journals = ['Achats', 'Ventes', 'Banque', 'Caisse', 'Operations Diverses'];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -81,9 +89,4 @@ export class DashboardNaccera implements OnInit {
     };
     return map[this.currentPage] || 'Comptabilite';
   }
-
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() { localStorage.removeItem('user'); localStorage.removeItem('token'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }

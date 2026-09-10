@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Taches } from '../taches/taches';
@@ -17,12 +18,37 @@ import { Conges } from '../conges/conges';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Solutions',
+  sousTitre: 'Espace Propriétaire',
+  roleLabel: '⭐ Propriétaire',
+  badge: '⭐ DIRECTION',
+  items: [
+    { key: 'dashboard', icon: 'dashboard', label: 'Dashboard', section: 'Général' },
+    { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention', section: 'Interventions' },
+    { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
+    { key: 'projets', icon: 'task_alt', label: 'Projets', section: 'Gestion' },
+    { key: 'clients', icon: 'people', label: 'Clients' },
+    { key: 'planning', icon: 'calendar_month', label: 'Planning' },
+    { key: 'semainier', icon: 'calendar_today', label: 'Semainier' },
+    { key: 'documents', icon: 'folder_open', label: 'Documents' },
+    { key: 'approvisionnement', icon: 'assignment', label: 'Approvisionnement', section: 'Finances' },
+    { key: 'conges', icon: 'beach_access', label: 'Congés', section: 'RH & Terrain' },
+    { key: 'remontees', icon: 'report_problem', label: 'Remontées Terrain' },
+    { key: 'employes', icon: 'badge', label: 'Employés' }
+  ],
+  gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
+  accent: '#5e35b1',
+  accentSoft: '#ede7f6',
+  tag: '#ce93d8'
+};
+
 @Component({
   selector: 'app-dashboard-essan',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatIconModule, MatButtonModule,
-    NgApexchartsModule,
+    NgApexchartsModule, DashboardLayout,
     FicheInterventionManager, FichesCompletees, Taches, GestionClients,
     Planning, Semainier, Documents, Conges,
     ApprovisionnementComponent, RemonteesTerrainComponent
@@ -31,8 +57,8 @@ import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrai
   styleUrl: './dashboard-essan.css'
 })
 export class DashboardEssan implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
   currentPage = 'dashboard';
 
   // Stats dashboard
@@ -193,8 +219,4 @@ export class DashboardEssan implements OnInit {
 
   ouvrirDetail(e: any) { this.selectedEmploye = e; this.showEmployeDetail = true; }
   fermerDetail() { this.showEmployeDetail = false; this.selectedEmploye = null; }
-
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-  logout() { localStorage.removeItem('user'); localStorage.removeItem('token'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }

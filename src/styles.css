@@ -1,5 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* Police de l'application — importée une seule fois ici (le layout partagé et les
+   dashboards y font référence sans l'importer eux-mêmes) */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap');
+
 /* ============================================================
    RESPONSIVE SIDEBAR — Global rules for all dashboards
    ============================================================ */

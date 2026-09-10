@@ -1,0 +1,63 @@
+<div class="dashboard-layout"
+     [class.sidebar-open]="sidebarOpen"
+     [style.--dl-grad]="config.gradient || null"
+     [style.--dl-accent]="config.accent || null"
+     [style.--dl-accent-soft]="config.accentSoft || null"
+     [style.--dl-tag]="config.tag || null">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-logo">MCL</div>
+        <div class="brand-text">
+          <strong>{{ config.brand }}</strong>
+          <span>{{ config.sousTitre }}</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div>
+          <div class="user-name">{{ user.nom }}</div>
+          <span class="role-tag">{{ config.roleLabel }}</span>
+        </div>
+      </div>
+    </div>
+
+    <nav>
+      @for (item of config.items; track item.key) {
+        @if (item.section) {
+          <div class="nav-section-label">{{ item.section }}</div>
+        }
+        <a class="nav-item" [class.active]="pageActive === item.key" (click)="naviguer(item.key)">
+          <mat-icon>{{ item.icon }}</mat-icon> {{ item.label }}
+          @if (badges[item.key]) {
+            <span class="nav-badge">{{ badges[item.key] }}</span>
+          }
+        </a>
+      }
+      <div class="nav-divider"></div>
+      <a class="nav-item logout" (click)="logout()">
+        <mat-icon>logout</mat-icon> Deconnexion
+      </a>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-left"><button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button><h3>{{ pageTitle }}</h3></div>
+      <div class="topbar-right">
+        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
+        <span class="role-badge-top">{{ config.badge }}</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <ng-content />
+    </div>
+  </div>
+
+  <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
+</div>

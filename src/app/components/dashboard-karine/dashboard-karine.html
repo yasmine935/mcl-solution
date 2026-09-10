@@ -1,310 +1,157 @@
-<div class="karine-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
+<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
+                      [pageTitle]="getPageTitle()" (pageChange)="currentPage = $event" [badges]="{ conges: congesEnAttente.length }"
+                      translate="no" lang="fr">
 
-  <!-- ══════════ SIDEBAR ══════════ -->
-  <div class="sidebar">
-    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <div class="brand-logo">MCL</div>
-        <div class="brand-text">
-          <strong>MCL Groupe</strong>
-          <span>Direction des RH</span>
+  <!-- ══ HOME ══ -->
+  @if (currentPage === 'home') {
+    <!-- BANNIÈRE DE BIENVENUE -->
+    <div class="home-welcome">
+      <div class="home-welcome-left">
+        <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
+        <div class="home-welcome-text">
+          <h2>{{ user.nom }}</h2>
+          <p>Voici un aperçu de votre activité RH du jour</p>
         </div>
       </div>
-      <div class="user-card">
-        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-        <div>
-          <div class="user-name">{{ user.nom }}</div>
-          <span class="role-tag">DRH</span>
-        </div>
-      </div>
+      <div class="home-welcome-badge"><mat-icon>manage_accounts</mat-icon> DRH MCL</div>
+    </div>
+    <!-- KPI COMPACTS -->
+    <div class="home-kpi-grid">
+      <button type="button" class="home-kpi-card" (click)="currentPage = 'conges'">
+        <span class="home-kpi-icon home-kpi-orange"><mat-icon>beach_access</mat-icon></span>
+        <span class="home-kpi-body">
+          <span class="home-kpi-num">{{ congesEnAttente.length }}</span>
+          <span class="home-kpi-label">Congés en attente</span>
+        </span>
+        <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+      </button>
+      <button type="button" class="home-kpi-card" (click)="currentPage = 'conges'">
+        <span class="home-kpi-icon home-kpi-vert"><mat-icon>check_circle</mat-icon></span>
+        <span class="home-kpi-body">
+          <span class="home-kpi-num">{{ congesApprouves.length }}</span>
+          <span class="home-kpi-label">Congés approuvés</span>
+        </span>
+        <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+      </button>
+      <button type="button" class="home-kpi-card" (click)="currentPage = 'employes'">
+        <span class="home-kpi-icon home-kpi-bleu"><mat-icon>people</mat-icon></span>
+        <span class="home-kpi-body">
+          <span class="home-kpi-num">{{ employes.length }}</span>
+          <span class="home-kpi-label">Employés actifs</span>
+        </span>
+        <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+      </button>
+      <button type="button" class="home-kpi-card" (click)="currentPage = 'voitures'">
+        <span class="home-kpi-icon home-kpi-violet"><mat-icon>directions_car</mat-icon></span>
+        <span class="home-kpi-body">
+          <span class="home-kpi-num">{{ voituresDisponibles.length }}</span>
+          <span class="home-kpi-label">Véhicules dispo.</span>
+        </span>
+        <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+      </button>
+      <button type="button" class="home-kpi-card" (click)="currentPage = 'sse'">
+        <span class="home-kpi-icon home-kpi-teal"><mat-icon>health_and_safety</mat-icon></span>
+        <span class="home-kpi-body">
+          <span class="home-kpi-num">{{ sseEnAttente.length }}</span>
+          <span class="home-kpi-label">SSE en attente</span>
+        </span>
+        <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
+      </button>
     </div>
 
-    <nav>
-      <div class="nav-section-label">Tableau de Bord</div>
-      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
-        <mat-icon>dashboard</mat-icon> Accueil
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">RH & Personnel</div>
-
-      <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
-        <mat-icon>beach_access</mat-icon> Congés
-        @if (congesEnAttente.length > 0) {
-          <span class="nav-badge">{{ congesEnAttente.length }}</span>
-        }
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'employes'" (click)="currentPage = 'employes'">
-        <mat-icon>people</mat-icon> Dossiers Personnel
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'reclamations'" 
-   (click)="currentPage = 'reclamations'">
-  <mat-icon>report_problem</mat-icon> Remontées Terrain
-</a>
-      <a class="nav-item" [class.active]="currentPage === 'voitures'" (click)="currentPage = 'voitures'">
-        <mat-icon>directions_car</mat-icon> Parc Automobile
-      </a>
-
-      <div class="nav-divider"></div>
-      <a class="nav-item logout" (click)="logout()">
-        <mat-icon>logout</mat-icon> Déconnexion
-      </a>
-    </nav>
-  </div>
-
-  <!-- ══════════ MAIN CONTENT ══════════ -->
-  <div class="main-content">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button>
-        <h3>{{ getPageTitle() }}</h3>
-      </div>
-      <div class="topbar-right">
-        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
-        <span class="role-badge-top">DRH</span>
+    <!-- ACTIONS RAPIDES -->
+    <div class="home-actions-card">
+      <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
+      <div class="home-actions-grid">
+        <button type="button" class="home-action-btn" (click)="currentPage = 'conges'">
+          <span class="home-action-icon home-action-orange"><mat-icon>beach_access</mat-icon></span>
+          <span class="home-action-text"><strong>Gérer les Congés</strong><span>{{ congesEnAttente.length }} en attente</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
+        <button type="button" class="home-action-btn" (click)="currentPage = 'sse'">
+          <span class="home-action-icon home-action-teal"><mat-icon>health_and_safety</mat-icon></span>
+          <span class="home-action-text"><strong>Remontées SSE</strong><span>{{ reclamationsSSE.length }} total</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
+        <button type="button" class="home-action-btn" (click)="currentPage = 'voitures'">
+          <span class="home-action-icon home-action-purple"><mat-icon>directions_car</mat-icon></span>
+          <span class="home-action-text"><strong>Parc Auto</strong><span>{{ voitures.length }} véhicules</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
+        <button type="button" class="home-action-btn" (click)="currentPage = 'employes'">
+          <span class="home-action-icon home-action-blue"><mat-icon>people</mat-icon></span>
+          <span class="home-action-text"><strong>Personnel</strong><span>{{ employes.length }} employés</span></span>
+          <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+        </button>
       </div>
     </div>
-
-    <div class="page-content">
-
-      <!-- ══ HOME ══ -->
-      @if (currentPage === 'home') {
-        <!-- BANNIÈRE DE BIENVENUE -->
-        <div class="home-welcome">
-          <div class="home-welcome-left">
-            <div class="home-welcome-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-            <div class="home-welcome-text">
-              <h2>{{ user.nom }}</h2>
-              <p>Voici un aperçu de votre activité RH du jour</p>
-            </div>
-          </div>
-          <div class="home-welcome-badge"><mat-icon>manage_accounts</mat-icon> DRH MCL</div>
-        </div>
-        <!-- KPI COMPACTS -->
-        <div class="home-kpi-grid">
-          <button type="button" class="home-kpi-card" (click)="currentPage = 'conges'">
-            <span class="home-kpi-icon home-kpi-orange"><mat-icon>beach_access</mat-icon></span>
-            <span class="home-kpi-body">
-              <span class="home-kpi-num">{{ congesEnAttente.length }}</span>
-              <span class="home-kpi-label">Congés en attente</span>
-            </span>
-            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
-          </button>
-          <button type="button" class="home-kpi-card" (click)="currentPage = 'conges'">
-            <span class="home-kpi-icon home-kpi-vert"><mat-icon>check_circle</mat-icon></span>
-            <span class="home-kpi-body">
-              <span class="home-kpi-num">{{ congesApprouves.length }}</span>
-              <span class="home-kpi-label">Congés approuvés</span>
-            </span>
-            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
-          </button>
-          <button type="button" class="home-kpi-card" (click)="currentPage = 'employes'">
-            <span class="home-kpi-icon home-kpi-bleu"><mat-icon>people</mat-icon></span>
-            <span class="home-kpi-body">
-              <span class="home-kpi-num">{{ employes.length }}</span>
-              <span class="home-kpi-label">Employés actifs</span>
-            </span>
-            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
-          </button>
-          <button type="button" class="home-kpi-card" (click)="currentPage = 'voitures'">
-            <span class="home-kpi-icon home-kpi-violet"><mat-icon>directions_car</mat-icon></span>
-            <span class="home-kpi-body">
-              <span class="home-kpi-num">{{ voituresDisponibles.length }}</span>
-              <span class="home-kpi-label">Véhicules dispo.</span>
-            </span>
-            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
-          </button>
-          <button type="button" class="home-kpi-card" (click)="currentPage = 'sse'">
-            <span class="home-kpi-icon home-kpi-teal"><mat-icon>health_and_safety</mat-icon></span>
-            <span class="home-kpi-body">
-              <span class="home-kpi-num">{{ sseEnAttente.length }}</span>
-              <span class="home-kpi-label">SSE en attente</span>
-            </span>
-            <mat-icon class="home-kpi-arrow">chevron_right</mat-icon>
-          </button>
-        </div>
-
-        <!-- ACTIONS RAPIDES -->
-        <div class="home-actions-card">
-          <div class="home-actions-title"><mat-icon>bolt</mat-icon> Actions Rapides</div>
-          <div class="home-actions-grid">
-            <button type="button" class="home-action-btn" (click)="currentPage = 'conges'">
-              <span class="home-action-icon home-action-orange"><mat-icon>beach_access</mat-icon></span>
-              <span class="home-action-text"><strong>Gérer les Congés</strong><span>{{ congesEnAttente.length }} en attente</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-            <button type="button" class="home-action-btn" (click)="currentPage = 'sse'">
-              <span class="home-action-icon home-action-teal"><mat-icon>health_and_safety</mat-icon></span>
-              <span class="home-action-text"><strong>Remontées SSE</strong><span>{{ reclamationsSSE.length }} total</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-            <button type="button" class="home-action-btn" (click)="currentPage = 'voitures'">
-              <span class="home-action-icon home-action-purple"><mat-icon>directions_car</mat-icon></span>
-              <span class="home-action-text"><strong>Parc Auto</strong><span>{{ voitures.length }} véhicules</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-            <button type="button" class="home-action-btn" (click)="currentPage = 'employes'">
-              <span class="home-action-icon home-action-blue"><mat-icon>people</mat-icon></span>
-              <span class="home-action-text"><strong>Personnel</strong><span>{{ employes.length }} employés</span></span>
-              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
-            </button>
-          </div>
-        </div>
-      }
+  }
 <!--remontees terrain -->
 @if (currentPage === 'reclamations') {
   <app-remontees-terrain></app-remontees-terrain>
 }
-      <!-- ══ CONGÉS ══ -->
-      @if (currentPage === 'conges') {
-        <div class="section-card">
-          <div class="section-header">
-            <h3>🏖️ Congés Approuvés — À Traiter</h3>
-            <div class="filter-pills">
-              <span class="pill pill-green">{{ congesApprouves.length }} approuvés</span>
-              <span class="pill pill-grey">{{ congesTraites.length }} traités</span>
-            </div>
-          </div>
+  <!-- ══ CONGÉS ══ -->
+  @if (currentPage === 'conges') {
+    <div class="section-card">
+      <div class="section-header">
+        <h3>🏖️ Congés Approuvés — À Traiter</h3>
+        <div class="filter-pills">
+          <span class="pill pill-green">{{ congesApprouves.length }} approuvés</span>
+          <span class="pill pill-grey">{{ congesTraites.length }} traités</span>
+        </div>
+      </div>
 
-          @if (congesApprouves.length === 0) {
-            <div class="empty-state"><span>🏖️</span><p>Aucun congé approuvé à traiter</p></div>
-          } @else {
-            <div class="conges-list">
-              @for (c of congesApprouves; track c.id) {
-                <div class="conge-card conge-approuve">
-                  <div class="conge-bar bar-approuve"></div>
-                  <div class="conge-body">
-                    <div class="conge-top">
-                      <div class="conge-employe">
-                        <div class="emp-avatar">{{ c.utilisateur?.prenom?.charAt(0) }}{{ c.utilisateur?.nom?.charAt(0) }}</div>
-                        <div>
-                          <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
-                          <span class="conge-type">{{ c.type }}</span>
-                        </div>
-                      </div>
-                      <span class="statut-pill pill-approuve">✅ Approuvé</span>
-                    </div>
-                    <div class="conge-dates">
-                      <span>📅 Du {{ c.dateDebut }}</span>
-                      <span>→</span>
-                      <span>Au {{ c.dateFin }}</span>
-                      @if (c.motif) { <span class="motif">💬 {{ c.motif }}</span> }
-                    </div>
-                    <div class="conge-actions">
-                      <button class="btn-action btn-traiter" (click)="ouvrirTraiter(c)">📋 Traiter</button>
+      @if (congesApprouves.length === 0) {
+        <div class="empty-state"><span>🏖️</span><p>Aucun congé approuvé à traiter</p></div>
+      } @else {
+        <div class="conges-list">
+          @for (c of congesApprouves; track c.id) {
+            <div class="conge-card conge-approuve">
+              <div class="conge-bar bar-approuve"></div>
+              <div class="conge-body">
+                <div class="conge-top">
+                  <div class="conge-employe">
+                    <div class="emp-avatar">{{ c.utilisateur?.prenom?.charAt(0) }}{{ c.utilisateur?.nom?.charAt(0) }}</div>
+                    <div>
+                      <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
+                      <span class="conge-type">{{ c.type }}</span>
                     </div>
                   </div>
+                  <span class="statut-pill pill-approuve">✅ Approuvé</span>
                 </div>
-              }
+                <div class="conge-dates">
+                  <span>📅 Du {{ c.dateDebut }}</span>
+                  <span>→</span>
+                  <span>Au {{ c.dateFin }}</span>
+                  @if (c.motif) { <span class="motif">💬 {{ c.motif }}</span> }
+                </div>
+                <div class="conge-actions">
+                  <button class="btn-action btn-traiter" (click)="ouvrirTraiter(c)">📋 Traiter</button>
+                </div>
+              </div>
             </div>
           }
         </div>
       }
+    </div>
+  }
 
-      <!-- modal moved to bottom of karine-layout -->
-      @if (false) {
-        @if (congeSelectionne) {
-          <div class="modal-overlay-traiter" (click)="fermerTraiter()">
-            <div class="modal-traiter" (click)="$event.stopPropagation()">
+  <!-- ══ DOSSIERS PERSONNEL ══ -->
+  @if (currentPage === 'employes') {
+    <app-employes></app-employes>
+  }
 
-              <!-- HEADER -->
-              <div class="modal-traiter-header">
-                <div class="modal-traiter-id">
-                  <span class="conge-ref">CONGÉ-{{ congeSelectionne.id }}</span>
-                  <span class="badge-approuve">APPROUVÉ</span>
-                </div>
-                <button type="button" class="modal-close-x" (click)="fermerTraiter()">✕</button>
-              </div>
-
-              <!-- INFOS -->
-              <div class="modal-traiter-body">
-                <div class="traiter-info-grid">
-                  <div class="traiter-info-cell">
-                    <span class="ti-icon">👤</span>
-                    <div>
-                      <p class="ti-label">EMPLOYÉ</p>
-                      <p class="ti-val">{{ congeSelectionne.utilisateur?.prenom }} {{ congeSelectionne.utilisateur?.nom }}</p>
-                    </div>
-                  </div>
-                  <div class="traiter-info-cell">
-                    <span class="ti-icon">📅</span>
-                    <div>
-                      <p class="ti-label">DATE DÉBUT</p>
-                      <p class="ti-val">{{ congeSelectionne.dateDebut }}</p>
-                    </div>
-                  </div>
-                  <div class="traiter-info-cell">
-                    <span class="ti-icon">📅</span>
-                    <div>
-                      <p class="ti-label">DATE FIN</p>
-                      <p class="ti-val">{{ congeSelectionne.dateFin }}</p>
-                    </div>
-                  </div>
-                  <div class="traiter-info-cell">
-                    <span class="ti-icon">🏷️</span>
-                    <div>
-                      <p class="ti-label">TYPE</p>
-                      <p class="ti-val">{{ congeSelectionne.type || '—' }}</p>
-                    </div>
-                  </div>
-                </div>
-
-                @if (congeSelectionne.motif) {
-                  <div class="traiter-section">
-                    <div class="traiter-section-title">💬 MOTIF</div>
-                    <div class="traiter-text-box">{{ congeSelectionne.motif }}</div>
-                  </div>
-                }
-
-                <div class="traiter-section">
-                  <div class="traiter-section-title">📝 NOTE DE TRAITEMENT (optionnel)</div>
-                  <textarea class="traiter-textarea" [(ngModel)]="noteTraitement"
-                    placeholder="Ajouter une note de traitement RH..."></textarea>
-                </div>
-
-                @if (traitementSuccess) {
-                  <div class="traiter-success">✅ Congé marqué comme traité !</div>
-                }
-              </div>
-
-              <!-- FOOTER -->
-              <div class="modal-traiter-footer">
-                <button type="button" class="btn-traiter-confirm" (click)="confirmerTraitement()" [disabled]="traitementSuccess">
-                  📋 Marquer comme Traité
-                </button>
-                <button type="button" class="btn-traiter-close" (click)="fermerTraiter()">✕ Fermer</button>
-              </div>
-
-            </div>
-          </div>
-        }
-      }
-
-      <!-- ══ DOSSIERS PERSONNEL ══ -->
-      @if (currentPage === 'employes') {
-        <app-employes></app-employes>
-      }
-
-      <!-- ══ SSE ══ -->
-     @if (currentPage === 'sse') {
+  <!-- ══ SSE ══ -->
+ @if (currentPage === 'sse') {
   <app-remontees-terrain></app-remontees-terrain>
 }
-      <!-- ══ VOITURES ══ -->
-     
-       @if (currentPage === 'voitures') {
+  <!-- ══ VOITURES ══ -->
+
+   @if (currentPage === 'voitures') {
   <app-voitures></app-voitures>
-}  
-           
-      
+}
 
-    </div>
-  </div>
-  <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
-
-  <!-- ══ MODAL TRAITER CONGÉ — hors de tout conteneur scrollable ══ -->
+  <!-- ══ MODAL TRAITER CONGÉ (position: fixed — indépendant du scroll) ══ -->
   @if (showTraiterModal && congeSelectionne) {
     <div class="modal-overlay-traiter" (click)="fermerTraiter()">
       <div class="modal-traiter" (click)="$event.stopPropagation()">
@@ -378,4 +225,4 @@
     </div>
   }
 
-</div>
+</app-dashboard-layout>

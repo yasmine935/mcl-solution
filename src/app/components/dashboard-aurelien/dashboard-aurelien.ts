@@ -1,7 +1,6 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +16,31 @@ import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Solutions',
+  sousTitre: 'Espace Manager',
+  roleLabel: 'Manager',
+  badge: 'MANAGER',
+  gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
+  accent: '#283593',
+  accentSoft: '#e8eaf6',
+  tag: '#9fa8da',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Dashboard', section: 'Principal' },
+    { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention' },
+    { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
+    { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'planning', icon: 'calendar_month', label: 'Planning' },
+    { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
+    { key: 'ged', icon: 'folder_open', label: 'Documents' },
+    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
+    { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés', section: 'Support' },
+    { key: 'messagerie', icon: 'email', label: 'Messagerie MCL', section: 'Communication' },
+    { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' }
+  ]
+};
 
 @Component({
   selector: 'app-dashboard-aurelien',
@@ -27,20 +51,25 @@ import { GestionClients } from '../clients/clients';
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Taches, FichesCompletees,
     Documents, Semainier, Planning, TicketingComponent,
-    ApprovisionnementComponent, GestionClients
+    ApprovisionnementComponent, GestionClients, DashboardLayout
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
 })
 export class DashboardAurelien implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) {
     this.fermerDetailFiche();
     this._currentPage = value;
+  }
+
+  onPageChange(page: string) {
+    this.currentPage = page;
+    if (page === 'messagerie') this.loadMessages();
   }
 
   showCongeForm = false;
@@ -67,7 +96,7 @@ export class DashboardAurelien implements OnInit {
   nombreJours = 0;
   congeEnEditionId: number | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -226,7 +255,7 @@ loadSoldeConges() {
   this.http.get<any>(`http://localhost:8080/api/conges/solde/${this.user.id}`).subscribe({
     next: (data) => this.soldeConges = data,
     error: () => this.soldeConges = null ,
-    
+
   });
 }
   ouvrirDetailFiche(fiche: any) { this.selectedFiche = fiche; this.showDetailModal = true; }
@@ -302,11 +331,4 @@ loadSoldeConges() {
       default: return 'Dashboard';
     }
   }
-
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() { localStorage.removeItem('user'); localStorage.removeItem('token'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }
-
-

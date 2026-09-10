@@ -1,13 +1,13 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Documents } from '../documents/documents';
@@ -20,13 +20,39 @@ import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
 
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Solutions',
+  sousTitre: 'Espace Manager',
+  roleLabel: 'Manager',
+  badge: 'MANAGER',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Dashboard', section: 'Principal' },
+    { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention' },
+    { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
+    { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'planning', icon: 'calendar_month', label: 'Planning' },
+    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
+    { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
+    { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
+    { key: 'ged', icon: 'folder_open', label: 'Documents' },
+    { key: 'approvisionnement', icon: 'assignment', label: 'Demandes Appro.', section: 'Approvisionnement' },
+    { key: 'remonteesTerrain', icon: 'report_problem', label: 'Remontées Terrain', section: 'Support' },
+    { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' }
+  ],
+  // Thème Bleu Acier / Dark Navy de l'ancien CSS (différent du violet par défaut du layout)
+  gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
+  accent: '#0277bd',
+  accentSoft: '#e1f5fe',
+  tag: '#81d4fa'
+};
+
 @Component({
   selector: 'app-dashboard-odile',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule,
+    MatInputModule, MatSelectModule, DashboardLayout,
     FicheInterventionManager, FichesCompletees, Documents, Semainier, Planning,
     TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail
   ],
@@ -34,8 +60,8 @@ import { JournalTravail } from '../journal-travail/journal-travail';
   styleUrl: './dashboard-odile.css'
 })
 export class DashboardOdile implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
   set currentPage(value: string) {
@@ -68,7 +94,7 @@ export class DashboardOdile implements OnInit {
   conge = { dateDebut: '', dateFin: '', type: '', motif: '', description: '', periode: '' };
   nombreJours = 0;
   congeEnEditionId: number | null = null;
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadData();
@@ -222,10 +248,6 @@ export class DashboardOdile implements OnInit {
       default: return 'Dashboard Odile';
     }
   }
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() { localStorage.removeItem('user'); localStorage.removeItem('token'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }
 
 

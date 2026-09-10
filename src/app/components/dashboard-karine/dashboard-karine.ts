@@ -1,24 +1,42 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { Voitures } from '../voitures/voitures';
 import { Employes } from '../employes/employes';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Groupe',
+  sousTitre: 'Direction des RH',
+  roleLabel: 'DRH',
+  badge: 'DRH',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Accueil', section: 'Tableau de Bord' },
+    { key: 'conges', icon: 'beach_access', label: 'Congés', section: 'RH & Personnel' },
+    { key: 'employes', icon: 'people', label: 'Dossiers Personnel' },
+    { key: 'reclamations', icon: 'report_problem', label: 'Remontées Terrain' },
+    { key: 'voitures', icon: 'directions_car', label: 'Parc Automobile' }
+  ],
+  gradient: 'linear-gradient(180deg, #1e1b4b 0%, #4338ca 40%, #6366f1 100%)',
+  accent: '#4338ca',
+  accentSoft: '#e0e7ff',
+  tag: 'rgba(255,255,255,0.9)'
+};
 
 @Component({
   selector: 'app-dashboard-karine',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, RemonteesTerrainComponent, Voitures, Employes],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, RemonteesTerrainComponent, Voitures, Employes, DashboardLayout],
   templateUrl: './dashboard-karine.html',
   styleUrl: './dashboard-karine.css'
 })
 export class DashboardKarine implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
@@ -45,7 +63,7 @@ export class DashboardKarine implements OnInit {
 };
   statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -190,11 +208,4 @@ getRoleColor(role: string): string {
   };
   return map[role] || '#546e7a';
 }
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() {
-    localStorage.removeItem('user'); localStorage.removeItem('token');
-    this.router.navigate(['/login'], { replaceUrl: true });
-  }
 }
