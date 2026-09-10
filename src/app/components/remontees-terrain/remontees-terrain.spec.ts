@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RemonteesTerrain } from './remontees-terrain';
+import { RemonteesTerrainComponent } from './remontees-terrain';
 
-describe('RemonteesTerrain', () => {
-  let component: RemonteesTerrain;
-  let fixture: ComponentFixture<RemonteesTerrain>;
+describe('RemonteesTerrainComponent', () => {
+  let component: RemonteesTerrainComponent;
+  let fixture: ComponentFixture<RemonteesTerrainComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RemonteesTerrain],
+      imports: [RemonteesTerrainComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(RemonteesTerrain);
+    fixture = TestBed.createComponent(RemonteesTerrainComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
