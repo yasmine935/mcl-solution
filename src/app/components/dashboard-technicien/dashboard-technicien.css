@@ -1,255 +1,6 @@
-/* ============================================================
-   DASHBOARD TECHNICIEN — MCL Solutions
-   Accent: Bleu Marine #01579b
-   Base: Dark Navy sidebar (cohérent avec tous les dashboards)
-   ============================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap');
+/* Styles des pages Technicien — le châssis vit dans layout/dashboard-layout.css */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-.dashboard-layout {
-  display: flex;
-  height: 100vh;
-  font-family: 'Exo 2', 'Segoe UI', sans-serif;
-  background: #f0f4f8;
-  overflow: hidden;
-}
-
-/* ══════════════════════════════════════════
-   SIDEBAR
-   ══════════════════════════════════════════ */
-.sidebar {
-  width: 260px;
-  min-width: 260px;
-  background: linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-}
-
-.sidebar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(1,87,155,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(1,87,155,0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
-  pointer-events: none;
-}
-
-.sidebar::after {
-  content: '';
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(1,87,155,0.22), transparent 70%);
-  pointer-events: none;
-}
-
-.sidebar-header {
-  padding: 24px 20px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  position: relative;
-  z-index: 1;
-}
-
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.brand-icon {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, #01579b, #0288d1);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 12px rgba(1,87,155,0.5);
-  flex-shrink: 0;
-}
-
-.brand-text strong {
-  display: block;
-  font-size: 1rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.brand-text span {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.45);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-}
-
-.user-card {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.user-avatar {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, #01579b, #0288d1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.user-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.role-tag {
-  display: inline-block;
-  background: linear-gradient(135deg, #01579b, #0288d1);
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-top: 3px;
-}
-
-nav {
-  padding: 14px 0;
-  flex: 1;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.nav-section-label {
-  padding: 10px 20px 6px;
-  font-size: 0.65rem;
-  color: rgba(255,255,255,0.3);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-weight: 600;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 11px 20px;
-  cursor: pointer;
-  color: rgba(255,255,255,0.6);
-  font-size: 0.88rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
-  text-decoration: none;
-}
-
-.nav-item:hover {
-  background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.95);
-  border-left-color: rgba(2,136,209,0.4);
-}
-
-.nav-item.active {
-  background: linear-gradient(90deg, rgba(1,87,155,0.35), rgba(1,87,155,0.05));
-  color: #fff;
-  border-left-color: #81d4fa;
-  font-weight: 700;
-}
-
-.nav-item.active mat-icon { color: #81d4fa; }
-.nav-item mat-icon { font-size: 20px; width: 20px; height: 20px; opacity: 0.8; }
-.nav-item.active mat-icon { opacity: 1; }
-
-.nav-divider {
-  height: 1px;
-  background: rgba(255,255,255,0.06);
-  margin: 8px 20px;
-}
-
-.nav-item.logout {
-  color: rgba(255,100,100,0.7);
-  border-top: 1px solid rgba(255,255,255,0.06);
-  margin-top: auto;
-}
-.nav-item.logout:hover {
-  background: rgba(255,50,50,0.1);
-  color: #ff6b6b;
-  border-left-color: #ff6b6b;
-}
-
-/* ══════════════════════════════════════════
-   MAIN CONTENT
-   ══════════════════════════════════════════ */
-.main-content {
-  flex: 1;
-  min-width: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar {
-  background: #fff;
-  padding: 0 30px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 1px 0 #e8ecf2;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  flex-shrink: 0;
-}
-
-.topbar-left h3 {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #0d1b2a;
-  letter-spacing: -0.3px;
-}
-
-.topbar-right { display: flex; align-items: center; gap: 16px; }
-.topbar-greeting { font-size: 0.88rem; color: #6b7a8d; }
-.topbar-greeting strong { color: #0d1b2a; }
-
-.role-badge {
-  background: linear-gradient(135deg, #e1f5fe, #b3e5fc);
-  color: #01579b;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.page-content { padding: 28px 30px; flex: 1; }
 
 /* ══ HOME WELCOME BANNER ══ */
 .home-welcome {
@@ -1998,52 +1749,15 @@ nav {
 .conge-modal-btn-modifier:hover { background: #e3f2fd; }
 
 /* ═══════════════════════════════════════════════════
-   RESPONSIVE MOBILE
+   RESPONSIVE MOBILE — contenu des pages uniquement
+   (le châssis responsive vit dans styles.css)
    ═══════════════════════════════════════════════════ */
 
 /* Tablette (768px) */
 @media (max-width: 768px) {
 
-  /* Sidebar cachée par défaut, glisse depuis la gauche */
-  .sidebar {
-    position: fixed;
-    left: -280px;
-    top: 0; bottom: 0;
-    z-index: 999;
-    transition: left 0.3s ease;
-    width: 260px;
-  }
-
-  /* Sidebar visible quand .sidebar-open */
-  .dashboard-layout.sidebar-open .sidebar { left: 0; }
-
-  /* Overlay sombre derrière la sidebar */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 998;
-    width: 100%;
-    height: 100%;
-    border: none;
-    cursor: pointer;
-  }
-  .dashboard-layout.sidebar-open .sidebar-overlay { display: block; }
-
-  /* Contenu principal prend toute la largeur */
-  .main-content { width: 100%; }
-
-  /* Topbar compact */
-  .topbar { padding: 0 16px; height: 56px; }
-  .topbar-left h3 { font-size: 1rem; }
-  .topbar-greeting { display: none; }
-
   /* Grille 2 colonnes sur tablette */
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-
-  /* Page content padding réduit */
-  .page-content { padding: 16px; }
 
   /* Cards plus compactes */
   .stat-card { padding: 18px 16px; }
@@ -2051,9 +1765,6 @@ nav {
   .stat-card-label { font-size: 0.68rem; letter-spacing: 0; }
   .stat-card-icon { width: 44px; height: 44px; }
   .stat-card-icon mat-icon { font-size: 22px; width: 22px; height: 22px; }
-
-  /* Hamburger visible */
-  .hamburger-btn { display: flex; }
 }
 
 /* Mobile (480px) */
@@ -2067,14 +1778,6 @@ nav {
   .stat-card-bg { display: none; }
   .stat-card-number { font-size: 1.8rem; }
   .stat-card-label { font-size: 0.7rem; white-space: normal; word-break: break-word; }
-
-  /* Topbar encore plus compact */
-  .topbar { padding: 0 12px; }
-  .topbar-left h3 { font-size: 0.9rem; }
-  .role-badge { font-size: 0.6rem; padding: 2px 6px; }
-
-  /* Page content */
-  .page-content { padding: 12px; }
 
   /* Modals full screen sur mobile */
   .modal-content, .modal-detail { width: 95vw !important; max-width: 95vw !important; margin: 10px; }

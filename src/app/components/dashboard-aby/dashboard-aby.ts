@@ -1,28 +1,49 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { Planning } from '../planning/planning';
 import { Taches } from '../taches/taches';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Groupe',
+  sousTitre: 'Supply Chain',
+  roleLabel: 'Supply Chain',
+  badge: 'SUPPLY CHAIN',
+  gradient: 'linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)',
+  accent: '#6366f1',
+  accentSoft: '#e0e7ff',
+  tag: '#a5b4fc',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Accueil', section: 'Tableau de Bord' },
+    { key: 'approvisionnement', icon: 'assignment', label: 'Fiches Appro. Reçues', section: 'Approvisionnement' },
+    { key: 'planning', icon: 'calendar_month', label: 'Planning', section: 'Suivi' },
+    { key: 'projets', icon: 'folder_special', label: 'Suivi Projets' },
+    { key: 'messagerie', icon: 'email', label: 'Messagerie MCL', section: 'Communication' }
+  ]
+};
 
 @Component({
   selector: 'app-dashboard-aby',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, ApprovisionnementComponent, Planning, Taches],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, ApprovisionnementComponent, Planning, Taches, DashboardLayout],
   templateUrl: './dashboard-aby.html',
   styleUrl: './dashboard-aby.css'
 })
 export class DashboardAby implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
 
-  private _currentPage = 'home';
-  get currentPage(): string { return this._currentPage; }
-  set currentPage(value: string) { this._currentPage = value; }
+  currentPage = 'home';
+
+  onPageChange(page: string) {
+    this.currentPage = page;
+    if (page === 'messagerie') this.loadMessages();
+  }
 
   // Données
   demandesMateriel: any[] = [];
@@ -56,7 +77,7 @@ export class DashboardAby implements OnInit {
 
   statutsCommande = ['En attente', 'Commandé', 'En transit', 'Livré', 'Annulé'];
 
-  constructor(private readonly http: HttpClient, private readonly router: Router) {}
+  constructor(private readonly http: HttpClient) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -323,9 +344,4 @@ export class DashboardAby implements OnInit {
   get projetsTermines() { return this.projets.filter(p => p.statut === 'TERMINEE').length; }
   get projetsAFaire() { return this.projets.filter(p => p.statut === 'A_FAIRE').length; }
   get projetsPerdus() { return this.projets.filter(p => p.statut === 'Perdu').length; }
-
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() { localStorage.removeItem('user'); localStorage.removeItem('token'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }

@@ -1,7 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +23,39 @@ import { CategoriesTaches } from '../categories-taches/categories-taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
 import { Visiteurs } from '../visiteurs/visiteurs';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Solutions',
+  sousTitre: 'Espace de travail',
+  roleLabel: 'Admin',
+  badge: 'ADMINISTRATEUR',
+  gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
+  accent: '#1565c0',
+  accentSoft: '#e3f2fd',
+  tag: '#90caf9',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Dashboard', section: 'Principal' },
+    { key: 'interventions', icon: 'engineering', label: 'Fiches Intervention' },
+    { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
+    { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'planning', icon: 'calendar_month', label: 'Planning' },
+    { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
+    { key: 'categories-taches', icon: 'category', label: 'Catégories de Tâches' },
+    { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
+    { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' },
+    { key: 'conges', icon: 'fact_check', label: 'Congés Équipe' },
+    { key: 'employes', icon: 'people_alt', label: 'Employés' },
+    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
+    { key: 'documents', icon: 'folder_open', label: 'Documents' },
+    { key: 'voitures', icon: 'directions_car', label: 'Parc Automobile' },
+    { key: 'visiteurs', icon: 'badge', label: 'Visiteurs (Écran accueil)' },
+    { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' },
+    { key: 'reclamations', icon: 'report_problem', label: 'Remontées Terrain', section: 'Support' },
+    { key: 'minutes-securite', icon: 'health_and_safety', label: 'Minutes Securite' },
+    { key: 'messages-aby', icon: 'forum', label: 'Messages ABY', section: 'Communication' }
+  ]
+};
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -33,14 +65,14 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
-    NgApexchartsModule
+    NgApexchartsModule, DashboardLayout
   ],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'
 })
 export class DashboardAdmin implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string {
@@ -50,6 +82,11 @@ export class DashboardAdmin implements OnInit {
     this.fermerDetailFiche();
     this.fermerDetailReclamation();
     this._currentPage = value;
+  }
+
+  onPageChange(page: string) {
+    this.currentPage = page;
+    if (page === 'messages-aby') this.loadMessagesAby();
   }
 
   showCreateFiche = false;
@@ -106,7 +143,7 @@ nouvelleVoiture = {
   conducteur: '', prochainControle: ''
 };
 statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -640,14 +677,6 @@ getStatutVoitureColor(statut: string): string {
   get chartTachesPrioriteSeries(): number[] {
     return ['Élevé', 'Moyenne', 'Faible']
       .map(p => this.taches.filter((t: any) => t.priorite === p).length);
-  }
-
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() {
-    localStorage.removeItem('user'); localStorage.removeItem('token');
-    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }
 

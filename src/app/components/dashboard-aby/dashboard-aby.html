@@ -1,82 +1,7 @@
-<div class="aby-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
-
-  <!-- ══════════ SIDEBAR ══════════ -->
-  <div class="sidebar">
-    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <div class="brand-logo">MCL</div>
-        <div class="brand-text">
-          <strong>MCL Groupe</strong>
-          <span>Supply Chain</span>
-        </div>
-      </div>
-      <div class="user-card">
-        <div class="user-avatar">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
-        <div>
-          <div class="user-name">{{ user.nom }}</div>
-          <span class="role-tag">Supply Chain</span>
-        </div>
-      </div>
-    </div>
-
-    <nav>
-      <div class="nav-section-label">Tableau de Bord</div>
-      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
-        <mat-icon>dashboard</mat-icon> Accueil
-        @if (demandesEnAttente.length > 0) {
-          <span class="nav-badge">{{ demandesEnAttente.length }}</span>
-        }
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Approvisionnement</div>
-      <a class="nav-item" [class.active]="currentPage === 'approvisionnement'" (click)="currentPage = 'approvisionnement'">
-        <mat-icon>assignment</mat-icon> Fiches Appro. Reçues
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Suivi</div>
-      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
-        <mat-icon>calendar_month</mat-icon> Planning
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'projets'" (click)="currentPage = 'projets'">
-        <mat-icon>folder_special</mat-icon> Suivi Projets
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Communication</div>
-      <a class="nav-item" [class.active]="currentPage === 'messagerie'" (click)="currentPage = 'messagerie'; loadMessages()">
-        <mat-icon>email</mat-icon> Messagerie MCL
-        @if (messagesEnAttente.length > 0) {
-          <span class="nav-badge">{{ messagesEnAttente.length }}</span>
-        }
-      </a>
-
-      <div class="nav-divider"></div>
-      <a class="nav-item logout" (click)="logout(); closeSidebar()">
-        <mat-icon>logout</mat-icon> Déconnexion
-      </a>
-    </nav>
-  </div>
-
-  <!-- ══════════ MAIN CONTENT ══════════ -->
-  <div class="main-content">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button>
-        <h3>{{ getPageTitle() }}</h3>
-      </div>
-      <div class="topbar-right">
-        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
-        <span class="role-badge-top">SUPPLY CHAIN</span>
-      </div>
-    </div>
-
-    <div class="page-content">
+<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
+                      [pageTitle]="getPageTitle()" (pageChange)="onPageChange($event)"
+                      [badges]="{ home: demandesEnAttente.length, messagerie: messagesEnAttente.length }"
+                      translate="no" lang="fr">
 
       <!-- ══ HOME ══ -->
       @if (currentPage === 'home') {
@@ -590,7 +515,4 @@
         </div>
       }
 
-    </div>
-  </div>
-  <div class="sidebar-overlay" (click)="closeSidebar()"></div>
-</div><!-- /aby-layout -->
+</app-dashboard-layout>

@@ -12,6 +12,28 @@ import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { JournalTravail } from '../journal-travail/journal-travail';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Solutions',
+  sousTitre: 'Espace Technicien',
+  roleLabel: 'Technicien',
+  badge: 'TECHNICIEN',
+  gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
+  accent: '#01579b',
+  accentSoft: '#e1f5fe',
+  tag: '#81d4fa',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Mon Dashboard', section: 'Mes Activites' },
+    { key: 'interventions', icon: 'engineering', label: 'Mes Interventions' },
+    { key: 'completees', icon: 'check_circle', label: 'Completees' },
+    { key: 'planning', icon: 'calendar_month', label: 'Planning' },
+    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
+    { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
+    { key: 'conges', icon: 'beach_access', label: 'Mes Conges', section: 'Personnel' },
+    { key: 'reclamations', icon: 'report_problem', label: 'Remontees Terrain' }
+  ]
+};
 
 @Component({
   selector: 'app-dashboard-technicien',
@@ -20,14 +42,15 @@ import { JournalTravail } from '../journal-travail/journal-travail';
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    Semainier, Planning, RemonteesTerrainComponent, JournalTravail
+    Semainier, Planning, RemonteesTerrainComponent, JournalTravail,
+    DashboardLayout
   ],
   templateUrl: './dashboard-technicien.html',
   styleUrl: './dashboard-technicien.css'
 })
 export class DashboardTechnicien implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
@@ -357,14 +380,6 @@ export class DashboardTechnicien implements OnInit {
       case 'planning':      return 'Planning';
       default: return 'Dashboard Technicien';
     }
-  }
-
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() {
-    localStorage.removeItem('user'); localStorage.removeItem('token');
-    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }
 

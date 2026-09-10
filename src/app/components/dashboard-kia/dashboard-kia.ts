@@ -1,7 +1,6 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,6 +18,34 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
 import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
+import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+
+const ESPACE: EspaceConfig = {
+  brand: 'MCL Solutions',
+  sousTitre: 'Mon espace',
+  roleLabel: 'Tech Sup',
+  badge: 'TECH SUP',
+  gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
+  accent: '#4527a0',
+  accentSoft: '#ede7f6',
+  tag: '#b39ddb',
+  items: [
+    { key: 'home', icon: 'dashboard', label: 'Dashboard', section: 'Principal' },
+    { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention' },
+    { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
+    { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'planning', icon: 'calendar_month', label: 'Planning' },
+    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
+    { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
+    { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
+    { key: 'mise-au-travail', icon: 'engineering', label: 'Mise au Travail' },
+    { key: 'ged', icon: 'folder_open', label: 'Documents' },
+    { key: 'conges-tech', icon: 'fact_check', label: 'Congés à Valider', section: 'RH & Support' },
+    { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' },
+    { key: 'remonteesTerrain', icon: 'report_problem', label: 'Remontées Terrain' },
+    { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' }
+  ]
+};
 
 @Component({
   selector: 'app-dashboard-kia',
@@ -29,14 +56,15 @@ import { JournalTravail } from '../journal-travail/journal-travail';
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees,
     Planning, Semainier, Documents,
-    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail
+    MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail,
+    DashboardLayout
   ],
   templateUrl: './dashboard-kia.html',
   styleUrl: './dashboard-kia.css'
 })
 export class DashboardKia implements OnInit {
+  espace = ESPACE;
   user: any = {};
-  sidebarOpen = false;
 
   private _currentPage = 'home';
   get currentPage(): string { return this._currentPage; }
@@ -74,7 +102,7 @@ export class DashboardKia implements OnInit {
   nombreJours = 0;
   congeEnEditionId: number | null = null;
 
-  constructor(private readonly http: HttpClient, private readonly router: Router) {}
+  constructor(private readonly http: HttpClient) {}
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -108,46 +136,40 @@ export class DashboardKia implements OnInit {
     });
   }
 
-  // ============================================================
-// AJOUTER dans dashboard-kia.ts
-// ============================================================
+  filtreConge = 'TOUS';
 
-// 1. Dans les propriétés de la classe :
-filtreConge = 'TOUS';
+  getCongesTechEnAttente(): number {
+    return this.congesTechniciens.filter((c: any) => c.statut === 'EN_ATTENTE').length;
+  }
 
-// 2. Ajouter ces méthodes dans la classe :
+  getCongesTechApprouves(): number {
+    return this.congesTechniciens.filter((c: any) => c.statut === 'APPROUVE').length;
+  }
 
-getCongesTechEnAttente(): number {
-  return this.congesTechniciens.filter((c: any) => c.statut === 'EN_ATTENTE').length;
-}
+  getCongesTechRefuses(): number {
+    return this.congesTechniciens.filter((c: any) => c.statut === 'REFUSE').length;
+  }
 
-getCongesTechApprouves(): number {
-  return this.congesTechniciens.filter((c: any) => c.statut === 'APPROUVE').length;
-}
+  getCongesTechValideesKia(): number {
+    return this.congesTechniciens.filter((c: any) => c.statut === 'VALIDE_KIA').length;
+  }
 
-getCongesTechRefuses(): number {
-  return this.congesTechniciens.filter((c: any) => c.statut === 'REFUSE').length;
-}
+  getCongesTechFiltres(): any[] {
+    if (this.filtreConge === 'TOUS') return this.congesTechniciens;
+    return this.congesTechniciens.filter((c: any) => c.statut === this.filtreConge);
+  }
 
-getCongesTechValideesKia(): number {
-  return this.congesTechniciens.filter((c: any) => c.statut === 'VALIDE_KIA').length;
-}
+  // ✅ Version string pour affichage (différente de calculerJours qui retourne number)
+  calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
+    if (!dateDebut || !dateFin || dateDebut === '-' || dateFin === '-') return '-';
+    const jours = this.calculerJours(dateDebut, dateFin, periode);
+    if (jours === 0) return '-';
+    let suffixe = '';
+    if (periode === 'MATIN') suffixe = ' (Matin)';
+    else if (periode === 'APRES_MIDI') suffixe = ' (Après-midi)';
+    return `${jours}j${suffixe}`;
+  }
 
-getCongesTechFiltres(): any[] {
-  if (this.filtreConge === 'TOUS') return this.congesTechniciens;
-  return this.congesTechniciens.filter((c: any) => c.statut === this.filtreConge);
-}
-
-// ✅ Version string pour affichage (différente de calculerJours qui retourne number)
-calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
-  if (!dateDebut || !dateFin || dateDebut === '-' || dateFin === '-') return '-';
-  const jours = this.calculerJours(dateDebut, dateFin, periode);
-  if (jours === 0) return '-';
-  let suffixe = '';
-  if (periode === 'MATIN') suffixe = ' (Matin)';
-  else if (periode === 'APRES_MIDI') suffixe = ' (Après-midi)';
-  return `${jours}j${suffixe}`;
-}
   loadEmployes() {
     this.http.get<any[]>('http://localhost:8080/api/utilisateurs').subscribe({
       next: (data) => this.employes = data,
@@ -301,11 +323,4 @@ calculerJoursStr(dateDebut: string, dateFin: string, periode?: string): string {
       default: return 'KIA Dashboard';
     }
   }
-
-  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
-  closeSidebar() { this.sidebarOpen = false; }
-
-  logout() { localStorage.removeItem('user'); localStorage.removeItem('token'); this.router.navigate(['/login'], { replaceUrl: true }); }
 }
-
-

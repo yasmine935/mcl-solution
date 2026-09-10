@@ -1,83 +1,6 @@
-﻿<div class="dashboard-layout" [class.sidebar-open]="sidebarOpen" translate="no" lang="fr">
-
-  <!-- ══════════ SIDEBAR ══════════ -->
-  <div class="sidebar">
-    <div class="sidebar-close-btn"><button (click)="closeSidebar()" type="button">✕ Fermer</button></div>
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <div class="brand-icon">🔧</div>
-        <div class="brand-text">
-          <strong>MCL Solutions</strong>
-          <span>Espace Technicien</span>
-        </div>
-      </div>
-      <div class="user-card">
-        <div class="user-avatar">
-          {{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}
-        </div>
-        <div>
-          <div class="user-name">{{ user.nom }}</div>
-          <span class="role-tag">Technicien</span>
-        </div>
-      </div>
-    </div>
-
-    <nav>
-      <div class="nav-section-label">Mes Activites</div>
-
-      <a class="nav-item" [class.active]="currentPage === 'home'" (click)="currentPage = 'home'">
-        <mat-icon>dashboard</mat-icon> Mon Dashboard
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'interventions'" (click)="currentPage = 'interventions'">
-        <mat-icon>engineering</mat-icon> Mes Interventions
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'completees'" (click)="currentPage = 'completees'">
-        <mat-icon>check_circle</mat-icon> Completees
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'planning'" (click)="currentPage = 'planning'">
-        <mat-icon>calendar_month</mat-icon> Planning
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'Semainier'" (click)="currentPage = 'Semainier'">
-        <mat-icon>calendar_today</mat-icon> Semainier
-      </a>
-
-      <a class="nav-item" [class.active]="currentPage === 'journal'" (click)="currentPage = 'journal'">
-        <mat-icon>auto_awesome</mat-icon> Journal IA
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Personnel</div>
-
-      <a class="nav-item" [class.active]="currentPage === 'conges'" (click)="currentPage = 'conges'">
-        <mat-icon>beach_access</mat-icon> Mes Conges
-      </a>
-      <a class="nav-item" [class.active]="currentPage === 'reclamations'" (click)="currentPage = 'reclamations'">
-        <mat-icon>report_problem</mat-icon> Remontees Terrain
-      </a>
-
-      <div class="nav-divider"></div>
-      <a class="nav-item logout" (click)="logout()">
-        <mat-icon>logout</mat-icon> Deconnexion
-      </a>
-    </nav>
-  </div>
-
-  <!-- ══════════ MAIN CONTENT ══════════ -->
-  <div class="main-content">
-
-    <!-- TOP BAR -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <button class="hamburger-btn" (click)="toggleSidebar()" type="button">☰</button>
-        <h3>{{ getPageTitle() }}</h3>
-      </div>
-      <div class="topbar-right">
-        <span class="topbar-greeting"><strong>{{ user.nom }}</strong></span>
-        <span class="role-badge">TECHNICIEN</span>
-      </div>
-    </div>
-
-    <div class="page-content">
+<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
+                      [pageTitle]="getPageTitle()" (pageChange)="currentPage = $event"
+                      translate="no" lang="fr">
 
       <!-- Journal de Travail IA -->
       @if (currentPage === 'journal') {
@@ -486,158 +409,6 @@
           </div>
         }
       }
-<!-- ══════════ POPUP MINUTE SECURITE ══════════ -->
-<!-- A ajouter dans dashboard-technicien.html -->
-<!-- Juste avant la fermeture </div> finale -->
-
-@if (showMinuteSecurite) {
-  <div class="ms-overlay">
-    <div class="ms-modal">
-
-      <!-- HEADER -->
-      <div class="ms-header">
-        <div class="ms-header-left">
-          <div class="ms-shield">🛡️</div>
-          <div>
-            <h2>LA MINUTE SÉCURITÉ</h2>
-            <p>Obligatoire avant chaque intervention</p>
-          </div>
-        </div>
-        <div class="ms-test-label">
-          Le test des 5 « OUI » — Si un « NON » apparaît, je m'arrête et j'appelle mon responsable
-        </div>
-      </div>
-
-      <div class="ms-body">
-
-        <!-- TACHE -->
-        <div class="ms-field">
-          <label>📋 Tâche à effectuer *</label>
-          <input type="text" [(ngModel)]="minuteForm.tacheAEffectuer"
-            class="ms-input" placeholder="Décrivez la tâche à effectuer..."/>
-        </div>
-
-        <!-- 5 QUESTIONS -->
-        <div class="ms-questions">
-          <h3>✅ Le Test des 5 « OUI »</h3>
-
-          <div class="ms-question">
-            <div class="ms-question-text">
-              <span class="ms-num">1</span>
-              <span>Ai-je les compétences et les habilitations pour cette tâche ?</span>
-            </div>
-            <div class="ms-oui-non">
-              <button class="btn-oui" [class.selected]="minuteForm.competencesHabilitations === true"
-                (click)="minuteForm.competencesHabilitations = true">OUI</button>
-              <button class="btn-non" [class.selected]="minuteForm.competencesHabilitations === false"
-                (click)="minuteForm.competencesHabilitations = false">NON</button>
-            </div>
-          </div>
-
-          <div class="ms-question">
-            <div class="ms-question-text">
-              <span class="ms-num">2</span>
-              <span>Mes outils, EPI et équipements sont-ils en bon état et conformes ?</span>
-            </div>
-            <div class="ms-oui-non">
-              <button class="btn-oui" [class.selected]="minuteForm.outilsEquipements === true"
-                (click)="minuteForm.outilsEquipements = true">OUI</button>
-              <button class="btn-non" [class.selected]="minuteForm.outilsEquipements === false"
-                (click)="minuteForm.outilsEquipements = false">NON</button>
-            </div>
-          </div>
-
-          <div class="ms-question">
-            <div class="ms-question-text">
-              <span class="ms-num">3</span>
-              <span>Mon environnement est-il sécurisé (météo, co-activité, sol) ?</span>
-            </div>
-            <div class="ms-oui-non">
-              <button class="btn-oui" [class.selected]="minuteForm.environnementSecurise === true"
-                (click)="minuteForm.environnementSecurise = true">OUI</button>
-              <button class="btn-non" [class.selected]="minuteForm.environnementSecurise === false"
-                (click)="minuteForm.environnementSecurise = false">NON</button>
-            </div>
-          </div>
-
-          <div class="ms-question">
-            <div class="ms-question-text">
-              <span class="ms-num">4</span>
-              <span>Je connais le mode opératoire et l'analyse de risque ?</span>
-            </div>
-            <div class="ms-oui-non">
-              <button class="btn-oui" [class.selected]="minuteForm.modeOperatoire === true"
-                (click)="minuteForm.modeOperatoire = true">OUI</button>
-              <button class="btn-non" [class.selected]="minuteForm.modeOperatoire === false"
-                (click)="minuteForm.modeOperatoire = false">NON</button>
-            </div>
-          </div>
-
-          <div class="ms-question">
-            <div class="ms-question-text">
-              <span class="ms-num">5</span>
-              <span>Est-ce que je sais quoi faire en cas d'urgence ?</span>
-            </div>
-            <div class="ms-oui-non">
-              <button class="btn-oui" [class.selected]="minuteForm.saitQuoiFaireUrgence === true"
-                (click)="minuteForm.saitQuoiFaireUrgence = true">OUI</button>
-              <button class="btn-non" [class.selected]="minuteForm.saitQuoiFaireUrgence === false"
-                (click)="minuteForm.saitQuoiFaireUrgence = false">NON</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ALERTE NON -->
-        @if (hasNonResponse()) {
-          <div class="ms-alerte">
-            🚨 Vous avez répondu NON à une ou plusieurs questions !
-            Arrêtez-vous et contactez votre responsable avant de continuer.
-          </div>
-        }
-
-        <!-- RISQUES -->
-        <div class="ms-field">
-          <label>⚠️ Risques Spécifiques Identifiés sur Place</label>
-          <small>(Ex: passage de piétons, bruit excessif, vent fort...)</small>
-          <textarea [(ngModel)]="minuteForm.risquesSpecifiques"
-            class="ms-textarea" rows="3"
-            placeholder="Décrivez les risques identifiés..."></textarea>
-        </div>
-
-        <!-- PREVENTION -->
-        <div class="ms-field">
-          <label>🔧 Mesures de Prévention Immédiates Prises</label>
-          <textarea [(ngModel)]="minuteForm.mesurePreventionImmediate"
-            class="ms-textarea" rows="3"
-            placeholder="Mesures prises pour sécuriser l'intervention..."></textarea>
-        </div>
-
-        <!-- VALIDATION -->
-        <div class="ms-validation">
-          <div class="ms-field">
-            <label>✍️ Nom et Signature *</label>
-            <input type="text" [(ngModel)]="minuteForm.nomSignataire"
-              class="ms-input" placeholder="Votre nom complet"/>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- FOOTER -->
-      <div class="ms-footer">
-        <button class="ms-btn-annuler" (click)="annulerMinuteSecurite()">
-          ← Retour au Dashboard
-        </button>
-        <button class="ms-btn-valider"
-          [disabled]="!minuteFormValide()"
-          (click)="validerMinuteSecurite()">
-          ✅ Valider et Accéder aux Interventions
-        </button>
-      </div>
-
-    </div>
-  </div>
-}
    <!-- ══ MES CONGES — Design Premium ══ -->
 @if (currentPage === 'conges') {
   <div class="conge-page">
@@ -872,11 +643,12 @@
         <app-remontees-terrain></app-remontees-terrain>
       }
 
-    </div><!-- /page-content -->
-  </div><!-- /main-content -->
+</app-dashboard-layout>
 
-  <!-- ✅ POPUP ICI — EN DEHORS DU page-content -->
-  @if (showMinuteSecurite) {
+<!-- Modals plein écran — hors du châssis (position: fixed) -->
+
+<!-- POPUP MINUTE SECURITE -->
+@if (showMinuteSecurite) {
     <div class="ms-overlay">
       <div class="ms-modal">
         <!-- HEADER -->
@@ -962,8 +734,6 @@
       </div>
     </div>
   }
-
-  <button class="sidebar-overlay" (click)="closeSidebar()" type="button" aria-label="Fermer le menu"></button>
 
   <!-- POPUP SOLDE ÉPUISÉ -->
   @if (showSoldeEpuiseWarning) {
@@ -1084,7 +854,5 @@
       </div>
     </div>
   }
-
-</div><!-- /dashboard-layout -->
 
 
