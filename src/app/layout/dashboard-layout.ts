@@ -8,6 +8,7 @@ export interface NavItem {
   icon: string;     // nom d'icône Material
   label: string;
   section?: string; // si présent, affiche un libellé de section au-dessus de l'item
+  route?: string;   // si présent, le clic NAVIGUE vers cette route (au lieu de changer de page interne)
 }
 
 export interface EspaceConfig {
@@ -54,9 +55,13 @@ export class DashboardLayout {
     }
   }
 
-  naviguer(key: string) {
-    this.pageChange.emit(key);
+  naviguer(item: NavItem) {
     this.sidebarOpen = false;
+    if (item.route) {
+      this.router.navigate([item.route]);   // lien vers un autre écran (ex. suivi des tickets client)
+    } else {
+      this.pageChange.emit(item.key);        // navigation interne au dashboard
+    }
   }
 
   toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }

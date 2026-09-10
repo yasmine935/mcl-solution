@@ -38,7 +38,8 @@ const ESPACE: EspaceConfig = {
     { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés', section: 'Support' },
     { key: 'messagerie', icon: 'email', label: 'Messagerie MCL', section: 'Communication' },
-    { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' }
+    { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' },
+    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', route: '/tickets-clients', section: 'Support Client' }
   ]
 };
 

@@ -30,7 +30,7 @@
         @if (item.section) {
           <div class="nav-section-label">{{ item.section }}</div>
         }
-        <a class="nav-item" [class.active]="pageActive === item.key" (click)="naviguer(item.key)">
+        <a class="nav-item" [class.active]="pageActive === item.key" (click)="naviguer(item)">
           <mat-icon>{{ item.icon }}</mat-icon> {{ item.label }}
           @if (badges[item.key]) {
             <span class="nav-badge">{{ badges[item.key] }}</span>

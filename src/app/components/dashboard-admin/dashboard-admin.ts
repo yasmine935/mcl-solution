@@ -57,7 +57,8 @@ const ESPACE: EspaceConfig = {
     { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' },
     { key: 'reclamations', icon: 'report_problem', label: 'Remontées Terrain', section: 'Support' },
     { key: 'minutes-securite', icon: 'health_and_safety', label: 'Minutes Securite' },
-    { key: 'messages-aby', icon: 'forum', label: 'Messages ABY', section: 'Communication' }
+    { key: 'messages-aby', icon: 'forum', label: 'Messages ABY', section: 'Communication' },
+    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', route: '/tickets-clients', section: 'Support Client' }
   ]
 };
 

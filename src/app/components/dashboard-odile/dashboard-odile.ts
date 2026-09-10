@@ -37,7 +37,8 @@ const ESPACE: EspaceConfig = {
     { key: 'ged', icon: 'folder_open', label: 'Documents' },
     { key: 'approvisionnement', icon: 'assignment', label: 'Demandes Appro.', section: 'Approvisionnement' },
     { key: 'remonteesTerrain', icon: 'report_problem', label: 'Remontées Terrain', section: 'Support' },
-    { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' }
+    { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' },
+    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', route: '/tickets-clients', section: 'Support Client' }
   ],
   // Thème Bleu Acier / Dark Navy de l'ancien CSS (différent du violet par défaut du layout)
   gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
