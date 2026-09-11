@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { Employes } from '../employes/employes';
+import { DossiersClients } from '../dossiers-clients/dossiers-clients';
 import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
@@ -50,6 +51,7 @@ const ESPACE: EspaceConfig = {
     { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' },
     { key: 'conges', icon: 'fact_check', label: 'Congés Équipe' },
     { key: 'employes', icon: 'people_alt', label: 'Employés' },
+    { key: 'clients-comptes', icon: 'support_agent', label: 'Dossiers Clients' },
     { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'documents', icon: 'folder_open', label: 'Documents' },
     { key: 'voitures', icon: 'directions_car', label: 'Parc Automobile' },
@@ -69,7 +71,7 @@ const ESPACE: EspaceConfig = {
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, Taches, Documents, FichesCompletees, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
+    FicheInterventionManager, Employes, DossiersClients, Taches, Documents, FichesCompletees, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
     NgApexchartsModule, DashboardLayout
   ],
   templateUrl: './dashboard-admin.html',
@@ -550,6 +552,7 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
       case 'fiches': return 'Fiches d\'Intervention';
       case 'tousLesConges': return 'Tous les Congés';
       case 'employes': return 'Employés';
+      case 'clients-comptes': return 'Dossiers Clients';
       case 'documents': return 'Documents';
       case 'reclamations': return 'Réclamations';
       case 'support': return 'Support';

@@ -68,9 +68,13 @@ export class Employes implements OnInit {
 
   constructor(private utilisateursApi: UtilisateursApi) {}
 
+  // Rôles autorisés à créer/gérer des comptes, alignés sur le backend
+  // (@PreAuthorize("hasAnyAuthority('ADMINISTRATEUR', 'RH')") sur UtilisateurController).
+  private readonly rolesGestionComptes = ['RH', 'ADMINISTRATEUR'];
+
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    this.canAdd = (this.currentUser.role || '').toUpperCase() === 'RH';
+    this.canAdd = this.rolesGestionComptes.includes((this.currentUser.role || '').toUpperCase());
     this.loadEmployes();
   }
 
@@ -78,8 +82,12 @@ export class Employes implements OnInit {
     this.utilisateursApi.lister<any>()
       .subscribe(
         (data: any[]) => {
-          this.employes = data;
-          localStorage.setItem('employes', JSON.stringify(data));
+          // Les comptes CLIENT (portail externe) ne sont pas des employés —
+          // ils ont leur propre écran (Dossiers Clients). Cf. UtilisateurController
+          // backend : un seul endpoint /api/utilisateurs sert les deux, donc le tri
+          // se fait ici par rôle.
+          this.employes = data.filter((u: any) => (u.role || '').toUpperCase() !== 'CLIENT');
+          localStorage.setItem('employes', JSON.stringify(this.employes));
         },
         (error: any) => {
           const stored = localStorage.getItem('employes');

@@ -1,0 +1,249 @@
+<div class="clients-container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon>support_agent</mat-icon>
+      <h2>Dossiers Clients</h2>
+    </div>
+    @if (canAdd) {
+      <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
+        <mat-icon>{{ showFormAdd ? 'close' : 'person_add' }}</mat-icon>
+        {{ showFormAdd ? 'Fermer' : 'Nouveau Compte Client' }}
+      </button>
+    }
+  </div>
+
+  <!-- FORMULAIRE AJOUT -->
+  @if (showFormAdd) {
+    <div class="form-container">
+      <div class="form-header-bar">
+        <mat-icon>person_add</mat-icon>
+        <h3>Nouveau Compte Client</h3>
+      </div>
+      <div class="form-body">
+        <p class="form-hint">
+          Compte externe pour le portail client (suivi de tickets). Le rôle est fixé automatiquement à « Client ».
+        </p>
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Prénom *</label>
+            <input class="compact-input" [(ngModel)]="nouveauClient.prenom" placeholder="Jean"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Nom *</label>
+            <input class="compact-input" [(ngModel)]="nouveauClient.nom" placeholder="Dupont"/>
+          </div>
+          <div class="field-xl">
+            <label class="field-label">Email *</label>
+            <input class="compact-input" type="email" [(ngModel)]="nouveauClient.email" placeholder="jean.dupont@client.fr"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Téléphone</label>
+            <input class="compact-input" [(ngModel)]="nouveauClient.telephone" placeholder="06 12 34 56 78"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Nom d'utilisateur (login) *</label>
+            <input class="compact-input" type="text" [(ngModel)]="nouveauClient.username" placeholder="jean.dupont">
+          </div>
+          <div class="field-md">
+            <label class="field-label">Mot de passe *</label>
+            <input class="compact-input" type="password" autocomplete="new-password" [(ngModel)]="nouveauClient.password" placeholder="Mot de passe">
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="ajouterClient()" class="btn-save">
+          <mat-icon>check</mat-icon> Créer le compte
+        </button>
+        <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- FORMULAIRE ÉDITION -->
+  @if (showFormEdit && selectedClient) {
+    <div class="form-container form-edit">
+      <div class="form-header-bar form-header-edit">
+        <mat-icon>edit</mat-icon>
+        <h3>Modifier — {{ selectedClient.prenom }} {{ selectedClient.nom }}</h3>
+      </div>
+      <div class="form-body">
+        <div class="form-row">
+          <div class="field-md">
+            <label class="field-label">Prénom *</label>
+            <input class="compact-input" [(ngModel)]="clientEnEdition.prenom"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Nom *</label>
+            <input class="compact-input" [(ngModel)]="clientEnEdition.nom"/>
+          </div>
+          <div class="field-xl">
+            <label class="field-label">Email *</label>
+            <input class="compact-input" type="email" [(ngModel)]="clientEnEdition.email"/>
+          </div>
+          <div class="field-md">
+            <label class="field-label">Téléphone</label>
+            <input class="compact-input" [(ngModel)]="clientEnEdition.telephone"/>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="modifierClient()" class="btn-save">
+          <mat-icon>save</mat-icon> Enregistrer
+        </button>
+        <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
+          <mat-icon>close</mat-icon> Annuler
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- TABLEAU -->
+  <div class="table-container">
+    <div class="table-header">
+      <h3>Comptes Clients ({{ clients_filtres().length }})</h3>
+      @if (countInactifs > 0) {
+        <button type="button" class="btn-toggle-inactifs-cli" [class.active]="showInactifs" (click)="showInactifs = !showInactifs">
+          <mat-icon>{{ showInactifs ? 'visibility_off' : 'history' }}</mat-icon>
+          {{ showInactifs ? 'Masquer désactivés' : 'Désactivés (' + countInactifs + ')' }}
+        </button>
+      }
+    </div>
+    @if (clients.length === 0) {
+      <div class="empty-state">
+        <mat-icon>support_agent</mat-icon>
+        <p>Aucun compte client</p>
+        <small>Cliquez sur "Nouveau Compte Client" pour commencer</small>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table class="clients-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Identifiant</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (client of clients_filtres(); track client.id) {
+              <tr class="clickable-row" [class.row-inactif]="client.actif === false" (click)="ouvrirDetailModal(client)">
+                <td>
+                  <div class="client-name">
+                    <div class="avatar" [style.opacity]="client.actif === false ? '0.5' : '1'">
+                      {{ client.prenom?.[0] }}{{ client.nom?.[0] }}
+                    </div>
+                    <div>
+                      <strong [class.nom-inactif]="client.actif === false">{{ client.prenom }} {{ client.nom }}</strong>
+                      @if (client.actif === false) {
+                        <span class="badge-desactive-cli">Désactivé</span>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  @if (client.email) {
+                    <a class="email-link" [href]="'mailto:' + client.email">{{ client.email }}</a>
+                  } @else { <span class="empty-val">—</span> }
+                </td>
+                <td>{{ client.telephone || '—' }}</td>
+                <td>{{ client.username || '—' }}</td>
+                <td class="actions-cell" (click)="$event.stopPropagation()">
+                  @if (client.actif !== false) {
+                    <button mat-icon-button color="accent" (click)="ouvrirEdition(client)" title="Modifier">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="desactiverClient(client.id, client.prenom + ' ' + client.nom)" title="Désactiver" class="btn-desactiver-cli">
+                      <mat-icon>person_off</mat-icon>
+                    </button>
+                  } @else {
+                    <button mat-icon-button color="primary" (click)="reactiverClient(client.id)" title="Réactiver">
+                      <mat-icon>person_add</mat-icon>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- MODAL DÉTAIL -->
+@if (showDetailModal && selectedClient) {
+  <div class="modal-overlay" (click)="fermerDetailModal()">
+    <div class="modal-fiche" (click)="$event.stopPropagation()">
+
+      <div class="modal-fiche-header">
+        <div class="modal-avatar-wrap">
+          <div class="modal-avatar">
+            {{ selectedClient.prenom?.[0] }}{{ selectedClient.nom?.[0] }}
+          </div>
+          <div>
+            <h3>{{ selectedClient.prenom }} {{ selectedClient.nom }}</h3>
+            <span class="badge-role-client">Compte Client</span>
+          </div>
+        </div>
+        <button class="modal-close-x" (click)="fermerDetailModal()">✕</button>
+      </div>
+
+      <div class="modal-fiche-body">
+        <div class="fiche-info-row">
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>email</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Email</p>
+              <p class="fiche-info-val">{{ selectedClient.email || '—' }}</p>
+            </div>
+          </div>
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>phone</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Téléphone</p>
+              <p class="fiche-info-val">{{ selectedClient.telephone || '—' }}</p>
+            </div>
+          </div>
+          <div class="fiche-info-cell">
+            <span class="fiche-info-icon"><mat-icon>badge</mat-icon></span>
+            <div>
+              <p class="fiche-info-label">Identifiant</p>
+              <p class="fiche-info-val">{{ selectedClient.username || '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-fiche-footer">
+        @if (selectedClient.actif !== false) {
+          <button mat-raised-button color="warn" (click)="desactiverClient(selectedClient.id, selectedClient.prenom + ' ' + selectedClient.nom)">
+            <mat-icon>person_off</mat-icon> Désactiver
+          </button>
+        } @else {
+          <button mat-raised-button color="primary" (click)="reactiverClient(selectedClient.id); fermerDetailModal()">
+            <mat-icon>person_add</mat-icon> Réactiver
+          </button>
+        }
+        <div class="footer-right">
+          @if (selectedClient.actif !== false) {
+            <button mat-raised-button color="primary" (click)="ouvrirEdition(selectedClient); showDetailModal = false">
+              <mat-icon>edit</mat-icon> Modifier
+            </button>
+          }
+          <button mat-stroked-button (click)="fermerDetailModal()">
+            <mat-icon>close</mat-icon> Fermer
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
