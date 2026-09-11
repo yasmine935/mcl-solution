@@ -64,7 +64,7 @@ export class TicketsClientApi extends ApiBase {
   // Décisions des valideurs (le service backend applique le cycle de vie + « premier qui prend »)
   valider(id: number, commentaire?: string): Observable<any> { return this.put(`${id}/valider`, { commentaire }); }
   rejeter(id: number, commentaire?: string): Observable<any> { return this.put(`${id}/rejeter`, { commentaire }); }
-  prendreEnCharge(id: number): Observable<any> { return this.put(`${id}/prendre-en-charge`, {}); }
+  prendreEnCharge(id: number, commentaire?: string): Observable<any> { return this.put(`${id}/prendre-en-charge`, { commentaire }); }
   resoudre(id: number): Observable<any> { return this.put(`${id}/resoudre`, {}); }
   cloturer(id: number): Observable<any> { return this.put(`${id}/cloturer`, {}); }
 

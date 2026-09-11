@@ -18,6 +18,7 @@ import { ApprovisionnementComponent } from '../approvisionnement/approvisionneme
 import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
+import { TicketsClientPanel } from '../tickets-client-panel/tickets-client-panel';
 import { CongesApi, ReclamationsApi, UtilisateursApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
@@ -38,7 +39,7 @@ const ESPACE: EspaceConfig = {
     { key: 'approvisionnement', icon: 'assignment', label: 'Demandes Appro.', section: 'Approvisionnement' },
     { key: 'remonteesTerrain', icon: 'report_problem', label: 'Remontées Terrain', section: 'Support' },
     { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' },
-    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', route: '/tickets-clients', section: 'Support Client' }
+    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', section: 'Support Client' }
   ],
   // Thème Bleu Acier / Dark Navy de l'ancien CSS (différent du violet par défaut du layout)
   gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
@@ -55,7 +56,7 @@ const ESPACE: EspaceConfig = {
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, DashboardLayout,
     FicheInterventionManager, FichesCompletees, Documents, Semainier, Planning,
-    TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail
+    TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail, TicketsClientPanel
   ],
   templateUrl: './dashboard-odile.html',
   styleUrl: './dashboard-odile.css'
@@ -245,6 +246,7 @@ export class DashboardOdile implements OnInit {
       case 'fiches-completees': return 'Fiches Completees';
       case 'ged': return 'Documents';
       case 'tickets': return 'Tickets Clients';
+      case 'tickets-clients': return 'Tickets Clients';
       case 'planning': return 'Planning';
       case 'Semainier': return 'Semainier';
       case 'mes-conges': return 'Mes Conges';

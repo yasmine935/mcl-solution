@@ -1,33 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import { TicketsClientApi } from '../../services/api/apis';
 import { Auth } from '../../services/auth';
-import { dashboardPourRole } from '../../services/role-routes';
-
-/**
- * Espace des valideurs internes des tickets clients (MANAGER + ADMINISTRATEUR).
- * Tous les valideurs reçoivent l'ensemble des tickets clients ; le premier qui
- * agit (valide / rejette / prend en charge) devient responsable du ticket.
- * Les autres le voient alors en lecture seule avec le nom du responsable.
- */
-const ESPACE: EspaceConfig = {
-  brand: 'MCL Solutions',
-  sousTitre: 'Tickets Clients',
-  roleLabel: 'Valideur',
-  badge: 'VALIDEUR',
-  items: [
-    { key: 'a-traiter', icon: 'inbox', label: 'À traiter', section: 'Tickets clients' },
-    { key: 'tous', icon: 'list', label: 'Tous les tickets' }
-  ],
-  gradient: 'linear-gradient(180deg,#3a2a06 0%,#78500a 50%,#b45309 100%)',
-  accent: '#b45309',
-  accentSoft: '#fef3c7',
-  tag: '#fcd34d'
-};
 
 interface TicketClient {
   id: number;
@@ -44,16 +20,25 @@ interface TicketClient {
   client: { nom: string; username: string } | null;
 }
 
+/**
+ * Panneau de gestion des tickets clients (valideurs MANAGER/ADMINISTRATEUR),
+ * pensé pour être EMBARQUÉ dans un dashboard existant (tel que DashboardAdmin,
+ * DashboardAurelien, DashboardOdile) — pas de sidebar/layout propre ici, juste le
+ * contenu, avec ses propres sous-onglets internes « À traiter » / « Tous les tickets ».
+ *
+ * Contient la même logique que la page autonome /tickets-clients
+ * (TicketsClientValideur), qui reste disponible séparément pour un accès direct.
+ */
 @Component({
-  selector: 'app-tickets-client-valideur',
+  selector: 'app-tickets-client-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, DashboardLayout],
-  templateUrl: './tickets-client-valideur.html',
-  styleUrl: './tickets-client-valideur.css'
+  imports: [CommonModule, FormsModule, MatIconModule],
+  templateUrl: './tickets-client-panel.html',
+  styleUrl: './tickets-client-panel.css'
 })
-export class TicketsClientValideur implements OnInit {
-  espace = ESPACE;
-  currentPage = 'a-traiter';
+export class TicketsClientPanel implements OnInit {
+  /** Sous-onglet interne actif (indépendant de la page hôte qui embarque ce panneau). */
+  vue: 'a-traiter' | 'tous' = 'a-traiter';
 
   tickets: TicketClient[] = [];
   chargement = false;
@@ -80,8 +65,7 @@ export class TicketsClientValideur implements OnInit {
 
   constructor(
     private readonly api: TicketsClientApi,
-    private readonly auth: Auth,
-    private readonly router: Router
+    private readonly auth: Auth
   ) {}
 
   ngOnInit() {
@@ -136,7 +120,7 @@ export class TicketsClientValideur implements OnInit {
     return !!t.traitePar && t.traitePar.username === this.usernameCourant;
   }
 
-  // ── Actions de décision (page « À traiter ») ────────────────
+  // ── Actions de décision (sous-onglet « À traiter ») ──────────
   // Depuis EN_ATTENTE_VALIDATION, le valideur choisit directement entre
   // « Prendre en charge » (-> EN_COURS) ou « Rejeter » — l'étape VALIDE
   // intermédiaire n'est plus utilisée par ce flux.
@@ -266,20 +250,7 @@ export class TicketsClientValideur implements OnInit {
     return nomComplet || auteur.username || 'Système';
   }
 
-  /** Renvoie le valideur vers son propre dashboard (même mapping rôle → route que le login). */
-  retourDashboard() {
-    this.router.navigate([dashboardPourRole(this.auth.utilisateurCourant()?.role)]);
-  }
-
   // ── Présentation ────────────────────────────────────────────
-
-  getPageTitle(): string {
-    const map: Record<string, string> = {
-      'a-traiter': 'Tickets à traiter',
-      'tous': 'Tous les tickets clients'
-    };
-    return map[this.currentPage] || 'Tickets Clients';
-  }
 
   /** Classe CSS d'indicateur de statut (pastille colorée). */
   statutClass(statut: string): string {

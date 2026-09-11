@@ -100,6 +100,11 @@
         <app-approvisionnement [modetous]="true"></app-approvisionnement>
       }
 
+      <!-- ══ TICKETS CLIENTS ══ -->
+      @if (currentPage === 'tickets-clients') {
+        <app-tickets-client-panel></app-tickets-client-panel>
+      }
+
       <!-- ══ MESSAGERIE ══ -->
       @if (currentPage === 'messagerie') {
         <div class="messagerie-wrap">

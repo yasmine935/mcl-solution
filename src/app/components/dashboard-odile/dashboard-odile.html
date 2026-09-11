@@ -73,7 +73,10 @@
         <app-approvisionnement [modetous]="true"></app-approvisionnement>
       }
 
-
+      <!-- ══ TICKETS CLIENTS ══ -->
+      @if (currentPage === 'tickets-clients') {
+        <app-tickets-client-panel></app-tickets-client-panel>
+      }
 
      <!-- ══ REMONTÉES TERRAIN ══ -->
 @if (currentPage === 'remonteesTerrain') {

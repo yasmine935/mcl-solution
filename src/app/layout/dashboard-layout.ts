@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,13 +36,16 @@ export interface EspaceConfig {
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css'
 })
-export class DashboardLayout {
+export class DashboardLayout implements OnChanges {
   @Input({ required: true }) config!: EspaceConfig;
   @Input() pageActive = 'home';
   @Input() pageTitle = '';
   /** Compteurs affichés à droite d'un item de nav, indexés par sa key (0/null = masqué). */
   @Input() badges: Record<string, number | string | null | undefined> = {};
   @Output() pageChange = new EventEmitter<string>();
+
+  /** Zone de contenu défilante (voir dashboard-layout.html) — remise en haut à chaque changement de page. */
+  @ViewChild('pageContentEl') pageContentEl?: ElementRef<HTMLDivElement>;
 
   user: any = {};
   sidebarOpen = false;
@@ -53,6 +56,22 @@ export class DashboardLayout {
     } catch {
       this.user = {};
     }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // La navigation interne (onglets du dashboard) ne recharge pas la page — contrairement
+    // a un vrai changement d'URL, le navigateur ne remet donc jamais le defilement en haut
+    // tout seul. On le fait nous-memes des que la page affichee change, y compris quand le
+    // clic vient d'un item de menu tout en bas de la sidebar (la ou le defilement etait le
+    // plus loin du haut).
+    if (changes['pageActive'] && !changes['pageActive'].firstChange) {
+      this.scrollToTop();
+    }
+  }
+
+  private scrollToTop() {
+    this.pageContentEl?.nativeElement.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }
 
   naviguer(item: NavItem) {

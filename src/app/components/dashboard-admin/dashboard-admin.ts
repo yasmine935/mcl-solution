@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { Employes } from '../employes/employes';
 import { DossiersClients } from '../dossiers-clients/dossiers-clients';
+import { TicketsClientPanel } from '../tickets-client-panel/tickets-client-panel';
 import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
@@ -60,7 +61,7 @@ const ESPACE: EspaceConfig = {
     { key: 'reclamations', icon: 'report_problem', label: 'Remontées Terrain', section: 'Support' },
     { key: 'minutes-securite', icon: 'health_and_safety', label: 'Minutes Securite' },
     { key: 'messages-aby', icon: 'forum', label: 'Messages ABY', section: 'Communication' },
-    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', route: '/tickets-clients', section: 'Support Client' }
+    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', section: 'Support Client' }
   ]
 };
 
@@ -71,7 +72,7 @@ const ESPACE: EspaceConfig = {
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, DossiersClients, Taches, Documents, FichesCompletees, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
+    FicheInterventionManager, Employes, DossiersClients, TicketsClientPanel, Taches, Documents, FichesCompletees, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
     NgApexchartsModule, DashboardLayout
   ],
   templateUrl: './dashboard-admin.html',
@@ -558,6 +559,7 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
       case 'support': return 'Support';
       case 'utilisateurs': return 'Utilisateurs';
       case 'tickets': return '🎫 Tickets Clients';
+      case 'tickets-clients': return 'Tickets Clients';
       default: return 'Dashboard Admin';
       case 'voitures': return '🚗 Parc Automobile';
     }

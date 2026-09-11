@@ -1,7 +1,15 @@
-<app-dashboard-layout [config]="espace" [pageActive]="currentPage"
-                      [pageTitle]="getPageTitle()"
-                      [badges]="{ 'a-traiter': ticketsATraiter.length }"
-                      (pageChange)="currentPage = $event">
+<div class="tickets-panel">
+
+  <!-- SOUS-ONGLETS INTERNES -->
+  <div class="panel-tabs">
+    <button type="button" class="panel-tab" [class.active]="vue === 'a-traiter'" (click)="vue = 'a-traiter'">
+      <mat-icon>inbox</mat-icon> À traiter
+      @if (ticketsATraiter.length > 0) { <span class="tab-badge">{{ ticketsATraiter.length }}</span> }
+    </button>
+    <button type="button" class="panel-tab" [class.active]="vue === 'tous'" (click)="vue = 'tous'">
+      <mat-icon>list</mat-icon> Tous les tickets
+    </button>
+  </div>
 
   <!-- BANDEAU DE MESSAGE -->
   @if (message) {
@@ -14,8 +22,8 @@
     </div>
   }
 
-  <!-- ════════════════════ PAGE À TRAITER ════════════════════ -->
-  @if (currentPage === 'a-traiter') {
+  <!-- ════════════════════ SOUS-ONGLET À TRAITER ════════════════════ -->
+  @if (vue === 'a-traiter') {
     <div class="section-card">
       <div class="section-header">
         <h3><mat-icon>inbox</mat-icon> Tickets en attente de validation</h3>
@@ -71,17 +79,12 @@
     </div>
   }
 
-  <!-- ════════════════════ PAGE TOUS ════════════════════ -->
-  @if (currentPage === 'tous') {
+  <!-- ════════════════════ SOUS-ONGLET TOUS ════════════════════ -->
+  @if (vue === 'tous') {
     <div class="section-card">
       <div class="section-header">
         <h3><mat-icon>list</mat-icon> Tous les tickets clients</h3>
-        <div class="section-header-right">
-          <span class="count-pill">{{ tousLesTickets.length }}</span>
-          <button class="btn-retour-dashboard" type="button" (click)="retourDashboard()" title="Retour au dashboard">
-            <mat-icon>arrow_back</mat-icon> Retour au dashboard
-          </button>
-        </div>
+        <span class="count-pill">{{ tousLesTickets.length }}</span>
       </div>
 
       @if (chargement) {
@@ -290,4 +293,4 @@
     </div>
   }
 
-</app-dashboard-layout>
+</div>

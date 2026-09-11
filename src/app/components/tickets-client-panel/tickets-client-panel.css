@@ -1,6 +1,28 @@
-/* Styles de l'espace Valideur des tickets clients.
-   Le châssis (sidebar/topbar) vit dans layout/dashboard-layout.css.
-   Accent ambre/orange cohérent avec l'EspaceConfig du composant. */
+/* Styles du panneau de tickets clients embarqué dans un dashboard.
+   Accent ambre/orange, cohérent avec l'espace Valideur autonome (/tickets-clients). */
+
+.tickets-panel { display: flex; flex-direction: column; }
+
+/* ── SOUS-ONGLETS INTERNES ── */
+.panel-tabs { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.panel-tab {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; color: #78716c; border: 1.5px solid #e7e5e4;
+  border-radius: 12px; padding: 10px 18px; font-size: 0.86rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.panel-tab mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.panel-tab:hover { border-color: #fcd34d; color: #b45309; }
+.panel-tab.active {
+  background: linear-gradient(135deg, #b45309, #78350f);
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.25);
+}
+.tab-badge {
+  background: #fff; color: #b45309; font-weight: 800;
+  font-size: 0.7rem; padding: 1px 8px; border-radius: 10px;
+}
+.panel-tab.active .tab-badge { background: rgba(255,255,255,0.25); color: #fff; }
 
 /* ── BANDEAU DE MESSAGE ── */
 .banner {
@@ -39,17 +61,8 @@
   background: #fef3c7; color: #b45309; font-weight: 800;
   padding: 4px 14px; border-radius: 20px; font-size: 0.85rem;
 }
-.section-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.btn-retour-dashboard {
-  display: flex; align-items: center; gap: 6px;
-  background: #fff; color: #b45309; border: 1.5px solid #fde68a;
-  border-radius: 10px; padding: 7px 14px; font-size: 0.8rem; font-weight: 800;
-  cursor: pointer; font-family: inherit; transition: all 0.15s;
-}
-.btn-retour-dashboard mat-icon { font-size: 18px; width: 18px; height: 18px; }
-.btn-retour-dashboard:hover { background: #fef3c7; border-color: #b45309; }
 
-/* ── LISTE DE CARTES (page À traiter) ── */
+/* ── LISTE DE CARTES (sous-onglet À traiter) ── */
 .ticket-list { display: flex; flex-direction: column; gap: 14px; }
 .ticket-card {
   border: 1.5px solid #fde68a; border-radius: 14px; padding: 18px 20px;
@@ -113,7 +126,7 @@
 .btn-table { padding: 7px 12px; font-size: 0.78rem; gap: 5px; }
 .btn-table mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
-/* ── TABLEAU (page Tous) ── */
+/* ── TABLEAU (sous-onglet Tous) ── */
 .table-wrap { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .data-table thead th {
