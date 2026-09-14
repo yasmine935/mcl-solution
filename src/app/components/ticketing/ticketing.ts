@@ -18,6 +18,7 @@ export interface Ticket {
   typeMateriel: string;
   marque: string;
   reference: string;
+  numeroSerie: string;
   sousGarantie: boolean;
   criticite: 'Faible' | 'Moyenne' | 'Importante' | 'Critique';
   descriptionPanne: string;
@@ -97,6 +98,7 @@ export class TicketingComponent implements OnInit {
       typeMateriel: t.typeMateriel,
       marque: t.marque,
       reference: t.reference,
+      numeroSerie: t.numeroSerie,
       sousGarantie: t.sousGarantie,
       criticite: t.criticite,
       descriptionPanne: t.descriptionPanne,
@@ -125,7 +127,7 @@ export class TicketingComponent implements OnInit {
     this.form = {
       site: '', nom: '', prenom: '', telephone: '', email: '',
       lieuSite: '', nomSalle: '', etage: '', informationsAdditionnelles: '',
-      typeMateriel: '', marque: '', reference: '',
+      typeMateriel: '', marque: '', reference: '', numeroSerie: '',
       sousGarantie: false, criticite: 'Faible', descriptionPanne: '',
       assigneId: null, priorite: 'Faible', echeance: '',
       statut: 'En attente', fichiers: []
@@ -154,6 +156,7 @@ export class TicketingComponent implements OnInit {
       typeMateriel: this.form.typeMateriel,
       marque: this.form.marque,
       reference: this.form.reference,
+      numeroSerie: this.form.numeroSerie,
       sousGarantie: this.form.sousGarantie,
       criticite: this.form.criticite,
       descriptionPanne: this.form.descriptionPanne,

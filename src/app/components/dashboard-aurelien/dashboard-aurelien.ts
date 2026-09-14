@@ -18,7 +18,7 @@ import { GestionClients } from '../clients/clients';
 import { TicketsClientPanel } from '../tickets-client-panel/tickets-client-panel';
 import { DossiersClients } from '../dossiers-clients/dossiers-clients';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
-import { CongesApi, MessagesAbyApi, UtilisateursApi } from '../../services/api/apis';
+import { CongesApi, MessagesAbyApi, UtilisateursApi, TicketsClientApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -82,6 +82,7 @@ export class DashboardAurelien implements OnInit {
   interventions: any[] = [];
   conges: any[] = [];
   documents: any[] = [];
+  ticketsClients: any[] = [];
   employes: any[] = [];
   fiches: any[] = [];
   selectedFiche: any = null;
@@ -103,7 +104,8 @@ export class DashboardAurelien implements OnInit {
   constructor(
     private congesApi: CongesApi,
     private messagesAbyApi: MessagesAbyApi,
-    private utilisateursApi: UtilisateursApi
+    private utilisateursApi: UtilisateursApi,
+    private ticketsClientApi: TicketsClientApi
   ) {}
 
   ngOnInit() {
@@ -118,6 +120,19 @@ export class DashboardAurelien implements OnInit {
     this.loadFiches();
     this.loadSoldeConges();
     this.loadMessages();
+    this.loadTicketsClients();
+  }
+
+  loadTicketsClients() {
+    this.ticketsClientApi.lister<any>().subscribe({
+      next: (data) => this.ticketsClients = data,
+      error: () => this.ticketsClients = []
+    });
+  }
+
+  /** Tickets client en attente de décision, non encore pris par un valideur. */
+  get ticketsClientsATraiter(): any[] {
+    return this.ticketsClients.filter((t: any) => t.statut === 'EN_ATTENTE_VALIDATION' && !t.traitePar);
   }
 
   loadConges() {

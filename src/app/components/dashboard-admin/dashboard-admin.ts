@@ -27,7 +27,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import {
   UtilisateursApi, CongesApi, FichesInterventionApi, TachesApi,
-  VoituresApi, MinutesSecuriteApi, MessagesAbyApi, ReclamationsApi
+  VoituresApi, MinutesSecuriteApi, MessagesAbyApi, ReclamationsApi, TicketsClientApi
 } from '../../services/api/apis';
 import { Auth } from '../../services/auth';
 
@@ -111,6 +111,7 @@ export class DashboardAdmin implements OnInit {
   documents: any[] = [];
   tickets: any[] = [];
   utilisateurs: any[] = [];
+  ticketsClients: any[] = [];
 
   selectedFiche: any = null;
   selectedReclamation: any = null;
@@ -160,6 +161,7 @@ statutsVoiture = ['Disponible', 'En service', 'En maintenance', 'Hors service'];
     private minutesSecuriteApi: MinutesSecuriteApi,
     private messagesAbyApi: MessagesAbyApi,
     private reclamationsApi: ReclamationsApi,
+    private ticketsClientApi: TicketsClientApi,
     private auth: Auth
   ) {}
 
@@ -253,6 +255,19 @@ get minutesOk(): number {
   this.loadSoldeCongesPerso();
   this.loadTaches();
   this.loadMessagesAby();
+  this.loadTicketsClients();
+}
+
+loadTicketsClients() {
+  this.ticketsClientApi.lister<any>().subscribe({
+    next: (data) => this.ticketsClients = data,
+    error: () => this.ticketsClients = []
+  });
+}
+
+/** Tickets client en attente de décision, non encore pris par un valideur. */
+get ticketsClientsATraiter(): any[] {
+  return this.ticketsClients.filter((t: any) => t.statut === 'EN_ATTENTE_VALIDATION' && !t.traitePar);
 }
 
 loadTaches() {

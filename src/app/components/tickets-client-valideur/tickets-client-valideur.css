@@ -218,6 +218,11 @@
 .modal-body::-webkit-scrollbar-thumb { background: #fde68a; border-radius: 4px; }
 
 .modal-titre { font-size: 1rem; font-weight: 800; color: #1a202c; margin: 0 0 12px; }
+.modal-subtitre {
+  font-size: 0.72rem; font-weight: 800; color: #b45309; margin: 14px 0 8px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  border-top: 1px dashed #fde68a; padding-top: 12px;
+}
 .modal-info-row {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px;
 }

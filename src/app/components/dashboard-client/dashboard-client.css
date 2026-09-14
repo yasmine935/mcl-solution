@@ -151,6 +151,25 @@ textarea.tc-input { resize: vertical; }
 .tc-fg.tc-full { grid-column: 1 / -1; }
 .tc-fg label { font-size: 0.78rem; font-weight: 700; color: #475569; }
 .tc-req { color: #dc2626; }
+.tc-hint { font-size: 0.7rem; color: #94a3b8; }
+
+/* Titres de section du formulaire (Demande d'Intervention / Lieu d'Intervention / Nature de la Panne) */
+.tc-section-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; font-weight: 800; color: #0f3d34;
+  margin: 22px 0 14px; padding-bottom: 8px; border-bottom: 1.5px solid #ccfbf1;
+}
+.tc-section-title mat-icon { color: #0d9488; font-size: 19px; width: 19px; height: 19px; }
+
+/* Bascule Oui/Non (Marque sous Garantie) */
+.tc-toggle-grp { display: flex; gap: 8px; }
+.tc-toggle-btn {
+  flex: 1; padding: 9px; border: 1.5px solid #cbd5e1; border-radius: 8px;
+  background: #fff; color: #475569; font-weight: 700; font-size: 0.82rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.tc-toggle-btn.on { background: #0d9488; border-color: #0d9488; color: #fff; }
+
 .tc-form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
 /* ══ MODAL DÉTAIL ══ */

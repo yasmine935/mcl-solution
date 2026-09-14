@@ -146,7 +146,7 @@
             <h4>☰ Demande d'Intervention</h4>
             <div class="frow full">
               <div class="fgroup">
-                <label>Site <span class="req">*</span></label>
+                <label>Adresse site <span class="req">*</span></label>
                 <input [(ngModel)]="form.site" type="text" />
               </div>
             </div>
@@ -216,6 +216,12 @@
               <div class="fgroup">
                 <label>Référence <span class="req">*</span></label>
                 <input [(ngModel)]="form.reference" type="text" />
+              </div>
+            </div>
+            <div class="frow two">
+              <div class="fgroup">
+                <label>Numéro de série</label>
+                <input [(ngModel)]="form.numeroSerie" type="text" />
               </div>
             </div>
             <div class="frow three-mix">
@@ -316,6 +322,7 @@
         <div class="ditem"><label>Matériel</label><span>{{ showDetail!.typeMateriel }}</span></div>
         <div class="ditem"><label>Marque</label><span>{{ showDetail!.marque }}</span></div>
         <div class="ditem"><label>Référence</label><span>{{ showDetail!.reference }}</span></div>
+        <div class="ditem"><label>N° Série</label><span>{{ showDetail!.numeroSerie || '-' }}</span></div>
         <div class="ditem"><label>Garantie</label><span>{{ showDetail!.sousGarantie ? '✅ Oui' : '❌ Non' }}</span></div>
         <div class="ditem">
           <label>Criticité</label>

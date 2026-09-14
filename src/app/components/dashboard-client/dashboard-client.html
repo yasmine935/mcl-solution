@@ -92,9 +92,9 @@
             <h4 class="tc-card-titre">{{ t.titre || 'Sans titre' }}</h4>
             <div class="tc-card-meta">
               @if (t.categorie) { <span class="tc-chip">{{ t.categorie }}</span> }
-              @if (t.priorite) {
-                <span class="tc-prio" [style.color]="getPrioriteColor(t.priorite)">
-                  <span class="tc-prio-dot" [style.background]="getPrioriteColor(t.priorite)"></span>{{ t.priorite }}
+              @if (t.criticite) {
+                <span class="tc-prio" [style.color]="getCriticiteColor(t.criticite)">
+                  <span class="tc-prio-dot" [style.background]="getCriticiteColor(t.criticite)"></span>{{ t.criticite }}
                 </span>
               }
             </div>
@@ -134,21 +134,100 @@
                  placeholder="Ex : Imprimante du 2e étage en panne" />
         </div>
         <div class="tc-fg tc-full">
-          <label>Description <span class="tc-req">*</span></label>
-          <textarea class="tc-input" rows="5" [(ngModel)]="form.description"
-                    placeholder="Décrivez le problème rencontré en détail…"></textarea>
-        </div>
-        <div class="tc-fg">
           <label>Catégorie</label>
           <select class="tc-select" [(ngModel)]="form.categorie">
             @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
           </select>
         </div>
+      </div>
+
+      <!-- ══ DEMANDE D'INTERVENTION ══ -->
+      <div class="tc-section-title"><mat-icon>assignment</mat-icon> Demande d'Intervention</div>
+      <div class="tc-form-grid">
+        <div class="tc-fg tc-full">
+          <label>Adresse site <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.adresseSite"
+                 placeholder="Ex : 12 rue des Lilas, 75011 Paris" />
+        </div>
         <div class="tc-fg">
-          <label>Priorité</label>
-          <select class="tc-select" [(ngModel)]="form.priorite">
-            @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
+          <label>Nom <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.nomDemandeur" />
+          <small class="tc-hint">du demandeur</small>
+        </div>
+        <div class="tc-fg">
+          <label>Prénom <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.prenomDemandeur" />
+          <small class="tc-hint">du demandeur</small>
+        </div>
+        <div class="tc-fg">
+          <label>Téléphone <span class="tc-req">*</span></label>
+          <input type="tel" class="tc-input" [(ngModel)]="form.telephoneDemandeur" />
+          <small class="tc-hint">du demandeur</small>
+        </div>
+        <div class="tc-fg">
+          <label>Adresse Mail <span class="tc-req">*</span></label>
+          <input type="email" class="tc-input" [(ngModel)]="form.emailDemandeur" />
+          <small class="tc-hint">du demandeur</small>
+        </div>
+      </div>
+
+      <!-- ══ LIEU D'INTERVENTION ══ -->
+      <div class="tc-section-title"><mat-icon>place</mat-icon> Lieu d'Intervention</div>
+      <div class="tc-form-grid">
+        <div class="tc-fg">
+          <label>Site <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.lieuSite" />
+        </div>
+        <div class="tc-fg">
+          <label>Nom de la Salle</label>
+          <input type="text" class="tc-input" [(ngModel)]="form.nomSalle" />
+        </div>
+        <div class="tc-fg">
+          <label>Étage</label>
+          <input type="text" class="tc-input" [(ngModel)]="form.etage" />
+        </div>
+        <div class="tc-fg">
+          <label>Informations additionnelles</label>
+          <input type="text" class="tc-input" [(ngModel)]="form.informationsAdditionnelles" />
+        </div>
+      </div>
+
+      <!-- ══ NATURE DE LA PANNE ══ -->
+      <div class="tc-section-title"><mat-icon>build</mat-icon> Nature de la Panne</div>
+      <div class="tc-form-grid">
+        <div class="tc-fg">
+          <label>Type de Matériel <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.typeMateriel" />
+        </div>
+        <div class="tc-fg">
+          <label>Marque <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.marque" />
+        </div>
+        <div class="tc-fg">
+          <label>Référence <span class="tc-req">*</span></label>
+          <input type="text" class="tc-input" [(ngModel)]="form.reference" />
+        </div>
+        <div class="tc-fg">
+          <label>Numéro de série</label>
+          <input type="text" class="tc-input" [(ngModel)]="form.numeroSerie"
+                 placeholder="Si connu" />
+        </div>
+        <div class="tc-fg">
+          <label>Marque sous Garantie</label>
+          <div class="tc-toggle-grp">
+            <button type="button" class="tc-toggle-btn" [class.on]="form.sousGarantie === true" (click)="form.sousGarantie = true">Oui</button>
+            <button type="button" class="tc-toggle-btn" [class.on]="form.sousGarantie === false" (click)="form.sousGarantie = false">Non</button>
+          </div>
+        </div>
+        <div class="tc-fg">
+          <label>Criticité de la Panne</label>
+          <select class="tc-select" [(ngModel)]="form.criticite">
+            @for (c of criticiteOptions; track c) { <option [value]="c">{{ c }}</option> }
           </select>
+        </div>
+        <div class="tc-fg tc-full">
+          <label>Description de la Panne <span class="tc-req">*</span></label>
+          <textarea class="tc-input" rows="3" [(ngModel)]="form.descriptionPanne"></textarea>
         </div>
       </div>
 
@@ -179,17 +258,12 @@
               {{ getStatutLabel(ticketSelectionne.statut) }}
             </span>
             @if (ticketSelectionne.categorie) { <span class="tc-chip">{{ ticketSelectionne.categorie }}</span> }
-            @if (ticketSelectionne.priorite) {
-              <span class="tc-prio" [style.color]="getPrioriteColor(ticketSelectionne.priorite)">
-                <span class="tc-prio-dot" [style.background]="getPrioriteColor(ticketSelectionne.priorite)"></span>
-                {{ ticketSelectionne.priorite }}
+            @if (ticketSelectionne.criticite) {
+              <span class="tc-prio" [style.color]="getCriticiteColor(ticketSelectionne.criticite)">
+                <span class="tc-prio-dot" [style.background]="getCriticiteColor(ticketSelectionne.criticite)"></span>
+                {{ ticketSelectionne.criticite }}
               </span>
             }
-          </div>
-
-          <div class="tc-field">
-            <label>Description</label>
-            <p>{{ ticketSelectionne.description || '—' }}</p>
           </div>
 
           <div class="tc-detail-grid">
@@ -209,7 +283,52 @@
                 } @else { Non attribué }
               </span>
             </div>
+            <div class="tc-detail-item">
+              <label>Adresse site</label>
+              <span>{{ ticketSelectionne.adresseSite || '—' }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Demandeur</label>
+              <span>{{ ticketSelectionne.prenomDemandeur }} {{ ticketSelectionne.nomDemandeur }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Téléphone</label>
+              <span>{{ ticketSelectionne.telephoneDemandeur || '—' }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Email</label>
+              <span>{{ ticketSelectionne.emailDemandeur || '—' }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Lieu</label>
+              <span>{{ ticketSelectionne.lieuSite }}{{ ticketSelectionne.nomSalle ? ' — ' + ticketSelectionne.nomSalle : '' }}{{ ticketSelectionne.etage ? ' (étage ' + ticketSelectionne.etage + ')' : '' }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Matériel</label>
+              <span>{{ ticketSelectionne.typeMateriel }} {{ ticketSelectionne.marque }} {{ ticketSelectionne.reference }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>N° Série</label>
+              <span>{{ ticketSelectionne.numeroSerie || '—' }}</span>
+            </div>
+            <div class="tc-detail-item">
+              <label>Garantie</label>
+              <span>{{ ticketSelectionne.sousGarantie ? 'Oui' : 'Non' }}</span>
+            </div>
           </div>
+
+          @if (ticketSelectionne.descriptionPanne) {
+            <div class="tc-field">
+              <label>Description de la panne</label>
+              <p>{{ ticketSelectionne.descriptionPanne }}</p>
+            </div>
+          }
+          @if (ticketSelectionne.informationsAdditionnelles) {
+            <div class="tc-field">
+              <label>Informations additionnelles</label>
+              <p>{{ ticketSelectionne.informationsAdditionnelles }}</p>
+            </div>
+          }
 
           @if (ticketSelectionne.commentaireValidation) {
             <div class="tc-field tc-comment">

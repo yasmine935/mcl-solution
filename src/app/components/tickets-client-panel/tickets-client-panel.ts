@@ -9,9 +9,26 @@ interface TicketClient {
   id: number;
   numero: string;
   titre: string;
-  description: string;
   categorie: string;
-  priorite: string;
+  criticite: string;
+  // Demande d'intervention
+  adresseSite: string | null;
+  nomDemandeur: string | null;
+  prenomDemandeur: string | null;
+  telephoneDemandeur: string | null;
+  emailDemandeur: string | null;
+  // Lieu d'intervention
+  lieuSite: string | null;
+  nomSalle: string | null;
+  etage: string | null;
+  informationsAdditionnelles: string | null;
+  // Nature de la panne
+  typeMateriel: string | null;
+  marque: string | null;
+  reference: string | null;
+  numeroSerie: string | null;
+  sousGarantie: boolean | null;
+  descriptionPanne: string | null;
   statut: string;
   dateCreation: string;
   dateTraitement: string | null;
@@ -271,9 +288,9 @@ export class TicketsClientPanel implements OnInit {
     return map[statut] || statut || '—';
   }
 
-  /** Classe CSS d'indicateur de priorité. */
-  prioriteClass(priorite: string): string {
-    return 'pr-' + (priorite || '').toLowerCase().replace(/_/g, '-');
+  /** Classe CSS d'indicateur de criticité. */
+  criticiteClass(criticite: string): string {
+    return 'pr-' + (criticite || '').toLowerCase().replace(/_/g, '-');
   }
 
   formatDate(iso: string | null | undefined): string {

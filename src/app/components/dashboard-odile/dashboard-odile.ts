@@ -19,7 +19,7 @@ import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
 import { TicketsClientPanel } from '../tickets-client-panel/tickets-client-panel';
-import { CongesApi, ReclamationsApi, UtilisateursApi } from '../../services/api/apis';
+import { CongesApi, ReclamationsApi, UtilisateursApi, TicketsClientApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -78,6 +78,7 @@ export class DashboardOdile implements OnInit {
   employes: any[] = [];
   documents: any[] = [];
   tickets: any[] = [];
+  ticketsClients: any[] = [];
   reclamations: any[] = [];
   fiches: any[] = [];
   selectedFiche: any = null;
@@ -99,7 +100,8 @@ export class DashboardOdile implements OnInit {
   constructor(
     private congesApi: CongesApi,
     private utilisateursApi: UtilisateursApi,
-    private reclamationsApi: ReclamationsApi
+    private reclamationsApi: ReclamationsApi,
+    private ticketsClientApi: TicketsClientApi
   ) {}
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -112,6 +114,19 @@ export class DashboardOdile implements OnInit {
     this.loadReclamations();
     this.loadFiches();
     this.loadSoldeConges();
+    this.loadTicketsClients();
+  }
+
+  loadTicketsClients() {
+    this.ticketsClientApi.lister<any>().subscribe({
+      next: (data) => this.ticketsClients = data,
+      error: () => this.ticketsClients = []
+    });
+  }
+
+  /** Tickets client en attente de décision, non encore pris par un valideur. */
+  get ticketsClientsATraiter(): any[] {
+    return this.ticketsClients.filter((t: any) => t.statut === 'EN_ATTENTE_VALIDATION' && !t.traitePar);
   }
   loadConges() {
     this.congesApi.parEmploye(this.user.id)

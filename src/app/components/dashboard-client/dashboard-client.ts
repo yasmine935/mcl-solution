@@ -61,8 +61,8 @@ export class DashboardClient implements OnInit {
 
   // ── Formulaire « nouveau ticket » ──
   categories = ['Matériel', 'Réseau', 'Logiciel', 'Autre'];
-  priorites = ['Faible', 'Moyenne', 'Haute'];
-  form = { titre: '', description: '', categorie: 'Matériel', priorite: 'Moyenne' };
+  criticiteOptions = ['Faible', 'Moyenne', 'Importante', 'Critique'];
+  form = this.formVide();
   formErreur = '';
   creationEnCours = false;
 
@@ -99,7 +99,25 @@ export class DashboardClient implements OnInit {
 
   ngOnInit() {
     this.user = this.auth.utilisateurCourant() || {};
+    // Pas de pré-remplissage des coordonnées du demandeur : le compte client
+    // est partagé entre plusieurs employés du client, donc la personne qui
+    // remplit CE ticket n'est pas forcément le titulaire du compte — elle doit
+    // renseigner ses propres coordonnées à chaque fois.
     this.chargerTickets();
+  }
+
+  /** État initial (vide) du formulaire de création. */
+  private formVide() {
+    return {
+      titre: '', categorie: 'Matériel',
+      // Demande d'intervention
+      adresseSite: '', nomDemandeur: '', prenomDemandeur: '', telephoneDemandeur: '', emailDemandeur: '',
+      // Lieu d'intervention
+      lieuSite: '', nomSalle: '', etage: '', informationsAdditionnelles: '',
+      // Nature de la panne
+      typeMateriel: '', marque: '', reference: '', numeroSerie: '',
+      sousGarantie: false, criticite: 'Faible', descriptionPanne: ''
+    };
   }
 
   // ══════════ LISTE ══════════
@@ -205,16 +223,40 @@ export class DashboardClient implements OnInit {
 
   creerTicket() {
     this.formErreur = '';
-    if (!this.form.titre.trim() || !this.form.description.trim()) {
-      this.formErreur = 'Le titre et la description sont obligatoires.';
+    const f = this.form;
+    const champsObligatoires: [string, string][] = [
+      [f.titre, 'Titre'],
+      [f.adresseSite, 'Adresse site'], [f.nomDemandeur, 'Nom'],
+      [f.prenomDemandeur, 'Prénom'], [f.telephoneDemandeur, 'Téléphone'],
+      [f.emailDemandeur, 'Adresse Mail'], [f.lieuSite, 'Site'],
+      [f.typeMateriel, 'Type de Matériel'], [f.marque, 'Marque'],
+      [f.reference, 'Référence'], [f.descriptionPanne, 'Description de la Panne']
+    ];
+    const manquant = champsObligatoires.find(([valeur]) => !valeur.trim());
+    if (manquant) {
+      this.formErreur = `Le champ « ${manquant[1]} » est obligatoire.`;
       return;
     }
     this.creationEnCours = true;
     const body = {
-      titre: this.form.titre.trim(),
-      description: this.form.description.trim(),
-      categorie: this.form.categorie,
-      priorite: this.form.priorite
+      titre: f.titre.trim(),
+      categorie: f.categorie,
+      adresseSite: f.adresseSite.trim(),
+      nomDemandeur: f.nomDemandeur.trim(),
+      prenomDemandeur: f.prenomDemandeur.trim(),
+      telephoneDemandeur: f.telephoneDemandeur.trim(),
+      emailDemandeur: f.emailDemandeur.trim(),
+      lieuSite: f.lieuSite.trim(),
+      nomSalle: f.nomSalle.trim() || null,
+      etage: f.etage.trim() || null,
+      informationsAdditionnelles: f.informationsAdditionnelles.trim() || null,
+      typeMateriel: f.typeMateriel.trim(),
+      marque: f.marque.trim(),
+      reference: f.reference.trim(),
+      numeroSerie: f.numeroSerie.trim() || null,
+      sousGarantie: f.sousGarantie,
+      criticite: f.criticite,
+      descriptionPanne: f.descriptionPanne.trim()
     };
     this.ticketsApi.creer<any>(body).subscribe({
       next: (cree) => {
@@ -235,7 +277,7 @@ export class DashboardClient implements OnInit {
   }
 
   resetForm() {
-    this.form = { titre: '', description: '', categorie: 'Matériel', priorite: 'Moyenne' };
+    this.form = this.formVide();
     this.formErreur = '';
   }
 
@@ -249,13 +291,14 @@ export class DashboardClient implements OnInit {
     return this.statutLabels[statut] || statut || '—';
   }
 
-  getPrioriteColor(priorite: string): string {
+  getCriticiteColor(criticite: string): string {
     const map: Record<string, string> = {
       Faible: '#16a34a',
       Moyenne: '#f59e0b',
-      Haute: '#dc2626'
+      Importante: '#ea580c',
+      Critique: '#dc2626'
     };
-    return map[priorite] || '#546e7a';
+    return map[criticite] || '#546e7a';
   }
 
   getAuteurNom(auteur: any): string {

@@ -44,7 +44,7 @@
                   <strong>{{ t.titre }}</strong>
                 </div>
                 <div class="ticket-head-right">
-                  <span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span>
+                  <span class="indic" [ngClass]="criticiteClass(t.criticite)">{{ t.criticite }}</span>
                   <button class="btn-detail" type="button" (click)="ouvrirDetail(t)"
                           title="Voir l'historique et répondre">
                     <mat-icon>forum</mat-icon> Détail
@@ -58,7 +58,7 @@
                 <span><mat-icon>schedule</mat-icon> {{ formatDate(t.dateCreation) }}</span>
               </div>
 
-              <p class="ticket-desc">{{ t.description }}</p>
+              <p class="ticket-desc">{{ t.descriptionPanne }}</p>
 
               <div class="ticket-action-zone">
                 <textarea class="fi" rows="2" placeholder="Commentaire (optionnel)…"
@@ -100,7 +100,7 @@
                 <th>Titre</th>
                 <th>Client</th>
                 <th>Catégorie</th>
-                <th>Priorité</th>
+                <th>Criticité</th>
                 <th>Statut</th>
                 <th>Traité par</th>
                 <th>Action</th>
@@ -113,7 +113,7 @@
                   <td>{{ t.titre }}</td>
                   <td>{{ t.client?.nom || '—' }}</td>
                   <td>{{ t.categorie || '—' }}</td>
-                  <td><span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span></td>
+                  <td><span class="indic" [ngClass]="criticiteClass(t.criticite)">{{ t.criticite }}</span></td>
                   <td>
                     <span class="statut-badge" [ngClass]="statutClass(t.statut)">
                       <span class="dot"></span>{{ statutLabel(t.statut) }}
@@ -184,14 +184,41 @@
               <div class="modal-info-item"><label>Client</label><span>{{ t.client?.nom || '—' }}</span></div>
               <div class="modal-info-item"><label>Catégorie</label><span>{{ t.categorie || '—' }}</span></div>
               <div class="modal-info-item">
-                <label>Priorité</label>
-                <span class="indic" [ngClass]="prioriteClass(t.priorite)">{{ t.priorite }}</span>
+                <label>Criticité</label>
+                <span class="indic" [ngClass]="criticiteClass(t.criticite)">{{ t.criticite }}</span>
               </div>
               <div class="modal-info-item"><label>Créé le</label><span>{{ formatDate(t.dateCreation) }}</span></div>
               <div class="modal-info-item"><label>Traité par</label><span>{{ t.traitePar?.nom || '—' }}</span></div>
             </div>
-            @if (t.description) {
-              <p class="modal-desc">{{ t.description }}</p>
+
+            <h5 class="modal-subtitre">Demande d'intervention</h5>
+            <div class="modal-info-row">
+              <div class="modal-info-item"><label>Demandeur</label><span>{{ t.prenomDemandeur }} {{ t.nomDemandeur }}</span></div>
+              <div class="modal-info-item"><label>Téléphone</label><span>{{ t.telephoneDemandeur || '—' }}</span></div>
+              <div class="modal-info-item"><label>Email</label><span>{{ t.emailDemandeur || '—' }}</span></div>
+              <div class="modal-info-item"><label>Adresse site</label><span>{{ t.adresseSite || '—' }}</span></div>
+            </div>
+
+            <h5 class="modal-subtitre">Lieu d'intervention</h5>
+            <div class="modal-info-row">
+              <div class="modal-info-item"><label>Site</label><span>{{ t.lieuSite || '—' }}</span></div>
+              <div class="modal-info-item"><label>Salle</label><span>{{ t.nomSalle || '—' }}</span></div>
+              <div class="modal-info-item"><label>Étage</label><span>{{ t.etage || '—' }}</span></div>
+            </div>
+            @if (t.informationsAdditionnelles) {
+              <p class="modal-desc">{{ t.informationsAdditionnelles }}</p>
+            }
+
+            <h5 class="modal-subtitre">Nature de la panne</h5>
+            <div class="modal-info-row">
+              <div class="modal-info-item"><label>Matériel</label><span>{{ t.typeMateriel || '—' }}</span></div>
+              <div class="modal-info-item"><label>Marque</label><span>{{ t.marque || '—' }}</span></div>
+              <div class="modal-info-item"><label>Référence</label><span>{{ t.reference || '—' }}</span></div>
+              <div class="modal-info-item"><label>N° Série</label><span>{{ t.numeroSerie || '—' }}</span></div>
+              <div class="modal-info-item"><label>Garantie</label><span>{{ t.sousGarantie ? 'Oui' : 'Non' }}</span></div>
+            </div>
+            @if (t.descriptionPanne) {
+              <p class="modal-desc">{{ t.descriptionPanne }}</p>
             }
           </div>
 

@@ -65,6 +65,11 @@
               <span class="home-action-text"><strong>Mes Congés</strong><span>Demandes</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'tickets-clients'">
+              <span class="home-action-icon home-action-orange"><mat-icon>confirmation_number</mat-icon></span>
+              <span class="home-action-text"><strong>Tickets Clients</strong><span>{{ ticketsClientsATraiter.length }} à traiter</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
           </div>
         </div>
       }
