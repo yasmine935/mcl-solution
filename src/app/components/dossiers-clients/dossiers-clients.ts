@@ -11,8 +11,8 @@ import { UtilisateursApi } from '../../services/api/apis';
  * Gestion des comptes CLIENT (accès externe au portail de ticketing) — distincte
  * de la gestion des employés (voir composant Employes) : un compte client n'est
  * pas un employé, mais les deux partagent la même table `utilisateurs` et le même
- * endpoint backend /api/utilisateurs (@PreAuthorize ADMINISTRATEUR/RH), d'où le tri
- * par rôle fait ici plutôt que côté API.
+ * endpoint backend /api/utilisateurs (@PreAuthorize ADMINISTRATEUR/RH/MANAGER),
+ * d'où le tri par rôle fait ici plutôt que côté API.
  */
 @Component({
   selector: 'app-dossiers-clients',
@@ -35,8 +35,8 @@ export class DossiersClients implements OnInit {
   currentUser: any = {};
 
   // Rôles autorisés à créer/gérer des comptes, alignés sur le backend
-  // (@PreAuthorize("hasAnyAuthority('ADMINISTRATEUR', 'RH')") sur UtilisateurController).
-  private readonly rolesGestionComptes = ['RH', 'ADMINISTRATEUR'];
+  // (@PreAuthorize("hasAnyAuthority('ADMINISTRATEUR', 'RH', 'MANAGER')") sur UtilisateurController).
+  private readonly rolesGestionComptes = ['RH', 'ADMINISTRATEUR', 'MANAGER'];
 
   nouveauClient = {
     prenom: '',

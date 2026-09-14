@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { Voitures } from '../voitures/voitures';
 import { Employes } from '../employes/employes';
-import { DossiersClients } from '../dossiers-clients/dossiers-clients';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import { CongesApi, UtilisateursApi, ReclamationsApi } from '../../services/api/apis';
 
@@ -19,7 +18,6 @@ const ESPACE: EspaceConfig = {
     { key: 'home', icon: 'dashboard', label: 'Accueil', section: 'Tableau de Bord' },
     { key: 'conges', icon: 'beach_access', label: 'Congés', section: 'RH & Personnel' },
     { key: 'employes', icon: 'people', label: 'Dossiers Personnel' },
-    { key: 'clients-comptes', icon: 'support_agent', label: 'Dossiers Clients' },
     { key: 'reclamations', icon: 'report_problem', label: 'Remontées Terrain' },
     { key: 'voitures', icon: 'directions_car', label: 'Parc Automobile' }
   ],
@@ -32,7 +30,7 @@ const ESPACE: EspaceConfig = {
 @Component({
   selector: 'app-dashboard-karine',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, RemonteesTerrainComponent, Voitures, Employes, DossiersClients, DashboardLayout],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, RemonteesTerrainComponent, Voitures, Employes, DashboardLayout],
   templateUrl: './dashboard-karine.html',
   styleUrl: './dashboard-karine.css'
 })
@@ -201,8 +199,7 @@ export class DashboardKarine implements OnInit {
       'conges': 'Gestion des Congés',
       'sse': 'Remontées SSE Terrain',
       'voitures': 'Parc Automobile',
-      'employes': 'Dossiers du Personnel',
-      'clients-comptes': 'Dossiers Clients'
+      'employes': 'Dossiers du Personnel'
     };
     return map[this.currentPage] || 'DRH';
   }

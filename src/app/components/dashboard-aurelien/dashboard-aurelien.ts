@@ -16,6 +16,7 @@ import { TicketingComponent } from '../ticketing/ticketing';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
 import { GestionClients } from '../clients/clients';
 import { TicketsClientPanel } from '../tickets-client-panel/tickets-client-panel';
+import { DossiersClients } from '../dossiers-clients/dossiers-clients';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import { CongesApi, MessagesAbyApi, UtilisateursApi } from '../../services/api/apis';
 
@@ -40,7 +41,8 @@ const ESPACE: EspaceConfig = {
     { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés', section: 'Support' },
     { key: 'messagerie', icon: 'email', label: 'Messagerie MCL', section: 'Communication' },
     { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' },
-    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', section: 'Support Client' }
+    { key: 'tickets-clients', icon: 'confirmation_number', label: 'Tickets Clients', section: 'Support Client' },
+    { key: 'clients-comptes', icon: 'support_agent', label: 'Dossiers Clients' }
   ]
 };
 
@@ -53,7 +55,7 @@ const ESPACE: EspaceConfig = {
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Taches, FichesCompletees,
     Documents, Semainier, Planning, TicketingComponent,
-    ApprovisionnementComponent, GestionClients, TicketsClientPanel, DashboardLayout
+    ApprovisionnementComponent, GestionClients, TicketsClientPanel, DossiersClients, DashboardLayout
   ],
   templateUrl: './dashboard-aurelien.html',
   styleUrl: './dashboard-aurelien.css'
@@ -332,6 +334,7 @@ loadSoldeConges() {
       case 'Semainier': return 'Semainier';
       case 'tickets': return 'Tickets Clients';
       case 'tickets-clients': return 'Tickets Clients';
+      case 'clients-comptes': return 'Dossiers Clients';
       case 'mes-conges': return 'Mes Conges';
       case 'approvisionnement': return 'Demandes d\'Approvisionnement';
       case 'messagerie': return 'Messagerie MCL Solutions';

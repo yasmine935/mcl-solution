@@ -105,6 +105,11 @@
         <app-tickets-client-panel></app-tickets-client-panel>
       }
 
+      <!-- ══ DOSSIERS CLIENTS ══ -->
+      @if (currentPage === 'clients-comptes') {
+        <app-dossiers-clients></app-dossiers-clients>
+      }
+
       <!-- ══ MESSAGERIE ══ -->
       @if (currentPage === 'messagerie') {
         <div class="messagerie-wrap">
