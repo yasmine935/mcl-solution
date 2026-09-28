@@ -214,7 +214,7 @@
         <button mat-raised-button color="primary" (click)="ajouterTache()" class="btn-save">
           <mat-icon>check</mat-icon> Créer le projet
         </button>
-        <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd()">
+        <button mat-stroked-button (click)="showFormAdd = false; resetFormAdd(); scrollListeEnHaut()">
           <mat-icon>close</mat-icon> Annuler
         </button>
       </div>
@@ -424,7 +424,7 @@
         <button mat-raised-button color="primary" (click)="modifierTache()" class="btn-save">
           <mat-icon>save</mat-icon> Enregistrer
         </button>
-        <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit()">
+        <button mat-stroked-button (click)="showFormEdit = false; resetFormEdit(); scrollListeEnHaut()">
           <mat-icon>close</mat-icon> Annuler
         </button>
       </div>

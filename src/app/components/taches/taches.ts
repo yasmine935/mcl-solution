@@ -90,10 +90,11 @@ export class Taches implements OnInit {
     if (this.pageActuelle < this.totalPages - 1) { this.pageActuelle++; this.chargerPage(); this.scrollListeEnHaut(); }
   }
 
-  /** Remonte en haut de la liste après un changement de page — sinon on reste
-   * sur les boutons Précédent/Suivant, en bas, sans voir les nouvelles lignes. */
-  private scrollListeEnHaut() {
-    document.querySelector('.table-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  /** Remonte en haut de la page — utilisé après un changement de page, ou en
+   * sortant d'un formulaire (ajout/édition) qui masque la liste et qui a pu être
+   * scrollé plus bas (ex: pour atteindre le bouton Enregistrer/Annuler). */
+  scrollListeEnHaut() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   showFormEdit = false;
   showNoteModal = false;
@@ -362,6 +363,7 @@ export class Taches implements OnInit {
         // Le nouveau projet est trié en premier (dateCreation DESC) -> page 0.
         this.pageActuelle = 0;
         this.chargerPage();
+        this.scrollListeEnHaut();
       },
       error: () => alert('Erreur création projet')
     });
@@ -387,6 +389,7 @@ export class Taches implements OnInit {
         this.resetFormEdit();
         this.showFormEdit = false;
         this.chargerPage();
+        this.scrollListeEnHaut();
       },
       error: () => alert('Erreur modification')
     });
