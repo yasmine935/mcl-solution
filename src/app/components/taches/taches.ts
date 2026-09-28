@@ -103,7 +103,7 @@ export class Taches implements OnInit {
   noteTemp = '';
   currentUser: any = {};
 
-  statuts = ['En Qualification', 'En cours', 'Fait', 'Perdu', 'En Attente', 'Qualification', 'Devis', 'Validation Resp', 'Bon de commande', 'Réalisation', 'Clôture'];
+  statuts = ['Qualification', 'Devis', 'Commande', 'En cours', 'Réalisé', 'Perdu'];
   priorites = ['Faible', 'Élevé', 'Moyenne'];
 
   clients: any[] = [];
@@ -113,7 +113,7 @@ export class Taches implements OnInit {
   clientModalTarget: 'add' | 'edit' = 'add';
 
   nouvelleTache = {
-    projet: '', statut: 'En Qualification', date: '',
+    projet: '', statut: 'Qualification', date: '',
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
     echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
   };
@@ -261,9 +261,7 @@ export class Taches implements OnInit {
     return {
       id: t.id,
       projet: t.titre,
-      statut: t.statut === 'A_FAIRE' ? 'En Qualification' :
-              t.statut === 'EN_COURS' ? 'En cours' :
-              t.statut === 'TERMINEE' ? 'Fait' : t.statut,
+      statut: this.normaliserStatut(t.statut),
       date: t.dateCreation ? new Date(t.dateCreation).toLocaleDateString('fr-FR') : '',
       priorite: t.priorite || 'Moyenne',
       echeance: t.dateEcheance || '',
@@ -282,8 +280,21 @@ export class Taches implements OnInit {
   }
 
   mapStatutToBackend(statutFr: string): string {
-    const map: any = { 'En Qualification': 'A_FAIRE', 'En cours': 'EN_COURS', 'Fait': 'TERMINEE' };
-    return map[statutFr] || statutFr;
+    return statutFr;
+  }
+
+  /** Ramène un statut venant de la BDD à l'une des 6 valeurs autorisées.
+   * Couvre les anciens codes/libellés déjà en base (dont ceux de prod, inconnus
+   * à l'avance) — tout ce qui n'est pas reconnu devient "Qualification". */
+  normaliserStatut(statutBrut: string): string {
+    const map: any = {
+      'A_FAIRE': 'Qualification', 'EN_COURS': 'En cours', 'TERMINEE': 'Réalisé',
+      'En Qualification': 'Qualification', 'En Attente': 'Qualification',
+      'Fait': 'Réalisé', 'Validation Resp': 'Devis', 'Bon de commande': 'Commande',
+      'Réalisation': 'Réalisé', 'Clôture': 'Réalisé'
+    };
+    if (this.statuts.includes(statutBrut)) return statutBrut;
+    return map[statutBrut] || 'Qualification';
   }
 
   buildBody(tache: any, statut?: string): any {
@@ -333,7 +344,7 @@ export class Taches implements OnInit {
     etape.done = true;
     etape.doneBy = `${this.currentUser.prenom} ${this.currentUser.nom}`;
     etape.doneAt = new Date().toLocaleString('fr-FR');
-    tache.statut = etape.nom === 'Clôture' ? 'Fait' : etape.nom;
+    tache.statut = etape.nom === 'Clôture' ? 'Réalisé' : this.normaliserStatut(etape.nom);
     this.tachesApi.modifier<any>(tache.id, this.buildBody(tache)).subscribe();
   }
 
@@ -555,10 +566,8 @@ export class Taches implements OnInit {
 
   getStatutColor(statut: string): string {
     const colors: any = {
-      'En Qualification': '#CCCCCC', 'En cours': '#FFA500',
-      'Fait': '#00CC00', 'Perdu': '#FF0000', 'En Attente': '#0066FF',
-      'Qualification': '#9e9e9e', 'Devis': '#f57f17', 'Validation Resp': '#fb8c00',
-      'Bon de commande': '#1565c0', 'Réalisation': '#00838f', 'Clôture': '#00CC00'
+      'Qualification': '#9e9e9e', 'Devis': '#f57f17', 'Commande': '#1565c0',
+      'En cours': '#FFA500', 'Réalisé': '#00CC00', 'Perdu': '#FF0000'
     };
     return colors[statut] || '#CCCCCC';
   }
