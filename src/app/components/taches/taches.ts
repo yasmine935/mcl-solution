@@ -587,13 +587,12 @@ export class Taches implements OnInit {
     return emp ? `${emp.prenom} ${emp.nom}` : 'Inconnu';
   }
 
-  rechercheClientTache = '';
-
+  /** Liste des clients triée par ordre alphabétique — utilisée dans le champ
+   * Client (input + datalist) des formulaires ajout/édition de projet. Le
+   * filtrage par saisie est géré nativement par le navigateur via <datalist>. */
   get clientsTries(): any[] {
-    const q = this.rechercheClientTache.toLowerCase().trim();
     return [...this.clients]
       .filter((c: any) => c.actif !== false)
-      .filter((c: any) => !q || (c.nom || '').toLowerCase().includes(q) || (c.codeClient || '').toLowerCase().includes(q))
       .sort((a: any, b: any) => (a.nom || '').localeCompare(b.nom || '', 'fr'));
   }
 }

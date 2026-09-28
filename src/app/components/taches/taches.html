@@ -62,14 +62,13 @@
         <div class="proj-row">
           <div class="proj-field-lg">
             <label class="field-label">Client</label>
-            <input type="text" class="compact-input client-search-input" [(ngModel)]="rechercheClientTache"
-              placeholder="🔍 Rechercher un client...">
-            <select class="compact-input" [(ngModel)]="nouvelleTache.client">
-              <option value="">— Sélectionner —</option>
+            <input type="text" class="compact-input" list="clients-datalist-add" [(ngModel)]="nouvelleTache.client"
+              placeholder="🔍 Rechercher ou sélectionner un client...">
+            <datalist id="clients-datalist-add">
               @for (c of clientsTries; track c.id) {
-                <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option>
+                <option [value]="c.nom"></option>
               }
-            </select>
+            </datalist>
           </div>
           <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
@@ -272,14 +271,13 @@
         <div class="proj-row">
           <div class="proj-field-lg">
             <label class="field-label">Client</label>
-            <input type="text" class="compact-input client-search-input" [(ngModel)]="rechercheClientTache"
-              placeholder="🔍 Rechercher un client...">
-            <select class="compact-input" [(ngModel)]="tacheEnEdition.client">
-              <option value="">— Sélectionner —</option>
+            <input type="text" class="compact-input" list="clients-datalist-edit" [(ngModel)]="tacheEnEdition.client"
+              placeholder="🔍 Rechercher ou sélectionner un client...">
+            <datalist id="clients-datalist-edit">
               @for (c of clientsTries; track c.id) {
-                <option [value]="c.nom">{{ c.nom }}@if (c.codeClient) { — {{ c.codeClient }}}</option>
+                <option [value]="c.nom"></option>
               }
-            </select>
+            </datalist>
           </div>
           <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
