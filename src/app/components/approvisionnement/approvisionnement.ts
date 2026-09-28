@@ -108,6 +108,7 @@ export class ApprovisionnementComponent implements OnInit {
     if (!this.form.dateAttendue || !this.form.department || !this.form.nomProjet || !this.form.codeAffaire) {
       this.formInvalide = true;
       alert('Veuillez remplir les champs obligatoires (*)');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     this.formInvalide = false;

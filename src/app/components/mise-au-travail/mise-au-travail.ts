@@ -95,6 +95,7 @@ export class MiseAuTravail implements OnInit {
     if (!this.form.chantierZone || !this.form.date || !this.form.responsableIntervention) {
       this.formInvalide = true;
       alert('Veuillez remplir les champs obligatoires (*)');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     this.formInvalide = false;

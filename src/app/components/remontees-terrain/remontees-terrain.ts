@@ -126,6 +126,7 @@ export class RemonteesTerrainComponent implements OnInit {
   if (!this.form.descriptionFaits || !this.form.lieu || !this.form.date) {
     this.formInvalide = true;
     alert('Veuillez remplir les champs obligatoires (*)');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
   this.formInvalide = false;

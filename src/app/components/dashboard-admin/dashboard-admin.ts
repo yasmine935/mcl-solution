@@ -304,7 +304,9 @@ joursEnTropSolde = 0;
 deposerCongePerso() {
   if (!this.congePerso.dateDebut || !this.congePerso.dateFin || !this.congePerso.type) {
     this.formCongeInvalide = true;
-    alert('Veuillez remplir les champs obligatoires'); return;
+    alert('Veuillez remplir les champs obligatoires');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
   }
   this.formCongeInvalide = false;
   if (this.congePerso.dateFin < this.congePerso.dateDebut) {

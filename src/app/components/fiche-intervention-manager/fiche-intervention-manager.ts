@@ -326,6 +326,7 @@ export class FicheInterventionManager implements OnInit {
     if (!this.nouvelleFiche.numProjet || !this.nouvelleFiche.client) {
       this.formAjoutInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     this.formAjoutInvalide = false;
@@ -379,6 +380,7 @@ export class FicheInterventionManager implements OnInit {
     if (!this.ficheEnEdition.numProjet) {
       this.formEditInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     this.formEditInvalide = false;

@@ -209,6 +209,7 @@ export class DashboardAby implements OnInit {
     if (!this.nouvelleCommande.reference || !this.nouvelleCommande.description) {
       this.formCommandeInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     this.formCommandeInvalide = false;

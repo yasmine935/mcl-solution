@@ -49,6 +49,7 @@ export class Voitures implements OnInit {
     if (!this.nouvelleVoiture.immatriculation || !this.nouvelleVoiture.marque) {
       this.formAjoutInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     this.formAjoutInvalide = false;
