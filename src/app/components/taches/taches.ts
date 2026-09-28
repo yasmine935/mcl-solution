@@ -589,6 +589,10 @@ export class Taches implements OnInit {
     return emp ? `${emp.prenom} ${emp.nom}` : 'Inconnu';
   }
 
+  getEmployeeNamesJoined(ids: number[]): string {
+    return (ids || []).map(id => this.getEmployeeName(id)).join(' - ');
+  }
+
   /** Liste des clients triée par ordre alphabétique — utilisée dans le champ
    * Client (combobox) des formulaires ajout/édition de projet. */
   get clientsTries(): any[] {

@@ -548,9 +548,7 @@
                 <td>
                   <div class="assignes-container">
                     @if (tache.assignes?.length > 0) {
-                      @for (id of tache.assignes; track id) {
-                        <span class="assignee-badge">{{ getEmployeeName(id) }}</span>
-                      }
+                      <span class="assignee-badge">{{ getEmployeeNamesJoined(tache.assignes) }}</span>
                     } @else {
                       <span class="assignee-empty">—</span>
                     }
@@ -701,9 +699,7 @@
             <strong>Personnes assignées</strong>
             <div class="assignes-container" style="margin-top:6px">
               @if (selectedTache.assignes?.length > 0) {
-                @for (id of selectedTache.assignes; track id) {
-                  <span class="assignee-badge">{{ getEmployeeName(id) }}</span>
-                }
+                <span class="assignee-badge">{{ getEmployeeNamesJoined(selectedTache.assignes) }}</span>
               } @else { <span class="assignee-empty">—</span> }
             </div>
           </div>
