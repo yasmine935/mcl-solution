@@ -44,7 +44,14 @@ export class FicheInterventionManager implements OnInit {
 
   fichesFiltrees(): any[] {
     let liste = this.fiches;
-    if (this.filtreStatut) liste = liste.filter((f: any) => f.statut === this.filtreStatut);
+    if (this.filtreStatut) {
+      liste = liste.filter((f: any) => f.statut === this.filtreStatut);
+    } else {
+      // Par défaut, les fiches complétées ne s'affichent pas ici — elles ont
+      // leur propre page "Fiches Complétées". Il faut choisir explicitement
+      // le filtre "Complétée" pour les voir dans cette liste.
+      liste = liste.filter((f: any) => f.statut !== 'COMPLETEE');
+    }
     if (this.filtreClient) liste = liste.filter((f: any) => f.client === this.filtreClient);
     if (!this.recherche.trim()) return liste;
     const q = this.recherche.toLowerCase().trim();
