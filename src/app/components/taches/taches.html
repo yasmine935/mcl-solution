@@ -172,11 +172,16 @@
         <div class="proj-row">
           <div class="proj-field-full">
             <label class="field-label">Personnes assignées</label>
-            <select class="compact-input select-multi" [(ngModel)]="nouvelleTache.assignes" multiple>
+            <div class="assignes-checklist">
               @for (emp of employes; track emp.id) {
-                <option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</option>
+                <label class="assignes-check-item">
+                  <input type="checkbox" [checked]="nouvelleTache.assignes.includes(emp.id)" (change)="toggleAssigne(nouvelleTache, emp.id)">
+                  <span>{{ emp.prenom }} {{ emp.nom }}</span>
+                </label>
+              } @empty {
+                <span class="assignee-empty">Aucun employé</span>
               }
-            </select>
+            </div>
           </div>
         </div>
       </div>
@@ -403,12 +408,17 @@
         </div>
         <div class="proj-row">
           <div class="proj-field-full">
-            <label class="field-label" for="assignes-edit">Personnes assignées</label>
-            <select id="assignes-edit" class="compact-input select-multi" [(ngModel)]="tacheEnEdition.assignes" multiple>
+            <label class="field-label">Personnes assignées</label>
+            <div class="assignes-checklist">
               @for (emp of employes; track emp.id) {
-                <option [value]="emp.id">{{ emp.prenom }} {{ emp.nom }}</option>
+                <label class="assignes-check-item">
+                  <input type="checkbox" [checked]="tacheEnEdition.assignes.includes(emp.id)" (change)="toggleAssigne(tacheEnEdition, emp.id)">
+                  <span>{{ emp.prenom }} {{ emp.nom }}</span>
+                </label>
+              } @empty {
+                <span class="assignee-empty">Aucun employé</span>
               }
-            </select>
+            </div>
           </div>
         </div>
       </div>

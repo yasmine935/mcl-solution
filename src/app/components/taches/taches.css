@@ -424,7 +424,16 @@ mat-form-field { width: 100%; }
   display: flex; flex-direction: column; gap: 6px; margin-top: 10px;
 }
 
-.select-multi { height: 70px !important; }
+.assignes-checklist {
+  display: flex; flex-wrap: wrap; gap: 4px; max-height: 140px; overflow-y: auto;
+  border: 1.5px solid #dde2ea; border-radius: 8px; padding: 8px; background: #fff;
+}
+.assignes-check-item {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px;
+  font-size: 0.82rem; color: #0d1b2a; cursor: pointer; flex: 0 0 auto; user-select: none;
+}
+.assignes-check-item:hover { background: #f0f6ff; }
+.assignes-check-item input[type="checkbox"] { cursor: pointer; accent-color: #01579b; }
 
 @media (max-width: 768px) {
   .proj-row { flex-direction: column; }

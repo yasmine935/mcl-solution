@@ -633,6 +633,13 @@ export class Taches implements OnInit {
     return this.clientsTries.filter((c: any) => (c.nom || '').toLowerCase().includes(valeur));
   }
 
+  toggleAssigne(tache: any, empId: number) {
+    if (!tache.assignes) tache.assignes = [];
+    const idx = tache.assignes.indexOf(empId);
+    if (idx === -1) tache.assignes.push(empId);
+    else tache.assignes.splice(idx, 1);
+  }
+
   selectionnerClient(cible: 'add' | 'edit', nom: string) {
     if (cible === 'add') this.nouvelleTache.client = nom;
     else this.tacheEnEdition.client = nom;
