@@ -152,7 +152,8 @@ export class FicheInterventionManager implements OnInit {
     if (client) {
       form.client = client.nom;
       form.codeClient = client.codeClient || '';
-      form.adresse = client.adresse || form.adresse || '';
+      // L'adresse du site d'intervention n'est pas forcément celle du client
+      // (siège, facturation…) — elle reste un champ saisi manuellement.
       form.contact = client.contact || form.contact || '';
     }
   }
