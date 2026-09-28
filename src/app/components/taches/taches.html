@@ -43,8 +43,8 @@
             </select>
           </div>
           <div class="proj-field-sm">
-            <label class="field-label">Date</label>
-            <input class="compact-input" [(ngModel)]="nouvelleTache.date" type="date"/>
+            <label class="field-label">Date de création</label>
+            <input class="compact-input" type="text" [value]="nouvelleTache.date" disabled/>
           </div>
           <div class="proj-field-sm">
             <label class="field-label">Échéance</label>
@@ -253,8 +253,8 @@
             </select>
           </div>
           <div class="proj-field-sm">
-            <label class="field-label">Date</label>
-            <input class="compact-input" [(ngModel)]="tacheEnEdition.date" type="date"/>
+            <label class="field-label">Date de création</label>
+            <input class="compact-input" type="text" [value]="tacheEnEdition.date" disabled/>
           </div>
           <div class="proj-field-sm">
             <label class="field-label">Échéance</label>
@@ -648,7 +648,7 @@
             <strong>Client Final</strong>
             <p>{{ selectedTache.clientFinal || '—' }}</p>
           </div>
-          <div class="detail-item"><strong>Date</strong><p>{{ selectedTache.date || '—' }}</p></div>
+          <div class="detail-item"><strong>Date de création</strong><p>{{ selectedTache.date || '—' }}</p></div>
           <div class="detail-item"><strong>Échéance</strong><p>{{ selectedTache.echeance || '—' }}</p></div>
           <div class="detail-item"><strong>CA</strong><p class="highlight-number">{{ selectedTache.chiffreAffaire ? selectedTache.chiffreAffaire + '€' : '—' }}</p></div>
           <div class="detail-item"><strong>N° Commande</strong><p>{{ selectedTache.numCommande || '—' }}</p></div>

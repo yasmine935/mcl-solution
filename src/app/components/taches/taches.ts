@@ -113,7 +113,7 @@ export class Taches implements OnInit {
   clientModalTarget: 'add' | 'edit' = 'add';
 
   nouvelleTache = {
-    projet: '', statut: 'Qualification', date: '',
+    projet: '', statut: 'Qualification', date: new Date().toLocaleDateString('fr-FR'),
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
     echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
   };
@@ -498,7 +498,7 @@ export class Taches implements OnInit {
 
   resetFormAdd() {
     this.nouvelleTache = {
-      projet: '', statut: 'En Qualification', date: '',
+      projet: '', statut: 'Qualification', date: new Date().toLocaleDateString('fr-FR'),
       priorite: 'Moyenne', fichiers: [], assignes: [],
       echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
     };
