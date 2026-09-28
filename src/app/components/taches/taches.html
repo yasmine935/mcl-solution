@@ -60,15 +60,21 @@
           <h4>Client</h4>
         </div>
         <div class="proj-row">
-          <div class="proj-field-lg">
+          <div class="proj-field-lg client-combobox-wrap">
             <label class="field-label">Client</label>
-            <input type="text" class="compact-input" list="clients-datalist-add" [(ngModel)]="nouvelleTache.client"
-              placeholder="🔍 Rechercher ou sélectionner un client...">
-            <datalist id="clients-datalist-add">
-              @for (c of clientsTries; track c.id) {
-                <option [value]="c.nom"></option>
-              }
-            </datalist>
+            <input type="text" class="compact-input" [(ngModel)]="nouvelleTache.client"
+              placeholder="🔍 Rechercher ou sélectionner un client..."
+              (focus)="ouvrirClientDropdown('add')" (click)="ouvrirClientDropdown('add')" (input)="onSaisieClient()" (blur)="fermerClientDropdownDelai()">
+            @if (clientDropdownCible === 'add') {
+              <div class="client-dropdown">
+                @for (c of clientsPourDropdown('add'); track c.id) {
+                  <div class="client-dropdown-item" [class.selected]="c.nom === nouvelleTache.client"
+                    (mousedown)="selectionnerClient('add', c.nom)">{{ c.nom }}</div>
+                } @empty {
+                  <div class="client-dropdown-empty">Aucun client</div>
+                }
+              </div>
+            }
           </div>
           <div class="proj-field-lg">
             <label class="field-label">Client Final</label>
@@ -269,15 +275,21 @@
           <h4>Client</h4>
         </div>
         <div class="proj-row">
-          <div class="proj-field-lg">
+          <div class="proj-field-lg client-combobox-wrap">
             <label class="field-label">Client</label>
-            <input type="text" class="compact-input" list="clients-datalist-edit" [(ngModel)]="tacheEnEdition.client"
-              placeholder="🔍 Rechercher ou sélectionner un client...">
-            <datalist id="clients-datalist-edit">
-              @for (c of clientsTries; track c.id) {
-                <option [value]="c.nom"></option>
-              }
-            </datalist>
+            <input type="text" class="compact-input" [(ngModel)]="tacheEnEdition.client"
+              placeholder="🔍 Rechercher ou sélectionner un client..."
+              (focus)="ouvrirClientDropdown('edit')" (click)="ouvrirClientDropdown('edit')" (input)="onSaisieClient()" (blur)="fermerClientDropdownDelai()">
+            @if (clientDropdownCible === 'edit') {
+              <div class="client-dropdown">
+                @for (c of clientsPourDropdown('edit'); track c.id) {
+                  <div class="client-dropdown-item" [class.selected]="c.nom === tacheEnEdition.client"
+                    (mousedown)="selectionnerClient('edit', c.nom)">{{ c.nom }}</div>
+                } @empty {
+                  <div class="client-dropdown-empty">Aucun client</div>
+                }
+              </div>
+            }
           </div>
           <div class="proj-field-lg">
             <label class="field-label">Client Final</label>

@@ -588,11 +588,52 @@ export class Taches implements OnInit {
   }
 
   /** Liste des clients triée par ordre alphabétique — utilisée dans le champ
-   * Client (input + datalist) des formulaires ajout/édition de projet. Le
-   * filtrage par saisie est géré nativement par le navigateur via <datalist>. */
+   * Client (combobox) des formulaires ajout/édition de projet. */
   get clientsTries(): any[] {
     return [...this.clients]
       .filter((c: any) => c.actif !== false)
       .sort((a: any, b: any) => (a.nom || '').localeCompare(b.nom || '', 'fr'));
+  }
+
+  /** Combobox Client : un seul champ texte qui ouvre une liste déroulante
+   * (taille du champ) au clic — montrant tous les clients triés, avec le
+   * client déjà sélectionné mis en évidence — et qui se filtre dès que l'on
+   * tape. `cible` distingue le formulaire d'ajout de celui d'édition. */
+  clientDropdownCible: 'add' | 'edit' | null = null;
+  /** Passe à true dès que l'utilisateur tape dans le champ une fois la liste
+   * ouverte — tant que c'est false, on affiche la liste complète (même si la
+   * valeur actuelle du champ ne correspond à aucun client connu). */
+  private clientRechercheEnCours = false;
+
+  ouvrirClientDropdown(cible: 'add' | 'edit') {
+    this.clientDropdownCible = cible;
+    this.clientRechercheEnCours = false;
+  }
+
+  onSaisieClient() {
+    this.clientRechercheEnCours = true;
+  }
+
+  fermerClientDropdown() {
+    this.clientDropdownCible = null;
+  }
+
+  /** Léger délai avant fermeture au blur pour laisser le temps au (mousedown)
+   * d'un item de la liste de s'exécuter avant que celle-ci ne disparaisse. */
+  fermerClientDropdownDelai() {
+    setTimeout(() => this.fermerClientDropdown(), 150);
+  }
+
+  clientsPourDropdown(cible: 'add' | 'edit'): any[] {
+    if (!this.clientRechercheEnCours) return this.clientsTries;
+    const valeur = ((cible === 'add' ? this.nouvelleTache.client : this.tacheEnEdition.client) || '').toLowerCase().trim();
+    if (!valeur) return this.clientsTries;
+    return this.clientsTries.filter((c: any) => (c.nom || '').toLowerCase().includes(valeur));
+  }
+
+  selectionnerClient(cible: 'add' | 'edit', nom: string) {
+    if (cible === 'add') this.nouvelleTache.client = nom;
+    else this.tacheEnEdition.client = nom;
+    this.fermerClientDropdown();
   }
 }
