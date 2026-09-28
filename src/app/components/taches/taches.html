@@ -431,7 +431,8 @@
     </div>
   }
 
-  <!-- TABLEAU -->
+  <!-- TABLEAU (masqué pendant l'édition -> le formulaire de modification prend toute la page) -->
+  @if (!showFormEdit) {
   <div class="table-container">
     <div class="table-header">
       <h3>📊 Liste des Projets ({{ taches.length }} sur cette page / {{ totalElements }} au total)</h3>
@@ -571,6 +572,7 @@
       </div>
     }
   </div>
+  }
 </div>
 
 
