@@ -535,6 +535,21 @@ export class Taches implements OnInit {
     event.target.value = '';
   }
 
+  /** Classe de la ligne selon la proximité de l'échéance :
+   * ≤ 5 jours restants (ou dépassée) -> rouge, ≤ 15 jours -> jaune, sinon rien. */
+  getEcheanceRowClass(tache: any): string {
+    if (!tache.echeance) return '';
+    const echeance = new Date(tache.echeance);
+    if (isNaN(echeance.getTime())) return '';
+    const aujourdhui = new Date();
+    aujourdhui.setHours(0, 0, 0, 0);
+    echeance.setHours(0, 0, 0, 0);
+    const joursRestants = Math.round((echeance.getTime() - aujourdhui.getTime()) / 86400000);
+    if (joursRestants <= 5) return 'row-echeance-rouge';
+    if (joursRestants <= 15) return 'row-echeance-jaune';
+    return '';
+  }
+
   getStatutColor(statut: string): string {
     const colors: any = {
       'En Qualification': '#CCCCCC', 'En cours': '#FFA500',

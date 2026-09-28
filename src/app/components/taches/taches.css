@@ -142,6 +142,14 @@ mat-form-field { width: 100%; }
 .taches-table tbody tr:hover { background: #f8fafc; }
 .taches-table tbody tr:last-child td { border-bottom: none; }
 
+/* Échéance proche : jaune (≤ 15 jours), rouge (≤ 5 jours ou dépassée) */
+.taches-table tbody tr.row-echeance-jaune { background: #fff8e1; }
+.taches-table tbody tr.row-echeance-jaune:hover { background: #fff1c2; }
+.taches-table tbody tr.row-echeance-jaune td:first-child { border-left: 3px solid #f9a825; }
+.taches-table tbody tr.row-echeance-rouge { background: #fdecea; }
+.taches-table tbody tr.row-echeance-rouge:hover { background: #fbd8d5; }
+.taches-table tbody tr.row-echeance-rouge td:first-child { border-left: 3px solid #d32f2f; }
+
 /* PROJET AVEC NOTE */
 .projet-with-note { display: flex; align-items: center; gap: 6px; }
 .note-btn { padding: 0 !important; min-width: 24px; width: 24px !important; height: 24px !important; position: relative; }

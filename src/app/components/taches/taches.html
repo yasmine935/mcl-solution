@@ -492,7 +492,7 @@
           </thead>
           <tbody>
             @for (tache of tachesFiltrees(); track tache.id) {
-              <tr>
+              <tr [class]="getEcheanceRowClass(tache)">
                 <td>
                   <div class="projet-with-note">
                     <strong class="projet-nom">{{ tache.projet }}</strong>
