@@ -333,7 +333,10 @@
                   <span class="doc-type-badge">{{ f.type }}</span>
                   <span class="fichier-nom">{{ f.nom }}</span>
                   <span class="fichier-taille">{{ f.taille }} KB</span>
-                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
+                  @if (f.dataUrl) {
+                    <button mat-icon-button color="primary" (click)="ouvrirFichier(f)" title="Ouvrir / Télécharger" type="button"><mat-icon>open_in_new</mat-icon></button>
+                  }
+                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button" title="Supprimer"><mat-icon>delete</mat-icon></button>
                 </div>
               }
             }
@@ -370,7 +373,10 @@
                   <span class="doc-type-badge">{{ f.type }}</span>
                   <span class="fichier-nom">{{ f.nom }}</span>
                   <span class="fichier-taille">{{ f.taille }} KB</span>
-                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
+                  @if (f.dataUrl) {
+                    <button mat-icon-button color="primary" (click)="ouvrirFichier(f)" title="Ouvrir / Télécharger" type="button"><mat-icon>open_in_new</mat-icon></button>
+                  }
+                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button" title="Supprimer"><mat-icon>delete</mat-icon></button>
                 </div>
               }
             }
@@ -422,7 +428,10 @@
                   <span class="doc-type-badge">{{ f.type }}</span>
                   <span class="fichier-nom">{{ f.nom }}</span>
                   <span class="fichier-taille">{{ f.taille }} KB</span>
-                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button"><mat-icon>delete</mat-icon></button>
+                  @if (f.dataUrl) {
+                    <button mat-icon-button color="primary" (click)="ouvrirFichier(f)" title="Ouvrir / Télécharger" type="button"><mat-icon>open_in_new</mat-icon></button>
+                  }
+                  <button mat-icon-button color="warn" (click)="supprimerFichierEdit($index)" type="button" title="Supprimer"><mat-icon>delete</mat-icon></button>
                 </div>
               }
             }
