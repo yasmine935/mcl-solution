@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiBase } from './api-base';
+import { ApiBase, ParamsHttp } from './api-base';
 
 /**
  * Services d'API par domaine — un par contrôleur backend.
@@ -94,6 +94,19 @@ export class MessagesAbyApi extends ApiBase {
 @Injectable({ providedIn: 'root' })
 export class TachesApi extends ApiBase {
   constructor() { super('taches'); }
+
+  /** Liste paginée (20 par défaut) + filtres appliqués côté serveur. */
+  page<T = any>(params: {
+    page: number; size: number;
+    statut?: string; priorite?: string; client?: string; recherche?: string;
+  }): Observable<{ content: T[]; totalElements: number; totalPages: number; number: number }> {
+    const p: ParamsHttp = { page: params.page, size: params.size };
+    if (params.statut) p['statut'] = params.statut;
+    if (params.priorite) p['priorite'] = params.priorite;
+    if (params.client) p['client'] = params.client;
+    if (params.recherche) p['recherche'] = params.recherche;
+    return this.get('page', p);
+  }
 }
 
 @Injectable({ providedIn: 'root' })

@@ -37,26 +37,57 @@ export class Taches implements OnInit {
   filtreClientTache = '';
   showFormAdd = false;
 
+  // ── Pagination serveur (20 projets par page, plus de findAll() complet) ──
+  pageActuelle = 0;
+  taillePage = 20;
+  totalElements = 0;
+  totalPages = 0;
+  chargementTaches = false;
+  private rechercheTimeout: any = null;
+
+  /** Clients disponibles pour le filtre — dérivé de la liste complète des clients,
+   * pas des projets déjà chargés (qui ne représentent qu'une seule page). */
   getClientsUniques(): string[] {
-    const clients = this.taches.map((t: any) => t.client).filter((c: any) => c && c.trim());
-    return [...new Set(clients)].sort();
+    return [...new Set(this.clients.map((c: any) => c.nom).filter((n: any) => n && n.trim()))].sort();
   }
 
+  /** Le filtrage/tri se fait désormais côté serveur (voir chargerPage) —
+   * cette méthode ne fait plus que renvoyer la page courante déjà filtrée.
+   * Conservée telle quelle pour ne pas toucher tous les appels du template. */
   tachesFiltrees(): any[] {
-    let liste = this.taches;
-    if (this.filtreStatutTache) liste = liste.filter((t: any) => t.statut === this.filtreStatutTache);
-    if (this.filtrePrioriteTache) liste = liste.filter((t: any) => t.priorite === this.filtrePrioriteTache);
-    if (this.filtreClientTache) liste = liste.filter((t: any) => t.client === this.filtreClientTache);
-    if (this.rechercheTache.trim()) {
-      const q = this.rechercheTache.toLowerCase().trim();
-      liste = liste.filter((t: any) =>
-        (t.projet || '').toLowerCase().includes(q) ||
-        (t.client || '').toLowerCase().includes(q) ||
-        (t.numCommande || '').toLowerCase().includes(q) ||
-        (t.clientFinal || '').toLowerCase().includes(q)
-      );
-    }
-    return liste;
+    return this.taches;
+  }
+
+  /** Déclenché par les filtres statut/priorité/client : recharge depuis la page 0. */
+  onFiltreChange() {
+    this.pageActuelle = 0;
+    this.chargerPage();
+  }
+
+  /** Recherche texte : léger debounce pour ne pas requêter à chaque frappe. */
+  onRechercheChange() {
+    if (this.rechercheTimeout) clearTimeout(this.rechercheTimeout);
+    this.rechercheTimeout = setTimeout(() => {
+      this.pageActuelle = 0;
+      this.chargerPage();
+    }, 350);
+  }
+
+  reinitialiserFiltres() {
+    this.rechercheTache = '';
+    this.filtreStatutTache = '';
+    this.filtrePrioriteTache = '';
+    this.filtreClientTache = '';
+    this.pageActuelle = 0;
+    this.chargerPage();
+  }
+
+  pagePrecedente() {
+    if (this.pageActuelle > 0) { this.pageActuelle--; this.chargerPage(); }
+  }
+
+  pageSuivante() {
+    if (this.pageActuelle < this.totalPages - 1) { this.pageActuelle++; this.chargerPage(); }
   }
   showFormEdit = false;
   showNoteModal = false;
@@ -92,7 +123,7 @@ export class Taches implements OnInit {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadClients();
     this.loadEmployes();
-    this.loadTaches();
+    this.chargerPage();
   }
 
   loadClients() {
@@ -176,13 +207,31 @@ export class Taches implements OnInit {
     });
   }
 
-  loadTaches() {
-    this.tachesApi.lister<any>().subscribe({
-      next: (data) => {
-        this.taches = data.map(t => this.mapFromBackend(t));
+  /** Charge la page courante (20 projets) avec les filtres actifs — remplace
+   * l'ancien loadTaches() qui rapatriait tous les projets en un seul appel. */
+  chargerPage() {
+    this.chargementTaches = true;
+    this.tachesApi.page<any>({
+      page: this.pageActuelle,
+      size: this.taillePage,
+      statut: this.filtreStatutTache ? this.mapStatutToBackend(this.filtreStatutTache) : undefined,
+      priorite: this.filtrePrioriteTache || undefined,
+      client: this.filtreClientTache || undefined,
+      recherche: this.rechercheTache.trim() || undefined
+    }).subscribe({
+      next: (res) => {
+        this.taches = res.content.map(t => this.mapFromBackend(t));
         this.taches.forEach(tache => { tache.notes = this.loadNotesForTache(tache.id); });
+        this.totalElements = res.totalElements;
+        this.totalPages = res.totalPages;
+        this.chargementTaches = false;
       },
-      error: () => this.taches = []
+      error: () => {
+        this.taches = [];
+        this.totalElements = 0;
+        this.totalPages = 0;
+        this.chargementTaches = false;
+      }
     });
   }
 
@@ -301,12 +350,12 @@ export class Taches implements OnInit {
     const body = this.buildBody(this.nouvelleTache, 'A_FAIRE');
     body.etapes = JSON.stringify(ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })));
     this.tachesApi.creer<any>(body).subscribe({
-      next: (created) => {
-        const t = this.mapFromBackend({ ...created, ...body });
-        t.notes = [];
-        this.taches.push(t);
+      next: () => {
         this.resetFormAdd();
         this.showFormAdd = false;
+        // Le nouveau projet est trié en premier (dateCreation DESC) -> page 0.
+        this.pageActuelle = 0;
+        this.chargerPage();
       },
       error: () => alert('Erreur création projet')
     });
@@ -329,10 +378,9 @@ export class Taches implements OnInit {
     }
     this.tachesApi.modifier<any>(this.tacheEnEdition.id, this.buildBody(this.tacheEnEdition)).subscribe({
       next: () => {
-        const index = this.taches.findIndex((t: any) => t.id === this.selectedTache.id);
-        if (index !== -1) this.taches[index] = { ...this.tacheEnEdition };
         this.resetFormEdit();
         this.showFormEdit = false;
+        this.chargerPage();
       },
       error: () => alert('Erreur modification')
     });
@@ -341,7 +389,11 @@ export class Taches implements OnInit {
   supprimerTache(id: number) {
     if (confirm('Supprimer cette tâche ?')) {
       this.tachesApi.supprimer(id).subscribe({
-        next: () => { this.taches = this.taches.filter((t: any) => t.id !== id); },
+        next: () => {
+          // Si on supprime le dernier élément d'une page qui n'est plus la première, reculer d'une page.
+          if (this.taches.length === 1 && this.pageActuelle > 0) this.pageActuelle--;
+          this.chargerPage();
+        },
         error: () => alert('❌ Erreur suppression')
       });
     }

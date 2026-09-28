@@ -434,35 +434,40 @@
   <!-- TABLEAU -->
   <div class="table-container">
     <div class="table-header">
-      <h3>📊 Liste des Projets ({{ tachesFiltrees().length }}/{{ taches.length }})</h3>
+      <h3>📊 Liste des Projets ({{ taches.length }} sur cette page / {{ totalElements }} au total)</h3>
       <div class="taches-toolbar">
         <div class="taches-search-wrap">
           <mat-icon>search</mat-icon>
-          <input type="text" class="taches-search" [(ngModel)]="rechercheTache" placeholder="Projet, client, N° CMD...">
+          <input type="text" class="taches-search" [(ngModel)]="rechercheTache" (ngModelChange)="onRechercheChange()" placeholder="Projet, client, N° CMD...">
           @if (rechercheTache) {
-            <button type="button" class="taches-search-clear" (click)="rechercheTache = ''"><mat-icon>close</mat-icon></button>
+            <button type="button" class="taches-search-clear" (click)="rechercheTache = ''; onRechercheChange()"><mat-icon>close</mat-icon></button>
           }
         </div>
-        <select class="taches-filter-select" [(ngModel)]="filtreStatutTache">
+        <select class="taches-filter-select" [(ngModel)]="filtreStatutTache" (change)="onFiltreChange()">
           <option value="">Tous les statuts</option>
           @for (s of statuts; track s) { <option [value]="s">{{ s }}</option> }
         </select>
-        <select class="taches-filter-select" [(ngModel)]="filtrePrioriteTache">
+        <select class="taches-filter-select" [(ngModel)]="filtrePrioriteTache" (change)="onFiltreChange()">
           <option value="">Toutes priorités</option>
           @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
         </select>
-        <select class="taches-filter-select" [(ngModel)]="filtreClientTache">
+        <select class="taches-filter-select" [(ngModel)]="filtreClientTache" (change)="onFiltreChange()">
           <option value="">Tous les clients</option>
           @for (c of getClientsUniques(); track c) { <option [value]="c">{{ c }}</option> }
         </select>
         @if (rechercheTache || filtreStatutTache || filtrePrioriteTache || filtreClientTache) {
-          <button type="button" class="taches-reset-btn" (click)="rechercheTache=''; filtreStatutTache=''; filtrePrioriteTache=''; filtreClientTache=''">
+          <button type="button" class="taches-reset-btn" (click)="reinitialiserFiltres()">
             <mat-icon>filter_alt_off</mat-icon> Réinitialiser
           </button>
         }
       </div>
     </div>
-    @if (tachesFiltrees().length === 0) {
+    @if (chargementTaches) {
+      <div class="empty-state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Chargement…</p>
+      </div>
+    } @else if (tachesFiltrees().length === 0) {
       <div class="empty-state">
         <mat-icon>folder_open</mat-icon>
         <p>Aucun projet</p>
@@ -552,6 +557,17 @@
             }
           </tbody>
         </table>
+      </div>
+    }
+    @if (totalPages > 1) {
+      <div class="taches-pagination">
+        <button type="button" class="taches-page-btn" [disabled]="pageActuelle === 0" (click)="pagePrecedente()">
+          <mat-icon>chevron_left</mat-icon> Précédent
+        </button>
+        <span class="taches-page-info">Page {{ pageActuelle + 1 }} / {{ totalPages }}</span>
+        <button type="button" class="taches-page-btn" [disabled]="pageActuelle >= totalPages - 1" (click)="pageSuivante()">
+          Suivant <mat-icon>chevron_right</mat-icon>
+        </button>
       </div>
     }
   </div>

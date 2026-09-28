@@ -414,6 +414,19 @@ mat-form-field { width: 100%; }
 .taches-reset-btn:hover { background: #eceff1; }
 .taches-reset-btn mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
+/* Pagination */
+.taches-pagination { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px 0 4px; }
+.taches-page-btn {
+  display: flex; align-items: center; gap: 4px;
+  background: #fff; color: #1565c0; border: 1.5px solid #cfd8dc; border-radius: 8px;
+  padding: 7px 14px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: all 0.15s;
+}
+.taches-page-btn:hover:not(:disabled) { background: #e3f2fd; border-color: #1565c0; }
+.taches-page-btn:disabled { color: #b0bec5; cursor: not-allowed; opacity: 0.6; }
+.taches-page-btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.taches-page-info { font-size: 0.85rem; font-weight: 700; color: #37474f; }
+
 /* Empty state */
 .empty-state { text-align: center; padding: 48px; color: #b0bec5; }
 .empty-state mat-icon { font-size: 2.5rem; width: 2.5rem; height: 2.5rem; display: block; margin: 0 auto 10px; }
