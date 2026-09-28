@@ -83,11 +83,17 @@ export class Taches implements OnInit {
   }
 
   pagePrecedente() {
-    if (this.pageActuelle > 0) { this.pageActuelle--; this.chargerPage(); }
+    if (this.pageActuelle > 0) { this.pageActuelle--; this.chargerPage(); this.scrollListeEnHaut(); }
   }
 
   pageSuivante() {
-    if (this.pageActuelle < this.totalPages - 1) { this.pageActuelle++; this.chargerPage(); }
+    if (this.pageActuelle < this.totalPages - 1) { this.pageActuelle++; this.chargerPage(); this.scrollListeEnHaut(); }
+  }
+
+  /** Remonte en haut de la liste après un changement de page — sinon on reste
+   * sur les boutons Précédent/Suivant, en bas, sans voir les nouvelles lignes. */
+  private scrollListeEnHaut() {
+    document.querySelector('.table-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   showFormEdit = false;
   showNoteModal = false;
