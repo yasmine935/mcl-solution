@@ -321,6 +321,17 @@ mat-form-field { width: 100%; }
 }
 .compact-input:focus { border-color: #01579b; }
 
+/* Avancement (formulaire édition) : curseur + champ nombre liés au même modèle */
+.avancement-control { display: flex; align-items: center; gap: 12px; }
+.avancement-slider { flex: 1; accent-color: #01579b; height: 6px; cursor: pointer; }
+.avancement-number { width: 70px; flex: 0 0 70px; text-align: center; }
+
+/* Avancement (colonne de la liste des projets) : mini barre de progression */
+.avancement-cell { display: flex; align-items: center; gap: 8px; min-width: 110px; }
+.avancement-bar { flex: 1; height: 8px; border-radius: 4px; background: #eceff1; overflow: hidden; }
+.avancement-bar-fill { height: 100%; background: #01579b; border-radius: 4px; transition: width 0.2s; }
+.avancement-pct { font-size: 0.78rem; font-weight: 700; color: #546e7a; min-width: 34px; text-align: right; }
+
 /* Combobox Client (champ unique avec liste déroulante filtrable) */
 .client-combobox-wrap { position: relative; }
 .client-dropdown {

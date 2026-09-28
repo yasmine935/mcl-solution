@@ -264,6 +264,7 @@ export class Taches implements OnInit {
       statut: this.normaliserStatut(t.statut),
       date: t.dateCreation ? new Date(t.dateCreation).toLocaleDateString('fr-FR') : '',
       priorite: t.priorite || 'Moyenne',
+      avancement: t.avancement != null ? t.avancement : 0,
       echeance: t.dateEcheance || '',
       client: t.client || '',
       clientFinal: t.clientFinal || '',
@@ -303,6 +304,7 @@ export class Taches implements OnInit {
       description: tache.numCommande || '',
       priorite: tache.priorite,
       statut: statut || this.mapStatutToBackend(tache.statut),
+      avancement: tache.avancement != null ? tache.avancement : 0,
       dateEcheance: tache.echeance && tache.echeance.match(/^\d{4}-\d{2}-\d{2}$/) ? tache.echeance : null,
       client: tache.client || '',
       clientFinal: tache.clientFinal || '',
@@ -635,5 +637,15 @@ export class Taches implements OnInit {
     if (cible === 'add') this.nouvelleTache.client = nom;
     else this.tacheEnEdition.client = nom;
     this.fermerClientDropdown();
+  }
+
+  /** Le curseur (range) est borné nativement par le navigateur, mais le champ
+   * nombre à côté (saisie libre) ne l'est pas — on corrige après coup. */
+  clamperAvancement() {
+    if (this.tacheEnEdition.avancement == null || this.tacheEnEdition.avancement === '') {
+      this.tacheEnEdition.avancement = 0;
+      return;
+    }
+    this.tacheEnEdition.avancement = Math.max(0, Math.min(100, Math.round(this.tacheEnEdition.avancement)));
   }
 }

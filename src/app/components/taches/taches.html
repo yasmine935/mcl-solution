@@ -266,6 +266,17 @@
             <input class="compact-input" [(ngModel)]="tacheEnEdition.echeance" type="date" [min]="tacheEnEdition.date"/>
           </div>
         </div>
+        <div class="proj-row">
+          <div class="proj-field-xl">
+            <label class="field-label">Avancement ({{ tacheEnEdition.avancement || 0 }}%)</label>
+            <div class="avancement-control">
+              <input type="range" min="0" max="100" step="1" class="avancement-slider"
+                [(ngModel)]="tacheEnEdition.avancement"/>
+              <input type="number" min="0" max="100" step="1" class="compact-input avancement-number"
+                [(ngModel)]="tacheEnEdition.avancement" (change)="clamperAvancement()"/>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- SECTION 2 : CLIENT -->
@@ -501,7 +512,7 @@
               <th>Projet</th>
               <th>Personnes</th>
               <th>Statut</th>
-              <th>Priorité</th>
+              <th>Avancement</th>
               <th>Échéance</th>
               <th>Client</th>
               <th>Client Final</th>
@@ -536,7 +547,12 @@
                   </div>
                 </td>
                 <td><span class="badge-priorite" [style.background]="getStatutColor(tache.statut)">{{ tache.statut }}</span></td>
-                <td><span class="badge-priorite-pastel" [style.background]="getPrioriteBg(tache.priorite)" [style.color]="getPrioriteTextColor(tache.priorite)">{{ tache.priorite }}</span></td>
+                <td>
+                  <div class="avancement-cell">
+                    <div class="avancement-bar"><div class="avancement-bar-fill" [style.width.%]="tache.avancement || 0"></div></div>
+                    <span class="avancement-pct">{{ tache.avancement || 0 }}%</span>
+                  </div>
+                </td>
                 <td>
                   @if (tache.echeance) {
                     <span class="badge-echeance">{{ tache.echeance }}</span>
