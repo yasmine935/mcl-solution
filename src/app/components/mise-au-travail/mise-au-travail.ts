@@ -53,6 +53,7 @@ export class MiseAuTravail implements OnInit {
   selectedFiche: FicheMiseAuTravail | null = null;
 
   form: Partial<FicheMiseAuTravail> = {};
+  formInvalide = false;
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -92,9 +93,11 @@ export class MiseAuTravail implements OnInit {
 
   soumettre(statut: 'Brouillon' | 'Validée') {
     if (!this.form.chantierZone || !this.form.date || !this.form.responsableIntervention) {
+      this.formInvalide = true;
       alert('Veuillez remplir les champs obligatoires (*)');
       return;
     }
+    this.formInvalide = false;
     const nouvelle: FicheMiseAuTravail = {
       ...this.form as FicheMiseAuTravail,
       id: Date.now().toString(),

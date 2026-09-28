@@ -20,6 +20,7 @@ export class ApprovisionnementComponent implements OnInit {
   demandes: any[] = [];
   selectedDemande: any = null;
   form: any = {};
+  formInvalide = false;
   lignes: any[] = [];
 
   departments = ['MCL Solutions', 'Technique', 'Commercial', 'RH', 'Finance', 'Direction'];
@@ -105,9 +106,11 @@ export class ApprovisionnementComponent implements OnInit {
 
   soumettre() {
     if (!this.form.dateAttendue || !this.form.department || !this.form.nomProjet || !this.form.codeAffaire) {
+      this.formInvalide = true;
       alert('Veuillez remplir les champs obligatoires (*)');
       return;
     }
+    this.formInvalide = false;
     const lignesValides = this.lignes.filter(l => l.designation.trim());
     if (lignesValides.length === 0) {
       alert('Ajoutez au moins un produit à approvisionner');

@@ -451,7 +451,7 @@
         <!-- DATES + COMPTEUR -->
         <div class="conge-dates-row">
           <div class="conge-field">
-            <label>📅 Date de début</label>
+            <label [class.label-erreur]="formCongeInvalide && !congePerso.dateDebut">📅 Date de début</label>
             <input type="date" class="conge-input" [(ngModel)]="congePerso.dateDebut" (ngModelChange)="calculerJoursPerso()">
           </div>
 
@@ -470,7 +470,7 @@
           </div>
 
           <div class="conge-field">
-            <label>📅 Date de fin</label>
+            <label [class.label-erreur]="formCongeInvalide && !congePerso.dateFin">📅 Date de fin</label>
             <input type="date" class="conge-input" [(ngModel)]="congePerso.dateFin" [min]="congePerso.dateDebut" (ngModelChange)="calculerJoursPerso()">
           </div>
         </div>

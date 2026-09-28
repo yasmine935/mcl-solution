@@ -28,7 +28,7 @@
         <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
         <div class="form-row-compact">
           <div class="field-sm">
-            <label class="field-label">Projet *</label>
+            <label class="field-label" [class.label-erreur]="formAjoutInvalide && !nouvelleFiche.numProjet">Projet *</label>
             <select class="compact-input" [(ngModel)]="nouvelleFiche.numProjet">
               <option value="">— Sélectionner un projet —</option>
               @for (p of projets; track p.id) {
@@ -37,7 +37,7 @@
             </select>
           </div>
           <div class="field-lg">
-            <label class="field-label">Client *</label>
+            <label class="field-label" [class.label-erreur]="formAjoutInvalide && !nouvelleFiche.client">Client *</label>
             <select class="compact-input" [(ngModel)]="nouvelleFiche.client" (ngModelChange)="onClientChange($event, nouvelleFiche)">
               <option value="">-- Sélectionner un client --</option>
               @for (c of clients; track c.id) {
@@ -239,7 +239,7 @@
         <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
         <div class="form-row-compact">
           <div class="field-sm">
-            <label class="field-label">Projet *</label>
+            <label class="field-label" [class.label-erreur]="formEditInvalide && !ficheEnEdition.numProjet">Projet *</label>
             <select class="compact-input" [(ngModel)]="ficheEnEdition.numProjet">
               <option value="">— Sélectionner un projet —</option>
               @for (p of projets; track p.id) {

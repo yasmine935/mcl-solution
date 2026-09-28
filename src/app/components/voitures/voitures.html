@@ -41,11 +41,11 @@
         <div class="form-v-section-title">🪪 Identification</div>
         <div class="form-v-grid">
           <div class="field-group">
-            <label>Immatriculation *</label>
+            <label [class.label-erreur]="formAjoutInvalide && !nouvelleVoiture.immatriculation">Immatriculation *</label>
             <input class="compact-input" [(ngModel)]="nouvelleVoiture.immatriculation" placeholder="AB-123-CD"/>
           </div>
           <div class="field-group">
-            <label>Marque *</label>
+            <label [class.label-erreur]="formAjoutInvalide && !nouvelleVoiture.marque">Marque *</label>
             <input class="compact-input" [(ngModel)]="nouvelleVoiture.marque" placeholder="Renault"/>
           </div>
           <div class="field-group">

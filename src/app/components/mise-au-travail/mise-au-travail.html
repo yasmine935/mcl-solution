@@ -94,12 +94,12 @@
       <div class="form-section">
         <h3 class="section-title">📋 Identification du Travail</h3>
         <div class="field-row">
-          <label>Chantier / Zone <span class="req">*</span></label>
+          <label [class.label-erreur]="formInvalide && !form.chantierZone">Chantier / Zone <span class="req">*</span></label>
           <input type="text" [(ngModel)]="form.chantierZone" class="field-input" placeholder="Ex: Bâtiment A - Zone 3"/>
         </div>
         <div class="field-row two-col">
           <div>
-            <label>Date <span class="req">*</span></label>
+            <label [class.label-erreur]="formInvalide && !form.date">Date <span class="req">*</span></label>
             <input type="date" [(ngModel)]="form.date" class="field-input"/>
           </div>
           <div>
@@ -112,7 +112,7 @@
           <input type="text" [(ngModel)]="form.entreprisesIntervenantes" class="field-input"/>
         </div>
         <div class="field-row">
-          <label>Responsable de l'intervention <span class="req">*</span></label>
+          <label [class.label-erreur]="formInvalide && !form.responsableIntervention">Responsable de l'intervention <span class="req">*</span></label>
           <input type="text" [(ngModel)]="form.responsableIntervention" class="field-input"/>
         </div>
       </div>

@@ -143,6 +143,7 @@ ouvrirDetailConge(c: any) { this.selectedConge = c; this.showCongeDetail = true;
 fermerDetailConge() { this.showCongeDetail = false; this.selectedConge = null; }
 showCongeFormPerso = false;
 congePerso = { dateDebut: '', dateFin: '', type: 'ANNUEL', motif: '', description: '', periode: '' };
+formCongeInvalide = false;
 nombreJoursPerso = 0;
 congePersoEnEditionId: number | null = null;
 typesConge = ['ANNUEL', 'RTT', 'MALADIE', 'SANS_SOLDE', 'FORMATION'];
@@ -302,8 +303,10 @@ joursEnTropSolde = 0;
 
 deposerCongePerso() {
   if (!this.congePerso.dateDebut || !this.congePerso.dateFin || !this.congePerso.type) {
+    this.formCongeInvalide = true;
     alert('Veuillez remplir les champs obligatoires'); return;
   }
+  this.formCongeInvalide = false;
   if (this.congePerso.dateFin < this.congePerso.dateDebut) {
     alert('La date de fin ne peut pas être avant la date de début.');
     return;

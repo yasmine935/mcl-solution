@@ -141,3 +141,11 @@
     width: 100% !important;
   }
 }
+
+/* Label d'un champ obligatoire non rempli, après tentative de validation
+   ("Veuillez remplir les champs obligatoires") — classe globale réutilisée
+   par tous les formulaires. */
+.label-erreur {
+  color: #e53935 !important;
+}
+

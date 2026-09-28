@@ -93,6 +93,9 @@ export class FicheInterventionManager implements OnInit {
     });
   }
 
+  formAjoutInvalide = false;
+  formEditInvalide = false;
+
   nouvelleFiche: any = {
     numProjet: '', client: '', dateDebut: '', dateFin: '',
     technicienAssigne: '', selectedTechIds: [] as number[],
@@ -321,9 +324,11 @@ export class FicheInterventionManager implements OnInit {
 
   ajouterFiche() {
     if (!this.nouvelleFiche.numProjet || !this.nouvelleFiche.client) {
+      this.formAjoutInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
       return;
     }
+    this.formAjoutInvalide = false;
     if (this.nouvelleFiche.dateDebut && this.nouvelleFiche.dateFin && this.nouvelleFiche.dateFin < this.nouvelleFiche.dateDebut) {
       alert('La date de fin ne peut pas être avant la date de début.');
       return;
@@ -372,9 +377,11 @@ export class FicheInterventionManager implements OnInit {
 
   modifierFiche() {
     if (!this.ficheEnEdition.numProjet) {
+      this.formEditInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
       return;
     }
+    this.formEditInvalide = false;
     if (this.ficheEnEdition.dateDebut && this.ficheEnEdition.dateFin && this.ficheEnEdition.dateFin < this.ficheEnEdition.dateDebut) {
       alert('La date de fin ne peut pas être avant la date de début.');
       return;

@@ -74,6 +74,7 @@ export class DashboardAby implements OnInit {
     quantite: '', prixUnitaire: '', statut: 'En attente',
     dateCommande: '', dateLivraison: '', demandeId: null as any
   };
+  formCommandeInvalide = false;
 
   statutsCommande = ['En attente', 'Commandé', 'En transit', 'Livré', 'Annulé'];
 
@@ -206,9 +207,11 @@ export class DashboardAby implements OnInit {
 
   ajouterCommande() {
     if (!this.nouvelleCommande.reference || !this.nouvelleCommande.description) {
+      this.formCommandeInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
       return;
     }
+    this.formCommandeInvalide = false;
 
     const body = {
       numeroCommande: this.nouvelleCommande.reference,

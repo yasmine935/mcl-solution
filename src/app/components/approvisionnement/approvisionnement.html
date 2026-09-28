@@ -232,7 +232,7 @@
           </div>
           <!-- Date attendue -->
           <div class="form-field">
-            <label>Date Attendue <span class="req">*</span></label>
+            <label [class.label-erreur]="formInvalide && !form.dateAttendue">Date Attendue <span class="req">*</span></label>
             <input type="date" [(ngModel)]="form.dateAttendue" class="field-input"/>
           </div>
         </div>
@@ -240,19 +240,19 @@
         <div class="form-grid-5">
           <!-- Département -->
           <div class="form-field">
-            <label>Department <span class="req">*</span></label>
+            <label [class.label-erreur]="formInvalide && !form.department">Department <span class="req">*</span></label>
             <select [(ngModel)]="form.department" class="field-input">
               @for (d of departments; track d) { <option [value]="d">{{ d }}</option> }
             </select>
           </div>
           <!-- Projet -->
           <div class="form-field field-wide2">
-            <label>Nom du Projet <span class="req">*</span></label>
+            <label [class.label-erreur]="formInvalide && !form.nomProjet">Nom du Projet <span class="req">*</span></label>
             <input type="text" [(ngModel)]="form.nomProjet" class="field-input" placeholder="Ex: SIKA Paviers"/>
           </div>
           <!-- Code Affaire -->
           <div class="form-field">
-            <label>Code Affaire <span class="req">*</span></label>
+            <label [class.label-erreur]="formInvalide && !form.codeAffaire">Code Affaire <span class="req">*</span></label>
             <input type="text" [(ngModel)]="form.codeAffaire" class="field-input" placeholder="Ex: Solutions Install"/>
           </div>
           <!-- Responsable -->

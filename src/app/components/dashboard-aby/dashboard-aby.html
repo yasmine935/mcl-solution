@@ -421,9 +421,9 @@
             <div class="form-commande">
               <h4>📋 Nouvelle Commande</h4>
               <div class="form-grid-c">
-                <div class="fg"><label>Référence *</label><input type="text" [(ngModel)]="nouvelleCommande.reference" class="fi" placeholder="CMD-2026-001"/></div>
+                <div class="fg"><label [class.label-erreur]="formCommandeInvalide && !nouvelleCommande.reference">Référence *</label><input type="text" [(ngModel)]="nouvelleCommande.reference" class="fi" placeholder="CMD-2026-001"/></div>
                 <div class="fg"><label>Fournisseur</label><input type="text" [(ngModel)]="nouvelleCommande.fournisseur" class="fi" placeholder="Ex: Amazon, Cdiscount..."/></div>
-                <div class="fg" style="grid-column: 1/-1"><label>Description *</label><input type="text" [(ngModel)]="nouvelleCommande.description" class="fi" placeholder="Description du matériel..."/></div>
+                <div class="fg" style="grid-column: 1/-1"><label [class.label-erreur]="formCommandeInvalide && !nouvelleCommande.description">Description *</label><input type="text" [(ngModel)]="nouvelleCommande.description" class="fi" placeholder="Description du matériel..."/></div>
                 <div class="fg"><label>Quantité</label><input type="number" [(ngModel)]="nouvelleCommande.quantite" class="fi" placeholder="1"/></div>
                 <div class="fg"><label>Prix unitaire (€)</label><input type="number" [(ngModel)]="nouvelleCommande.prixUnitaire" class="fi" placeholder="0.00"/></div>
                 <div class="fg"><label>Date commande</label><input type="date" [(ngModel)]="nouvelleCommande.dateCommande" class="fi"/></div>

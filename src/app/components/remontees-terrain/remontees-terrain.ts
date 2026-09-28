@@ -44,6 +44,7 @@ export class RemonteesTerrainComponent implements OnInit {
   fiches: FicheSSE[] = [];
   selectedFiche: FicheSSE | null = null;
   form: Partial<FicheSSE> = {};
+  formInvalide = false;
   photosTemp: { nom: string; data: string }[] = [];
   isManager = false;
   isSubmitting = false;
@@ -123,9 +124,11 @@ export class RemonteesTerrainComponent implements OnInit {
   soumettre() {
   if (this.isSubmitting) return;
   if (!this.form.descriptionFaits || !this.form.lieu || !this.form.date) {
+    this.formInvalide = true;
     alert('Veuillez remplir les champs obligatoires (*)');
     return;
   }
+  this.formInvalide = false;
   if (!this.form.typeSituationDangereuse && !this.form.typePresquAccident && !this.form.typeSuggestion) {
     alert('Veuillez choisir au moins un type de signalement');
     return;

@@ -272,13 +272,13 @@
       <div class="form-section">
         <h3 class="section-title">1. Description des faits</h3>
         <div class="three-col field-row">
-          <div><label>Date <span class="req">*</span></label><input type="date" [(ngModel)]="form.date" class="field-input"/></div>
+          <div><label [class.label-erreur]="formInvalide && !form.date">Date <span class="req">*</span></label><input type="date" [(ngModel)]="form.date" class="field-input"/></div>
           <div><label>Heure</label><input type="time" [(ngModel)]="form.heure" class="field-input"/></div>
-          <div><label>Lieu <span class="req">*</span></label><input type="text" [(ngModel)]="form.lieu" class="field-input" placeholder="Bâtiment A - Étage 2"/></div>
+          <div><label [class.label-erreur]="formInvalide && !form.lieu">Lieu <span class="req">*</span></label><input type="text" [(ngModel)]="form.lieu" class="field-input" placeholder="Bâtiment A - Étage 2"/></div>
         </div>
         <div class="field-row"><label>Entreprise concernée</label><input type="text" [(ngModel)]="form.entrepriseConcernee" class="field-input"/></div>
         <div class="field-row">
-          <label>Description précise <span class="req">*</span></label>
+          <label [class.label-erreur]="formInvalide && !form.descriptionFaits">Description précise <span class="req">*</span></label>
           <textarea [(ngModel)]="form.descriptionFaits" class="field-input textarea-large" placeholder="Décrivez précisément les faits observés..."></textarea>
         </div>
       </div>

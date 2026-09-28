@@ -29,6 +29,7 @@ export class Voitures implements OnInit {
   };
 
   voitureEnEdition: any = {};
+  formAjoutInvalide = false;
 
   constructor(private voituresApi: VoituresApi) {}
 
@@ -46,9 +47,11 @@ export class Voitures implements OnInit {
 
   ajouterVoiture() {
     if (!this.nouvelleVoiture.immatriculation || !this.nouvelleVoiture.marque) {
+      this.formAjoutInvalide = true;
       alert('Veuillez remplir les champs obligatoires');
       return;
     }
+    this.formAjoutInvalide = false;
     const body = {
       ...this.nouvelleVoiture,
       prochainControle: this.nouvelleVoiture.prochainControle || null,
