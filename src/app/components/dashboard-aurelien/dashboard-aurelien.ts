@@ -18,7 +18,7 @@ import { GestionClients } from '../clients/clients';
 import { TicketsClientPanel } from '../tickets-client-panel/tickets-client-panel';
 import { DossiersClients } from '../dossiers-clients/dossiers-clients';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
-import { CongesApi, MessagesAbyApi, UtilisateursApi, TicketsClientApi } from '../../services/api/apis';
+import { CongesApi, MessagesAbyApi, UtilisateursApi, TicketsClientApi, FichesInterventionApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -105,7 +105,8 @@ export class DashboardAurelien implements OnInit {
     private congesApi: CongesApi,
     private messagesAbyApi: MessagesAbyApi,
     private utilisateursApi: UtilisateursApi,
-    private ticketsClientApi: TicketsClientApi
+    private ticketsClientApi: TicketsClientApi,
+    private fichesInterventionApi: FichesInterventionApi
   ) {}
 
   ngOnInit() {
@@ -156,8 +157,15 @@ export class DashboardAurelien implements OnInit {
   }
 
   loadFiches() {
-    const stored = localStorage.getItem('interventions');
-    this.fiches = stored ? JSON.parse(stored) : [];
+    this.fichesInterventionApi.lister<any>().subscribe({
+      next: (data) => this.fiches = data,
+      error: () => this.fiches = []
+    });
+  }
+
+  /** Fiches confirmées par le Technicien Supérieur, en attente de facturation. */
+  get fichesAFacturer(): any[] {
+    return this.fiches.filter((f: any) => f.statut === 'VALIDEE_KIA');
   }
 
   showSoldeEpuiseWarning = false;

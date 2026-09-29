@@ -70,6 +70,11 @@
               <span class="home-action-text"><strong>Tickets Clients</strong><span>{{ ticketsClientsATraiter.length }} à traiter</span></span>
               <mat-icon class="home-action-arrow">chevron_right</mat-icon>
             </button>
+            <button type="button" class="home-action-btn" (click)="currentPage = 'fiches-completees'">
+              <span class="home-action-icon home-action-blue"><mat-icon>receipt_long</mat-icon></span>
+              <span class="home-action-text"><strong>Fiches Complétées</strong><span>{{ fichesAFacturer.length }} à facturer</span></span>
+              <mat-icon class="home-action-arrow">chevron_right</mat-icon>
+            </button>
           </div>
         </div>
       }
