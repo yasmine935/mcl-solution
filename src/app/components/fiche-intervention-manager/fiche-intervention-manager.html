@@ -31,12 +31,12 @@
             <label class="field-label" [class.label-erreur]="formAjoutInvalide && !nouvelleFiche.numProjet">Projet *</label>
             <input type="text" class="compact-input" [(ngModel)]="nouvelleFiche.numProjet"
               placeholder="Rechercher un projet..."
-              (focus)="ouvrirProjetDropdown()" (click)="ouvrirProjetDropdown()" (input)="onSaisieProjet()" (blur)="fermerProjetDropdownDelai()">
-            @if (projetDropdownOuvert) {
+              (focus)="ouvrirProjetDropdown('add')" (click)="ouvrirProjetDropdown('add')" (input)="onSaisieProjet()" (blur)="fermerProjetDropdownDelai()">
+            @if (projetDropdownCible === 'add') {
               <div class="projet-dropdown">
-                @for (p of projetsPourDropdown(); track p.id) {
+                @for (p of projetsPourDropdown('add'); track p.id) {
                   <div class="projet-dropdown-item" [class.selected]="p.titre === nouvelleFiche.numProjet"
-                    (mousedown)="selectionnerProjet(p.titre)">{{ p.titre }}@if (p.client) { — {{ p.client }} }</div>
+                    (mousedown)="selectionnerProjet('add', p.titre)">{{ p.titre }}@if (p.client) { — {{ p.client }} }</div>
                 } @empty {
                   <div class="projet-dropdown-empty">Aucun projet{{ nouvelleFiche.client ? ' pour ce client' : '' }}</div>
                 }
@@ -245,14 +245,21 @@
       <div class="section">
         <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
         <div class="form-row-compact">
-          <div class="field-sm">
+          <div class="field-sm projet-combobox-wrap">
             <label class="field-label" [class.label-erreur]="formEditInvalide && !ficheEnEdition.numProjet">Projet *</label>
-            <select class="compact-input" [(ngModel)]="ficheEnEdition.numProjet">
-              <option value="">— Sélectionner un projet —</option>
-              @for (p of projets; track p.id) {
-                <option [value]="p.titre">{{ p.titre }}@if (p.client) { — {{ p.client }}}</option>
-              }
-            </select>
+            <input type="text" class="compact-input" [(ngModel)]="ficheEnEdition.numProjet"
+              placeholder="Rechercher un projet..."
+              (focus)="ouvrirProjetDropdown('edit')" (click)="ouvrirProjetDropdown('edit')" (input)="onSaisieProjet()" (blur)="fermerProjetDropdownDelai()">
+            @if (projetDropdownCible === 'edit') {
+              <div class="projet-dropdown">
+                @for (p of projetsPourDropdown('edit'); track p.id) {
+                  <div class="projet-dropdown-item" [class.selected]="p.titre === ficheEnEdition.numProjet"
+                    (mousedown)="selectionnerProjet('edit', p.titre)">{{ p.titre }}@if (p.client) { — {{ p.client }} }</div>
+                } @empty {
+                  <div class="projet-dropdown-empty">Aucun projet{{ ficheEnEdition.client ? ' pour ce client' : '' }}</div>
+                }
+              </div>
+            }
           </div>
           <div class="field-lg">
             <label class="field-label">Client</label>

@@ -169,12 +169,12 @@ export class FicheInterventionManager implements OnInit {
     }
   }
 
-  // ── COMBOBOX PROJET (formulaire d'ajout) : filtré par client + saisie libre ──
-  projetDropdownOuvert = false;
+  // ── COMBOBOX PROJET (ajout + édition) : filtré par client + saisie libre ──
+  projetDropdownCible: 'add' | 'edit' | null = null;
   private projetRechercheEnCours = false;
 
-  ouvrirProjetDropdown() {
-    this.projetDropdownOuvert = true;
+  ouvrirProjetDropdown(cible: 'add' | 'edit') {
+    this.projetDropdownCible = cible;
     this.projetRechercheEnCours = false;
   }
 
@@ -183,30 +183,34 @@ export class FicheInterventionManager implements OnInit {
   }
 
   fermerProjetDropdown() {
-    this.projetDropdownOuvert = false;
+    this.projetDropdownCible = null;
   }
 
   fermerProjetDropdownDelai() {
     setTimeout(() => this.fermerProjetDropdown(), 150);
   }
 
-  /** Projets du client sélectionné — tous les projets si aucun client choisi. */
-  get projetsDuClient(): any[] {
-    return this.nouvelleFiche.client
-      ? this.projets.filter((p: any) => p.client === this.nouvelleFiche.client)
+  /** Projets du client sélectionné sur le formulaire ciblé — tous les projets
+   * si aucun client n'y est choisi. */
+  projetsDuClient(cible: 'add' | 'edit'): any[] {
+    const form = cible === 'add' ? this.nouvelleFiche : this.ficheEnEdition;
+    return form.client
+      ? this.projets.filter((p: any) => p.client === form.client)
       : this.projets;
   }
 
-  projetsPourDropdown(): any[] {
-    const base = this.projetsDuClient;
+  projetsPourDropdown(cible: 'add' | 'edit'): any[] {
+    const base = this.projetsDuClient(cible);
     if (!this.projetRechercheEnCours) return base;
-    const q = (this.nouvelleFiche.numProjet || '').toLowerCase().trim();
+    const form = cible === 'add' ? this.nouvelleFiche : this.ficheEnEdition;
+    const q = (form.numProjet || '').toLowerCase().trim();
     if (!q) return base;
     return base.filter((p: any) => (p.titre || '').toLowerCase().includes(q));
   }
 
-  selectionnerProjet(titre: string) {
-    this.nouvelleFiche.numProjet = titre;
+  selectionnerProjet(cible: 'add' | 'edit', titre: string) {
+    if (cible === 'add') this.nouvelleFiche.numProjet = titre;
+    else this.ficheEnEdition.numProjet = titre;
     this.fermerProjetDropdown();
   }
 
