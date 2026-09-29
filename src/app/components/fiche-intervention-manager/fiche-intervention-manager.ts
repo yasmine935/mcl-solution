@@ -159,6 +159,55 @@ export class FicheInterventionManager implements OnInit {
       // (siège, facturation…) — elle reste un champ saisi manuellement.
       form.contact = client.contact || form.contact || '';
     }
+    // Le projet déjà choisi n'a plus de sens si son client ne correspond
+    // plus au client nouvellement sélectionné.
+    if (form.numProjet) {
+      const projetActuel = this.projets.find((p: any) => p.titre === form.numProjet);
+      if (projetActuel && projetActuel.client !== form.client) {
+        form.numProjet = '';
+      }
+    }
+  }
+
+  // ── COMBOBOX PROJET (formulaire d'ajout) : filtré par client + saisie libre ──
+  projetDropdownOuvert = false;
+  private projetRechercheEnCours = false;
+
+  ouvrirProjetDropdown() {
+    this.projetDropdownOuvert = true;
+    this.projetRechercheEnCours = false;
+  }
+
+  onSaisieProjet() {
+    this.projetRechercheEnCours = true;
+  }
+
+  fermerProjetDropdown() {
+    this.projetDropdownOuvert = false;
+  }
+
+  fermerProjetDropdownDelai() {
+    setTimeout(() => this.fermerProjetDropdown(), 150);
+  }
+
+  /** Projets du client sélectionné — tous les projets si aucun client choisi. */
+  get projetsDuClient(): any[] {
+    return this.nouvelleFiche.client
+      ? this.projets.filter((p: any) => p.client === this.nouvelleFiche.client)
+      : this.projets;
+  }
+
+  projetsPourDropdown(): any[] {
+    const base = this.projetsDuClient;
+    if (!this.projetRechercheEnCours) return base;
+    const q = (this.nouvelleFiche.numProjet || '').toLowerCase().trim();
+    if (!q) return base;
+    return base.filter((p: any) => (p.titre || '').toLowerCase().includes(q));
+  }
+
+  selectionnerProjet(titre: string) {
+    this.nouvelleFiche.numProjet = titre;
+    this.fermerProjetDropdown();
   }
 
   onFileSelectCategorie(event: any, form: any, categorie: string) {
