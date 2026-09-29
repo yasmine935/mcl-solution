@@ -316,6 +316,37 @@
             </div>
           </div>
 
+          <!-- FACTURATION -->
+          @if (selectedFiche.statut === 'VALIDEE_KIA' && !isKia()) {
+            <div class="md-card md-facturation-card">
+              <div class="md-card-title"><mat-icon>receipt_long</mat-icon> Facturation</div>
+              <div class="md-facturation-fields">
+                <div class="md-facturation-field">
+                  <label>Date de facturation</label>
+                  <input type="date" [(ngModel)]="selectedFiche.dateFacturation" class="md-facturation-input">
+                </div>
+                <div class="md-facturation-field">
+                  <label>N° de facture</label>
+                  <input type="text" [(ngModel)]="selectedFiche.numeroFacture" class="md-facturation-input" placeholder="FAC-2026-001">
+                </div>
+              </div>
+            </div>
+          } @else if (selectedFiche.statut === 'VALIDEE' && (selectedFiche.dateFacturation || selectedFiche.numeroFacture)) {
+            <div class="md-card md-facturation-card">
+              <div class="md-card-title"><mat-icon>receipt_long</mat-icon> Facturation</div>
+              <div class="md-facturation-fields">
+                <div class="md-facturation-field">
+                  <label>Date de facturation</label>
+                  <div class="md-facturation-readonly">{{ selectedFiche.dateFacturation || '—' }}</div>
+                </div>
+                <div class="md-facturation-field">
+                  <label>N° de facture</label>
+                  <div class="md-facturation-readonly">{{ selectedFiche.numeroFacture || '—' }}</div>
+                </div>
+              </div>
+            </div>
+          }
+
           <!-- PHOTOS -->
           @if (selectedFiche.photos && selectedFiche.photos.length > 0) {
             <div class="md-card md-docs">
@@ -364,19 +395,9 @@
               <mat-icon>verified_user</mat-icon> Confirmer (Tech Sup)
             </button>
           } @else if (!isKia() && selectedFiche.statut === 'VALIDEE_KIA') {
-            <div class="md-facturation">
-              <div class="md-facturation-field">
-                <label>Date de facturation</label>
-                <input type="date" [(ngModel)]="selectedFiche.dateFacturation" class="md-facturation-input">
-              </div>
-              <div class="md-facturation-field">
-                <label>N° de facture</label>
-                <input type="text" [(ngModel)]="selectedFiche.numeroFacture" class="md-facturation-input" placeholder="FAC-2026-001">
-              </div>
-              <button type="button" class="md-btn-valider" (click)="facturerFiche(selectedFiche)">
-                <mat-icon>receipt_long</mat-icon> Facturé
-              </button>
-            </div>
+            <button type="button" class="md-btn-valider" (click)="facturerFiche(selectedFiche)">
+              <mat-icon>receipt_long</mat-icon> Facturé
+            </button>
           } @else if (!isKia() && selectedFiche.statut === 'COMPLETEE') {
             <span class="md-attente-kia">⏳ En attente de confirmation</span>
           }
