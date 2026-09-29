@@ -160,7 +160,7 @@
                 <mat-icon>check_circle</mat-icon> Valider
               </button>
             } @else if (!isKia() && fiche.statut === 'COMPLETEE') {
-              <span class="fc-attente-kia">⏳ En attente de confirmation par le Technicien Supérieur</span>
+              <span class="fc-attente-kia">⏳ En attente de confirmation</span>
             }
           </div>
         </div>
@@ -368,7 +368,7 @@
               <mat-icon>check_circle</mat-icon> Valider
             </button>
           } @else if (!isKia() && selectedFiche.statut === 'COMPLETEE') {
-            <span class="md-attente-kia">⏳ En attente de confirmation par le Technicien Supérieur</span>
+            <span class="md-attente-kia">⏳ En attente de confirmation</span>
           }
           <button type="button" class="md-btn-fermer" (click)="fermerDetail()">
             <mat-icon>close</mat-icon> Fermer
