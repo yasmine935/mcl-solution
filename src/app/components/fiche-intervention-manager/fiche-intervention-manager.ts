@@ -573,6 +573,23 @@ export class FicheInterventionManager implements OnInit {
     else tache.selections.splice(idx, 1);
   }
 
+  estOptionPersonnalisee(tache: any, option: string): boolean {
+    return tache.customOptions?.includes(option) || false;
+  }
+
+  /** Retire une sous-tâche créée pour cette intervention (les sous-tâches
+   * prédéfinies par l'admin, elles, ne se suppriment pas d'ici). */
+  supprimerOptionPersonnalisee(tache: any, option: string) {
+    if (tache.customOptions) {
+      const idx = tache.customOptions.indexOf(option);
+      if (idx !== -1) tache.customOptions.splice(idx, 1);
+    }
+    if (tache.selections) {
+      const idx = tache.selections.indexOf(option);
+      if (idx !== -1) tache.selections.splice(idx, 1);
+    }
+  }
+
   /** Crée une sous-tâche propre à cette intervention (en plus des sous-tâches
    * prédéfinies par l'admin) et la sélectionne automatiquement. */
   ajouterOptionPersonnalisee(tache: any) {

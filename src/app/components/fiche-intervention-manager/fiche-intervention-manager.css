@@ -275,6 +275,12 @@
 .option-chip.selected {
   background: #01579b; color: #fff; border-color: #01579b;
 }
+.option-chip-delete {
+  font-size: 15px !important; width: 15px !important; height: 15px !important;
+  margin-left: 6px; opacity: 0.6; cursor: pointer;
+}
+.option-chip-delete:hover { opacity: 1; color: #d32f2f; }
+.option-chip.selected .option-chip-delete:hover { color: #ffcdd2; }
 
 /* Ajout d'une sous-tâche personnalisée */
 .option-ajout { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
