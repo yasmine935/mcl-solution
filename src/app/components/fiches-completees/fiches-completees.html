@@ -156,8 +156,8 @@
                 <mat-icon>verified_user</mat-icon> Confirmer (Tech Sup)
               </button>
             } @else if (!isKia() && fiche.statut === 'VALIDEE_KIA') {
-              <button type="button" class="fc-btn-valider" (click)="validerFiche(fiche)">
-                <mat-icon>check_circle</mat-icon> Valider
+              <button type="button" class="fc-btn-valider" (click)="ouvrirFacturation(fiche)">
+                <mat-icon>receipt_long</mat-icon> À facturer
               </button>
             } @else if (!isKia() && fiche.statut === 'COMPLETEE') {
               <span class="fc-attente-kia">⏳ En attente de confirmation</span>
@@ -364,9 +364,19 @@
               <mat-icon>verified_user</mat-icon> Confirmer (Tech Sup)
             </button>
           } @else if (!isKia() && selectedFiche.statut === 'VALIDEE_KIA') {
-            <button type="button" class="md-btn-valider" (click)="validerFiche(selectedFiche)">
-              <mat-icon>check_circle</mat-icon> Valider
-            </button>
+            <div class="md-facturation">
+              <div class="md-facturation-field">
+                <label>Date de facturation</label>
+                <input type="date" [(ngModel)]="selectedFiche.dateFacturation" class="md-facturation-input">
+              </div>
+              <div class="md-facturation-field">
+                <label>N° de facture</label>
+                <input type="text" [(ngModel)]="selectedFiche.numeroFacture" class="md-facturation-input" placeholder="FAC-2026-001">
+              </div>
+              <button type="button" class="md-btn-valider" (click)="facturerFiche(selectedFiche)">
+                <mat-icon>receipt_long</mat-icon> Facturé
+              </button>
+            </div>
           } @else if (!isKia() && selectedFiche.statut === 'COMPLETEE') {
             <span class="md-attente-kia">⏳ En attente de confirmation</span>
           }

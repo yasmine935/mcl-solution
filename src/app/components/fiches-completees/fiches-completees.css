@@ -793,6 +793,16 @@
 .md-btn-confirmer-kia { background: linear-gradient(135deg, #6a1b9a, #8e24aa); color: #fff; border: none; padding: 10px 22px; border-radius: 9px; font-size: 0.88rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .md-btn-confirmer-kia:hover { background: linear-gradient(135deg, #4a148c, #6a1b9a); }
 .md-attente-kia { flex: 1; text-align: center; font-size: 0.85rem; font-weight: 700; color: #b06d00; }
+
+.md-facturation { flex: 1; display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.md-facturation-field { display: flex; flex-direction: column; gap: 4px; }
+.md-facturation-field label { font-size: 0.7rem; font-weight: 700; color: #546e7a; text-transform: uppercase; letter-spacing: 0.3px; }
+.md-facturation-input {
+  height: 36px; border: 1.5px solid #dde2ea; border-radius: 8px;
+  padding: 0 10px; font-size: 0.85rem; font-family: inherit; outline: none;
+  background: #fff; color: #0d1b2a; transition: border-color 0.15s;
+}
+.md-facturation-input:focus { border-color: #2e7d32; }
 .md-btn-fermer { background: #f0f4f8; color: #546e7a; border: 1px solid #cfd8dc; padding: 10px 20px; border-radius: 9px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .md-btn-fermer:hover { background: #e3eaf5; }
 

@@ -39,6 +39,8 @@ export class FichesCompletees implements OnInit {
             date: f.dateIntervention,
             technicienAssigne: f.technicien ? `${f.technicien.prenom} ${f.technicien.nom}` : '',
             approuvePar: f.approuvePar || (f.statut === 'VALIDEE' ? 'Manager' : null),
+            dateFacturation: f.dateFacturation || '',
+            numeroFacture: f.numeroFacture || '',
             confirmeParKia: f.confirmeParKia || null,
             dateConfirmationKia: f.dateConfirmationKia || null,
             signatureTechnicien: f.signatureTechnicien || '',
@@ -125,29 +127,39 @@ export class FichesCompletees implements OnInit {
     });
   }
 
-  validerFiche(fiche: any) {
+  /** Bouton "À facturer" de la carte : ouvre la fiche pour saisir la
+   * facturation, au lieu de valider directement. */
+  ouvrirFacturation(fiche: any) {
+    this.ouvrirDetail(fiche);
+  }
+
+  facturerFiche(fiche: any) {
     if (fiche.statut !== 'VALIDEE_KIA') {
-      alert('Ce travail doit d\'abord être confirmé par KIA (Technicien Supérieur).');
+      alert('Ce travail doit d\'abord être confirmé par le Technicien Supérieur.');
+      return;
+    }
+    if (!fiche.dateFacturation || !fiche.numeroFacture?.trim()) {
+      alert('Veuillez renseigner la date de facturation et le numéro de facture.');
       return;
     }
     const nomManager = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-    if (confirm('Valider le travail du technicien ?')) {
-      // 1. Mettre à jour le statut + approuvePar dans le backend
-      const body = {
-        approuvePar: nomManager,
-        dateApprobation: new Date().toISOString()
-      };
-      this.fichesApi.put<any>(`${fiche.id}/valider`, body).subscribe({
-        next: () => {
-          fiche.statut = 'VALIDEE';
-          fiche.approuvePar = nomManager;
-          alert('Fiche validee !');
-          this.loadFichesCompletees();
-          this.fermerDetail();
-        },
-        error: () => alert('Erreur validation')
-      });
-    }
+    if (!confirm('Confirmer la facturation et valider le travail du technicien ?')) return;
+    const body = {
+      approuvePar: nomManager,
+      dateApprobation: new Date().toISOString(),
+      dateFacturation: fiche.dateFacturation,
+      numeroFacture: fiche.numeroFacture.trim()
+    };
+    this.fichesApi.put<any>(`${fiche.id}/valider`, body).subscribe({
+      next: () => {
+        fiche.statut = 'VALIDEE';
+        fiche.approuvePar = nomManager;
+        alert('Fiche facturée et validée !');
+        this.loadFichesCompletees();
+        this.fermerDetail();
+      },
+      error: () => alert('Erreur validation')
+    });
   }
 
   getCountPending(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE_KIA').length; }
