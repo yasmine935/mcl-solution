@@ -455,7 +455,9 @@
     </div>
   }
 
-  <!-- BARRE DE RECHERCHE -->
+  <!-- BARRE DE RECHERCHE + LISTE (masquées pendant la création/modification -->
+  <!-- pour que le formulaire prenne toute la page) -->
+  @if (!showFormAdd && !showFormEdit) {
   <div class="search-bar-row">
     <div class="search-input-wrap">
       <mat-icon>search</mat-icon>
@@ -528,5 +530,6 @@
       }
     }
   </div>
+  }
 
 </div>

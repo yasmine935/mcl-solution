@@ -238,6 +238,7 @@ export class FicheInterventionManager implements OnInit {
     this.showFormAdd = !this.showFormAdd;
     this.showFormEdit = false;
     if (this.showFormAdd) { this.loadEmployes(); }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   loadEmployes() {
@@ -468,6 +469,7 @@ export class FicheInterventionManager implements OnInit {
         }
         this.showFormEdit = false;
         this.ficheEnEdition = null;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       error: () => alert('Erreur modification')
     });
@@ -491,6 +493,7 @@ export class FicheInterventionManager implements OnInit {
       materielsHorsStandard: [],
       nouveauMateriel: '', documentsImportes: [], taches: []
     };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   getDuree(dateDebut: string, dateFin: string): number {
@@ -501,7 +504,11 @@ export class FicheInterventionManager implements OnInit {
     return Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) + 1;
   }
 
-  resetFormEdit() { this.ficheEnEdition = null; this.showFormEdit = false; }
+  resetFormEdit() {
+    this.ficheEnEdition = null;
+    this.showFormEdit = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   ajouterMateriel(form: any) {
     if (form.nouveauMateriel?.trim()) {
