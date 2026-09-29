@@ -254,24 +254,48 @@
   color: #90a4ae;
 }
 
-.fit-tache-badge {
-  background: #01579b;
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.72rem;
-  font-weight: 700;
+.fit-tache-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.fit-tache-content {
-  display: flex; flex-direction: column; gap: 5px; flex: 1;
+/* Sous-tâches : les unes sous les autres, légèrement en retrait */
+.fit-sous-taches {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 30px;
+  padding-left: 12px;
+  border-left: 2px solid #dde2ea;
 }
-.fit-tache-selections {
-  display: flex; flex-wrap: wrap; gap: 4px;
+
+.fit-sous-tache-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: #fafbfc;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
-.fit-tache-selections .fit-tache-badge {
-  background: #e3f2fd; color: #01579b;
-  font-size: 0.68rem;
+
+.fit-sous-tache-row input[type="checkbox"] { display: none; }
+
+.fit-sous-tache-row.fit-tache-checked {
+  background: #e8f5e9;
+}
+
+.fit-sous-tache-row .fit-tache-check {
+  width: 17px;
+  height: 17px;
+  font-size: 0.65rem;
+}
+
+.fit-sous-tache-row .fit-tache-name {
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 /* ══ DOCUMENTS ══ */

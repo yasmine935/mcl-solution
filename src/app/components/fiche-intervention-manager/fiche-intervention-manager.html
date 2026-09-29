@@ -208,15 +208,20 @@
                   <input type="checkbox" [(ngModel)]="tache.coche" [id]="'tache-add-' + $index"/>
                   <label [for]="'tache-add-' + $index">{{ tache.nom }}</label>
                 </div>
-                @if (getOptionsTache(tache.nom).length > 0) {
-                  <div class="tache-options">
-                    @for (option of getAllOptions(tache); track option) {
-                      <span class="option-chip" [class.selected]="isSelected(tache, option)" (click)="toggleSelection(tache, option)">
-                        {{ option }}
-                      </span>
-                    }
+                <div class="tache-options">
+                  @for (option of getAllOptions(tache); track option) {
+                    <span class="option-chip" [class.selected]="isSelected(tache, option)" (click)="toggleSelection(tache, option)">
+                      {{ option }}
+                    </span>
+                  }
+                  <div class="option-ajout">
+                    <input type="text" class="option-input" placeholder="Nouvelle sous-tâche..."
+                      [(ngModel)]="tache.nouvelleOption" (keydown.enter)="$event.preventDefault(); ajouterOptionPersonnalisee(tache)">
+                    <button type="button" class="option-add-btn" (click)="ajouterOptionPersonnalisee(tache)" title="Ajouter">
+                      <mat-icon>add</mat-icon>
+                    </button>
                   </div>
-                }
+                </div>
                 <button mat-icon-button color="warn" (click)="supprimerTache(nouvelleFiche, $index)" type="button"><mat-icon>delete</mat-icon></button>
               </div>
             }
@@ -418,15 +423,20 @@
                   <input type="checkbox" [(ngModel)]="tache.coche" [id]="'tache-edit-' + $index"/>
                   <label [for]="'tache-edit-' + $index">{{ tache.nom }}</label>
                 </div>
-                @if (getOptionsTache(tache.nom).length > 0) {
-                  <div class="tache-options">
-                    @for (option of getAllOptions(tache); track option) {
-                      <span class="option-chip" [class.selected]="isSelected(tache, option)" (click)="toggleSelection(tache, option)">
-                        {{ option }}
-                      </span>
-                    }
+                <div class="tache-options">
+                  @for (option of getAllOptions(tache); track option) {
+                    <span class="option-chip" [class.selected]="isSelected(tache, option)" (click)="toggleSelection(tache, option)">
+                      {{ option }}
+                    </span>
+                  }
+                  <div class="option-ajout">
+                    <input type="text" class="option-input" placeholder="Nouvelle sous-tâche..."
+                      [(ngModel)]="tache.nouvelleOption" (keydown.enter)="$event.preventDefault(); ajouterOptionPersonnalisee(tache)">
+                    <button type="button" class="option-add-btn" (click)="ajouterOptionPersonnalisee(tache)" title="Ajouter">
+                      <mat-icon>add</mat-icon>
+                    </button>
                   </div>
-                }
+                </div>
                 <button mat-icon-button color="warn" (click)="supprimerTache(ficheEnEdition, $index)" type="button"><mat-icon>delete</mat-icon></button>
               </div>
             }

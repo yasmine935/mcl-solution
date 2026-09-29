@@ -75,20 +75,24 @@
             <div class="fit-card-title">✅ Tâches à Effectuer</div>
             <div class="fit-taches">
               @for (tache of intervention.taches; track $index) {
-                <label class="fit-tache-row" [class.fit-tache-checked]="tache.coche">
-                  <input type="checkbox" [(ngModel)]="tache.coche" (change)="sauvegarderProgres()">
-                  <span class="fit-tache-check">{{ tache.coche ? '✓' : '' }}</span>
-                  <span class="fit-tache-content">
+                <div class="fit-tache-group">
+                  <label class="fit-tache-row" [class.fit-tache-checked]="tache.coche">
+                    <input type="checkbox" [(ngModel)]="tache.coche" (change)="toggleTache(tache)">
+                    <span class="fit-tache-check">{{ tache.coche ? '✓' : '' }}</span>
                     <span class="fit-tache-name">{{ tache.nom }}</span>
-                    @if (tache.selections?.length > 0) {
-                      <span class="fit-tache-selections">
-                        @for (sel of tache.selections; track sel) {
-                          <span class="fit-tache-badge">{{ sel }}</span>
-                        }
-                      </span>
-                    }
-                  </span>
-                </label>
+                  </label>
+                  @if (tache.selections?.length > 0) {
+                    <div class="fit-sous-taches">
+                      @for (sel of tache.selections; track sel) {
+                        <label class="fit-sous-tache-row" [class.fit-tache-checked]="estSousTacheCochee(tache, sel)">
+                          <input type="checkbox" [checked]="estSousTacheCochee(tache, sel)" (change)="toggleSousTache(tache, sel)">
+                          <span class="fit-tache-check">{{ estSousTacheCochee(tache, sel) ? '✓' : '' }}</span>
+                          <span class="fit-tache-name">{{ sel }}</span>
+                        </label>
+                      }
+                    </div>
+                  }
+                </div>
               }
             </div>
           </div>

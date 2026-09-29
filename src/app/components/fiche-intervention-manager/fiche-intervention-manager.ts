@@ -566,6 +566,20 @@ export class FicheInterventionManager implements OnInit {
     else tache.selections.splice(idx, 1);
   }
 
+  /** Crée une sous-tâche propre à cette intervention (en plus des sous-tâches
+   * prédéfinies par l'admin) et la sélectionne automatiquement. */
+  ajouterOptionPersonnalisee(tache: any) {
+    const val = (tache.nouvelleOption || '').trim();
+    if (!val) return;
+    if (!tache.customOptions) tache.customOptions = [];
+    if (!this.getAllOptions(tache).includes(val)) {
+      tache.customOptions.push(val);
+    }
+    if (!tache.selections) tache.selections = [];
+    if (!tache.selections.includes(val)) tache.selections.push(val);
+    tache.nouvelleOption = '';
+  }
+
   tacheExiste(form: any, nomTache: string): boolean {
     return form.taches?.some((t: any) => t.nom === nomTache) || false;
   }

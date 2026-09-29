@@ -232,6 +232,31 @@ export class FicheInterventionTechnicien implements OnInit {
     }, 50);
   }
 
+  estSousTacheCochee(tache: any, sousTache: string): boolean {
+    return tache.sousTachesCochees?.includes(sousTache) || false;
+  }
+
+  /** Coche/décoche une sous-tâche, puis synchronise la tâche parente : cochée
+   * seulement si toutes ses sous-tâches le sont. */
+  toggleSousTache(tache: any, sousTache: string) {
+    if (!tache.sousTachesCochees) tache.sousTachesCochees = [];
+    const idx = tache.sousTachesCochees.indexOf(sousTache);
+    if (idx === -1) tache.sousTachesCochees.push(sousTache);
+    else tache.sousTachesCochees.splice(idx, 1);
+    tache.coche = (tache.selections?.length > 0) &&
+      tache.selections.every((s: string) => tache.sousTachesCochees.includes(s));
+    this.sauvegarderProgres();
+  }
+
+  /** Coche/décoche la tâche parente : répercute l'état sur toutes ses
+   * sous-tâches (tache.coche a déjà été basculé par le ngModel du checkbox). */
+  toggleTache(tache: any) {
+    if (tache.selections?.length > 0) {
+      tache.sousTachesCochees = tache.coche ? [...tache.selections] : [];
+    }
+    this.sauvegarderProgres();
+  }
+
   ajouterMateriel() {
     const val = this.nouveauMateriel.trim();
     if (val && !this.materielsHorsStandard.includes(val)) {
