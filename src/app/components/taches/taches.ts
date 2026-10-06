@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ClientsApi, TachesApi, UtilisateursApi } from '../../services/api/apis';
+import { COULEURS_STATUT_PROJET, STATUTS_PROJET, normaliserStatutProjet } from '../../services/statuts-projet';
 
 const ETAPES_PROJET = [
   'Qualification',
@@ -35,6 +36,9 @@ export class Taches implements OnInit {
   filtreStatutTache = '';
   filtrePrioriteTache = '';
   filtreClientTache = '';
+  /** Les listes ne renvoient plus les pièces jointes (base64, trop lourdes) :
+   * elles sont chargées à l'ouverture du détail / de l'édition d'un projet. */
+  chargementFichiers = false;
   showFormAdd = false;
 
   // ── Pagination serveur (20 projets par page, plus de findAll() complet) ──
@@ -103,7 +107,7 @@ export class Taches implements OnInit {
   noteTemp = '';
   currentUser: any = {};
 
-  statuts = ['Qualification', 'Devis', 'Commande', 'En cours', 'Réalisé', 'Perdu'];
+  statuts = STATUTS_PROJET;
   priorites = ['Faible', 'Élevé', 'Moyenne'];
 
   clients: any[] = [];
@@ -273,7 +277,8 @@ export class Taches implements OnInit {
       numCommande: t.description || '',
       numDevis: t.numDevis || '',
       caDevis: t.caDevis || '',
-      fichiers: this.parseJsonField(t.fichiers, []),
+      // null = pas encore chargés (les listes ne les renvoient pas), ≠ [] = aucun fichier.
+      fichiers: t.fichiers != null ? this.parseJsonField(t.fichiers, []) : null,
       assignes: this.parseJsonField(t.assignes, []),
       notes: [],
       etapes: this.parseJsonField(t.etapes, ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })))
@@ -284,18 +289,9 @@ export class Taches implements OnInit {
     return statutFr;
   }
 
-  /** Ramène un statut venant de la BDD à l'une des 6 valeurs autorisées.
-   * Couvre les anciens codes/libellés déjà en base (dont ceux de prod, inconnus
-   * à l'avance) — tout ce qui n'est pas reconnu devient "Qualification". */
+  /** Voir normaliserStatutProjet (services/statuts-projet.ts). */
   normaliserStatut(statutBrut: string): string {
-    const map: any = {
-      'A_FAIRE': 'Qualification', 'EN_COURS': 'En cours', 'TERMINEE': 'Réalisé',
-      'En Qualification': 'Qualification', 'En Attente': 'Qualification',
-      'Fait': 'Réalisé', 'Validation Resp': 'Devis', 'Bon de commande': 'Commande',
-      'Réalisation': 'Réalisé', 'Clôture': 'Réalisé'
-    };
-    if (this.statuts.includes(statutBrut)) return statutBrut;
-    return map[statutBrut] || 'Qualification';
+    return normaliserStatutProjet(statutBrut);
   }
 
   buildBody(tache: any, statut?: string): any {
@@ -314,7 +310,8 @@ export class Taches implements OnInit {
       caDevis: tache.caDevis || '',
       assignes: JSON.stringify(tache.assignes || []),
       etapes: JSON.stringify(tache.etapes || []),
-      fichiers: JSON.stringify(tache.fichiers || []),
+      // Fichiers non chargés -> champ omis : le backend conserve ceux en base.
+      fichiers: tache.fichiers ? JSON.stringify(tache.fichiers) : undefined,
       utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
     };
   }
@@ -367,7 +364,7 @@ export class Taches implements OnInit {
       alert("L'échéance ne peut pas être avant la date de début du projet.");
       return;
     }
-    const body = this.buildBody(this.nouvelleTache, 'A_FAIRE');
+    const body = this.buildBody(this.nouvelleTache, 'Qualification');
     body.etapes = JSON.stringify(ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })));
     this.tachesApi.creer<any>(body).subscribe({
       next: () => {
@@ -386,11 +383,33 @@ export class Taches implements OnInit {
     this.tacheEnEdition = { ...tache };
     this.selectedTache = tache;
     this.showFormEdit = true;
+    this.chargerFichiers(tache, this.tacheEnEdition);
+  }
+
+  /** Récupère le projet complet (GET /{id}) pour ses pièces jointes et les place
+   * sur chaque objet cible. Les fichiers ajoutés entre-temps sont conservés. */
+  chargerFichiers(tache: any, ...cibles: any[]) {
+    if (tache.fichiers != null) return;
+    this.chargementFichiers = true;
+    this.tachesApi.parId<any>(tache.id).subscribe({
+      next: (complet) => {
+        const charges = this.parseJsonField(complet.fichiers, []);
+        for (const cible of [tache, ...cibles]) {
+          cible.fichiers = [...charges, ...(cible.fichiers || [])];
+        }
+        this.chargementFichiers = false;
+      },
+      error: () => { this.chargementFichiers = false; }
+    });
   }
 
   modifierTache() {
     if (!this.tacheEnEdition.projet) {
       alert('Veuillez remplir le nom du projet');
+      return;
+    }
+    if (this.chargementFichiers) {
+      alert('Chargement des pièces jointes en cours, veuillez patienter.');
       return;
     }
     if (this.tacheEnEdition.date && this.tacheEnEdition.echeance && this.tacheEnEdition.echeance < this.tacheEnEdition.date) {
@@ -494,6 +513,7 @@ export class Taches implements OnInit {
   ouvrirDetailModal(tache: any) {
     this.selectedTache = tache;
     this.showDetailModal = true;
+    this.chargerFichiers(tache);
   }
 
   fermerDetailModal() { this.showDetailModal = false; this.selectedTache = null; }
@@ -567,11 +587,7 @@ export class Taches implements OnInit {
   }
 
   getStatutColor(statut: string): string {
-    const colors: any = {
-      'Qualification': '#9e9e9e', 'Devis': '#f57f17', 'Commande': '#1565c0',
-      'En cours': '#FFA500', 'Réalisé': '#00CC00', 'Perdu': '#FF0000'
-    };
-    return colors[statut] || '#CCCCCC';
+    return COULEURS_STATUT_PROJET[statut] || '#CCCCCC';
   }
 
   getPrioriteBg(priorite: string): string {

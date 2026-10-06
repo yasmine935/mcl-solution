@@ -121,22 +121,12 @@
             </div>
           </div>
           <div class="projets-kpi-row">
-            <div class="projets-kpi projets-kpi-bleu">
-              <span class="projets-kpi-num">{{ projetsEnCours }}</span>
-              <span class="projets-kpi-label">En cours</span>
-            </div>
-            <div class="projets-kpi projets-kpi-vert">
-              <span class="projets-kpi-num">{{ projetsTermines }}</span>
-              <span class="projets-kpi-label">Terminées</span>
-            </div>
-            <div class="projets-kpi projets-kpi-gris">
-              <span class="projets-kpi-num">{{ projetsAFaire }}</span>
-              <span class="projets-kpi-label">À faire</span>
-            </div>
-            <div class="projets-kpi projets-kpi-rouge">
-              <span class="projets-kpi-num">{{ projetsPerdus }}</span>
-              <span class="projets-kpi-label">Perdus</span>
-            </div>
+            @for (c of compteursStatutProjet; track c.statut) {
+              <div class="projets-kpi" [style.border-color]="c.couleur">
+                <span class="projets-kpi-num">{{ c.nombre }}</span>
+                <span class="projets-kpi-label">{{ c.statut }}</span>
+              </div>
+            }
           </div>
         </div>
 
@@ -152,9 +142,12 @@
           <div class="projets-filters">
             <span class="filter-label">Statut :</span>
             <button type="button" class="filter-pill" [class.active]="filtreStatut === ''" (click)="filtreStatut = ''">Tous</button>
-            <button type="button" class="filter-pill filter-pill-bleu" [class.active]="filtreStatut === 'EN_COURS'" (click)="filtreStatut = filtreStatut === 'EN_COURS' ? '' : 'EN_COURS'">En cours</button>
-            <button type="button" class="filter-pill filter-pill-vert" [class.active]="filtreStatut === 'TERMINEE'" (click)="filtreStatut = filtreStatut === 'TERMINEE' ? '' : 'TERMINEE'">Terminée</button>
-            <button type="button" class="filter-pill filter-pill-gris" [class.active]="filtreStatut === 'A_FAIRE'" (click)="filtreStatut = filtreStatut === 'A_FAIRE' ? '' : 'A_FAIRE'">À faire</button>
+            @for (s of statutsProjet; track s) {
+              <button type="button" class="filter-pill" [class.active]="filtreStatut === s"
+                [style.background]="filtreStatut === s ? getProjetStatutColor(s) : null"
+                [style.border-color]="filtreStatut === s ? getProjetStatutColor(s) : null"
+                (click)="filtreStatut = filtreStatut === s ? '' : s">{{ s }}</button>
+            }
             <span class="filter-sep">|</span>
             <span class="filter-label">Priorité :</span>
             <button type="button" class="filter-pill filter-pill-rouge" [class.active]="filtrePriorite === 'Élevé'" (click)="filtrePriorite = filtrePriorite === 'Élevé' ? '' : 'Élevé'">Élevé</button>

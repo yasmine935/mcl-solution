@@ -8,6 +8,7 @@ import { Planning } from '../planning/planning';
 import { Taches } from '../taches/taches';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import { CommandesApi, MessagesAbyApi, StockApi, TachesApi } from '../../services/api/apis';
+import { COULEURS_STATUT_PROJET, STATUTS_PROJET, compterParStatutProjet, normaliserStatutProjet } from '../../services/statuts-projet';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Groupe',
@@ -317,20 +318,15 @@ export class DashboardAby implements OnInit {
     return map[priorite] || '#546e7a';
   }
 
+  /** Statuts actuels des projets (anciens codes en base regroupés, cf. statuts-projet.ts). */
+  readonly statutsProjet = STATUTS_PROJET;
+
   getProjetStatutColor(statut: string): string {
-    const map: any = {
-      'A_FAIRE': '#546e7a', 'EN_COURS': '#1565c0',
-      'TERMINEE': '#2e7d32', 'Perdu': '#c62828', 'En Attente': '#f57f17'
-    };
-    return map[statut] || '#546e7a';
+    return COULEURS_STATUT_PROJET[normaliserStatutProjet(statut)];
   }
 
   getProjetStatutLabel(statut: string): string {
-    const map: any = {
-      'A_FAIRE': 'À faire', 'EN_COURS': 'En cours',
-      'TERMINEE': 'Terminée', 'Perdu': 'Perdu', 'En Attente': 'En attente'
-    };
-    return map[statut] || statut;
+    return normaliserStatutProjet(statut);
   }
 
   get messagesAvecReponse() { return this.messages.filter(m => m.reponse); }
@@ -343,14 +339,16 @@ export class DashboardAby implements OnInit {
         (p.titre || p.nom || '').toLowerCase().includes(q) ||
         (p.client || '').toLowerCase().includes(q) ||
         (p.assignes || '').toLowerCase().includes(q);
-      const matchStatut = !this.filtreStatut || p.statut === this.filtreStatut;
+      const matchStatut = !this.filtreStatut || normaliserStatutProjet(p.statut) === this.filtreStatut;
       const matchPriorite = !this.filtrePriorite || p.priorite === this.filtrePriorite;
       return matchRecherche && matchStatut && matchPriorite;
     });
   }
 
-  get projetsEnCours() { return this.projets.filter(p => p.statut === 'EN_COURS').length; }
-  get projetsTermines() { return this.projets.filter(p => p.statut === 'TERMINEE').length; }
-  get projetsAFaire() { return this.projets.filter(p => p.statut === 'A_FAIRE').length; }
-  get projetsPerdus() { return this.projets.filter(p => p.statut === 'Perdu').length; }
+  /** Compteurs par statut, dans l'ordre de STATUTS_PROJET. */
+  get compteursStatutProjet(): { statut: string; nombre: number; couleur: string }[] {
+    const nombres = compterParStatutProjet(this.projets);
+    return STATUTS_PROJET.map((statut, i) =>
+      ({ statut, nombre: nombres[i], couleur: COULEURS_STATUT_PROJET[statut] }));
+  }
 }

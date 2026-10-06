@@ -30,6 +30,7 @@ import {
   VoituresApi, MinutesSecuriteApi, MessagesAbyApi, ReclamationsApi, TicketsClientApi
 } from '../../services/api/apis';
 import { Auth } from '../../services/auth';
+import { COULEURS_STATUT_PROJET, STATUTS_PROJET, compterParStatutProjet } from '../../services/statuts-projet';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
@@ -708,9 +709,12 @@ getStatutVoitureColor(statut: string): string {
     });
   }
 
+  /** Statuts actuels des projets (anciens codes en base regroupés, cf. statuts-projet.ts). */
+  readonly statutsProjet = STATUTS_PROJET;
+  readonly couleursStatutsProjet = STATUTS_PROJET.map(s => COULEURS_STATUT_PROJET[s]);
+
   get chartTachesStatutSeries(): number[] {
-    const statuts = ['A_FAIRE', 'EN_COURS', 'TERMINEE', 'Perdu', 'En Attente'];
-    return statuts.map(s => this.taches.filter((t: any) => t.statut === s).length);
+    return compterParStatutProjet(this.taches);
   }
 
   get chartTachesPrioriteSeries(): number[] {

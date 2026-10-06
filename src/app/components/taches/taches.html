@@ -441,6 +441,9 @@
             <button class="btn-doc-cat" (click)="fileAutresEdit.click()" type="button">Importer</button>
           </div>
         </div>
+        @if (chargementFichiers) {
+          <div class="fichiers-liste">Chargement des documents…</div>
+        }
         @if (tacheEnEdition.fichiers?.length) {
           <div class="fichiers-liste">
             @for (f of tacheEnEdition.fichiers; track $index) {
@@ -750,6 +753,9 @@
         </div>
 
         <!-- DOCUMENTS -->
+        @if (chargementFichiers) {
+          <div class="detail-docs-section">📎 Chargement des documents…</div>
+        }
         @if (selectedTache.fichiers?.length > 0) {
           <div class="detail-docs-section">
             <div class="detail-docs-title">📎 Documents attachés ({{ selectedTache.fichiers.length }})</div>

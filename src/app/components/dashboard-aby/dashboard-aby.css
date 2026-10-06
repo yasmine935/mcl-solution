@@ -372,10 +372,6 @@
 }
 .projets-kpi-num { font-size: 1.6rem; font-weight: 900; color: #fff; line-height: 1; }
 .projets-kpi-label { font-size: 0.65rem; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
-.projets-kpi-bleu  { border-color: rgba(33,150,243,0.5); }
-.projets-kpi-vert  { border-color: rgba(76,175,80,0.5); }
-.projets-kpi-gris  { border-color: rgba(255,255,255,0.25); }
-.projets-kpi-rouge { border-color: rgba(244,67,54,0.5); }
 
 /* TABLE */
 /* ── TOOLBAR RECHERCHE / FILTRES ── */
