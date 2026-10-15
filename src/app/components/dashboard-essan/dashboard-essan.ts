@@ -1,5 +1,6 @@
+import { libelleRole } from '../../services/roles';
 import { COULEURS_STATUT_PROJET, STATUTS_PROJET, compterParStatutProjet } from '../../services/statuts-projet';
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -32,6 +33,7 @@ const ESPACE: EspaceConfig = {
     { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention', section: 'Interventions' },
     { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
     { key: 'projets', icon: 'task_alt', label: 'Projets', section: 'Gestion' },
+    { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'clients', icon: 'people', label: 'Clients' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
     { key: 'semainier', icon: 'calendar_today', label: 'Semainier' },
@@ -62,8 +64,24 @@ const ESPACE: EspaceConfig = {
 })
 export class DashboardEssan implements OnInit {
   espace = ESPACE;
+  /** Libellé affiché d'un rôle (ex. TECHNICIEN_SUP → Directeur des opérations). */
+  readonly libelleRole = libelleRole;
   user: any = {};
-  currentPage = 'dashboard';
+
+  private _currentPage = 'dashboard';
+  get currentPage(): string {
+    return this._currentPage;
+  }
+  set currentPage(value: string) {
+    this.ficheStatutCible = '';
+    this.projetStatutCible = '';
+    this._currentPage = value;
+  }
+
+  /** Statuts pré-filtrés à l'ouverture des listes (clic sur un donut). */
+  ficheStatutCible = '';
+  projetStatutCible = '';
+  private readonly zone = inject(NgZone);
 
   // Stats dashboard
   totalFiches = 0;
@@ -97,6 +115,28 @@ export class DashboardEssan implements OnInit {
     grid: { borderColor: '#f0f4f8' }
   };
 
+  /** Ordre identique aux labels du donut « Statut des interventions ». */
+  private readonly statutsFichesDonut = ['EN_COURS', 'COMPLETEE', 'VALIDEE'];
+
+  // Clic sur une part ou sur la légende → liste des fiches filtrée sur ce statut.
+  // ApexCharts tourne hors de la zone Angular : on y revient pour la navigation.
+  readonly chartDonutFichesChart = {
+    ...this.chartDonutOptions.chart,
+    events: {
+      dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.ouvrirFichesStatut(cfg.dataPointIndex),
+      legendClick: (_ctx: any, seriesIndex: number) => this.ouvrirFichesStatut(seriesIndex)
+    }
+  };
+
+  private ouvrirFichesStatut(index: number) {
+    const statut = this.statutsFichesDonut[index];
+    if (!statut) return;
+    this.zone.run(() => {
+      this.currentPage = 'fiches';
+      this.ficheStatutCible = statut;
+    });
+  }
+
   get chartFichesStatutSeries(): number[] {
     return [
       this.fiches.filter(f => f.statut === 'EN_COURS').length,
@@ -125,6 +165,29 @@ export class DashboardEssan implements OnInit {
   /** Statuts actuels des projets (anciens codes en base regroupés, cf. statuts-projet.ts). */
   readonly statutsProjet = STATUTS_PROJET;
   readonly couleursStatutsProjet = STATUTS_PROJET.map(s => COULEURS_STATUT_PROJET[s]);
+
+  // Clic sur le donut « Statut des projets » → même page que le menu, filtrée.
+  // « Réalisé » a sa propre page (Projets Réalisés), exclue de la page Projets.
+  readonly chartDonutProjetsChart = {
+    ...this.chartDonutOptions.chart,
+    events: {
+      dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.ouvrirProjetsStatut(cfg.dataPointIndex),
+      legendClick: (_ctx: any, seriesIndex: number) => this.ouvrirProjetsStatut(seriesIndex)
+    }
+  };
+
+  private ouvrirProjetsStatut(index: number) {
+    const statut = STATUTS_PROJET[index];
+    if (!statut) return;
+    this.zone.run(() => {
+      if (statut === 'Réalisé') {
+        this.currentPage = 'projets-realises';
+      } else {
+        this.currentPage = 'projets';
+        this.projetStatutCible = statut;
+      }
+    });
+  }
 
   get chartTachesStatutSeries(): number[] {
     return compterParStatutProjet(this.taches);
@@ -199,6 +262,7 @@ export class DashboardEssan implements OnInit {
       'fiches': '🔧 Fiches d\'Intervention',
       'fiches-completees': '✅ Fiches Complétées',
       'projets': '📊 Gestion des Projets',
+      'projets-realises': '✅ Projets Réalisés',
       'clients': '👥 Gestion des Clients',
       'planning': '📅 Planning',
       'semainier': '📆 Semainier',

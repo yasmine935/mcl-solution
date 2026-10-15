@@ -2,8 +2,8 @@
 
   <!-- HEADER -->
   <div class="page-header">
-    <h2>📊 Gestion des Projets</h2>
-    @if (!modeConsultation) {
+    <h2>{{ perimetre === 'realises' ? '✅ Projets Réalisés' : '📊 Gestion des Projets' }}</h2>
+    @if (!modeConsultation && perimetre !== 'realises') {
       <button mat-raised-button (click)="showFormAdd = !showFormAdd" class="btn-add">
         <mat-icon>{{ showFormAdd ? 'close' : 'add' }}</mat-icon>
         {{ showFormAdd ? 'Fermer' : 'Nouveau Projet' }}
@@ -49,6 +49,13 @@
           <div class="proj-field-sm">
             <label class="field-label">Échéance</label>
             <input class="compact-input" [(ngModel)]="nouvelleTache.echeance" type="date" [min]="nouvelleTache.date"/>
+          </div>
+        </div>
+        <div class="proj-row">
+          <div class="proj-field-full">
+            <label class="field-label">Commentaire</label>
+            <textarea class="compact-input compact-textarea" rows="3" [(ngModel)]="nouvelleTache.commentaire"
+              placeholder="Commentaire libre..."></textarea>
           </div>
         </div>
       </div>
@@ -282,6 +289,13 @@
             </div>
           </div>
         </div>
+        <div class="proj-row">
+          <div class="proj-field-full">
+            <label class="field-label">Commentaire</label>
+            <textarea class="compact-input compact-textarea" rows="3" [(ngModel)]="tacheEnEdition.commentaire"
+              placeholder="Commentaire libre..."></textarea>
+          </div>
+        </div>
       </div>
 
       <!-- SECTION 2 : CLIENT -->
@@ -487,10 +501,12 @@
             <button type="button" class="taches-search-clear" (click)="rechercheTache = ''; onRechercheChange()"><mat-icon>close</mat-icon></button>
           }
         </div>
-        <select class="taches-filter-select" [(ngModel)]="filtreStatutTache" (change)="onFiltreChange()">
-          <option value="">Tous les statuts</option>
-          @for (s of statuts; track s) { <option [value]="s">{{ s }}</option> }
-        </select>
+        @if (perimetre !== 'realises') {
+          <select class="taches-filter-select" [(ngModel)]="filtreStatutTache" (change)="onFiltreChange()">
+            <option value="">Tous les statuts</option>
+            @for (s of statutsFiltre; track s) { <option [value]="s">{{ s }}</option> }
+          </select>
+        }
         <select class="taches-filter-select" [(ngModel)]="filtrePrioriteTache" (change)="onFiltreChange()">
           <option value="">Toutes priorités</option>
           @for (p of priorites; track p) { <option [value]="p">{{ p }}</option> }
@@ -574,8 +590,8 @@
                 <td><span class="badge-client">{{ tache.client || '—' }}</span></td>
                 <td><span class="badge-client">{{ tache.clientFinal || '—' }}</span></td>
                 <td>
-                  @if (tache.chiffreAffaire) {
-                    <strong class="ca-value">{{ tache.chiffreAffaire }}€</strong>
+                  @if (tache.caDevis) {
+                    <strong class="ca-value">{{ tache.caDevis }}€</strong>
                   } @else {
                     <span class="assignee-empty">—</span>
                   }
@@ -705,6 +721,10 @@
                 <span class="assignee-badge">{{ getEmployeeNamesJoined(selectedTache.assignes) }}</span>
               } @else { <span class="assignee-empty">—</span> }
             </div>
+          </div>
+          <div class="detail-item full-width">
+            <strong>Commentaire</strong>
+            <p class="detail-commentaire">{{ selectedTache.commentaire || '—' }}</p>
           </div>
         </div>
 

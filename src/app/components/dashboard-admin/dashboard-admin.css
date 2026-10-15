@@ -872,6 +872,31 @@
   gap: 16px;
   margin: 20px 0;
 }
+/* Donut cliquable : main sur les parts et la légende (SVG généré → ::ng-deep) */
+.bi-card-cliquable ::ng-deep .apexcharts-pie-area,
+.bi-card-cliquable ::ng-deep .apexcharts-legend-series { cursor: pointer; }
+.bi-filtres { display: flex; gap: 8px; margin: -4px 0 6px; flex-wrap: wrap; }
+.bi-filtre-select {
+  height: 30px; padding: 0 8px; border: 1.5px solid #e0e6ed; border-radius: 8px;
+  font-size: 0.78rem; font-weight: 600; color: #37474f; background: #fff;
+  font-family: inherit; cursor: pointer;
+}
+.bi-filtre-select:focus { outline: none; border-color: #1565c0; }
+/* Badge « X à facturer » du graphique Interventions (même orange que la série) */
+.bi-badge-facturer {
+  height: 30px; padding: 0 10px; border: none; border-radius: 15px;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #fff3e0; color: #e65100; font-family: inherit;
+  font-size: 0.78rem; font-weight: 800; cursor: pointer; transition: background 0.15s;
+}
+.bi-badge-facturer:hover { background: #ffe0b2; }
+.bi-badge-facturer mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.bi-badge-facturer.bi-badge-zero { background: #f4f6f9; color: #90a4ae; }
+.bi-card-cliquable ::ng-deep .apexcharts-bar-area { cursor: pointer; }
+.bi-card-vide {
+  height: 220px; display: flex; align-items: center; justify-content: center;
+  color: #90a4ae; font-size: 0.85rem; font-style: italic;
+}
 .bi-card {
   background: #fff;
   border-radius: 16px;

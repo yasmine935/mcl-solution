@@ -34,6 +34,7 @@ const ESPACE: EspaceConfig = {
     { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention' },
     { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
     { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
     { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
     { key: 'ged', icon: 'folder_open', label: 'Documents' },
@@ -163,7 +164,7 @@ export class DashboardAurelien implements OnInit {
     });
   }
 
-  /** Fiches confirmées par le Technicien Supérieur, en attente de facturation. */
+  /** Fiches confirmées par le Directeur des opérations, en attente de facturation. */
   get fichesAFacturer(): any[] {
     return this.fiches.filter((f: any) => f.statut === 'VALIDEE_KIA');
   }
@@ -352,6 +353,7 @@ loadSoldeConges() {
       case 'fiches': return 'Fiches Intervention';
       case 'fiches-completees': return 'Fiches Completees';
       case 'taches': return 'Taches';
+      case 'projets-realises': return 'Projets Réalisés';
       case 'planning': return 'Planning';
       case 'ged': return 'Documents';
       case 'Semainier': return 'Semainier';

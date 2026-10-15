@@ -31,6 +31,7 @@ const ESPACE: EspaceConfig = {
     { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention' },
     { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
     { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
     { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },

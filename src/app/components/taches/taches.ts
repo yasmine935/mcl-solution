@@ -30,6 +30,11 @@ const ETAPES_PROJET = [
 })
 export class Taches implements OnInit {
   @Input() modeConsultation = false;
+  /** Projets affichés : 'tous' (par défaut), 'en-cours' (tout sauf Réalisé) ou
+   * 'realises' (Réalisé uniquement). Filtre appliqué côté serveur. */
+  @Input() perimetre: 'tous' | 'en-cours' | 'realises' = 'tous';
+  /** Filtre statut appliqué à l'ouverture (ex. clic sur le graphique du dashboard). */
+  @Input() statutInitial = '';
   taches: any[] = [];
   employes: any[] = [];
   rechercheTache = '';
@@ -108,6 +113,13 @@ export class Taches implements OnInit {
   currentUser: any = {};
 
   statuts = STATUTS_PROJET;
+
+  /** Statuts proposés dans le filtre de la liste (les formulaires gardent `statuts`
+   * complet, pour pouvoir passer un projet en Réalisé). */
+  get statutsFiltre(): string[] {
+    return this.perimetre === 'en-cours' ? this.statuts.filter(s => s !== 'Réalisé') : this.statuts;
+  }
+
   priorites = ['Faible', 'Élevé', 'Moyenne'];
 
   clients: any[] = [];
@@ -119,7 +131,7 @@ export class Taches implements OnInit {
   nouvelleTache = {
     projet: '', statut: 'Qualification', date: new Date().toLocaleDateString('fr-FR'),
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
-    echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
+    echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: '', commentaire: ''
   };
 
   tacheEnEdition: any = {};
@@ -132,6 +144,7 @@ export class Taches implements OnInit {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    if (this.statutInitial) this.filtreStatutTache = this.statutInitial;
     this.loadClients();
     this.loadEmployes();
     this.chargerPage();
@@ -225,7 +238,9 @@ export class Taches implements OnInit {
     this.tachesApi.page<any>({
       page: this.pageActuelle,
       size: this.taillePage,
-      statut: this.filtreStatutTache ? this.mapStatutToBackend(this.filtreStatutTache) : undefined,
+      statut: this.perimetre === 'realises' ? 'Réalisé'
+        : this.filtreStatutTache ? this.mapStatutToBackend(this.filtreStatutTache) : undefined,
+      exclureStatut: this.perimetre === 'en-cours' ? 'Réalisé' : undefined,
       priorite: this.filtrePrioriteTache || undefined,
       client: this.filtreClientTache || undefined,
       recherche: this.rechercheTache.trim() || undefined
@@ -269,6 +284,7 @@ export class Taches implements OnInit {
       date: t.dateCreation ? new Date(t.dateCreation).toLocaleDateString('fr-FR') : '',
       priorite: t.priorite || 'Moyenne',
       avancement: t.avancement != null ? t.avancement : 0,
+      commentaire: t.commentaire || '',
       echeance: t.dateEcheance || '',
       client: t.client || '',
       clientFinal: t.clientFinal || '',
@@ -301,6 +317,7 @@ export class Taches implements OnInit {
       priorite: tache.priorite,
       statut: statut || this.mapStatutToBackend(tache.statut),
       avancement: tache.avancement != null ? tache.avancement : 0,
+      commentaire: tache.commentaire || '',
       dateEcheance: tache.echeance && tache.echeance.match(/^\d{4}-\d{2}-\d{2}$/) ? tache.echeance : null,
       client: tache.client || '',
       clientFinal: tache.clientFinal || '',
@@ -522,7 +539,7 @@ export class Taches implements OnInit {
     this.nouvelleTache = {
       projet: '', statut: 'Qualification', date: new Date().toLocaleDateString('fr-FR'),
       priorite: 'Moyenne', fichiers: [], assignes: [],
-      echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: ''
+      echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: '', commentaire: ''
     };
   }
 

@@ -87,7 +87,10 @@
         <app-fiches-completees></app-fiches-completees>
       }
       @if (currentPage === 'taches') {
-        <app-taches></app-taches>
+        <app-taches perimetre="en-cours"></app-taches>
+      }
+      @if (currentPage === 'projets-realises') {
+        <app-taches perimetre="realises"></app-taches>
       }
       @if (currentPage === 'clients') {
         <app-gestion-clients></app-gestion-clients>

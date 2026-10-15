@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { UtilisateursApi } from '../../services/api/apis';
+import { ROLES, libelleRole } from '../../services/roles';
 
 @Component({
  selector: 'app-employes',
@@ -28,17 +29,7 @@ export class Employes implements OnInit {
   showInactifs = false;
   currentUser: any = {};
 
-  roles = [
-    { value: 'TECHNICIEN', label: 'Technicien' },
-    { value: 'TECHNICIEN_SUP', label: 'Technicien Supérieur' },
-    { value: 'MANAGER', label: 'Manager' },
-    { value: 'ADMINISTRATEUR', label: 'Administrateur' },
-    { value: 'DIRECTION', label: 'Direction' },
-    { value: 'RH', label: 'Ressources Humaines' },
-    { value: 'COMPTABILITE', label: 'Comptabilité' },
-    { value: 'SUPPLY_CHAIN', label: 'Supply Chain' },
-    { value: 'ADMINISTRATIF', label: 'Direction Administrative' }
-  ];
+  roles = ROLES;
 
   departements = [
     'Maintenance',
@@ -217,7 +208,6 @@ export class Employes implements OnInit {
   }
 
   getRoleLabel(role: string): string {
-    const found = this.roles.find((r: any) => r.value === role);
-    return found ? found.label : role;
+    return libelleRole(role);
   }
 }

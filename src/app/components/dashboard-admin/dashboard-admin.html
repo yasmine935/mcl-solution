@@ -18,41 +18,63 @@
         </div>
         <!-- BI CHARTS -->
         <div class="bi-section">
-          <div class="bi-card">
-            <div class="bi-card-title"><mat-icon>bar_chart</mat-icon> Interventions / 6 derniers mois</div>
+          <div class="bi-card bi-card-cliquable">
+            <div class="bi-card-title"><mat-icon>bar_chart</mat-icon> {{ titreChartFiches }}</div>
+            <div class="bi-filtres">
+              <button type="button" class="bi-badge-facturer" [class.bi-badge-zero]="!nbFichesAFacturer"
+                      (click)="ouvrirFichesAFacturer()"
+                      title="Fiches validées par le Directeur des opérations, en attente de facturation">
+                <mat-icon>receipt_long</mat-icon> {{ nbFichesAFacturer }} à facturer
+              </button>
+              <select class="bi-filtre-select" [(ngModel)]="periodeFiches" (ngModelChange)="recalculerChartFichesMois()">
+                <option [ngValue]="1">1 mois</option>
+                <option [ngValue]="3">3 mois</option>
+                <option [ngValue]="6">6 mois</option>
+                <option [ngValue]="12">12 mois</option>
+              </select>
+              @if (periodeFiches === 1) {
+                <input type="month" class="bi-filtre-select" [(ngModel)]="moisFiches" (ngModelChange)="recalculerChartFichesMois()">
+              }
+            </div>
             <apx-chart
               [series]="chartFichesMoisSeries"
-              [chart]="chartBarOptions.chart"
+              [chart]="chartFichesMoisChart"
               [grid]="chartBarOptions.grid"
-              [colors]="['#1565c0']"
-              [xaxis]="{ categories: chartFichesMoisCategories }">
+              [colors]="['#1565c0', '#f57c00']"
+              [legend]="chartFichesMoisLegend"
+              [xaxis]="chartFichesMoisXaxis">
             </apx-chart>
           </div>
-          <div class="bi-card">
+          <div class="bi-card bi-card-cliquable" title="Cliquer sur un statut pour voir les interventions">
             <div class="bi-card-title"><mat-icon>donut_large</mat-icon> Statut des interventions</div>
             <apx-chart
               [series]="chartFichesStatutSeries"
-              [chart]="chartDonutOptions.chart"
+              [chart]="chartDonutFichesChart"
               [labels]="['En cours', 'Complétées', 'Validées']"
               [colors]="['#1565c0', '#f57f17', '#2e7d32']"
               [legend]="chartDonutOptions.legend">
             </apx-chart>
           </div>
-          <div class="bi-card">
-            <div class="bi-card-title"><mat-icon>pie_chart</mat-icon> Congés par type</div>
-            <apx-chart
-              [series]="chartCongesTypeSeries"
-              [chart]="chartDonutOptions.chart"
-              [labels]="['Annuel', 'RTT', 'Maladie', 'Sans solde', 'Formation']"
-              [colors]="['#1565c0', '#6a1b9a', '#e65100', '#c62828', '#00695c']"
-              [legend]="chartDonutOptions.legend">
-            </apx-chart>
+          <div class="bi-card bi-card-cliquable" title="Cliquer sur un statut pour voir les tickets">
+            <div class="bi-card-title"><mat-icon>confirmation_number</mat-icon> Tickets clients</div>
+            @if (chartTicketsClientSeries.length) {
+              <apx-chart
+                [series]="chartTicketsClientSeries"
+                [chart]="chartDonutTicketsChart"
+                [labels]="chartTicketsClientLabels"
+                [colors]="chartTicketsClientColors"
+                [plotOptions]="chartDonutTicketsPlot"
+                [legend]="chartDonutOptions.legend">
+              </apx-chart>
+            } @else {
+              <div class="bi-card-vide">Aucun ticket client</div>
+            }
           </div>
-          <div class="bi-card">
+          <div class="bi-card bi-card-cliquable" title="Cliquer sur un statut pour voir les projets">
             <div class="bi-card-title"><mat-icon>task_alt</mat-icon> Statut des projets</div>
             <apx-chart
               [series]="chartTachesStatutSeries"
-              [chart]="chartDonutOptions.chart"
+              [chart]="chartDonutProjetsChart"
               [labels]="statutsProjet"
               [colors]="couleursStatutsProjet"
               [legend]="chartDonutOptions.legend">
@@ -65,6 +87,16 @@
               [chart]="chartDonutOptions.chart"
               [labels]="['Élevé', 'Moyenne', 'Faible']"
               [colors]="['#c62828', '#f57f17', '#2e7d32']"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
+          </div>
+          <div class="bi-card">
+            <div class="bi-card-title"><mat-icon>pie_chart</mat-icon> Congés par type</div>
+            <apx-chart
+              [series]="chartCongesTypeSeries"
+              [chart]="chartDonutOptions.chart"
+              [labels]="['Annuel', 'RTT', 'Maladie', 'Sans solde', 'Formation']"
+              [colors]="['#1565c0', '#6a1b9a', '#e65100', '#c62828', '#00695c']"
               [legend]="chartDonutOptions.legend">
             </apx-chart>
           </div>
@@ -158,13 +190,16 @@
 
       <!-- ══ MODULES ══ -->
       @if (currentPage === 'interventions') {
-        <app-fiche-intervention-manager></app-fiche-intervention-manager>
+        <app-fiche-intervention-manager [statutInitial]="ficheStatutCible" [periodeInitiale]="fichePeriodeCible"></app-fiche-intervention-manager>
       }
       @if (currentPage === 'fiches-completees') {
         <app-fiches-completees></app-fiches-completees>
       }
       @if (currentPage === 'taches') {
-        <app-taches></app-taches>
+        <app-taches perimetre="en-cours" [statutInitial]="projetStatutCible"></app-taches>
+      }
+      @if (currentPage === 'projets-realises') {
+        <app-taches perimetre="realises"></app-taches>
       }
       @if (currentPage === 'clients') {
         <app-gestion-clients></app-gestion-clients>
@@ -185,7 +220,7 @@
         <app-dossiers-clients></app-dossiers-clients>
       }
       @if (currentPage === 'tickets-clients') {
-        <app-tickets-client-panel></app-tickets-client-panel>
+        <app-tickets-client-panel [vueInitiale]="ticketsVueCible"></app-tickets-client-panel>
       }
       @if (currentPage === 'Semainier') {
         <app-semenier></app-semenier>
@@ -567,7 +602,7 @@
         </div>
         <div class="conge-kpi violet">
           <span>{{ getCongesValideesKia() }}</span>
-          <small>À valider (Tech. Sup. ✓)</small>
+          <small>À valider (Dir. des opérations ✓)</small>
         </div>
         <div class="conge-kpi green">
           <span>{{ getCongesApprouves() }}</span>
@@ -593,7 +628,7 @@
         ⏳ En attente ({{ getCongesEnAttente() }})
       </button>
       <button class="filtre-btn filtre-valide-kia" [class.active]="filtreConge === 'VALIDE_KIA'" (click)="filtreConge = 'VALIDE_KIA'">
-        🔄 À valider (Tech. Sup. ✓) ({{ getCongesValideesKia() }})
+        🔄 À valider (Dir. des opérations ✓) ({{ getCongesValideesKia() }})
       </button>
       <button class="filtre-btn filtre-approuve" [class.active]="filtreConge === 'APPROUVE'" (click)="filtreConge = 'APPROUVE'">
         ✅ Approuvés ({{ getCongesApprouves() }})
@@ -629,7 +664,7 @@
                   </div>
                   <div>
                     <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
-                    <span class="conge-role">{{ c.utilisateur?.role }}</span>
+                    <span class="conge-role">{{ libelleRole(c.utilisateur?.role) }}</span>
                   </div>
                 </div>
                 <div class="conge-statut-badge"
@@ -637,7 +672,7 @@
                   [class.badge-valide-kia]="c.statut === 'VALIDE_KIA'"
                   [class.badge-approuve]="c.statut === 'APPROUVE'"
                   [class.badge-refuse]="c.statut === 'REFUSE'">
-                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'VALIDE_KIA' ? '🔄 Validé (Tech. Sup.)' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
+                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'VALIDE_KIA' ? '🔄 Validé (Dir. des opérations)' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
                 </div>
               </div>
 
@@ -680,12 +715,12 @@
 
               @if (c.statut === 'VALIDE_KIA') {
                 <div class="conge-double-valid-note">
-                  🔄 Déjà validé par le Technicien Supérieur — en attente de votre validation finale.
+                  🔄 Déjà validé par le Directeur des opérations — en attente de votre validation finale.
                 </div>
               }
               @if (c.valideParKia && (c.statut === 'APPROUVE' || c.statut === 'REFUSE')) {
                 <div class="conge-trace-kia">
-                  🔄 Validé par le Technicien Supérieur, puis {{ c.statut === 'APPROUVE' ? 'approuvé' : 'refusé' }} par vous.
+                  🔄 Validé par le Directeur des opérations, puis {{ c.statut === 'APPROUVE' ? 'approuvé' : 'refusé' }} par vous.
                 </div>
               }
 

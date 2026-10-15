@@ -25,6 +25,12 @@ import {
 })
 export class FicheInterventionManager implements OnInit {
   @Input() modeConsultation = false;
+  /** Filtre statut appliqué à l'ouverture (ex. clic sur le graphique du dashboard). */
+  @Input() statutInitial = '';
+  /** Filtre période appliqué à l'ouverture (clic sur une barre du graphique Interventions).
+   * debut/fin au format AAAA-MM-JJ, inclus. */
+  @Input() periodeInitiale: { debut: string; fin: string; libelle: string } | null = null;
+  filtrePeriode: { debut: string; fin: string; libelle: string } | null = null;
   fiches: any[] = [];
   employes: any[] = [];
   techniciens: any[] = [];
@@ -44,12 +50,21 @@ export class FicheInterventionManager implements OnInit {
 
   fichesFiltrees(): any[] {
     let liste = this.fiches;
+    if (this.filtrePeriode) {
+      const { debut, fin } = this.filtrePeriode;
+      // Même date de référence que le graphique du dashboard
+      liste = liste.filter((f: any) => {
+        const d = String(f.dateIntervention || f.dateCreation || '').slice(0, 10);
+        return d >= debut && d <= fin;
+      });
+    }
     if (this.filtreStatut) {
       liste = liste.filter((f: any) => f.statut === this.filtreStatut);
-    } else {
+    } else if (!this.filtrePeriode) {
       // Par défaut, les fiches complétées ne s'affichent pas ici — elles ont
       // leur propre page "Fiches Complétées". Il faut choisir explicitement
       // le filtre "Complétée" pour les voir dans cette liste.
+      // (Avec un filtre période, tous les statuts sont affichés — comme dans le graphique.)
       liste = liste.filter((f: any) => f.statut !== 'COMPLETEE');
     }
     if (this.filtreClient) liste = liste.filter((f: any) => f.client === this.filtreClient);
@@ -114,6 +129,8 @@ export class FicheInterventionManager implements OnInit {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    if (this.statutInitial) this.filtreStatut = this.statutInitial;
+    if (this.periodeInitiale) this.filtrePeriode = this.periodeInitiale;
     this.loadEmployes();
     this.loadFiches();
     this.loadClients();
@@ -154,7 +171,6 @@ export class FicheInterventionManager implements OnInit {
     const client = this.clients.find((c: any) => c.nom === clientNom);
     if (client) {
       form.client = client.nom;
-      form.codeClient = client.codeClient || '';
       // L'adresse du site d'intervention n'est pas forcément celle du client
       // (siège, facturation…) — elle reste un champ saisi manuellement.
       form.contact = client.contact || form.contact || '';
@@ -167,6 +183,7 @@ export class FicheInterventionManager implements OnInit {
         form.numProjet = '';
       }
     }
+    this.afficherInfosProjet(form);
   }
 
   // ── COMBOBOX PROJET (ajout + édition) : filtré par client + saisie libre ──
@@ -178,8 +195,11 @@ export class FicheInterventionManager implements OnInit {
     this.projetRechercheEnCours = false;
   }
 
-  onSaisieProjet() {
+  onSaisieProjet(cible: 'add' | 'edit', valeur: string) {
     this.projetRechercheEnCours = true;
+    const form = cible === 'add' ? this.nouvelleFiche : this.ficheEnEdition;
+    form.numProjet = valeur;
+    this.afficherInfosProjet(form);
   }
 
   fermerProjetDropdown() {
@@ -209,9 +229,36 @@ export class FicheInterventionManager implements OnInit {
   }
 
   selectionnerProjet(cible: 'add' | 'edit', titre: string) {
-    if (cible === 'add') this.nouvelleFiche.numProjet = titre;
-    else this.ficheEnEdition.numProjet = titre;
+    const form = cible === 'add' ? this.nouvelleFiche : this.ficheEnEdition;
+    form.numProjet = titre;
+    const projet = this.projets.find((p: any) => p.titre === titre);
+    if (projet) this.remplirDepuisProjet(projet, form);
+    this.afficherInfosProjet(form);
     this.fermerProjetDropdown();
+  }
+
+  /** Pré-remplit les infos client à partir de la fiche projet (et du client qui
+   * y est rattaché). Seules les valeurs renseignées écrasent le formulaire ;
+   * les champs restent modifiables. */
+  private remplirDepuisProjet(projet: any, form: any) {
+    if (projet.client) form.client = projet.client;
+    if (projet.adresse) form.adresse = projet.adresse;
+    const client = this.clients.find((c: any) => c.nom === projet.client);
+    if (client?.contact) form.contact = client.contact;
+  }
+
+  /** Code Client, N° Commande et Montant : affichage seul, non enregistrés sur
+   * la fiche — toujours recalculés depuis le client et le projet sélectionnés. */
+  private afficherInfosProjet(form: any) {
+    const client = this.clients.find((c: any) => c.nom === form.client);
+    form.codeClient = client?.codeClient || '';
+    const projet = this.projets.find((p: any) => p.titre === form.numProjet);
+    // Côté projet, le N° Commande est stocké dans "description" (cf. taches.ts)
+    form.numCommande = projet?.description || '';
+    const montant = parseFloat(projet?.chiffreAffaire);
+    form.chiffreAffaire = isNaN(montant)
+      ? ''
+      : montant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   onFileSelectCategorie(event: any, form: any, categorie: string) {
@@ -272,6 +319,7 @@ export class FicheInterventionManager implements OnInit {
       numProjet: f.numProjet,
       client: f.client,
       dateIntervention: f.dateIntervention,
+      dateCreation: f.dateCreation,
       date: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
       dateDebut: f.dateIntervention ? f.dateIntervention.split('T')[0] : '',
       dateFin: f.dateFin ? f.dateFin.split('T')[0] : '',
@@ -426,6 +474,7 @@ export class FicheInterventionManager implements OnInit {
     if (this.ficheEnEdition.date) {
       this.ficheEnEdition.date = this.ficheEnEdition.date.toString().split('T')[0];
     }
+    this.afficherInfosProjet(this.ficheEnEdition);
     this.showFormEdit = true;
     this.showFormAdd = false;
   }

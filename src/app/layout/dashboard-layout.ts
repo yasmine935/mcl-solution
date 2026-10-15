@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -67,6 +67,33 @@ export class DashboardLayout implements OnChanges {
     if (changes['pageActive'] && !changes['pageActive'].firstChange) {
       this.scrollToTop();
     }
+    if (changes['pageActive']) this.memoriserDansHistorique(changes['pageActive'].firstChange);
+  }
+
+  // ── Bouton « Retour » du navigateur ──
+  // Les pages internes ne changent pas l'URL : sans entrée d'historique, « Retour »
+  // quitterait l'application. On empile donc une entrée (même URL, state.mclPage)
+  // à chaque changement de page, et on la rejoue sur popstate. L'état existant est
+  // conservé (navigationId du Router) ; l'URL étant identique, le Router ignore ces popstate.
+  private pageDepuisHistorique: string | null = null;
+
+  private memoriserDansHistorique(premiereFois: boolean) {
+    if (this.pageDepuisHistorique === this.pageActive) {
+      this.pageDepuisHistorique = null;   // changement provoqué par « Retour » : ne rien empiler
+      return;
+    }
+    const state = { ...(history.state || {}), mclPage: this.pageActive };
+    if (premiereFois) history.replaceState(state, '');
+    else if (history.state?.mclPage !== this.pageActive) history.pushState(state, '');
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: PopStateEvent) {
+    const page = event.state?.mclPage;
+    if (!page || page === this.pageActive) return;
+    this.pageDepuisHistorique = page;
+    this.sidebarOpen = false;
+    this.pageChange.emit(page);
   }
 
   private scrollToTop() {

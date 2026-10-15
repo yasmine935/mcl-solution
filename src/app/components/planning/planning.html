@@ -23,7 +23,7 @@
     <span class="leg-item"><span class="leg-dot" style="background:#e65100"></span>Distance</span>
     <span class="leg-item"><span class="leg-dot" style="background:#6a1b9a"></span>Déplacement</span>
     <span class="leg-item"><span class="leg-dot" style="background:#c62828"></span>Congé/Maladie</span>
-    <span class="leg-item"><span class="leg-dot" style="background:#2e7d32"></span>Formation</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#1e88e5"></span>Formation</span>
     <span class="leg-item"><span class="leg-dot" style="background:#1a6b3c"></span>Intervention</span>
   </div>
 
@@ -228,14 +228,14 @@
       }
       <div class="interventions-list">
         @for (f of fichesIntervention; track f.id) {
-          @if (f.dateDebut && f.technicienId) {
+          @if (f.dateDebut && techniciensDeFiche(f).length) {
             <div class="intervention-row">
-              <div class="intervention-tech">
-                @for (u of techniciens; track u.id) {
-                  @if (u.id === f.technicienId) {
+              <div class="intervention-tech intervention-tech-multi">
+                @for (u of techniciensDeFiche(f); track u.id) {
+                  <div class="intervention-tech-item">
                     <div class="intervention-avatar">{{ u.prenom?.charAt(0) }}{{ u.nom?.charAt(0) }}</div>
                     <span class="intervention-tech-name">{{ u.prenom }} {{ u.nom }}</span>
-                  }
+                  </div>
                 }
               </div>
               <div class="intervention-info">
@@ -266,6 +266,10 @@
     <div class="equipe-card">
       <h3 class="equipe-title">
         <span>👥</span> Planning Toute l'Équipe — {{ getMoisAnnee() }}
+        <select class="equipe-filtre-dept" [(ngModel)]="filtreDepartement">
+          <option value="">Tous les départements</option>
+          @for (d of departementsEquipe; track d) { <option [value]="d">{{ d }}</option> }
+        </select>
       </h3>
       <div class="equipe-table-wrapper">
         <table class="equipe-table">
@@ -282,7 +286,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let user of utilisateurs">
+            <ng-container *ngFor="let groupe of groupesEquipe">
+            <tr class="tr-groupe-dept">
+              <td class="td-groupe-dept">{{ groupe.departement }} <span class="groupe-dept-count">{{ groupe.users.length }}</span></td>
+              <td [attr.colspan]="joursAvecJour.length"></td>
+            </tr>
+            <tr *ngFor="let user of groupe.users">
               <td class="td-personne">
                 <div class="user-avatar-sm">{{ user.prenom?.charAt(0) }}{{ user.nom?.charAt(0) }}</div>
                 {{ user.prenom }} {{ user.nom }}
@@ -314,6 +323,7 @@
                 </td>
               </ng-container>
             </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>

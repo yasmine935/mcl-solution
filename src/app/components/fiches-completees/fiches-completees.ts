@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +18,10 @@ export class FichesCompletees implements OnInit {
   fichesCompletees: any[] = [];
   selectedFiche: any = null;
   showDetailModal = false;
+  /** 'PENDING' (complétées + confirmées KIA), 'A_FACTURER' (confirmées KIA) ou 'VALIDEE'. */
   filterStatut = 'PENDING';
+  /** Onglet ouvert au chargement (ex. clic sur l'indicateur « À facturer » du dashboard). */
+  @Input() filtreInitial = '';
   rechercheFC = '';
   currentUser: any = {};
 
@@ -26,6 +29,7 @@ export class FichesCompletees implements OnInit {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    if (this.filtreInitial) this.filterStatut = this.filtreInitial;
     this.loadFichesCompletees();
   }
 
@@ -64,6 +68,7 @@ export class FichesCompletees implements OnInit {
   getFichesAffichees(): any[] {
     let liste = this.fichesCompletees;
     if (this.filterStatut === 'PENDING') liste = liste.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE_KIA');
+    else if (this.filterStatut === 'A_FACTURER') liste = liste.filter((f: any) => f.statut === 'VALIDEE_KIA');
     else if (this.filterStatut === 'VALIDEE') liste = liste.filter((f: any) => f.statut === 'VALIDEE');
     if (this.rechercheFC.trim()) {
       const q = this.rechercheFC.toLowerCase().trim();
@@ -115,7 +120,7 @@ export class FichesCompletees implements OnInit {
 
   confirmerKia(fiche: any) {
     const nom = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-    if (!confirm('Confirmer ce travail en tant que Technicien Supérieur ?')) return;
+    if (!confirm('Confirmer ce travail en tant que Directeur des opérations ?')) return;
     this.fichesApi.put<any>(`${fiche.id}/confirmer-kia`, { confirmePar: nom }).subscribe({
       next: () => {
         fiche.statut = 'VALIDEE_KIA';
@@ -135,7 +140,7 @@ export class FichesCompletees implements OnInit {
 
   facturerFiche(fiche: any) {
     if (fiche.statut !== 'VALIDEE_KIA') {
-      alert('Ce travail doit d\'abord être confirmé par le Technicien Supérieur.');
+      alert('Ce travail doit d\'abord être confirmé par le Directeur des opérations.');
       return;
     }
     if (!fiche.dateFacturation || !fiche.numeroFacture?.trim()) {
@@ -163,6 +168,7 @@ export class FichesCompletees implements OnInit {
   }
 
   getCountPending(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'COMPLETEE' || f.statut === 'VALIDEE_KIA').length; }
+  getCountAFacturer(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE_KIA').length; }
   getCountValidees(): number { return this.fichesCompletees.filter((f: any) => f.statut === 'VALIDEE').length; }
 
   getStatutBadgeClass(statut: string): string {

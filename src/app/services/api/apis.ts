@@ -98,13 +98,14 @@ export class TachesApi extends ApiBase {
   /** Liste paginée (20 par défaut) + filtres appliqués côté serveur. */
   page<T = any>(params: {
     page: number; size: number;
-    statut?: string; priorite?: string; client?: string; recherche?: string;
+    statut?: string; priorite?: string; client?: string; recherche?: string; exclureStatut?: string;
   }): Observable<{ content: T[]; totalElements: number; totalPages: number; number: number }> {
     const p: ParamsHttp = { page: params.page, size: params.size };
     if (params.statut) p['statut'] = params.statut;
     if (params.priorite) p['priorite'] = params.priorite;
     if (params.client) p['client'] = params.client;
     if (params.recherche) p['recherche'] = params.recherche;
+    if (params.exclureStatut) p['exclureStatut'] = params.exclureStatut;
     return this.get('page', p);
   }
 }

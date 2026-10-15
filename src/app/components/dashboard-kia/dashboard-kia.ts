@@ -18,13 +18,14 @@ import { GestionClients } from '../clients/clients';
 import { Taches } from '../taches/taches';
 import { JournalTravail } from '../journal-travail/journal-travail';
 import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
+import { libelleRole } from '../../services/roles';
 import { CongesApi, FichesInterventionApi, ReclamationsApi, UtilisateursApi } from '../../services/api/apis';
 
 const ESPACE: EspaceConfig = {
   brand: 'MCL Solutions',
   sousTitre: 'Mon espace',
-  roleLabel: 'Tech Sup',
-  badge: 'TECH SUP',
+  roleLabel: 'Directeur des opérations',
+  badge: 'DIR. OPÉRATIONS',
   gradient: 'linear-gradient(180deg, #020c1b 0%, #0a1628 50%, #071020 100%)',
   accent: '#4527a0',
   accentSoft: '#ede7f6',
@@ -34,6 +35,7 @@ const ESPACE: EspaceConfig = {
     { key: 'fiches', icon: 'description', label: 'Fiches d\'Intervention' },
     { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
     { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
     { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
@@ -64,6 +66,8 @@ const ESPACE: EspaceConfig = {
 })
 export class DashboardKia implements OnInit {
   espace = ESPACE;
+  /** Libellé affiché d'un rôle (ex. TECHNICIEN_SUP → Directeur des opérations). */
+  readonly libelleRole = libelleRole;
   user: any = {};
 
   private _currentPage = 'home';

@@ -410,6 +410,8 @@ mat-form-field { width: 100%; }
 .proj-field-lg     { flex: 1; min-width: 180px; }
 .proj-field-xl     { flex: 2; min-width: 220px; }
 .proj-field-full   { flex: 1 1 100%; }
+.compact-textarea  { height: auto; min-height: 70px; padding: 8px 10px; resize: vertical; line-height: 1.4; }
+.detail-commentaire { white-space: pre-wrap; }
 .proj-field-import {
   display: flex; align-items: center; gap: 8px;
   background: #f8faff; border: 1.5px solid #e0e0e0;

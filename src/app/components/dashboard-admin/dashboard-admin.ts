@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -30,6 +30,7 @@ import {
   VoituresApi, MinutesSecuriteApi, MessagesAbyApi, ReclamationsApi, TicketsClientApi
 } from '../../services/api/apis';
 import { Auth } from '../../services/auth';
+import { libelleRole } from '../../services/roles';
 import { COULEURS_STATUT_PROJET, STATUTS_PROJET, compterParStatutProjet } from '../../services/statuts-projet';
 
 const ESPACE: EspaceConfig = {
@@ -46,6 +47,7 @@ const ESPACE: EspaceConfig = {
     { key: 'interventions', icon: 'engineering', label: 'Fiches Intervention' },
     { key: 'fiches-completees', icon: 'check_circle', label: 'Fiches Complétées' },
     { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
+    { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
     { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
     { key: 'categories-taches', icon: 'category', label: 'Catégories de Tâches' },
@@ -81,6 +83,8 @@ const ESPACE: EspaceConfig = {
 })
 export class DashboardAdmin implements OnInit {
   espace = ESPACE;
+  /** Libellé affiché d'un rôle (ex. TECHNICIEN_SUP → Directeur des opérations). */
+  readonly libelleRole = libelleRole;
   user: any = {};
 
   private _currentPage = 'home';
@@ -90,8 +94,30 @@ export class DashboardAdmin implements OnInit {
   set currentPage(value: string) {
     this.fermerDetailFiche();
     this.fermerDetailReclamation();
+    this.ficheStatutCible = '';
+    this.fichePeriodeCible = null;
+    this.projetStatutCible = '';
+    this.ticketsVueCible = '';
     this._currentPage = value;
   }
+
+  /** Fiches confirmées par le Directeur des opérations (VALIDEE_KIA), en attente de facturation. */
+  get nbFichesAFacturer(): number {
+    return this.fiches.filter((f: any) => f.statut === 'VALIDEE_KIA').length;
+  }
+
+  /** Indicateur « Fiches à facturer » → liste Fiches Intervention (comme le menu), filtrée. */
+  ouvrirFichesAFacturer() {
+    this.currentPage = 'interventions';
+    this.ficheStatutCible = 'VALIDEE_KIA';
+  }
+
+  /** Statuts pré-filtrés à l'ouverture des listes (clic sur un donut). */
+  ficheStatutCible = '';
+  fichePeriodeCible: { debut: string; fin: string; libelle: string } | null = null;
+  projetStatutCible = '';
+  ticketsVueCible: 'a-traiter' | 'tous' | '' = '';
+  private readonly zone = inject(NgZone);
 
   onPageChange(page: string) {
     this.currentPage = page;
@@ -262,8 +288,8 @@ get minutesOk(): number {
 
 loadTicketsClients() {
   this.ticketsClientApi.lister<any>().subscribe({
-    next: (data) => this.ticketsClients = data,
-    error: () => this.ticketsClients = []
+    next: (data) => { this.ticketsClients = data; this.calculerChartTicketsClient(); },
+    error: () => { this.ticketsClients = []; this.calculerChartTicketsClient(); }
   });
 }
 
@@ -419,8 +445,9 @@ resetCongeFormPerso() {
         this.fiches = data;
         this.fichesFiltrees = data.filter((f: any) => f.statut === 'EN_COURS');
         this.ficheCompletees = data.filter((f: any) => f.statut === 'COMPLETEE');
+        this.recalculerChartFichesMois();
       },
-      error: () => { this.fiches = []; this.fichesFiltrees = []; this.ficheCompletees = []; }
+      error: () => { this.fiches = []; this.fichesFiltrees = []; this.ficheCompletees = []; this.recalculerChartFichesMois(); }
     });
   }
 
@@ -672,6 +699,29 @@ getStatutVoitureColor(statut: string): string {
     grid: { borderColor: '#f0f4f8' }
   };
 
+  /** Ordre identique aux labels du donut « Statut des interventions ». */
+  private readonly statutsFichesDonut = ['EN_COURS', 'COMPLETEE', 'VALIDEE'];
+
+  // Clic sur une part ou sur la légende → liste des fiches filtrée sur ce statut.
+  // ApexCharts tourne hors de la zone Angular : on y revient pour la navigation.
+  readonly chartDonutFichesChart = {
+    ...this.chartDonutOptions.chart,
+    events: {
+      dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.ouvrirFichesStatut(cfg.dataPointIndex),
+      legendClick: (_ctx: any, seriesIndex: number) => this.ouvrirFichesStatut(seriesIndex)
+    }
+  };
+
+  private ouvrirFichesStatut(index: number) {
+    const statut = this.statutsFichesDonut[index];
+    if (!statut) return;
+    this.zone.run(() => {
+      // Même page que le menu « Fiches Intervention » (clé 'interventions')
+      this.currentPage = 'interventions';
+      this.ficheStatutCible = statut;
+    });
+  }
+
   get chartFichesStatutSeries(): number[] {
     return [
       this.fiches.filter((f: any) => f.statut === 'EN_COURS').length,
@@ -685,33 +735,175 @@ getStatutVoitureColor(statut: string): string {
       .map(t => this.conges.filter((c: any) => c.type === t).length);
   }
 
-  get chartFichesMoisSeries(): any[] {
-    const mois: Record<string, number> = {};
-    const now = new Date();
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      mois[d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })] = 0;
+  // ── Graphique « Interventions » : période au choix ──
+  // 3 / 6 / 12 = derniers mois (une barre par mois) ; 1 = un mois choisi (une barre par jour).
+  periodeFiches: 1 | 3 | 6 | 12 = 6;
+  /** Mois affiché quand periodeFiches = 1, format AAAA-MM (valeur d'un <input type="month">). */
+  moisFiches = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+  chartFichesMoisSeries: any[] = [{ name: 'Interventions', data: [] }, { name: 'À facturer', data: [] }];
+  chartFichesMoisXaxis: any = { categories: [] };
+  readonly chartFichesMoisLegend = { position: 'bottom' as const, fontSize: '12px' };
+
+  /** Clé de chaque barre affichée (AAAA-MM en vue mensuelle, AAAA-MM-JJ en vue « 1 mois »). */
+  private chartFichesMoisCles: string[] = [];
+
+  // Barres côte à côte : bleu = toutes les fiches, orange = dont à facturer (VALIDEE_KIA).
+  // Clic sur une barre → liste Fiches Intervention filtrée sur ce mois / ce jour
+  // (et sur « à facturer » pour la barre orange).
+  readonly chartFichesMoisChart = {
+    ...this.chartBarOptions.chart,
+    events: {
+      dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.zone.run(() =>
+        this.ouvrirFichesPeriode(cfg.dataPointIndex, cfg.seriesIndex === 1))
     }
-    this.fiches.forEach((f: any) => {
-      const date = f.dateIntervention || f.dateCreation;
-      if (!date) return;
-      const key = new Date(date).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
-      if (key in mois) mois[key]++;
-    });
-    return [{ name: 'Interventions', data: Object.values(mois) }];
+  };
+
+  private ouvrirFichesPeriode(index: number, aFacturer: boolean) {
+    const cle = this.chartFichesMoisCles[index];
+    if (!cle) return;
+    let periode: { debut: string; fin: string; libelle: string };
+    if (cle.length === 10) {
+      const [a, m, j] = cle.split('-').map(Number);
+      periode = { debut: cle, fin: cle, libelle: new Date(a, m - 1, j).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) };
+    } else {
+      const [a, m] = cle.split('-').map(Number);
+      const dernierJour = String(new Date(a, m, 0).getDate()).padStart(2, '0');
+      periode = { debut: `${cle}-01`, fin: `${cle}-${dernierJour}`, libelle: new Date(a, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) };
+    }
+    this.currentPage = 'interventions';
+    this.fichePeriodeCible = periode;
+    this.ficheStatutCible = aFacturer ? 'VALIDEE_KIA' : '';
   }
 
-  get chartFichesMoisCategories(): string[] {
-    const now = new Date();
-    return Array.from({ length: 6 }, (_, i) => {
-      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
-      return d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+  get titreChartFiches(): string {
+    if (this.periodeFiches !== 1) return `Interventions / ${this.periodeFiches} derniers mois`;
+    const [a, m] = this.moisFiches.split('-').map(Number);
+    return `Interventions / ${new Date(a, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`;
+  }
+
+  /** Date d'une fiche au format AAAA-MM-JJ (lue telle quelle, sans décalage de fuseau). */
+  private dateFiche(f: any): string {
+    return String(f.dateIntervention || f.dateCreation || '').slice(0, 10);
+  }
+
+  /** Recalculé au chargement des fiches et à chaque changement de période/mois
+   * (pas de getter : un nouveau tableau à chaque détection ferait redessiner le graphique). */
+  recalculerChartFichesMois() {
+    const fiches = this.fiches
+      .map((f: any) => ({ date: this.dateFiche(f), aFacturer: f.statut === 'VALIDEE_KIA' }))
+      .filter(f => f.date.length === 10);
+    let cles: string[];
+    let libelles: string[];
+    let compter: (d: string) => string;
+
+    if (this.periodeFiches === 1) {
+      if (!this.moisFiches) return;
+      const [a, m] = this.moisFiches.split('-').map(Number);
+      const nbJours = new Date(a, m, 0).getDate();
+      cles = Array.from({ length: nbJours }, (_, i) => `${this.moisFiches}-${String(i + 1).padStart(2, '0')}`);
+      libelles = cles.map(c => String(Number(c.slice(8))));
+      compter = d => d;
+    } else {
+      const now = new Date();
+      const mois = Array.from({ length: this.periodeFiches }, (_, i) =>
+        new Date(now.getFullYear(), now.getMonth() - (this.periodeFiches - 1 - i), 1));
+      cles = mois.map(d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+      libelles = mois.map(d => d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }));
+      compter = d => d.slice(0, 7);
+    }
+
+    const total: Record<string, number> = Object.fromEntries(cles.map(c => [c, 0]));
+    const aFacturer: Record<string, number> = Object.fromEntries(cles.map(c => [c, 0]));
+    fiches.forEach(f => {
+      const k = compter(f.date);
+      if (!(k in total)) return;
+      total[k]++;
+      if (f.aFacturer) aFacturer[k]++;
     });
+    this.chartFichesMoisCles = cles;
+    this.chartFichesMoisSeries = [
+      { name: 'Interventions', data: cles.map(c => total[c]) },
+      { name: 'À facturer', data: cles.map(c => aFacturer[c]) }
+    ];
+    this.chartFichesMoisXaxis = { categories: libelles };
   }
 
   /** Statuts actuels des projets (anciens codes en base regroupés, cf. statuts-projet.ts). */
   readonly statutsProjet = STATUTS_PROJET;
   readonly couleursStatutsProjet = STATUTS_PROJET.map(s => COULEURS_STATUT_PROJET[s]);
+
+  // Clic sur le donut « Statut des projets » → même page que le menu, filtrée.
+  // « Réalisé » a sa propre page (Projets Réalisés), exclue de Gestion des Projets.
+  readonly chartDonutProjetsChart = {
+    ...this.chartDonutOptions.chart,
+    events: {
+      dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.ouvrirProjetsStatut(cfg.dataPointIndex),
+      legendClick: (_ctx: any, seriesIndex: number) => this.ouvrirProjetsStatut(seriesIndex)
+    }
+  };
+
+  private ouvrirProjetsStatut(index: number) {
+    const statut = STATUTS_PROJET[index];
+    if (!statut) return;
+    this.zone.run(() => {
+      if (statut === 'Réalisé') {
+        this.currentPage = 'projets-realises';
+      } else {
+        this.currentPage = 'taches';
+        this.projetStatutCible = statut;
+      }
+    });
+  }
+
+  // ── Donut « Tickets clients » : répartition par statut, total au centre ──
+  private readonly statutsTicketsClient: { code: string; label: string; couleur: string }[] = [
+    { code: 'NOUVEAU', label: 'Nouveau', couleur: '#90a4ae' },
+    { code: 'EN_ATTENTE_VALIDATION', label: 'En attente', couleur: '#f57f17' },
+    { code: 'VALIDE', label: 'Validé', couleur: '#1565c0' },
+    { code: 'EN_COURS', label: 'En cours', couleur: '#6a1b9a' },
+    { code: 'RESOLU', label: 'Résolu', couleur: '#2e7d32' },
+    { code: 'CLOTURE', label: 'Clôturé', couleur: '#546e7a' },
+    { code: 'REJETE', label: 'Rejeté', couleur: '#c62828' }
+  ];
+
+  // Calculés une fois au chargement (pas de getters : de nouveaux tableaux à chaque
+  // détection de changements feraient redessiner le graphique en boucle).
+  // Seuls les statuts présents sont affichés, pour une légende lisible.
+  private statutsTicketsPresents: { code: string; label: string; couleur: string }[] = [];
+  chartTicketsClientSeries: number[] = [];
+  chartTicketsClientLabels: string[] = [];
+  chartTicketsClientColors: string[] = [];
+
+  private calculerChartTicketsClient() {
+    this.statutsTicketsPresents = this.statutsTicketsClient
+      .filter(s => this.ticketsClients.some((t: any) => t.statut === s.code));
+    this.chartTicketsClientSeries = this.statutsTicketsPresents
+      .map(s => this.ticketsClients.filter((t: any) => t.statut === s.code).length);
+    this.chartTicketsClientLabels = this.statutsTicketsPresents.map(s => s.label);
+    this.chartTicketsClientColors = this.statutsTicketsPresents.map(s => s.couleur);
+  }
+
+  readonly chartDonutTicketsPlot = {
+    pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'Tickets', fontSize: '13px' } } } }
+  };
+
+  // Clic → page « Tickets Clients » : onglet « À traiter » pour les tickets en attente, sinon « Tous ».
+  readonly chartDonutTicketsChart = {
+    ...this.chartDonutOptions.chart,
+    events: {
+      dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.ouvrirTicketsStatut(cfg.dataPointIndex),
+      legendClick: (_ctx: any, seriesIndex: number) => this.ouvrirTicketsStatut(seriesIndex)
+    }
+  };
+
+  private ouvrirTicketsStatut(index: number) {
+    const statut = this.statutsTicketsPresents[index];
+    if (!statut) return;
+    this.zone.run(() => {
+      this.currentPage = 'tickets-clients';
+      this.ticketsVueCible = statut.code === 'EN_ATTENTE_VALIDATION' ? 'a-traiter' : 'tous';
+    });
+  }
 
   get chartTachesStatutSeries(): number[] {
     return compterParStatutProjet(this.taches);

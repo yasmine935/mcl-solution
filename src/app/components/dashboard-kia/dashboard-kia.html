@@ -13,7 +13,7 @@
               <p>Voici un aperçu de votre activité du jour</p>
             </div>
           </div>
-          <div class="home-welcome-badge"><mat-icon>engineering</mat-icon> Tech Sup MCL</div>
+          <div class="home-welcome-badge"><mat-icon>engineering</mat-icon> Directeur des opérations MCL</div>
         </div>
         <!-- KPI COMPACTS -->
         <div class="home-kpi-grid">
@@ -78,7 +78,10 @@
         <app-fiches-completees></app-fiches-completees>
       }
       @if (currentPage === 'taches') {
-        <app-taches></app-taches>
+        <app-taches perimetre="en-cours"></app-taches>
+      }
+      @if (currentPage === 'projets-realises') {
+        <app-taches perimetre="realises"></app-taches>
       }
       @if (currentPage === 'planning') {
         <app-planning></app-planning>
@@ -200,7 +203,7 @@
                   </div>
                   <div>
                     <strong>{{ c.utilisateur?.prenom }} {{ c.utilisateur?.nom }}</strong>
-                    <span class="conge-role">{{ c.utilisateur?.role }}</span>
+                    <span class="conge-role">{{ libelleRole(c.utilisateur?.role) }}</span>
                   </div>
                 </div>
                 <div class="conge-statut-badge"
@@ -208,7 +211,7 @@
                   [class.badge-valide-kia]="c.statut === 'VALIDE_KIA'"
                   [class.badge-approuve]="c.statut === 'APPROUVE'"
                   [class.badge-refuse]="c.statut === 'REFUSE'">
-                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'VALIDE_KIA' ? '🔄 Validé (Tech. Sup.)' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
+                  {{ c.statut === 'EN_ATTENTE' ? '⏳ En attente' : c.statut === 'VALIDE_KIA' ? '🔄 Validé (Dir. des opérations)' : c.statut === 'APPROUVE' ? '✅ Approuvé' : '❌ Refusé' }}
                 </div>
               </div>
 

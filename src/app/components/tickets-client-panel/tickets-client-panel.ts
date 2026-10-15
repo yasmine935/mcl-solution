@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -56,6 +56,8 @@ interface TicketClient {
 export class TicketsClientPanel implements OnInit {
   /** Sous-onglet interne actif (indépendant de la page hôte qui embarque ce panneau). */
   vue: 'a-traiter' | 'tous' = 'a-traiter';
+  /** Sous-onglet ouvert au chargement (ex. clic sur le graphique du dashboard). */
+  @Input() vueInitiale: 'a-traiter' | 'tous' | '' = '';
 
   tickets: TicketClient[] = [];
   chargement = false;
@@ -86,6 +88,7 @@ export class TicketsClientPanel implements OnInit {
   ) {}
 
   ngOnInit() {
+    if (this.vueInitiale) this.vue = this.vueInitiale;
     this.charger();
   }
 

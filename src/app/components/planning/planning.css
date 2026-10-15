@@ -144,6 +144,21 @@
   font-size: 0.95rem; font-weight: 800; color: #0d1b2a; margin-bottom: 16px;
   display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #f0f4f8;
 }
+.equipe-filtre-dept {
+  margin-left: auto; padding: 6px 10px; border: 1.5px solid #e0e6ed; border-radius: 8px;
+  font-size: 0.8rem; font-weight: 600; color: #0d1b2a; background: #fff; cursor: pointer;
+}
+.equipe-filtre-dept:focus { outline: none; border-color: #1565c0; }
+.tr-groupe-dept td { background: #eef3fb; border-top: 2px solid #d6e2f3; }
+.td-groupe-dept {
+  text-align: left !important; padding: 6px 12px !important;
+  font-size: 0.75rem; font-weight: 800; color: #1565c0; text-transform: uppercase; letter-spacing: 0.5px;
+  position: sticky; left: 0; z-index: 1; white-space: nowrap;
+}
+.groupe-dept-count {
+  margin-left: 6px; padding: 1px 8px; border-radius: 10px;
+  background: #1565c0; color: #fff; font-size: 0.7rem;
+}
 .equipe-table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #eef0f5; }
 .equipe-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 800px; }
 .equipe-table thead th {
@@ -523,6 +538,9 @@
   background: #f0faf4; border: 1.5px solid #a5d6a7; border-radius: 10px; flex-wrap: wrap;
 }
 .intervention-tech { display: flex; align-items: center; gap: 8px; min-width: 140px; }
+/* Plusieurs techniciens sur une même fiche : un par ligne */
+.intervention-tech-multi { flex-direction: column; align-items: flex-start; gap: 6px; min-width: 180px; }
+.intervention-tech-item { display: flex; align-items: center; gap: 8px; }
 .intervention-avatar {
   width: 32px; height: 32px; border-radius: 50%; background: #1a6b3c;
   color: #fff; display: flex; align-items: center; justify-content: center;

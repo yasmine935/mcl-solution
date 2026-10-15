@@ -190,7 +190,7 @@ export class Planning implements OnInit {
       'ANNUEL': '#1565c0',
       'RTT': '#0277bd',
       'MALADIE': '#c62828',
-      'FORMATION': '#2e7d32',
+      'FORMATION': '#1e88e5',
       'SANS_SOLDE': '#546e7a',
       'AUTRE': '#6a1b9a'
     };
@@ -309,7 +309,7 @@ export class Planning implements OnInit {
     if (n.includes('DISTANCE') || n.includes('TELETRAVAIL')) return '#e65100';
     if (n.includes('DEPLACEMENT') || n.includes('CLIENT')) return '#6a1b9a';
     if (n.includes('CONGE') || n.includes('RTT') || n.includes('ABSENT')) return '#c62828';
-    if (n.includes('FORMATION')) return '#2e7d32';
+    if (n.includes('FORMATION')) return '#1e88e5';
     return '#37474f';
   }
 
@@ -330,8 +330,44 @@ export class Planning implements OnInit {
     return this.utilisateurs.filter(u => (u.role || '').toUpperCase() === 'TECHNICIEN');
   }
 
+  /** Tous les techniciens assignés à une fiche (technicienIds), à défaut le technicien principal. */
+  techniciensDeFiche(f: any): any[] {
+    const ids: number[] = f.technicienIds?.length ? f.technicienIds : (f.technicienId ? [f.technicienId] : []);
+    return ids.map(id => this.utilisateurs.find(u => u.id === id)).filter(Boolean);
+  }
+
   get collegues(): any[] {
     return this.techniciens.filter(u => u.id !== this.currentUserId);
+  }
+
+  // ── PLANNING ÉQUIPE : filtre / regroupement par département ──
+  static readonly SANS_DEPARTEMENT = 'Sans département';
+  filtreDepartement = '';
+
+  private departementDe(user: any): string {
+    const d = (user.departement || '').trim();
+    return d && d !== '-' ? d : Planning.SANS_DEPARTEMENT;
+  }
+
+  get departementsEquipe(): string[] {
+    const noms = new Set(this.utilisateurs.map(u => this.departementDe(u)));
+    return [...noms].sort((a, b) => {
+      // « Sans département » toujours en dernier
+      if (a === Planning.SANS_DEPARTEMENT) return 1;
+      if (b === Planning.SANS_DEPARTEMENT) return -1;
+      return a.localeCompare(b, 'fr');
+    });
+  }
+
+  get groupesEquipe(): { departement: string; users: any[] }[] {
+    return this.departementsEquipe
+      .filter(d => !this.filtreDepartement || d === this.filtreDepartement)
+      .map(d => ({
+        departement: d,
+        users: this.utilisateurs
+          .filter(u => this.departementDe(u) === d)
+          .sort((a, b) => `${a.nom} ${a.prenom}`.localeCompare(`${b.nom} ${b.prenom}`, 'fr'))
+      }));
   }
 
   selectedCollegue: any = null;

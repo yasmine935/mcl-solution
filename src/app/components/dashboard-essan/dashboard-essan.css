@@ -48,6 +48,9 @@
   gap: 16px;
   margin-bottom: 20px;
 }
+/* Donut cliquable : main sur les parts et la légende (SVG généré → ::ng-deep) */
+.bi-card-cliquable ::ng-deep .apexcharts-pie-area,
+.bi-card-cliquable ::ng-deep .apexcharts-legend-series { cursor: pointer; }
 .bi-card {
   background: #fff;
   border-radius: 14px;

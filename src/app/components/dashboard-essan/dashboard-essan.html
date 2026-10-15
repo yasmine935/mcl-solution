@@ -26,11 +26,11 @@
           [xaxis]="{ categories: chartFichesMoisCategories }">
         </apx-chart>
       </div>
-      <div class="bi-card">
+      <div class="bi-card bi-card-cliquable" title="Cliquer sur un statut pour voir les interventions">
         <div class="bi-card-title"><mat-icon>donut_large</mat-icon> Statut des interventions</div>
         <apx-chart
           [series]="chartFichesStatutSeries"
-          [chart]="chartDonutOptions.chart"
+          [chart]="chartDonutFichesChart"
           [labels]="['En cours', 'Complétées', 'Validées']"
           [colors]="['#5e35b1', '#f57f17', '#2e7d32']"
           [legend]="chartDonutOptions.legend">
@@ -46,11 +46,11 @@
           [legend]="chartDonutOptions.legend">
         </apx-chart>
       </div>
-      <div class="bi-card">
+      <div class="bi-card bi-card-cliquable" title="Cliquer sur un statut pour voir les projets">
         <div class="bi-card-title"><mat-icon>task_alt</mat-icon> Statut des projets</div>
         <apx-chart
           [series]="chartTachesStatutSeries"
-          [chart]="chartDonutOptions.chart"
+          [chart]="chartDonutProjetsChart"
           [labels]="statutsProjet"
           [colors]="couleursStatutsProjet"
           [legend]="chartDonutOptions.legend">
@@ -102,13 +102,16 @@
 
   <!-- COMPOSANTS INTÉGRÉS — ESSAN en lecture seule -->
   @if (currentPage === 'fiches') {
-    <app-fiche-intervention-manager [modeConsultation]="true"></app-fiche-intervention-manager>
+    <app-fiche-intervention-manager [modeConsultation]="true" [statutInitial]="ficheStatutCible"></app-fiche-intervention-manager>
   }
   @if (currentPage === 'fiches-completees') {
     <app-fiches-completees></app-fiches-completees>
   }
   @if (currentPage === 'projets') {
-    <app-taches [modeConsultation]="true"></app-taches>
+    <app-taches [modeConsultation]="true" perimetre="en-cours" [statutInitial]="projetStatutCible"></app-taches>
+  }
+  @if (currentPage === 'projets-realises') {
+    <app-taches [modeConsultation]="true" perimetre="realises"></app-taches>
   }
   @if (currentPage === 'clients') {
     <app-gestion-clients [modeConsultation]="true"></app-gestion-clients>
@@ -211,7 +214,7 @@
                 </div>
                 <div class="emp-info">
                   <strong class="emp-nom">{{ e.prenom }} {{ e.nom }}</strong>
-                  <span class="emp-role-badge" [style.background]="getRoleColorLight(e.role)" [style.color]="getRoleColor(e.role)">{{ e.role }}</span>
+                  <span class="emp-role-badge" [style.background]="getRoleColorLight(e.role)" [style.color]="getRoleColor(e.role)">{{ libelleRole(e.role) }}</span>
                 </div>
               </div>
               @if (e.email) {
@@ -249,7 +252,7 @@
         </div>
         <div class="emp-modal-title">
           <h3>{{ selectedEmploye.prenom }} {{ selectedEmploye.nom }}</h3>
-          <span class="emp-modal-role">{{ selectedEmploye.role }}</span>
+          <span class="emp-modal-role">{{ libelleRole(selectedEmploye.role) }}</span>
         </div>
         <button type="button" class="emp-modal-close" (click)="fermerDetail()">✕</button>
       </div>

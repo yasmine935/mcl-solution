@@ -68,6 +68,11 @@
   background: #fff; color: #0d1b2a; box-sizing: border-box; transition: border-color 0.15s;
 }
 .compact-input:focus { border-color: #01579b; box-shadow: 0 0 0 3px rgba(1,87,155,0.08); }
+/* Champs en lecture seule (repris du client / projet, non enregistrés sur la fiche) */
+.compact-input.input-lecture {
+  background: #f4f6f9; color: #37474f; border-style: dashed; cursor: default;
+}
+.compact-input.input-lecture:focus { border-color: #dde2ea; box-shadow: none; }
 
 /* Combobox Projet (formulaire d'ajout) : filtré par client, saisie libre */
 .projet-combobox-wrap { position: relative; }
@@ -369,6 +374,19 @@
 .badge-statut { padding: 2px 8px !important; border-radius: 16px !important; font-size: 0.65rem !important; font-weight: 800 !important; }
 .statut-en-cours { background: #e3f2fd !important; color: #01579b !important; }
 .statut-completee { background: #e8f5e9 !important; color: #2e7d32 !important; }
+.filtre-periode-chip {
+  display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 4px 0 10px;
+  border-radius: 16px; background: #e3f2fd; color: #01579b; font-size: 0.8rem; font-weight: 700;
+  white-space: nowrap;
+}
+.filtre-periode-chip mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.filtre-periode-chip button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border: none; border-radius: 50%;
+  background: transparent; color: inherit; cursor: pointer;
+}
+.filtre-periode-chip button:hover { background: rgba(1,87,155,0.12); }
+.statut-a-facturer { background: #fff3e0 !important; color: #e65100 !important; }
 .fiche-actions { display: flex; gap: 2px; flex-shrink: 0; }
 .fiche-actions button:hover { transform: scale(1.1); }
 .fiche-description { font-size: 0.82rem; color: #546e7a; margin: 0 0 8px; padding: 8px 12px; background: #f8fafc; border-left: 3px solid #01579b; border-radius: 6px; line-height: 1.5; }

@@ -31,7 +31,7 @@
             <label class="field-label" [class.label-erreur]="formAjoutInvalide && !nouvelleFiche.numProjet">Projet *</label>
             <input type="text" class="compact-input" [(ngModel)]="nouvelleFiche.numProjet"
               placeholder="Rechercher un projet..."
-              (focus)="ouvrirProjetDropdown('add')" (click)="ouvrirProjetDropdown('add')" (input)="onSaisieProjet()" (blur)="fermerProjetDropdownDelai()">
+              (focus)="ouvrirProjetDropdown('add')" (click)="ouvrirProjetDropdown('add')" (input)="onSaisieProjet('add', $any($event.target).value)" (blur)="fermerProjetDropdownDelai()">
             @if (projetDropdownCible === 'add') {
               <div class="projet-dropdown">
                 @for (p of projetsPourDropdown('add'); track p.id) {
@@ -107,15 +107,15 @@
         <div class="form-row-compact">
           <div class="field-sm">
             <label class="field-label">Code Client</label>
-            <input class="compact-input" [(ngModel)]="nouvelleFiche.codeClient" placeholder="CLI-001"/>
+            <input class="compact-input input-lecture" [value]="nouvelleFiche.codeClient" readonly tabindex="-1" placeholder="—"/>
           </div>
           <div class="field-sm">
             <label class="field-label">N° Commande</label>
-            <input class="compact-input" [(ngModel)]="nouvelleFiche.numCommande" placeholder="CMD-001"/>
+            <input class="compact-input input-lecture" [value]="nouvelleFiche.numCommande" readonly tabindex="-1" placeholder="—"/>
           </div>
           <div class="field-sm">
             <label class="field-label">Montant (€)</label>
-            <input class="compact-input" type="number" [(ngModel)]="nouvelleFiche.chiffreAffaire" placeholder="0.00"/>
+            <input class="compact-input input-lecture" [value]="nouvelleFiche.chiffreAffaire" readonly tabindex="-1" placeholder="—"/>
           </div>
           <div class="field-lg">
             <label class="field-label">Adresse du site</label>
@@ -257,7 +257,7 @@
             <label class="field-label" [class.label-erreur]="formEditInvalide && !ficheEnEdition.numProjet">Projet *</label>
             <input type="text" class="compact-input" [(ngModel)]="ficheEnEdition.numProjet"
               placeholder="Rechercher un projet..."
-              (focus)="ouvrirProjetDropdown('edit')" (click)="ouvrirProjetDropdown('edit')" (input)="onSaisieProjet()" (blur)="fermerProjetDropdownDelai()">
+              (focus)="ouvrirProjetDropdown('edit')" (click)="ouvrirProjetDropdown('edit')" (input)="onSaisieProjet('edit', $any($event.target).value)" (blur)="fermerProjetDropdownDelai()">
             @if (projetDropdownCible === 'edit') {
               <div class="projet-dropdown">
                 @for (p of projetsPourDropdown('edit'); track p.id) {
@@ -332,15 +332,15 @@
         <div class="form-row-compact">
           <div class="field-sm">
             <label class="field-label">Code Client</label>
-            <input class="compact-input" [(ngModel)]="ficheEnEdition.codeClient"/>
+            <input class="compact-input input-lecture" [value]="ficheEnEdition.codeClient" readonly tabindex="-1" placeholder="—"/>
           </div>
           <div class="field-sm">
             <label class="field-label">N° Commande</label>
-            <input class="compact-input" [(ngModel)]="ficheEnEdition.numCommande"/>
+            <input class="compact-input input-lecture" [value]="ficheEnEdition.numCommande" readonly tabindex="-1" placeholder="—"/>
           </div>
           <div class="field-sm">
             <label class="field-label">Montant (€)</label>
-            <input class="compact-input" type="number" [(ngModel)]="ficheEnEdition.chiffreAffaire"/>
+            <input class="compact-input input-lecture" [value]="ficheEnEdition.chiffreAffaire" readonly tabindex="-1" placeholder="—"/>
           </div>
           <div class="field-lg">
             <label class="field-label">Adresse du site</label>
@@ -476,14 +476,21 @@
       <option value="">Tous les statuts</option>
       <option value="EN_COURS">EN COURS</option>
       <option value="COMPLETEE">COMPLÉTÉE</option>
+      <option value="VALIDEE_KIA">À FACTURER (confirmée Dir. des opérations)</option>
       <option value="VALIDEE">VALIDÉE</option>
     </select>
     <select class="search-select" [(ngModel)]="filtreClient">
       <option value="">Tous les clients</option>
       @for (c of getClientsUniques(); track c) { <option [value]="c">{{ c }}</option> }
     </select>
-    @if (filtreStatut || filtreClient || recherche) {
-      <button type="button" class="search-reset-btn" (click)="filtreStatut=''; filtreClient=''; recherche=''">
+    @if (filtrePeriode) {
+      <span class="filtre-periode-chip">
+        <mat-icon>event</mat-icon> {{ filtrePeriode.libelle }}
+        <button type="button" (click)="filtrePeriode = null" title="Retirer le filtre période"><mat-icon>close</mat-icon></button>
+      </span>
+    }
+    @if (filtreStatut || filtreClient || recherche || filtrePeriode) {
+      <button type="button" class="search-reset-btn" (click)="filtreStatut=''; filtreClient=''; recherche=''; filtrePeriode = null">
         <mat-icon>filter_alt_off</mat-icon>
       </button>
     }
@@ -510,7 +517,7 @@
                 <div class="fiche-meta">
                   <span><mat-icon>calendar_today</mat-icon> {{ afficherDate(fiche.date) }}</span>
                   <span><mat-icon>engineering</mat-icon> {{ fiche.technicienAssigne || 'Non assigné' }}</span>
-                  <span class="badge-statut" [class.statut-en-cours]="fiche.statut === 'EN_COURS'" [class.statut-completee]="fiche.statut === 'COMPLETEE'">
+                  <span class="badge-statut" [class.statut-en-cours]="fiche.statut === 'EN_COURS'" [class.statut-completee]="fiche.statut === 'COMPLETEE'" [class.statut-a-facturer]="fiche.statut === 'VALIDEE_KIA'">
                     {{ fiche.statut }}
                   </span>
                   @if (fiche.dateFin) {
