@@ -1,4 +1,5 @@
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit, inject } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -116,6 +117,7 @@ export class FicheInterventionManager implements OnInit {
     technicienAssigne: '', selectedTechIds: [] as number[],
     description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
     adresse: '', contact: '', nomContactSite: '', telContactSite: '',
+    numeroFacture: '', dateFacturation: '', montantFacture: '', refSage: '',
     materielsHorsStandard: [], nouveauMateriel: '', documentsImportes: [], taches: []
   };
 
@@ -330,6 +332,10 @@ export class FicheInterventionManager implements OnInit {
       adresse: f.adresse,
       contact: f.contact,
       nomContactSite: f.nomContactSite || '',
+      numeroFacture: f.numeroFacture || '',
+      dateFacturation: f.dateFacturation || '',
+      montantFacture: f.montantFacture || '',
+      refSage: f.refSage || '',
       telContactSite: f.telContactSite || '',
       statut: f.statut,
       heureDebut: f.heureDebut,
@@ -444,10 +450,15 @@ export class FicheInterventionManager implements OnInit {
       contact: this.nouvelleFiche.contact,
       nomContactSite: this.nouvelleFiche.nomContactSite,
       telContactSite: this.nouvelleFiche.telContactSite,
+      numeroFacture: this.nouvelleFiche.numeroFacture || null,
+      dateFacturation: this.nouvelleFiche.dateFacturation || null,
+      montantFacture: this.nouvelleFiche.montantFacture != null && this.nouvelleFiche.montantFacture !== '' ? String(this.nouvelleFiche.montantFacture) : null,
+      refSage: this.nouvelleFiche.refSage || null,
       dateIntervention: this.formatDate(this.nouvelleFiche.dateDebut),
       dateFin: this.formatDate(this.nouvelleFiche.dateFin),
       description: this.nouvelleFiche.description,
       taches: JSON.stringify(this.nouvelleFiche.taches || []),
+      materielsHorsStandard: JSON.stringify(this.nouvelleFiche.materielsHorsStandard || []),
       documentsImportes: JSON.stringify(this.nouvelleFiche.documentsImportes || []),
       statut: 'EN_COURS',
       manager: { id: this.currentUser.id },
@@ -499,10 +510,15 @@ export class FicheInterventionManager implements OnInit {
       contact: this.ficheEnEdition.contact,
       nomContactSite: this.ficheEnEdition.nomContactSite,
       telContactSite: this.ficheEnEdition.telContactSite,
+      numeroFacture: this.ficheEnEdition.numeroFacture || null,
+      dateFacturation: this.ficheEnEdition.dateFacturation || null,
+      montantFacture: this.ficheEnEdition.montantFacture != null && this.ficheEnEdition.montantFacture !== '' ? String(this.ficheEnEdition.montantFacture) : null,
+      refSage: this.ficheEnEdition.refSage || null,
       dateIntervention: this.formatDate(this.ficheEnEdition.dateDebut || this.ficheEnEdition.date),
       dateFin: this.formatDate(this.ficheEnEdition.dateFin),
       description: this.ficheEnEdition.description,
       taches: JSON.stringify(this.ficheEnEdition.taches || []),
+      materielsHorsStandard: JSON.stringify(this.ficheEnEdition.materielsHorsStandard || []),
       documentsImportes: JSON.stringify(this.ficheEnEdition.documentsImportes || []),
       statut: this.ficheEnEdition.statut,
       ...techBody
@@ -539,6 +555,7 @@ export class FicheInterventionManager implements OnInit {
       technicienAssigne: '', selectedTechIds: [] as number[],
       description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
       adresse: '', contact: '', nomContactSite: '', telContactSite: '',
+      numeroFacture: '', dateFacturation: '', montantFacture: '', refSage: '',
       materielsHorsStandard: [],
       nouveauMateriel: '', documentsImportes: [], taches: []
     };
@@ -585,6 +602,20 @@ export class FicheInterventionManager implements OnInit {
 
   supprimerDocument(form: any, index: number) { form.documentsImportes.splice(index, 1); }
 
+  // ── Rubrique Facturation : les factures sont des documents de type "Facture",
+  // affichées dans leur rubrique et non dans « Documents / Fichiers ». ──
+  static readonly TYPE_FACTURE = 'Facture';
+  facturesDe(form: any): any[] {
+    return (form?.documentsImportes || []).filter((d: any) => d.type === FicheInterventionManager.TYPE_FACTURE);
+  }
+  documentsHorsFactures(form: any): any[] {
+    return (form?.documentsImportes || []).filter((d: any) => d.type !== FicheInterventionManager.TYPE_FACTURE);
+  }
+  /** Suppression par référence (les listes affichées sont filtrées, l'index ne correspond plus). */
+  supprimerDocumentObjet(form: any, doc: any) {
+    form.documentsImportes = (form.documentsImportes || []).filter((d: any) => d !== doc);
+  }
+
   ouvrirDocument(doc: any) {
     if (!doc.data) { alert('Contenu du fichier non disponible'); return; }
     const a = document.createElement('a');
@@ -592,6 +623,49 @@ export class FicheInterventionManager implements OnInit {
     a.download = doc.nom;
     a.target = '_blank';
     a.click();
+  }
+
+  // ── Aperçu d'un document importé (images, PDF, texte) ──
+  private readonly sanitizer = inject(DomSanitizer);
+  apercuDoc: { doc: any; genre: 'image' | 'pdf' | 'texte' | 'autre'; url: SafeResourceUrl | null; texte: string } | null = null;
+  private apercuBlobUrl: string | null = null;
+
+  visualiserDocument(doc: any) {
+    if (!doc.data) { alert('Contenu du fichier non disponible'); return; }
+    this.fermerApercu();
+    // doc.data est une data URL (data:<mime>;base64,<contenu>) produite à l'import
+    const [entete, base64 = ''] = String(doc.data).split(',');
+    const nom = (doc.nom || '').toLowerCase();
+    let mime = (entete.match(/^data:([^;]+)/) || [])[1] || '';
+    if (!mime || mime === 'application/octet-stream') {
+      if (/\.pdf$/.test(nom)) mime = 'application/pdf';
+      else if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(nom)) mime = 'image/' + nom.split('.').pop()!.replace('jpg', 'jpeg').replace('svg', 'svg+xml');
+      else if (/\.(txt|csv|log|json|xml)$/.test(nom)) mime = 'text/plain';
+    }
+    const genre = mime.startsWith('image/') ? 'image' : mime === 'application/pdf' ? 'pdf' : mime.startsWith('text/') ? 'texte' : 'autre';
+
+    let url: SafeResourceUrl | null = null;
+    let texte = '';
+    try {
+      const octets = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      if (genre === 'texte') {
+        texte = new TextDecoder('utf-8').decode(octets);
+      } else if (genre !== 'autre') {
+        // URL blob (les navigateurs bloquent l'affichage direct des data URL dans une iframe)
+        this.apercuBlobUrl = URL.createObjectURL(new Blob([octets], { type: mime }));
+        url = this.sanitizer.bypassSecurityTrustResourceUrl(this.apercuBlobUrl);
+      }
+    } catch {
+      alert('Impossible de lire ce fichier.');
+      return;
+    }
+    this.apercuDoc = { doc, genre, url, texte };
+  }
+
+  fermerApercu() {
+    if (this.apercuBlobUrl) URL.revokeObjectURL(this.apercuBlobUrl);
+    this.apercuBlobUrl = null;
+    this.apercuDoc = null;
   }
 
   ajouterTache(form: any, tache: string) {

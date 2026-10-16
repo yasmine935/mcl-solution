@@ -148,6 +148,10 @@
             <label class="field-label" for="num-cmd-add">N° Commande</label>
             <input id="num-cmd-add" type="text" class="compact-input" [(ngModel)]="nouvelleTache.numCommande" placeholder="CMD-001">
           </div>
+          <div class="proj-field-md">
+            <label class="field-label" for="num-cmd-client-add">N° Commande client</label>
+            <input id="num-cmd-client-add" type="text" class="compact-input" [(ngModel)]="nouvelleTache.numCommandeClient" placeholder="Réf. commande du client">
+          </div>
           <div class="proj-field-import">
             <span class="proj-import-label">📋 Bon de commande</span>
             <input type="file" #fileCmdAdd (change)="onFileSelectCategorie($event, nouvelleTache, 'Commande')" multiple class="file-input" accept="*/*">
@@ -348,6 +352,10 @@
           <div class="proj-field-md">
             <label class="field-label">N° Commande</label>
             <input class="compact-input" [(ngModel)]="tacheEnEdition.numCommande"/>
+          </div>
+          <div class="proj-field-md">
+            <label class="field-label">N° Commande client</label>
+            <input class="compact-input" [(ngModel)]="tacheEnEdition.numCommandeClient"/>
           </div>
           <div class="proj-field-import">
             <span class="proj-import-label">📋 Bon de commande</span>
@@ -714,6 +722,7 @@
           <div class="detail-item"><strong>Échéance</strong><p>{{ selectedTache.echeance || '—' }}</p></div>
           <div class="detail-item"><strong>CA</strong><p class="highlight-number">{{ selectedTache.chiffreAffaire ? selectedTache.chiffreAffaire + '€' : '—' }}</p></div>
           <div class="detail-item"><strong>N° Commande</strong><p>{{ selectedTache.numCommande || '—' }}</p></div>
+          <div class="detail-item"><strong>N° Commande client</strong><p>{{ selectedTache.numCommandeClient || '—' }}</p></div>
           <div class="detail-item full-width">
             <strong>Personnes assignées</strong>
             <div class="assignes-container" style="margin-top:6px">
@@ -726,6 +735,45 @@
             <strong>Commentaire</strong>
             <p class="detail-commentaire">{{ selectedTache.commentaire || '—' }}</p>
           </div>
+        </div>
+
+        <!-- FACTURATION DU PROJET -->
+        <div class="facturation-projet">
+          <div class="facturation-projet-titre">🧾 Facturation des interventions</div>
+          @if (chargementFactures) {
+            <p class="facturation-projet-vide">Chargement…</p>
+          } @else {
+            <table class="facturation-table">
+              <thead>
+                <tr><th>Date de facturation</th><th>N° Facture</th><th class="col-montant">Montant facturé</th></tr>
+              </thead>
+              <tbody>
+                @for (f of facturesProjet; track f.id) {
+                  <tr>
+                    <td>{{ f.dateFacturation ? (f.dateFacturation | date:'dd/MM/yyyy') : '—' }}</td>
+                    <td>{{ f.numeroFacture || '—' }}</td>
+                    <td class="col-montant">{{ euros(montantNum(f.montantFacture)) }}</td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="3" class="facturation-projet-vide">Aucune fiche d'intervention facturée pour ce projet</td></tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="ligne-total">
+                  <td colspan="2">Total facturé</td>
+                  <td class="col-montant">{{ euros(totalFacture) }}</td>
+                </tr>
+                <tr class="ligne-ca">
+                  <td colspan="2">CA (€) de la commande</td>
+                  <td class="col-montant">{{ euros(montantNum(selectedTache.chiffreAffaire)) }}</td>
+                </tr>
+                <tr class="ligne-reste" [class.reste-negatif]="resteAFacturer < 0" [class.reste-solde]="resteAFacturer === 0">
+                  <td colspan="2">Reste à facturer</td>
+                  <td class="col-montant">{{ euros(resteAFacturer) }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          }
         </div>
 
         <!-- AVANCEMENT -->

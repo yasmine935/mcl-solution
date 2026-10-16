@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { ClientsApi, TachesApi, UtilisateursApi } from '../../services/api/apis';
+import { ClientsApi, FichesInterventionApi, TachesApi, UtilisateursApi } from '../../services/api/apis';
 import { COULEURS_STATUT_PROJET, STATUTS_PROJET, normaliserStatutProjet } from '../../services/statuts-projet';
 
 const ETAPES_PROJET = [
@@ -131,7 +131,7 @@ export class Taches implements OnInit {
   nouvelleTache = {
     projet: '', statut: 'Qualification', date: new Date().toLocaleDateString('fr-FR'),
     priorite: 'Moyenne', fichiers: [] as any[], assignes: [] as any[],
-    echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: '', commentaire: ''
+    echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numCommandeClient: '', numDevis: '', caDevis: '', commentaire: ''
   };
 
   tacheEnEdition: any = {};
@@ -139,7 +139,8 @@ export class Taches implements OnInit {
   constructor(
     private tachesApi: TachesApi,
     private clientsApi: ClientsApi,
-    private utilisateursApi: UtilisateursApi
+    private utilisateursApi: UtilisateursApi,
+    private fichesInterventionApi: FichesInterventionApi
   ) {}
 
   ngOnInit() {
@@ -291,6 +292,7 @@ export class Taches implements OnInit {
       adresse: t.adresse || '',
       chiffreAffaire: t.chiffreAffaire || '',
       numCommande: t.description || '',
+      numCommandeClient: t.numCommandeClient || '',
       numDevis: t.numDevis || '',
       caDevis: t.caDevis || '',
       // null = pas encore chargés (les listes ne les renvoient pas), ≠ [] = aucun fichier.
@@ -323,6 +325,7 @@ export class Taches implements OnInit {
       clientFinal: tache.clientFinal || '',
       adresse: tache.adresse || '',
       chiffreAffaire: tache.chiffreAffaire || '',
+      numCommandeClient: tache.numCommandeClient || '',
       numDevis: tache.numDevis || '',
       caDevis: tache.caDevis || '',
       assignes: JSON.stringify(tache.assignes || []),
@@ -531,15 +534,51 @@ export class Taches implements OnInit {
     this.selectedTache = tache;
     this.showDetailModal = true;
     this.chargerFichiers(tache);
+    this.chargerFacturesProjet(tache);
   }
 
-  fermerDetailModal() { this.showDetailModal = false; this.selectedTache = null; }
+  fermerDetailModal() { this.showDetailModal = false; this.selectedTache = null; this.facturesProjet = []; }
+
+  // ── Facturation du projet (détail) : fiches d'intervention facturées de ce projet ──
+  // Lien fiche ↔ projet : numProjet de la fiche = titre du projet.
+  facturesProjet: { id: number; dateFacturation: string; numeroFacture: string; montantFacture: string; statut: string }[] = [];
+  chargementFactures = false;
+
+  chargerFacturesProjet(tache: any) {
+    this.facturesProjet = [];
+    if (!tache?.projet) return;
+    this.chargementFactures = true;
+    this.fichesInterventionApi.get<any[]>('factures', { numProjet: tache.projet }).subscribe({
+      next: (data) => { this.facturesProjet = data || []; this.chargementFactures = false; },
+      error: () => { this.facturesProjet = []; this.chargementFactures = false; }
+    });
+  }
+
+  /** Montant saisi (texte en base, virgule ou point) → nombre ; 0 si vide/invalide. */
+  montantNum(v: any): number {
+    const n = parseFloat(String(v ?? '').replace(/\s/g, '').replace(',', '.'));
+    return isNaN(n) ? 0 : n;
+  }
+
+  /** Format monétaire français : 12 345,67 € */
+  euros(n: number): string {
+    return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  get totalFacture(): number {
+    return this.facturesProjet.reduce((s, f) => s + this.montantNum(f.montantFacture), 0);
+  }
+
+  /** CA (€) de la commande − total facturé. */
+  get resteAFacturer(): number {
+    return this.montantNum(this.selectedTache?.chiffreAffaire) - this.totalFacture;
+  }
 
   resetFormAdd() {
     this.nouvelleTache = {
       projet: '', statut: 'Qualification', date: new Date().toLocaleDateString('fr-FR'),
       priorite: 'Moyenne', fichiers: [], assignes: [],
-      echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numDevis: '', caDevis: '', commentaire: ''
+      echeance: '', client: '', clientFinal: '', adresse: '', chiffreAffaire: '', numCommande: '', numCommandeClient: '', numDevis: '', caDevis: '', commentaire: ''
     };
   }
 

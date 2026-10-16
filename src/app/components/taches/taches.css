@@ -642,3 +642,22 @@ mat-form-field { width: 100%; }
 .fichier-no-preview {
   font-size: 0.7rem; color: #f57c00; font-style: italic; white-space: nowrap;
 }
+
+/* ── Détail projet : facturation des interventions ── */
+.facturation-projet { margin: 16px 0 4px; }
+.facturation-projet-titre { font-weight: 800; font-size: 0.85rem; color: #0d1b2a; margin-bottom: 8px; }
+.facturation-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.facturation-table th {
+  text-align: left; padding: 8px 10px; background: #f8fafc; color: #546e7a;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  border-bottom: 2px solid #eef0f5;
+}
+.facturation-table td { padding: 8px 10px; border-bottom: 1px solid #f0f4f8; color: #0d1b2a; }
+.facturation-table .col-montant { text-align: right; white-space: nowrap; }
+.facturation-projet-vide { color: #90a4ae; font-style: italic; text-align: center; }
+.facturation-table tfoot td { font-weight: 700; border-bottom: none; }
+.facturation-table .ligne-total td { border-top: 2px solid #eef0f5; }
+.facturation-table .ligne-ca td { color: #546e7a; font-weight: 600; }
+.facturation-table .ligne-reste td { background: #fff3e0; color: #e65100; font-size: 0.9rem; font-weight: 800; }
+.facturation-table .ligne-reste.reste-solde td { background: #e8f5e9; color: #2e7d32; }
+.facturation-table .ligne-reste.reste-negatif td { background: #ffebee; color: #c62828; }

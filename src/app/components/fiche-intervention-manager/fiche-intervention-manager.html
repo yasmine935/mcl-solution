@@ -132,6 +132,48 @@
         </div>
       </div>
 
+      <!-- FACTURATION -->
+      <div class="section">
+        <div class="section-title"><span class="section-icon">🧾</span><h4>Facturation</h4></div>
+        <div class="form-row-compact">
+          <div class="field-sm">
+            <label class="field-label">N° Facture</label>
+            <input class="compact-input" [(ngModel)]="nouvelleFiche.numeroFacture" placeholder="FAC-2026-001"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Date de facturation</label>
+            <input class="compact-input" type="date" [(ngModel)]="nouvelleFiche.dateFacturation"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Montant facturé (€)</label>
+            <input class="compact-input" type="number" step="0.01" [(ngModel)]="nouvelleFiche.montantFacture" placeholder="0.00"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Réf. Sage</label>
+            <input class="compact-input" [(ngModel)]="nouvelleFiche.refSage" placeholder="Réf. Sage"/>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">🧾 Factures</span>
+            <input type="file" #fileFacture (change)="onFileSelectCategorie($event, nouvelleFiche, 'Facture')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileFacture.click()" type="button">Importer</button>
+          </div>
+        </div>
+        @if (facturesDe(nouvelleFiche).length) {
+          <div class="documents-list">
+            @for (doc of facturesDe(nouvelleFiche); track $index) {
+              <div class="document-item">
+                <span class="doc-type-badge">{{ doc.type }}</span>
+                <mat-icon>insert_drive_file</mat-icon>
+                <div class="doc-info"><p class="doc-nom">{{ doc.nom }}</p><p class="doc-meta">{{ doc.taille }} KB</p></div>
+                <button mat-icon-button color="primary" (click)="visualiserDocument(doc)" type="button" title="Visualiser"><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button color="primary" (click)="ouvrirDocument(doc)" type="button" title="Télécharger"><mat-icon>download</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="supprimerDocumentObjet(nouvelleFiche, doc)" type="button"><mat-icon>delete</mat-icon></button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
       <!-- MATERIEL -->
       <div class="section">
         <div class="section-title"><span class="section-icon">🔩</span><h4>Matériel Hors Standard</h4></div>
@@ -170,15 +212,16 @@
             <button class="btn-doc-cat" (click)="fileAutres.click()" type="button">Importer</button>
           </div>
         </div>
-        @if (nouvelleFiche.documentsImportes?.length) {
+        @if (documentsHorsFactures(nouvelleFiche).length) {
           <div class="documents-list">
-            @for (doc of nouvelleFiche.documentsImportes; track $index) {
+            @for (doc of documentsHorsFactures(nouvelleFiche); track $index) {
               <div class="document-item">
                 <span class="doc-type-badge">{{ doc.type }}</span>
                 <mat-icon>insert_drive_file</mat-icon>
                 <div class="doc-info"><p class="doc-nom">{{ doc.nom }}</p><p class="doc-meta">{{ doc.taille }} KB</p></div>
+                <button mat-icon-button color="primary" (click)="visualiserDocument(doc)" type="button" title="Visualiser"><mat-icon>visibility</mat-icon></button>
                 <button mat-icon-button color="primary" (click)="ouvrirDocument(doc)" type="button" title="Télécharger"><mat-icon>download</mat-icon></button>
-                <button mat-icon-button color="warn" (click)="supprimerDocument(nouvelleFiche, $index)" type="button"><mat-icon>delete</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="supprimerDocumentObjet(nouvelleFiche, doc)" type="button"><mat-icon>delete</mat-icon></button>
               </div>
             }
           </div>
@@ -357,6 +400,48 @@
         </div>
       </div>
 
+      <!-- FACTURATION -->
+      <div class="section">
+        <div class="section-title"><span class="section-icon">🧾</span><h4>Facturation</h4></div>
+        <div class="form-row-compact">
+          <div class="field-sm">
+            <label class="field-label">N° Facture</label>
+            <input class="compact-input" [(ngModel)]="ficheEnEdition.numeroFacture" placeholder="FAC-2026-001"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Date de facturation</label>
+            <input class="compact-input" type="date" [(ngModel)]="ficheEnEdition.dateFacturation"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Montant facturé (€)</label>
+            <input class="compact-input" type="number" step="0.01" [(ngModel)]="ficheEnEdition.montantFacture" placeholder="0.00"/>
+          </div>
+          <div class="field-sm">
+            <label class="field-label">Réf. Sage</label>
+            <input class="compact-input" [(ngModel)]="ficheEnEdition.refSage" placeholder="Réf. Sage"/>
+          </div>
+          <div class="doc-cat-item">
+            <span class="doc-cat-label">🧾 Factures</span>
+            <input type="file" #fileFactureEdit (change)="onFileSelectCategorie($event, ficheEnEdition, 'Facture')" multiple class="file-input" accept="*/*">
+            <button class="btn-doc-cat" (click)="fileFactureEdit.click()" type="button">Importer</button>
+          </div>
+        </div>
+        @if (facturesDe(ficheEnEdition).length) {
+          <div class="documents-list">
+            @for (doc of facturesDe(ficheEnEdition); track $index) {
+              <div class="document-item">
+                <span class="doc-type-badge">{{ doc.type }}</span>
+                <mat-icon>insert_drive_file</mat-icon>
+                <div class="doc-info"><p class="doc-nom">{{ doc.nom }}</p><p class="doc-meta">{{ doc.taille }} KB</p></div>
+                <button mat-icon-button color="primary" (click)="visualiserDocument(doc)" type="button" title="Visualiser"><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button color="primary" (click)="ouvrirDocument(doc)" type="button" title="Télécharger"><mat-icon>download</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="supprimerDocumentObjet(ficheEnEdition, doc)" type="button"><mat-icon>delete</mat-icon></button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
       <div class="section">
         <div class="section-title"><span class="section-icon">🔩</span><h4>Matériel Hors Standard</h4></div>
         <div class="inline-add">
@@ -393,14 +478,16 @@
             <button class="btn-doc-cat" (click)="fileAutresEdit.click()" type="button">Importer</button>
           </div>
         </div>
-        @if (ficheEnEdition.documentsImportes?.length) {
+        @if (documentsHorsFactures(ficheEnEdition).length) {
           <div class="documents-list">
-            @for (doc of ficheEnEdition.documentsImportes; track $index) {
+            @for (doc of documentsHorsFactures(ficheEnEdition); track $index) {
               <div class="document-item">
                 <span class="doc-type-badge">{{ doc.type }}</span>
                 <mat-icon>insert_drive_file</mat-icon>
                 <div class="doc-info"><p class="doc-nom">{{ doc.nom }}</p><p class="doc-meta">{{ doc.taille }} KB</p></div>
-                <button mat-icon-button color="warn" (click)="supprimerDocument(ficheEnEdition, $index)" type="button"><mat-icon>delete</mat-icon></button>
+                <button mat-icon-button color="primary" (click)="visualiserDocument(doc)" type="button" title="Visualiser"><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button color="primary" (click)="ouvrirDocument(doc)" type="button" title="Télécharger"><mat-icon>download</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="supprimerDocumentObjet(ficheEnEdition, doc)" type="button"><mat-icon>delete</mat-icon></button>
               </div>
             }
           </div>
@@ -543,6 +630,34 @@
       }
     }
   </div>
+  }
+
+  <!-- APERÇU D'UN DOCUMENT IMPORTÉ -->
+  @if (apercuDoc) {
+    <div class="apercu-overlay" (click)="fermerApercu()">
+      <div class="apercu-modal" (click)="$event.stopPropagation()">
+        <div class="apercu-header">
+          <span class="doc-type-badge">{{ apercuDoc.doc.type }}</span>
+          <span class="apercu-titre">{{ apercuDoc.doc.nom }}</span>
+          <button mat-icon-button color="primary" (click)="ouvrirDocument(apercuDoc.doc)" type="button" title="Télécharger"><mat-icon>download</mat-icon></button>
+          <button mat-icon-button (click)="fermerApercu()" type="button" title="Fermer"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="apercu-corps">
+          @switch (apercuDoc.genre) {
+            @case ('image') { <img [src]="apercuDoc.url" [alt]="apercuDoc.doc.nom" class="apercu-image"/> }
+            @case ('pdf') { <iframe [src]="apercuDoc.url" class="apercu-pdf" [title]="apercuDoc.doc.nom"></iframe> }
+            @case ('texte') { <pre class="apercu-texte">{{ apercuDoc.texte }}</pre> }
+            @default {
+              <div class="apercu-indispo">
+                <mat-icon>visibility_off</mat-icon>
+                <p>L'aperçu n'est pas disponible pour ce type de fichier.</p>
+                <button class="btn-doc-cat" (click)="ouvrirDocument(apercuDoc.doc)" type="button">Télécharger</button>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
   }
 
 </div>
