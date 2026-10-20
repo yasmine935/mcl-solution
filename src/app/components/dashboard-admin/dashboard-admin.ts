@@ -13,8 +13,8 @@ import { TicketsClientPanel } from '../tickets-client-panel/tickets-client-panel
 import { Taches } from '../taches/taches';
 import { Documents } from '../documents/documents';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
-import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
+import { MiseAuTravail } from '../mise-au-travail/mise-au-travail';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { Voitures } from '../voitures/voitures';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
@@ -50,13 +50,13 @@ const ESPACE: EspaceConfig = {
     { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
     { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
+    { key: 'mise-au-travail', icon: 'engineering', label: 'Mise au Travail' },
     { key: 'categories-taches', icon: 'category', label: 'Catégories de Tâches' },
     { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
     { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés' },
     { key: 'conges', icon: 'fact_check', label: 'Congés Équipe' },
     { key: 'employes', icon: 'people_alt', label: 'Employés' },
     { key: 'clients-comptes', icon: 'support_agent', label: 'Dossiers Clients' },
-    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'documents', icon: 'folder_open', label: 'Documents' },
     { key: 'voitures', icon: 'directions_car', label: 'Parc Automobile' },
     { key: 'visiteurs', icon: 'badge', label: 'Visiteurs (Écran accueil)' },
@@ -75,7 +75,7 @@ const ESPACE: EspaceConfig = {
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    FicheInterventionManager, Employes, DossiersClients, TicketsClientPanel, Taches, Documents, FichesCompletees, Semainier, Planning, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
+    FicheInterventionManager, Employes, DossiersClients, TicketsClientPanel, Taches, Documents, FichesCompletees, Planning, MiseAuTravail, TicketingComponent, Voitures, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, CategoriesTaches, JournalTravail, Visiteurs,
     NgApexchartsModule, DashboardLayout
   ],
   templateUrl: './dashboard-admin.html',
@@ -98,7 +98,19 @@ export class DashboardAdmin implements OnInit {
     this.fichePeriodeCible = null;
     this.projetStatutCible = '';
     this.ticketsVueCible = '';
+    const retourAccueil = value === 'home' && this._currentPage !== 'home';
     this._currentPage = value;
+    // Les autres sections modifient fiches / projets / congés / tickets sans recharger la page :
+    // on rafraîchit les données des indicateurs à chaque retour sur le Dashboard.
+    if (retourAccueil) this.rafraichirIndicateurs();
+  }
+
+  /** Recharge les données utilisées par les graphiques et indicateurs du Dashboard. */
+  private rafraichirIndicateurs() {
+    this.loadFiches();
+    this.loadTaches();
+    this.loadConges();
+    this.loadTicketsClients();
   }
 
   /** Fiches confirmées par le Directeur des opérations (VALIDEE_KIA), en attente de facturation. */
@@ -300,8 +312,8 @@ get ticketsClientsATraiter(): any[] {
 
 loadTaches() {
   this.tachesApi.lister().subscribe({
-    next: (data) => this.taches = data,
-    error: () => this.taches = []
+    next: (data) => { this.taches = data; this.calculerMontantsFacturation(); },
+    error: () => { this.taches = []; this.calculerMontantsFacturation(); }
   });
 }
 
@@ -446,8 +458,9 @@ resetCongeFormPerso() {
         this.fichesFiltrees = data.filter((f: any) => f.statut === 'EN_COURS');
         this.ficheCompletees = data.filter((f: any) => f.statut === 'COMPLETEE');
         this.recalculerChartFichesMois();
+        this.calculerChartFacturation();
       },
-      error: () => { this.fiches = []; this.fichesFiltrees = []; this.ficheCompletees = []; this.recalculerChartFichesMois(); }
+      error: () => { this.fiches = []; this.fichesFiltrees = []; this.ficheCompletees = []; this.recalculerChartFichesMois(); this.calculerChartFacturation(); }
     });
   }
 
@@ -608,6 +621,7 @@ calculerJours(dateDebut: string, dateFin: string, periode?: string): string {
       case 'utilisateurs': return 'Utilisateurs';
       case 'tickets': return '🎫 Tickets Clients';
       case 'tickets-clients': return 'Tickets Clients';
+      case 'mise-au-travail': return 'Fiches Mise au Travail';
       default: return 'Dashboard Admin';
       case 'voitures': return '🚗 Parc Automobile';
     }
@@ -712,6 +726,95 @@ getStatutVoitureColor(statut: string): string {
     }
   };
 
+  // ── Donut « Facturation des interventions » : à facturer (VALIDEE_KIA) / facturées (VALIDEE) ──
+  private readonly statutsFacturationDonut = ['VALIDEE_KIA', 'VALIDEE'];
+  /** Calculé au chargement des fiches et au changement de mois (pas de getter : évite de redessiner en boucle). */
+  chartFacturationSeries: number[] = [0, 0];
+  /** Mois filtré (AAAA-MM, date d'intervention) — mois courant par défaut ; vide = toutes les dates. */
+  moisFacturation = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+  calculerChartFacturation() {
+    const fiches = this.moisFacturation
+      ? this.fiches.filter((f: any) => this.dateFiche(f).startsWith(this.moisFacturation))
+      : this.fiches;
+    this.chartFacturationSeries = this.statutsFacturationDonut
+      .map(s => fiches.filter((f: any) => f.statut === s).length);
+    this.calculerMontantsFacturation();
+  }
+
+  // ── Montants affichés sous le donut Facturation ──
+  /** Somme des « Montant facturé » des fiches facturées (VALIDEE) du mois filtré. */
+  montantFactureMois = 0;
+  /** Tous projets confondus : Σ (CA € de la commande − déjà facturé), par projet ayant un CA. */
+  resteAFacturerGlobal = 0;
+
+  private montantNum(v: any): number {
+    const n = parseFloat(String(v ?? '').replace(/\s/g, '').replace(',', '.'));
+    return isNaN(n) ? 0 : n;
+  }
+
+  euros(n: number): string {
+    return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  calculerMontantsFacturation() {
+    const fichesMois = this.moisFacturation
+      ? this.fiches.filter((f: any) => this.dateFiche(f).startsWith(this.moisFacturation))
+      : this.fiches;
+    this.montantFactureMois = fichesMois
+      .filter((f: any) => f.statut === 'VALIDEE')
+      .reduce((s: number, f: any) => s + this.montantNum(f.montantFacture), 0);
+
+    // Même règle que le tableau « Facturation des interventions » du détail projet :
+    // fiche facturée = N° de facture ou montant renseigné ; lien fiche ↔ projet par numProjet = titre.
+    const factureParProjet = new Map<string, number>();
+    this.fiches
+      .filter((f: any) => (f.numeroFacture || '').trim() || (f.montantFacture || '').toString().trim())
+      .forEach((f: any) => factureParProjet.set(f.numProjet, (factureParProjet.get(f.numProjet) || 0) + this.montantNum(f.montantFacture)));
+    this.resteAFacturerGlobal = this.taches
+      .filter((t: any) => this.montantNum(t.chiffreAffaire) > 0)
+      // un projet sur-facturé ne compte pas en négatif : il n'a simplement plus rien à facturer
+      .reduce((s: number, t: any) => s + Math.max(0, this.montantNum(t.chiffreAffaire) - (factureParProjet.get(t.titre) || 0)), 0);
+  }
+
+  get titreChartFacturation(): string {
+    if (!this.moisFacturation) return 'Facturation des interventions';
+    return `Facturation / ${this.periodeDuMois(this.moisFacturation).libelle}`;
+  }
+
+  /** Période couvrant un mois AAAA-MM (filtre de la liste Fiches Intervention). */
+  private periodeDuMois(cle: string): { debut: string; fin: string; libelle: string } {
+    const [a, m] = cle.split('-').map(Number);
+    const dernierJour = String(new Date(a, m, 0).getDate()).padStart(2, '0');
+    return {
+      debut: `${cle}-01`, fin: `${cle}-${dernierJour}`,
+      libelle: new Date(a, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+    };
+  }
+
+  readonly chartDonutFacturationPlot = {
+    pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'Interventions', fontSize: '13px' } } } }
+  };
+
+  // Clic sur une part ou sur la légende → liste Fiches Intervention filtrée sur ce statut.
+  readonly chartDonutFacturationChart = {
+    ...this.chartDonutOptions.chart,
+    events: {
+      dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.ouvrirFichesFacturation(cfg.dataPointIndex),
+      legendClick: (_ctx: any, seriesIndex: number) => this.ouvrirFichesFacturation(seriesIndex)
+    }
+  };
+
+  private ouvrirFichesFacturation(index: number) {
+    const statut = this.statutsFacturationDonut[index];
+    if (!statut) return;
+    this.zone.run(() => {
+      this.currentPage = 'interventions';
+      this.ficheStatutCible = statut;
+      if (this.moisFacturation) this.fichePeriodeCible = this.periodeDuMois(this.moisFacturation);
+    });
+  }
+
   private ouvrirFichesStatut(index: number) {
     const statut = this.statutsFichesDonut[index];
     if (!statut) return;
@@ -736,43 +839,38 @@ getStatutVoitureColor(statut: string): string {
   }
 
   // ── Graphique « Interventions » : période au choix ──
-  // 3 / 6 / 12 = derniers mois (une barre par mois) ; 1 = un mois choisi (une barre par jour).
+  // 3 / 6 / 12 = derniers mois (une barre par mois) ; 1 = un mois choisi (une seule barre).
   periodeFiches: 1 | 3 | 6 | 12 = 6;
   /** Mois affiché quand periodeFiches = 1, format AAAA-MM (valeur d'un <input type="month">). */
   moisFiches = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-  chartFichesMoisSeries: any[] = [{ name: 'Interventions', data: [] }, { name: 'À facturer', data: [] }];
+  chartFichesMoisSeries: any[] = [
+    { name: 'Interventions', data: [] }, { name: 'À facturer', data: [] }, { name: 'Facturées', data: [] }
+  ];
+  /** Statut filtré dans la liste au clic, par série (même ordre que chartFichesMoisSeries). */
+  private readonly statutParSerieFiches = ['', 'VALIDEE_KIA', 'VALIDEE'];
   chartFichesMoisXaxis: any = { categories: [] };
   readonly chartFichesMoisLegend = { position: 'bottom' as const, fontSize: '12px' };
 
-  /** Clé de chaque barre affichée (AAAA-MM en vue mensuelle, AAAA-MM-JJ en vue « 1 mois »). */
+  /** Clé de chaque barre affichée (AAAA-MM). */
   private chartFichesMoisCles: string[] = [];
 
-  // Barres côte à côte : bleu = toutes les fiches, orange = dont à facturer (VALIDEE_KIA).
-  // Clic sur une barre → liste Fiches Intervention filtrée sur ce mois / ce jour
-  // (et sur « à facturer » pour la barre orange).
+  // Barres côte à côte : bleu = toutes les fiches, orange = dont à facturer (VALIDEE_KIA),
+  // vert = dont facturées (VALIDEE). Clic sur une barre → liste Fiches Intervention
+  // filtrée sur ce mois (et sur le statut de la barre orange / verte).
   readonly chartFichesMoisChart = {
     ...this.chartBarOptions.chart,
     events: {
       dataPointSelection: (_e: any, _ctx: any, cfg: any) => this.zone.run(() =>
-        this.ouvrirFichesPeriode(cfg.dataPointIndex, cfg.seriesIndex === 1))
+        this.ouvrirFichesPeriode(cfg.dataPointIndex, this.statutParSerieFiches[cfg.seriesIndex] || ''))
     }
   };
 
-  private ouvrirFichesPeriode(index: number, aFacturer: boolean) {
+  private ouvrirFichesPeriode(index: number, statut: string) {
     const cle = this.chartFichesMoisCles[index];
     if (!cle) return;
-    let periode: { debut: string; fin: string; libelle: string };
-    if (cle.length === 10) {
-      const [a, m, j] = cle.split('-').map(Number);
-      periode = { debut: cle, fin: cle, libelle: new Date(a, m - 1, j).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) };
-    } else {
-      const [a, m] = cle.split('-').map(Number);
-      const dernierJour = String(new Date(a, m, 0).getDate()).padStart(2, '0');
-      periode = { debut: `${cle}-01`, fin: `${cle}-${dernierJour}`, libelle: new Date(a, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) };
-    }
     this.currentPage = 'interventions';
-    this.fichePeriodeCible = periode;
-    this.ficheStatutCible = aFacturer ? 'VALIDEE_KIA' : '';
+    this.fichePeriodeCible = this.periodeDuMois(cle);
+    this.ficheStatutCible = statut;
   }
 
   get titreChartFiches(): string {
@@ -790,19 +888,19 @@ getStatutVoitureColor(statut: string): string {
    * (pas de getter : un nouveau tableau à chaque détection ferait redessiner le graphique). */
   recalculerChartFichesMois() {
     const fiches = this.fiches
-      .map((f: any) => ({ date: this.dateFiche(f), aFacturer: f.statut === 'VALIDEE_KIA' }))
+      .map((f: any) => ({ date: this.dateFiche(f), aFacturer: f.statut === 'VALIDEE_KIA', facturee: f.statut === 'VALIDEE' }))
       .filter(f => f.date.length === 10);
     let cles: string[];
     let libelles: string[];
     let compter: (d: string) => string;
 
     if (this.periodeFiches === 1) {
+      // Mois choisi : une seule barre (total + à facturer), pas de détail par jour
       if (!this.moisFiches) return;
       const [a, m] = this.moisFiches.split('-').map(Number);
-      const nbJours = new Date(a, m, 0).getDate();
-      cles = Array.from({ length: nbJours }, (_, i) => `${this.moisFiches}-${String(i + 1).padStart(2, '0')}`);
-      libelles = cles.map(c => String(Number(c.slice(8))));
-      compter = d => d;
+      cles = [this.moisFiches];
+      libelles = [new Date(a, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })];
+      compter = d => d.slice(0, 7);
     } else {
       const now = new Date();
       const mois = Array.from({ length: this.periodeFiches }, (_, i) =>
@@ -814,16 +912,19 @@ getStatutVoitureColor(statut: string): string {
 
     const total: Record<string, number> = Object.fromEntries(cles.map(c => [c, 0]));
     const aFacturer: Record<string, number> = Object.fromEntries(cles.map(c => [c, 0]));
+    const facturees: Record<string, number> = Object.fromEntries(cles.map(c => [c, 0]));
     fiches.forEach(f => {
       const k = compter(f.date);
       if (!(k in total)) return;
       total[k]++;
       if (f.aFacturer) aFacturer[k]++;
+      if (f.facturee) facturees[k]++;
     });
     this.chartFichesMoisCles = cles;
     this.chartFichesMoisSeries = [
       { name: 'Interventions', data: cles.map(c => total[c]) },
-      { name: 'À facturer', data: cles.map(c => aFacturer[c]) }
+      { name: 'À facturer', data: cles.map(c => aFacturer[c]) },
+      { name: 'Facturées', data: cles.map(c => facturees[c]) }
     ];
     this.chartFichesMoisXaxis = { categories: libelles };
   }

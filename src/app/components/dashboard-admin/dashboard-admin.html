@@ -40,10 +40,35 @@
               [series]="chartFichesMoisSeries"
               [chart]="chartFichesMoisChart"
               [grid]="chartBarOptions.grid"
-              [colors]="['#1565c0', '#f57c00']"
+              [colors]="['#1565c0', '#f57c00', '#2e7d32']"
               [legend]="chartFichesMoisLegend"
               [xaxis]="chartFichesMoisXaxis">
             </apx-chart>
+          </div>
+          <div class="bi-card bi-card-cliquable" title="Cliquer sur un statut pour voir les interventions">
+            <div class="bi-card-title"><mat-icon>receipt_long</mat-icon> {{ titreChartFacturation }}</div>
+            <div class="bi-filtres">
+              <input type="month" class="bi-filtre-select" [(ngModel)]="moisFacturation" (ngModelChange)="calculerChartFacturation()"
+                     title="Mois de l'intervention (vider pour toutes les dates)">
+            </div>
+            <apx-chart
+              [series]="chartFacturationSeries"
+              [chart]="chartDonutFacturationChart"
+              [labels]="['À facturer', 'Facturées']"
+              [colors]="['#f57c00', '#2e7d32']"
+              [plotOptions]="chartDonutFacturationPlot"
+              [legend]="chartDonutOptions.legend">
+            </apx-chart>
+            <div class="bi-montants">
+              <div class="bi-montant bi-montant-facture" title="Somme des montants facturés des interventions facturées du mois sélectionné">
+                <span class="bi-montant-label">Montant facturé{{ moisFacturation ? ' (mois)' : '' }}</span>
+                <span class="bi-montant-valeur">{{ euros(montantFactureMois) }}</span>
+              </div>
+              <div class="bi-montant bi-montant-reste" title="Tous projets : CA (€) de la commande − montants déjà facturés">
+                <span class="bi-montant-label">Reste à facturer (tous projets)</span>
+                <span class="bi-montant-valeur">{{ euros(resteAFacturerGlobal) }}</span>
+              </div>
+            </div>
           </div>
           <div class="bi-card bi-card-cliquable" title="Cliquer sur un statut pour voir les interventions">
             <div class="bi-card-title"><mat-icon>donut_large</mat-icon> Statut des interventions</div>
@@ -213,6 +238,9 @@
       @if (currentPage === 'planning') {
         <app-planning></app-planning>
       }
+      @if (currentPage === 'mise-au-travail') {
+        <app-mise-au-travail></app-mise-au-travail>
+      }
       @if (currentPage === 'employes') {
         <app-employes></app-employes>
       }
@@ -221,9 +249,6 @@
       }
       @if (currentPage === 'tickets-clients') {
         <app-tickets-client-panel [vueInitiale]="ticketsVueCible"></app-tickets-client-panel>
-      }
-      @if (currentPage === 'Semainier') {
-        <app-semenier></app-semenier>
       }
       @if (currentPage === 'documents') {
         <app-documents></app-documents>

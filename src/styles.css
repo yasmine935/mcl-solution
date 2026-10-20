@@ -9,21 +9,23 @@
    ============================================================ */
 
 /* ── Hamburger button (hidden on desktop) ── */
+/* La topbar est blanche : bouton aux couleurs de l'espace (--dl-accent, cf. dashboard-layout). */
 .hamburger-btn {
   display: none;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
+  background: var(--dl-accent-soft, #e3f2fd);
+  border: 1px solid var(--dl-accent, #1565c0);
+  color: var(--dl-accent, #1565c0);
   border-radius: 8px;
   padding: 6px 10px;
   font-size: 1.2rem;
+  font-weight: 800;
   cursor: pointer;
   line-height: 1;
   flex-shrink: 0;
   font-family: inherit;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
-.hamburger-btn:hover { background: rgba(255,255,255,0.22); }
+.hamburger-btn:hover { background: var(--dl-accent, #1565c0); color: #fff; }
 
 /* ── Close button hidden on desktop ── */
 .sidebar-close-btn { display: none; }
@@ -48,6 +50,8 @@
     z-index: 200;
     transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: none;
+    overflow-y: auto;            /* menu plus long que l'écran du téléphone */
+    -webkit-overflow-scrolling: touch;
   }
 
   .dashboard-layout.sidebar-open .sidebar {
@@ -101,6 +105,11 @@
 
   .topbar-greeting { display: none !important; }
 
+  /* Titre de page sur une ligne (« … » si trop long) pour garder ☰ et le badge visibles */
+  .topbar-left { min-width: 0; flex: 1; }
+  .topbar-left h3 { font-size: 0.95rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .role-badge-top { font-size: 0.62rem !important; padding: 4px 10px !important; white-space: nowrap; }
+
   .page-content {
     padding: 12px !important;
   }
@@ -123,10 +132,6 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  table {
-    min-width: 500px;
-  }
-
   /* Modals full screen on mobile */
   .fd-overlay,
   .ms-overlay {
@@ -139,6 +144,97 @@
     border-radius: 18px 18px 0 0 !important;
     max-height: 92vh !important;
     width: 100% !important;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — SOCLE COMMUN DES PAGES
+   Règles génériques sur les classes de mise en page partagées par les écrans
+   (rangées de formulaire, grilles, tableaux, modales). Les styles de composant
+   étant plus spécifiques (encapsulation Angular), ces règles sont en !important,
+   uniquement dans les media queries. Les ajustements propres à une page restent
+   dans le CSS de son composant.
+   ============================================================ */
+
+/* ── TABLETTE (≤ 1024px) : les grilles de 3+ colonnes passent à 2 ── */
+@media (max-width: 1024px) {
+  .bi-section,
+  .home-actions-grid,
+  .kpi-grid, .kpi-row, .tc-stats,
+  .clients-grid, .voitures-grid, .services-grid, .conges-cards, .fc-grid,
+  .three-col, .encadrement-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ── MOBILE / PETITE TABLETTE (≤ 768px) ── */
+@media (max-width: 768px) {
+  /* Jamais de défilement horizontal de la page entière */
+  html, body { overflow-x: hidden; }
+  .page-content { min-width: 0; }
+  img, video, iframe { max-width: 100%; }
+
+  /* En-têtes, barres d'outils, filtres, pieds et groupes d'actions : passage à la ligne
+     plutôt que débordement (sans effet sur les éléments qui ne sont pas en flex ;
+     sans !important : une page qui fixe explicitement flex-wrap garde son choix). */
+  [class*="-header"], [class*="toolbar"], [class*="filtre"], [class*="filter"],
+  [class*="-actions"], [class*="-footer"], [class*="-tabs"], .legende {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  /* Rangées de formulaire : les champs passent les uns sous les autres */
+  .form-row, .form-row-compact, .proj-row, .inline-add,
+  .search-bar-row, .fc-toolbar, .bi-filtres, .modal-footer {
+    flex-wrap: wrap !important;
+  }
+  .field-sm, .field-md, .field-lg, .field-xl,
+  .proj-field-sm, .proj-field-md, .proj-field-lg, .proj-field-xl, .proj-field-full, .proj-field-import {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+  .search-bar-row > *, .fc-toolbar > * { min-width: 0; }
+  .search-input-wrap, .fc-search-wrap { flex: 1 1 100% !important; }
+
+  /* Grilles d'informations et de formulaires : une seule colonne */
+  .bi-section,
+  .detail-grid, .modal-info-row, .modal-grid, .form-grid, .form-grid-a, .form-grid-c,
+  .form-grid-n, .form-grid-v, .tc-form-grid, .client-form-grid,
+  .conge-detail-grid, .conge-card-infos, .tc-detail-grid, .emp-modal-grid,
+  .md-row, .md-row2, .md-fields, .md-sig-grid, .solde-grid, .service-infos, .jt-grid,
+  .clients-grid, .voitures-grid, .services-grid, .conges-cards, .fc-grid,
+  .three-col, .encadrement-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Tuiles chiffrées / actions rapides : 2 par ligne */
+  .home-actions-grid, .kpi-grid, .kpi-row, .tc-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Tableaux : défilement horizontal dans leur propre zone au lieu de déborder
+     (sauf ceux déjà placés dans un conteneur défilant : *-wrap, *-wrapper, *-container…) */
+  .page-content :not([class*="-wrap"]):not([class*="container"]):not(.table-card):not(.table-responsive) > table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modales : pleine largeur, ancrées en bas de l'écran, défilables */
+  .modal-overlay, .conge-modal-overlay, .solde-warning-overlay, .apercu-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+  .modal-content, .modal-detail, .modal-detail-content, .modal-fiche,
+  .conge-modal, .solde-warning-modal, .apercu-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    border-radius: 16px 16px 0 0 !important;
+    overflow-y: auto !important;
   }
 }
 

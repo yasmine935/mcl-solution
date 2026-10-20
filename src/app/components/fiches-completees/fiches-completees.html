@@ -154,15 +154,15 @@
             <button type="button" class="fc-btn-detail" (click)="ouvrirDetail(fiche)">
               <mat-icon>visibility</mat-icon> Voir détails
             </button>
-            @if (isKia() && fiche.statut === 'COMPLETEE') {
+            @if (peutConfirmer() && fiche.statut === 'COMPLETEE') {
               <button type="button" class="fc-btn-confirmer-kia" (click)="confirmerKia(fiche)">
                 <mat-icon>verified_user</mat-icon> Confirmer (Directeur des opérations)
               </button>
-            } @else if (!isKia() && fiche.statut === 'VALIDEE_KIA') {
+            } @else if (peutFacturer() && fiche.statut === 'VALIDEE_KIA') {
               <button type="button" class="fc-btn-valider" (click)="ouvrirFacturation(fiche)">
                 <mat-icon>receipt_long</mat-icon> À facturer
               </button>
-            } @else if (!isKia() && fiche.statut === 'COMPLETEE') {
+            } @else if (fiche.statut === 'COMPLETEE') {
               <span class="fc-attente-kia">⏳ En attente de confirmation</span>
             }
           </div>
@@ -320,7 +320,7 @@
           </div>
 
           <!-- FACTURATION -->
-          @if (selectedFiche.statut === 'VALIDEE_KIA' && !isKia()) {
+          @if (selectedFiche.statut === 'VALIDEE_KIA' && peutFacturer()) {
             <div class="md-card md-facturation-card">
               <div class="md-card-title"><mat-icon>receipt_long</mat-icon> Facturation</div>
               <div class="md-facturation-fields">
@@ -393,15 +393,15 @@
 
         <!-- FOOTER -->
         <div class="md-footer">
-          @if (isKia() && selectedFiche.statut === 'COMPLETEE') {
+          @if (peutConfirmer() && selectedFiche.statut === 'COMPLETEE') {
             <button type="button" class="md-btn-confirmer-kia" (click)="confirmerKia(selectedFiche)">
               <mat-icon>verified_user</mat-icon> Confirmer (Directeur des opérations)
             </button>
-          } @else if (!isKia() && selectedFiche.statut === 'VALIDEE_KIA') {
+          } @else if (peutFacturer() && selectedFiche.statut === 'VALIDEE_KIA') {
             <button type="button" class="md-btn-valider" (click)="facturerFiche(selectedFiche)">
               <mat-icon>receipt_long</mat-icon> Facturé
             </button>
-          } @else if (!isKia() && selectedFiche.statut === 'COMPLETEE') {
+          } @else if (selectedFiche.statut === 'COMPLETEE') {
             <span class="md-attente-kia">⏳ En attente de confirmation</span>
           }
           <button type="button" class="md-btn-fermer" (click)="fermerDetail()">

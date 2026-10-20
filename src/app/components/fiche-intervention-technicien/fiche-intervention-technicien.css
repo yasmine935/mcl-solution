@@ -637,3 +637,12 @@
   .fit-back-btn,
   .fit-send-btn { padding: 7px 10px; font-size: 0.78rem; }
 }
+
+/* ── Signature au doigt : la page ne défile pas pendant qu'on signe ── */
+.fit-canvas { touch-action: none; width: 100%; max-width: 520px; height: auto; }
+
+@media (max-width: 768px) {
+  /* Cibles tactiles confortables (gants, terrain) */
+  .fit-sig-btn-clear, .fit-sig-btn-save, .fit-send-btn, .fit-back-btn { min-height: 44px; }
+  .fit-card { padding: 14px; }
+}

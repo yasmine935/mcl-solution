@@ -10,7 +10,6 @@ import { DashboardLayout, EspaceConfig } from '../../layout/dashboard-layout';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Documents } from '../documents/documents';
-import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
@@ -33,7 +32,6 @@ const ESPACE: EspaceConfig = {
     { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
     { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
-    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
     { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
     { key: 'ged', icon: 'folder_open', label: 'Documents' },
@@ -56,7 +54,7 @@ const ESPACE: EspaceConfig = {
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, DashboardLayout,
-    FicheInterventionManager, FichesCompletees, Documents, Semainier, Planning,
+    FicheInterventionManager, FichesCompletees, Documents, Planning,
     TicketingComponent, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail, TicketsClientPanel
   ],
   templateUrl: './dashboard-odile.html',
@@ -264,7 +262,6 @@ export class DashboardOdile implements OnInit {
       case 'tickets': return 'Tickets Clients';
       case 'tickets-clients': return 'Tickets Clients';
       case 'planning': return 'Planning';
-      case 'Semainier': return 'Semainier';
       case 'mes-conges': return 'Mes Conges';
       case 'remonteesTerrain': return 'Remontees Terrain';
       case 'approvisionnement': return 'Demandes d\'Approvisionnement';

@@ -64,6 +64,10 @@ export class FichesCompletees implements OnInit {
   }
 
   isKia(): boolean { return this.currentUser?.role === 'TECHNICIEN_SUP'; }
+  /** Confirmation du travail (étape Directeur des opérations) : Tech Sup ou Admin. */
+  peutConfirmer(): boolean { return this.isKia() || this.currentUser?.role === 'ADMINISTRATEUR'; }
+  /** Facturation (étape suivante) : tout valideur sauf le Tech Sup — l'Admin peut donc faire les deux. */
+  peutFacturer(): boolean { return !this.isKia(); }
 
   getFichesAffichees(): any[] {
     let liste = this.fichesCompletees;

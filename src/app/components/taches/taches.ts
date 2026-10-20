@@ -17,6 +17,8 @@ const ETAPES_PROJET = [
   'Réalisation',
   'Clôture'
 ];
+/** Étape affichée grisée, jamais cochée ni comptée (cf. ProjetEtapesService côté serveur). */
+const ETAPE_IGNOREE = 'Validation Resp';
 
 @Component({
   selector: 'app-taches',
@@ -299,7 +301,8 @@ export class Taches implements OnInit {
       fichiers: t.fichiers != null ? this.parseJsonField(t.fichiers, []) : null,
       assignes: this.parseJsonField(t.assignes, []),
       notes: [],
-      etapes: this.parseJsonField(t.etapes, ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })))
+      etapes: this.parseJsonField(t.etapes, ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' }))),
+      historique: this.parseJsonField(t.historiqueStatut, [])
     };
   }
 
@@ -328,51 +331,26 @@ export class Taches implements OnInit {
       numCommandeClient: tache.numCommandeClient || '',
       numDevis: tache.numDevis || '',
       caDevis: tache.caDevis || '',
-      assignes: JSON.stringify(tache.assignes || []),
-      etapes: JSON.stringify(tache.etapes || []),
+      assignes: JSON.stringify(tache.assignes || []),
       // Fichiers non chargés -> champ omis : le backend conserve ceux en base.
       fichiers: tache.fichiers ? JSON.stringify(tache.fichiers) : undefined,
       utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
     };
   }
 
+  // ── Étapes d'avancement : pilotées par le statut, côté serveur (ProjetEtapesService).
+  // Affichage seul ici. « Validation Resp » est grisée et non comptée (pas de notion de responsable).
+  readonly etapeIgnoree = ETAPE_IGNOREE;
+
   getAvancement(tache: any): number {
-    if (!tache.etapes?.length) return 0;
-    const done = tache.etapes.filter((e: any) => e.done).length;
-    return Math.round((done / tache.etapes.length) * 100);
+    const comptees = (tache.etapes || []).filter((e: any) => e.nom !== ETAPE_IGNOREE);
+    if (!comptees.length) return 0;
+    return Math.round((comptees.filter((e: any) => e.done).length / comptees.length) * 100);
   }
 
-  marquerEtape(tache: any, index: number) {
-    if (!tache.etapes) return;
-    const etape = tache.etapes[index];
-
-    if (etape.done) {
-      // Étape déjà validée — irréversible
-      alert(`L'étape « ${etape.nom} » est définitivement validée et ne peut plus être annulée.`);
-      return;
-    }
-
-    // Vérifier que toutes les étapes précédentes sont cochées avant de cocher celle-ci
-    for (let i = 0; i < index; i++) {
-      if (!tache.etapes[i].done) {
-        alert(`Vous devez d'abord valider l'étape « ${tache.etapes[i].nom} » avant de passer à « ${etape.nom} ».`);
-        return;
-      }
-    }
-
-    etape.done = true;
-    etape.doneBy = `${this.currentUser.prenom} ${this.currentUser.nom}`;
-    etape.doneAt = new Date().toLocaleString('fr-FR');
-    tache.statut = etape.nom === 'Clôture' ? 'Réalisé' : this.normaliserStatut(etape.nom);
-    this.tachesApi.modifier<any>(tache.id, this.buildBody(tache)).subscribe();
-  }
-
+  /** 5 derniers changements de statut, du plus récent au plus ancien. */
   getActiviteRecente(tache: any): any[] {
-    if (!tache.etapes) return [];
-    return tache.etapes
-      .filter((e: any) => e.done && e.doneAt)
-      .slice(-3)
-      .reverse();
+    return (tache.historique || []).slice(-5).reverse();
   }
 
   ajouterTache() {
@@ -384,8 +362,7 @@ export class Taches implements OnInit {
       alert("L'échéance ne peut pas être avant la date de début du projet.");
       return;
     }
-    const body = this.buildBody(this.nouvelleTache, 'Qualification');
-    body.etapes = JSON.stringify(ETAPES_PROJET.map(nom => ({ nom, done: false, doneBy: '', doneAt: '' })));
+    const body = this.buildBody(this.nouvelleTache, 'Qualification');
     this.tachesApi.creer<any>(body).subscribe({
       next: () => {
         this.resetFormAdd();

@@ -893,6 +893,13 @@
 .bi-badge-facturer mat-icon { font-size: 16px; width: 16px; height: 16px; }
 .bi-badge-facturer.bi-badge-zero { background: #f4f6f9; color: #90a4ae; }
 .bi-card-cliquable ::ng-deep .apexcharts-bar-area { cursor: pointer; }
+/* Montants sous le donut Facturation */
+.bi-montants { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.bi-montant { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 10px; }
+.bi-montant-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.85; }
+.bi-montant-valeur { font-size: 1rem; font-weight: 800; white-space: nowrap; }
+.bi-montant-facture { background: #e8f5e9; color: #2e7d32; }
+.bi-montant-reste { background: #fff3e0; color: #e65100; }
 .bi-card-vide {
   height: 220px; display: flex; align-items: center; justify-content: center;
   color: #90a4ae; font-size: 0.85rem; font-style: italic;
@@ -1219,3 +1226,47 @@
 }
 .solde-warning-actions .btn-envoyer-conge { background: #f57c00; }
 .solde-warning-actions .btn-envoyer-conge:hover { background: #e65100; }
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — dashboard Admin (complète le socle de styles.css)
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+}
+
+@media (max-width: 768px) {
+  /* Accueil */
+  .home-welcome { flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px; border-radius: 14px; }
+  .stats-grid { gap: 10px; margin-bottom: 18px; }
+  .stat-card { padding: 16px 14px; }
+  .home-actions-card { padding: 14px; }
+  .bi-card { padding: 14px 12px 8px; }
+
+  /* Cartes / en-têtes de section */
+  .table-card { padding: 16px; }
+  .table-card-header { flex-wrap: wrap; gap: 10px; }
+  .ms-manager-header, .conges-header, .msg-header-card { padding: 16px; }
+  .ms-manager-stats { flex-wrap: wrap; }
+  .conge-page-wrap { padding: 0; }
+  .conge-page-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+
+  /* Congés */
+  .conge-card-infos { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .conge-card-actions, .conge-item, .conge-form-actions, .modal-reset-footer { flex-wrap: wrap; }
+  .conge-form-field { min-width: 100%; }
+  .conge-dates-row { grid-template-columns: minmax(0, 1fr); }
+  .conge-periode-choix { flex-wrap: wrap; }
+
+  /* Détails (modales) : libellé au-dessus de la valeur */
+  .detail-row { flex-direction: column; gap: 2px; }
+
+  /* Messagerie */
+  .msg-item { flex-wrap: wrap; gap: 8px; }
+  .msg-item-right { width: 100%; justify-content: flex-end; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: minmax(0, 1fr); }
+  .bi-montants { grid-template-columns: minmax(0, 1fr); }
+  .conge-card-infos { grid-template-columns: minmax(0, 1fr) !important; }
+}

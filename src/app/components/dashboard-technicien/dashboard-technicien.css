@@ -1835,3 +1835,22 @@
 }
 .solde-warning-actions .btn-envoyer-conge { background: #f57c00; }
 .solde-warning-actions .btn-envoyer-conge:hover { background: #e65100; }
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — compléments (le socle commun est dans styles.css)
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Accueil */
+  .home-welcome { flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px; }
+
+  /* Listes de fiches : une carte par ligne (les minmax 300-340px débordaient sur téléphone) */
+  .interventions-grid, .completees-grid { grid-template-columns: minmax(0, 1fr); }
+
+  /* Détail d'une fiche / formulaires : une colonne */
+  .fd-grid2, .fd-grid3, .form-grid, .conge-detail-grid, .solde-grid, .conge-dates-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Boutons d'action plus faciles à toucher */
+  .int-card button, .completee-card button, .fd-modal button, .ms-modal button { min-height: 40px; }
+}

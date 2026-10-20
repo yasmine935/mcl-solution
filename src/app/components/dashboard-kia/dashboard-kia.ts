@@ -9,7 +9,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-intervention-manager';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Planning } from '../planning/planning';
-import { Semainier } from '../semenier/semenier';
 import { Documents } from '../documents/documents';
 import { MiseAuTravail } from '../mise-au-travail/mise-au-travail';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
@@ -37,7 +36,6 @@ const ESPACE: EspaceConfig = {
     { key: 'taches', icon: 'task_alt', label: 'Gestion des Projets' },
     { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
-    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
     { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
     { key: 'mise-au-travail', icon: 'engineering', label: 'Mise au Travail' },
@@ -57,7 +55,7 @@ const ESPACE: EspaceConfig = {
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, FichesCompletees,
-    Planning, Semainier, Documents,
+    Planning, Documents,
     MiseAuTravail, RemonteesTerrainComponent, ApprovisionnementComponent, GestionClients, Taches, JournalTravail,
     DashboardLayout
   ],
@@ -323,7 +321,6 @@ export class DashboardKia implements OnInit {
       case 'fiches': return 'Fiches Intervention';
       case 'fiches-completees': return 'Fiches Completees';
       case 'planning': return 'Planning';
-      case 'Semainier': return 'Semainier';
       case 'ged': return 'Documents';
       case 'conges-tech': return 'Conges a Valider';
       case 'mes-conges': return 'Mes Conges';

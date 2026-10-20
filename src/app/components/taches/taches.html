@@ -793,27 +793,45 @@
 
           <!-- ÉTAPES -->
           <div class="etapes-list">
+            <!-- Lecture seule : les étapes suivent le statut du projet (mis à jour par le serveur) -->
             @for (etape of selectedTache.etapes; track $index) {
-              <div class="etape-row" [class.etape-done]="etape.done" (click)="marquerEtape(selectedTache, $index)">
-                <div class="etape-check">{{ etape.done ? '✅' : '⬜' }}</div>
-                <div class="etape-content">
-                  <span class="etape-nom">{{ etape.nom }}</span>
-                  @if (etape.done && etape.doneBy) {
-                    <span class="etape-meta">{{ etape.doneBy }} · {{ etape.doneAt }}</span>
-                  }
+              @if (etape.nom === etapeIgnoree) {
+                <div class="etape-row etape-ignoree" title="Étape non utilisée : la notion de responsable n'est pas encore en place">
+                  <div class="etape-check">➖</div>
+                  <div class="etape-content">
+                    <span class="etape-nom">{{ etape.nom }}</span>
+                    <span class="etape-meta">Non utilisée</span>
+                  </div>
                 </div>
-              </div>
+              } @else {
+                <div class="etape-row" [class.etape-done]="etape.done">
+                  <div class="etape-check">{{ etape.done ? '✅' : '⬜' }}</div>
+                  <div class="etape-content">
+                    <span class="etape-nom">{{ etape.nom }}</span>
+                    @if (etape.done && etape.doneAt) {
+                      <span class="etape-meta">
+                        {{ etape.doneAt }}{{ etape.doneBy ? ' · ' + etape.doneBy : '' }}{{ etape.auto ? ' · auto (étape sautée)' : '' }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
             }
           </div>
+          <p class="etapes-aide">Les étapes se cochent automatiquement quand le statut du projet change.</p>
 
-          <!-- ACTIVITÉ RÉCENTE -->
+          <!-- ACTIVITÉ RÉCENTE : historique des changements de statut -->
           @if (getActiviteRecente(selectedTache).length > 0) {
             <div class="activite-section">
               <div class="activite-title">Activité récente</div>
               @for (act of getActiviteRecente(selectedTache); track $index) {
                 <div class="activite-item">
                   <span class="activite-dot"></span>
-                  <span>Vous avez validé l'étape <strong>{{ act.nom }}</strong> le {{ act.doneAt }}</span>
+                  @if (act.ancien) {
+                    <span>Statut passé de <strong>{{ act.ancien }}</strong> à <strong>{{ act.statut }}</strong> le {{ act.at }}{{ act.par ? ' par ' + act.par : '' }}</span>
+                  } @else {
+                    <span>Projet créé en <strong>{{ act.statut }}</strong> le {{ act.at }}{{ act.par ? ' par ' + act.par : '' }}</span>
+                  }
                 </div>
               }
             </div>

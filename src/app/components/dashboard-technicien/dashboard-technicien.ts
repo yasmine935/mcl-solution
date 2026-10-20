@@ -7,7 +7,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { RemonteesTerrainComponent } from '../remontees-terrain/remontees-terrain';
 import { JournalTravail } from '../journal-travail/journal-travail';
@@ -28,7 +27,6 @@ const ESPACE: EspaceConfig = {
     { key: 'interventions', icon: 'engineering', label: 'Mes Interventions' },
     { key: 'completees', icon: 'check_circle', label: 'Completees' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
-    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'journal', icon: 'auto_awesome', label: 'Journal IA' },
     { key: 'conges', icon: 'beach_access', label: 'Mes Conges', section: 'Personnel' },
     { key: 'reclamations', icon: 'report_problem', label: 'Remontees Terrain' }
@@ -42,7 +40,7 @@ const ESPACE: EspaceConfig = {
     CommonModule, FormsModule, MatIconModule,
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
-    Semainier, Planning, RemonteesTerrainComponent, JournalTravail,
+    Planning, RemonteesTerrainComponent, JournalTravail,
     DashboardLayout
   ],
   templateUrl: './dashboard-technicien.html',
@@ -379,7 +377,6 @@ export class DashboardTechnicien implements OnInit {
       case 'completees':    return 'Interventions Completees';
       case 'conges':        return 'Mes Conges';
       case 'reclamations':  return 'Remontees SSE Terrain';
-      case 'Semainier':      return 'Semainier';
       case 'planning':      return 'Planning';
       default: return 'Dashboard Technicien';
     }

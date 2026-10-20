@@ -13,7 +13,6 @@ import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Taches } from '../taches/taches';
 import { GestionClients } from '../clients/clients';
 import { Planning } from '../planning/planning';
-import { Semainier } from '../semenier/semenier';
 import { Documents } from '../documents/documents';
 import { Conges } from '../conges/conges';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
@@ -36,7 +35,6 @@ const ESPACE: EspaceConfig = {
     { key: 'projets-realises', icon: 'done_all', label: 'Projets Réalisés' },
     { key: 'clients', icon: 'people', label: 'Clients' },
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
-    { key: 'semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'documents', icon: 'folder_open', label: 'Documents' },
     { key: 'approvisionnement', icon: 'assignment', label: 'Approvisionnement', section: 'Finances' },
     { key: 'conges', icon: 'beach_access', label: 'Congés', section: 'RH & Terrain' },
@@ -56,7 +54,7 @@ const ESPACE: EspaceConfig = {
     CommonModule, FormsModule, MatIconModule, MatButtonModule,
     NgApexchartsModule, DashboardLayout,
     FicheInterventionManager, FichesCompletees, Taches, GestionClients,
-    Planning, Semainier, Documents, Conges,
+    Planning, Documents, Conges,
     ApprovisionnementComponent, RemonteesTerrainComponent
   ],
   templateUrl: './dashboard-essan.html',
@@ -265,7 +263,6 @@ export class DashboardEssan implements OnInit {
       'projets-realises': '✅ Projets Réalisés',
       'clients': '👥 Gestion des Clients',
       'planning': '📅 Planning',
-      'semainier': '📆 Semainier',
       'documents': '📁 Documents',
       'approvisionnement': '📋 Approvisionnement',
       'stock': '📦 Stock',

@@ -584,11 +584,12 @@ mat-form-field { width: 100%; }
   display: flex; align-items: center; gap: 12px;
   padding: 10px 14px; background: #fff;
   border: 1.5px solid #e8ecf0; border-radius: 10px;
-  cursor: pointer; transition: all 0.18s;
 }
-.etape-row:hover { border-color: #90caf9; background: #f0f8ff; transform: translateX(3px); }
+/* Lecture seule : les étapes suivent le statut du projet (plus de clic) */
 .etape-row.etape-done { background: #f1f8e9; border-color: #a5d6a7; }
-.etape-row.etape-done:hover { background: #e8f5e9; }
+.etape-row.etape-ignoree { background: #f4f6f9; border-style: dashed; opacity: 0.6; }
+.etape-row.etape-ignoree .etape-nom { color: #90a4ae; }
+.etapes-aide { margin: 8px 0 0; font-size: 0.72rem; color: #90a4ae; font-style: italic; }
 
 .etape-check { font-size: 1.1rem; flex-shrink: 0; }
 .etape-content { display: flex; flex-direction: column; gap: 2px; }

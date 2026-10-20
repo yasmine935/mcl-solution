@@ -10,7 +10,6 @@ import { FicheInterventionManager } from '../fiche-intervention-manager/fiche-in
 import { Taches } from '../taches/taches';
 import { FichesCompletees } from '../fiches-completees/fiches-completees';
 import { Documents } from '../documents/documents';
-import { Semainier } from '../semenier/semenier';
 import { Planning } from '../planning/planning';
 import { TicketingComponent } from '../ticketing/ticketing';
 import { ApprovisionnementComponent } from '../approvisionnement/approvisionnement';
@@ -38,7 +37,6 @@ const ESPACE: EspaceConfig = {
     { key: 'planning', icon: 'calendar_month', label: 'Planning' },
     { key: 'clients', icon: 'people', label: 'Gestion des Clients', section: 'Gestion' },
     { key: 'ged', icon: 'folder_open', label: 'Documents' },
-    { key: 'Semainier', icon: 'calendar_today', label: 'Semainier' },
     { key: 'mes-conges', icon: 'beach_access', label: 'Mes Congés', section: 'Support' },
     { key: 'messagerie', icon: 'email', label: 'Messagerie MCL', section: 'Communication' },
     { key: 'approvisionnement', icon: 'shopping_cart', label: 'Demandes Appro.', section: 'Approvisionnement' },
@@ -55,7 +53,7 @@ const ESPACE: EspaceConfig = {
     MatButtonModule, MatFormFieldModule,
     MatInputModule, MatSelectModule,
     FicheInterventionManager, Taches, FichesCompletees,
-    Documents, Semainier, Planning, TicketingComponent,
+    Documents, Planning, TicketingComponent,
     ApprovisionnementComponent, GestionClients, TicketsClientPanel, DossiersClients, DashboardLayout
   ],
   templateUrl: './dashboard-aurelien.html',
@@ -356,7 +354,6 @@ loadSoldeConges() {
       case 'projets-realises': return 'Projets Réalisés';
       case 'planning': return 'Planning';
       case 'ged': return 'Documents';
-      case 'Semainier': return 'Semainier';
       case 'tickets': return 'Tickets Clients';
       case 'tickets-clients': return 'Tickets Clients';
       case 'clients-comptes': return 'Dossiers Clients';
