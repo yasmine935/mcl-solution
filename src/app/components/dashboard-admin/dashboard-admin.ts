@@ -111,6 +111,7 @@ export class DashboardAdmin implements OnInit {
     this.loadTaches();
     this.loadConges();
     this.loadTicketsClients();
+    this.loadResetRequests();   // demandes « mot de passe oublié » arrivées entre-temps
   }
 
   /** Fiches confirmées par le Directeur des opérations (VALIDEE_KIA), en attente de facturation. */
