@@ -28,19 +28,21 @@
         <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
         <div class="form-row-compact">
           <div class="field-sm projet-combobox-wrap">
-            <label class="field-label" [class.label-erreur]="formAjoutInvalide && !nouvelleFiche.numProjet">Projet *</label>
-            <input type="text" class="compact-input" [(ngModel)]="nouvelleFiche.numProjet"
+            <label class="field-label" [class.label-erreur]="formAjoutInvalide && !!erreurProjet(nouvelleFiche)">Projet *</label>
+            <input type="text" class="compact-input" [class.input-erreur]="!!nouvelleFiche.numProjet && !projetDeFiche(nouvelleFiche)" [(ngModel)]="nouvelleFiche.numProjet"
               placeholder="Rechercher un projet..."
               (focus)="ouvrirProjetDropdown('add')" (click)="ouvrirProjetDropdown('add')" (input)="onSaisieProjet('add', $any($event.target).value)" (blur)="fermerProjetDropdownDelai()">
             @if (projetDropdownCible === 'add') {
               <div class="projet-dropdown">
                 @for (p of projetsPourDropdown('add'); track p.id) {
-                  <div class="projet-dropdown-item" [class.selected]="p.titre === nouvelleFiche.numProjet"
-                    (mousedown)="selectionnerProjet('add', p.titre)">{{ p.titre }}@if (p.client) { — {{ p.client }} }</div>
+                  <div class="projet-dropdown-item" [class.selected]="p.id === nouvelleFiche.projetId"
+                    (mousedown)="selectionnerProjet('add', p)">{{ p.titre }}@if (p.client) { — {{ p.client }} }</div>
                 } @empty {
                   <div class="projet-dropdown-empty">Aucun projet{{ nouvelleFiche.client ? ' pour ce client' : '' }}</div>
                 }
               </div>
+            } @else if (nouvelleFiche.numProjet && !projetDeFiche(nouvelleFiche)) {
+              <div class="projet-erreur-msg">Projet introuvable : choisissez-le dans la liste</div>
             }
           </div>
           <div class="field-lg">
@@ -297,19 +299,21 @@
         <div class="section-title"><span class="section-icon">⭐</span><h4>Informations Principales</h4></div>
         <div class="form-row-compact">
           <div class="field-sm projet-combobox-wrap">
-            <label class="field-label" [class.label-erreur]="formEditInvalide && !ficheEnEdition.numProjet">Projet *</label>
-            <input type="text" class="compact-input" [(ngModel)]="ficheEnEdition.numProjet"
+            <label class="field-label" [class.label-erreur]="formEditInvalide && !!erreurProjet(ficheEnEdition)">Projet *</label>
+            <input type="text" class="compact-input" [class.input-erreur]="!!ficheEnEdition.numProjet && !projetDeFiche(ficheEnEdition)" [(ngModel)]="ficheEnEdition.numProjet"
               placeholder="Rechercher un projet..."
               (focus)="ouvrirProjetDropdown('edit')" (click)="ouvrirProjetDropdown('edit')" (input)="onSaisieProjet('edit', $any($event.target).value)" (blur)="fermerProjetDropdownDelai()">
             @if (projetDropdownCible === 'edit') {
               <div class="projet-dropdown">
                 @for (p of projetsPourDropdown('edit'); track p.id) {
-                  <div class="projet-dropdown-item" [class.selected]="p.titre === ficheEnEdition.numProjet"
-                    (mousedown)="selectionnerProjet('edit', p.titre)">{{ p.titre }}@if (p.client) { — {{ p.client }} }</div>
+                  <div class="projet-dropdown-item" [class.selected]="p.id === ficheEnEdition.projetId"
+                    (mousedown)="selectionnerProjet('edit', p)">{{ p.titre }}@if (p.client) { — {{ p.client }} }</div>
                 } @empty {
                   <div class="projet-dropdown-empty">Aucun projet{{ ficheEnEdition.client ? ' pour ce client' : '' }}</div>
                 }
               </div>
+            } @else if (ficheEnEdition.numProjet && !projetDeFiche(ficheEnEdition)) {
+              <div class="projet-erreur-msg">Projet introuvable : choisissez-le dans la liste</div>
             }
           </div>
           <div class="field-lg">
@@ -600,6 +604,11 @@
             <div class="fiche-header">
               <div class="fiche-title">
                 <span class="fiche-num">{{ fiche.numProjet }}</span>
+                @if (!fiche.projetId) {
+                  <span class="badge-projet-introuvable" title="Cette fiche n'est rattachée à aucun projet existant : ouvrez-la en modification et choisissez le projet dans la liste">
+                    <mat-icon>link_off</mat-icon> Projet introuvable
+                  </span>
+                }
                 <h4>{{ fiche.client }}</h4>
                 <div class="fiche-meta">
                   <span><mat-icon>calendar_today</mat-icon> {{ afficherDate(fiche.date) }}</span>

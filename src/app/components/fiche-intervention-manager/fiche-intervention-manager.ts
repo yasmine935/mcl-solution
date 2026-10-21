@@ -113,7 +113,7 @@ export class FicheInterventionManager implements OnInit {
   formEditInvalide = false;
 
   nouvelleFiche: any = {
-    numProjet: '', client: '', dateDebut: '', dateFin: '',
+    projetId: null, numProjet: '', client: '', dateDebut: '', dateFin: '',
     technicienAssigne: '', selectedTechIds: [] as number[],
     description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
     adresse: '', contact: '', nomContactSite: '', telContactSite: '',
@@ -179,18 +179,25 @@ export class FicheInterventionManager implements OnInit {
     }
     // Le projet déjà choisi n'a plus de sens si son client ne correspond
     // plus au client nouvellement sélectionné.
-    if (form.numProjet) {
-      const projetActuel = this.projets.find((p: any) => p.titre === form.numProjet);
+    if (form.projetId) {
+      const projetActuel = this.projetDeFiche(form);
       if (projetActuel && projetActuel.client !== form.client) {
+        form.projetId = null;
         form.numProjet = '';
       }
     }
     this.afficherInfosProjet(form);
   }
 
-  // ── COMBOBOX PROJET (ajout + édition) : filtré par client + saisie libre ──
+  // ── COMBOBOX PROJET (ajout + édition) : filtré par client, la saisie sert à
+  // CHERCHER — seul un projet de la liste peut être retenu (projetId). ──
   projetDropdownCible: 'add' | 'edit' | null = null;
   private projetRechercheEnCours = false;
+
+  /** Projet réel de la fiche (par son id), ou undefined si non choisi / introuvable. */
+  projetDeFiche(form: any): any {
+    return form?.projetId ? this.projets.find((p: any) => p.id === form.projetId) : undefined;
+  }
 
   ouvrirProjetDropdown(cible: 'add' | 'edit') {
     this.projetDropdownCible = cible;
@@ -201,6 +208,9 @@ export class FicheInterventionManager implements OnInit {
     this.projetRechercheEnCours = true;
     const form = cible === 'add' ? this.nouvelleFiche : this.ficheEnEdition;
     form.numProjet = valeur;
+    // Le texte tapé ne désigne un projet que s'il correspond exactement à un titre existant
+    const exact = this.projets.find((p: any) => (p.titre || '').trim().toLowerCase() === valeur.trim().toLowerCase());
+    form.projetId = exact ? exact.id : null;
     this.afficherInfosProjet(form);
   }
 
@@ -230,13 +240,20 @@ export class FicheInterventionManager implements OnInit {
     return base.filter((p: any) => (p.titre || '').toLowerCase().includes(q));
   }
 
-  selectionnerProjet(cible: 'add' | 'edit', titre: string) {
+  selectionnerProjet(cible: 'add' | 'edit', projet: any) {
     const form = cible === 'add' ? this.nouvelleFiche : this.ficheEnEdition;
-    form.numProjet = titre;
-    const projet = this.projets.find((p: any) => p.titre === titre);
-    if (projet) this.remplirDepuisProjet(projet, form);
+    form.projetId = projet.id;
+    form.numProjet = projet.titre;
+    this.remplirDepuisProjet(projet, form);
     this.afficherInfosProjet(form);
     this.fermerProjetDropdown();
+  }
+
+  /** Message d'erreur du champ Projet (vide = OK). */
+  erreurProjet(form: any): string {
+    if (!form?.numProjet?.trim() && !form?.projetId) return 'Le projet est obligatoire.';
+    if (!this.projetDeFiche(form)) return 'Choisissez un projet dans la liste (saisie libre non acceptée).';
+    return '';
   }
 
   /** Pré-remplit les infos client à partir de la fiche projet (et du client qui
@@ -254,7 +271,7 @@ export class FicheInterventionManager implements OnInit {
   private afficherInfosProjet(form: any) {
     const client = this.clients.find((c: any) => c.nom === form.client);
     form.codeClient = client?.codeClient || '';
-    const projet = this.projets.find((p: any) => p.titre === form.numProjet);
+    const projet = this.projetDeFiche(form);
     // Côté projet, le N° Commande est stocké dans "description" (cf. taches.ts)
     form.numCommande = projet?.description || '';
     const montant = parseFloat(projet?.chiffreAffaire);
@@ -318,6 +335,7 @@ export class FicheInterventionManager implements OnInit {
       : (f.technicien ? [f.technicien.id] : []);
     return {
       id: f.id,
+      projetId: f.projetId ?? null,
       numProjet: f.numProjet,
       client: f.client,
       dateIntervention: f.dateIntervention,
@@ -431,9 +449,10 @@ export class FicheInterventionManager implements OnInit {
   }
 
   ajouterFiche() {
-    if (!this.nouvelleFiche.numProjet || !this.nouvelleFiche.client) {
+    const erreurProjet = this.erreurProjet(this.nouvelleFiche);
+    if (erreurProjet || !this.nouvelleFiche.client) {
       this.formAjoutInvalide = true;
-      alert('Veuillez remplir les champs obligatoires');
+      alert(erreurProjet || 'Veuillez remplir les champs obligatoires');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -444,6 +463,7 @@ export class FicheInterventionManager implements OnInit {
     }
     const techBody = this.buildTechBody(this.nouvelleFiche.selectedTechIds || []);
     const body = {
+      projetId: this.nouvelleFiche.projetId,
       numProjet: this.nouvelleFiche.numProjet,
       client: this.nouvelleFiche.client,
       adresse: this.nouvelleFiche.adresse,
@@ -476,7 +496,7 @@ export class FicheInterventionManager implements OnInit {
         this.resetFormAdd();
         this.showFormAdd = false;
       },
-      error: () => alert('Erreur creation fiche')
+      error: (e) => alert(e?.error?.message || 'Erreur creation fiche')
     });
   }
 
@@ -491,9 +511,10 @@ export class FicheInterventionManager implements OnInit {
   }
 
   modifierFiche() {
-    if (!this.ficheEnEdition.numProjet) {
+    const erreurProjet = this.erreurProjet(this.ficheEnEdition);
+    if (erreurProjet) {
       this.formEditInvalide = true;
-      alert('Veuillez remplir les champs obligatoires');
+      alert(erreurProjet);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -504,6 +525,7 @@ export class FicheInterventionManager implements OnInit {
     }
     const techBody = this.buildTechBody(this.ficheEnEdition.selectedTechIds || []);
     const body = {
+      projetId: this.ficheEnEdition.projetId,
       numProjet: this.ficheEnEdition.numProjet,
       client: this.ficheEnEdition.client,
       adresse: this.ficheEnEdition.adresse,
@@ -536,7 +558,7 @@ export class FicheInterventionManager implements OnInit {
         this.ficheEnEdition = null;
         window.scrollTo({ top: 0, behavior: 'smooth' });
       },
-      error: () => alert('Erreur modification')
+      error: (e) => alert(e?.error?.message || 'Erreur modification')
     });
   }
 
@@ -551,7 +573,7 @@ export class FicheInterventionManager implements OnInit {
 
   resetFormAdd() {
     this.nouvelleFiche = {
-      numProjet: '', client: '', dateDebut: '', dateFin: '',
+      projetId: null, numProjet: '', client: '', dateDebut: '', dateFin: '',
       technicienAssigne: '', selectedTechIds: [] as number[],
       description: '', codeClient: '', numCommande: '', chiffreAffaire: 0,
       adresse: '', contact: '', nomContactSite: '', telContactSite: '',

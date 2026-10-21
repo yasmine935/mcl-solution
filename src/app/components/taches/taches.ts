@@ -331,7 +331,7 @@ export class Taches implements OnInit {
       numCommandeClient: tache.numCommandeClient || '',
       numDevis: tache.numDevis || '',
       caDevis: tache.caDevis || '',
-      assignes: JSON.stringify(tache.assignes || []),
+      assignes: JSON.stringify(tache.assignes || []),
       // Fichiers non chargés -> champ omis : le backend conserve ceux en base.
       fichiers: tache.fichiers ? JSON.stringify(tache.fichiers) : undefined,
       utilisateur: this.currentUser.id ? { id: this.currentUser.id } : null
@@ -362,7 +362,7 @@ export class Taches implements OnInit {
       alert("L'échéance ne peut pas être avant la date de début du projet.");
       return;
     }
-    const body = this.buildBody(this.nouvelleTache, 'Qualification');
+    const body = this.buildBody(this.nouvelleTache, 'Qualification');
     this.tachesApi.creer<any>(body).subscribe({
       next: () => {
         this.resetFormAdd();
@@ -517,15 +517,15 @@ export class Taches implements OnInit {
   fermerDetailModal() { this.showDetailModal = false; this.selectedTache = null; this.facturesProjet = []; }
 
   // ── Facturation du projet (détail) : fiches d'intervention facturées de ce projet ──
-  // Lien fiche ↔ projet : numProjet de la fiche = titre du projet.
+  // Lien fiche ↔ projet : projetId de la fiche = id du projet.
   facturesProjet: { id: number; dateFacturation: string; numeroFacture: string; montantFacture: string; statut: string }[] = [];
   chargementFactures = false;
 
   chargerFacturesProjet(tache: any) {
     this.facturesProjet = [];
-    if (!tache?.projet) return;
+    if (!tache?.id) return;
     this.chargementFactures = true;
-    this.fichesInterventionApi.get<any[]>('factures', { numProjet: tache.projet }).subscribe({
+    this.fichesInterventionApi.get<any[]>('factures', { projetId: tache.id }).subscribe({
       next: (data) => { this.facturesProjet = data || []; this.chargementFactures = false; },
       error: () => { this.facturesProjet = []; this.chargementFactures = false; }
     });
