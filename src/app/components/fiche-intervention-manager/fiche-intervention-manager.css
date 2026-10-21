@@ -442,3 +442,13 @@
 }
 .apercu-indispo { text-align: center; color: #546e7a; }
 .apercu-indispo mat-icon { font-size: 40px; width: 40px; height: 40px; color: #90a4ae; }
+
+/* ── Projet obligatoirement choisi dans la liste (lien fiche → projet) ── */
+.compact-input.input-erreur { border-color: #e53935; background: #fff8f8; }
+.projet-erreur-msg { margin-top: 4px; font-size: 0.72rem; font-weight: 600; color: #c62828; }
+.badge-projet-introuvable {
+  display: inline-flex; align-items: center; gap: 3px; margin-left: 6px;
+  padding: 1px 8px; border-radius: 16px; background: #ffebee; color: #c62828;
+  font-size: 0.68rem; font-weight: 800; vertical-align: top;
+}
+.badge-projet-introuvable mat-icon { font-size: 13px; width: 13px; height: 13px; }
